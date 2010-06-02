@@ -1,21 +1,9 @@
-module RDFa class Reader
+module RDF::RDFa class Reader
   # From RdfContext
   class Namespace
     attr_accessor :prefix, :fragment
  
-    ## 
     # Creates a new namespace given a URI and the prefix.
-    #
-    #  nil is a valid prefix to specify the default namespace
-    # ==== Example
-    #   Namespace.new("http://xmlns.com/foaf/0.1/", "foaf") # => returns a new Foaf namespace
-    #
-    # @param [String] uri:: the URI of the namespace
-    # @param [String] prefix:: the prefix of the namespace
-    # @return [Namespace]:: The newly created namespace.
-    # @raise [Error]:: Checks validity of the desired prefix and raises if it is incorrect.
-    #
-    # @author Tom Morris, Pius Uzamere
     def initialize(uri, prefix)
       prefix = prefix.to_s
 
@@ -25,18 +13,7 @@ module RDFa class Reader
       @prefix = prefix
     end
 
-    ## 
     # Allows the construction of arbitrary URIs on the namespace.
-    #
-    # ==== Example
-    #   foaf = Namespace.new("http://xmlns.com/foaf/0.1/", "foaf"); foaf.knows # => returns a new URIRef with URI "http://xmlns.com/foaf/0.1/knows"
-    #   foaf = Namespace.new("http://xmlns.com/foaf/0.1/", "foaf", true); foaf.knows # => returns a new URIRef with URI "http://xmlns.com/foaf/0.1/#knows"
-    #
-    # To avoid naming problems, a suffix may have an appended '_', which will be removed when the URI is generated.
-    #
-    # @return [String]:: The newly created URI.
-    # @raise [Error]:: Checks validity of the desired prefix and raises if it is incorrect.
-    # @author Tom Morris, Pius Uzamere
     def method_missing(methodname, *args)
       self + methodname
     end

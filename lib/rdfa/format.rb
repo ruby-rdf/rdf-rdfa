@@ -1,4 +1,4 @@
-module RDFa
+module RDF::RDFa
   ##
   # N-Triples format specification.
   #

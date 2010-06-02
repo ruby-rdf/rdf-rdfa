@@ -1,4 +1,4 @@
-module RdfContext
+module RDF::RDFa
   class RdfException    < RuntimeError; end
 
   class ParserException < RdfException; end

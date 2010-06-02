@@ -1,0 +1,2 @@
+=== 0.0.1
+First port from RdfContext version 0.5.4

@@ -1,210 +1,35 @@
-= RdfContext
+= RDF::RDFa reader/writer
 
-Context-sensitive RDF Graphs, including a ConjunctiveGraph.
-
-A set of compliant RDF parsers:
-* N3-rdf
-* RDF/XML
-* RDFa
-
-Multiple data-stores may be attached to a Graph, including Memory, List and SQLite3
+RDFa parser for RDF.rb.
 
 == DESCRIPTION:
 
-RdfContext is an RDF library for Ruby.
+RDF::RDFa is an RDFa parser for Ruby using the RDF.rb library suite.
 
 == FEATURES:
-RdfContext parses RDF/XML, RDFa and N3-rdf into a Graph object. It also serializes RDF/XML and N-Triples from the Graph.
+RDF::RDFa parses RDFa into a Graph object.
 
-* Fully compliant RDF/XML parser.
 * Fully compliant XHTML/RDFa 1.0 parser.
-* Fully compliant N3-rdf parser (N3-rdf level)
-* Turtle, N-Triples and RDF/XML serializer
-* RDFa tests use SPARQL for most tests due to Rasqal limitations. Other tests compare directly against N-triples.
-* Graph serializes into RDF/XML and N-Triples.
-* ConjunctiveGraph, named Graphs and contextual storage modules.
 
-RdfContext is based, in part, on Tom Morris' Reddy gem.
-
-Install with 'gem install rdf_context'
+Install with 'gem install rdf-rdfa'
 
 == Usage:
-=== Graphs
-Instantiate a graph using Graph.new. A Graph may take an :identifier (defaults to a BNode) and
-a :store (defaults to :list_store)
-
-  use RdfContext
-  g = Graph.new(:store => :list_store, :identifier => URIRef.new("http://example.com"))
-  g = Graph.new(:store => SQLite3Store.new(:path => "store.db"),
-                :identifier => URIRef.new("http://example.com"))
-
-  g.add(Triple.new(subject, predicate, object))
-  
-Graphs also store namespace associations, and can serialize graphs to Turtle, RDF/XML, N-triples or a custom serializer
-
-  g.bind(Namespace.new("http://example.com", "ex"))
-  g.namespace("ex")
-  g.prefix("http://example.com")
-  
-  g.to_rdfxml
-  g.to_ntriples
-  g.serialize(:format => :xml, :io => StringIO.new, :base => "http://base.example.com/") => IO Object, or string if none specified
-
-or, pass an instantiated Serializer object
-
-  ser = TurtleSerializer.new(g)
-  g.serialize(:format => ser, :io => StringIO.new, :base => "http://base.example.com/")
-
-Resource properties
-
-  graph.parse(':foo a :bar; rdfs:label "An example" .', "http://example.com/")
-  graph.resources("http://example.com/subject") =>
-  {
-   "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" => [<http://example.com/#bar>],
-   "http://example.com/#label"                       => ["An example"]
-  }
-
-Instantiate an existing graph from a datastore
-
-  s = SQLIte3Store.new(:path => "store.db")
-  g = Graph.new(:store => s, :identifier => "http://example.com/context")
-
-==== Named Graphs / Conjunctive Graphs
-RdfContext defines the following kinds of Graphs:
-Graph:: Basic graph, associated with a Store and an identifier
-QuotedGraph:: implements N3 Formulae semantics, by creating a graph within a store that is formula_aware. QuotedGraph triples are not returned in a query to a ConjunctiveGraph.
-ConjunctiveGraph:: A Conjunctive Graph is the most relevant collection of graphs that are considered to be the boundary for closed world assumptions. This boundary is equivalent to that of the store instance (which is itself uniquely identified and distinct from other instances of Store that signify other Conjunctive Graphs). It is equivalent to all the named graphs within it and associated with a _default_ graph which is automatically assigned a BNode for an identifier - if one isn't given.
-AggregateGraph:: allow multiple graphs from a given context_aware store to be combined into a single read-only graph.
-
-=== Terminology
-_Context_: A named, unordered set of statements. Also could be called a sub-graph. The named graphs literature and ontology are relevant to this concept. A context could be thought of as only the relationship between an RDF triple and a sub-graph (this is how the term context is used in the Notation 3 Design Issues page) in which it is found or the sub-graph itself.
-
-It's worth noting that the concept of logically grouping triples within an addressable 'set' or 'subgraph' is just barely beyond the scope of the RDF model. The RDF model defines a graph as an arbitrary collection of triples and the semantics of these triples, but doesn't give guidance on how to consistently address such arbitrary collections. Though a collection of triples can be thought of as a resource itself, the association between a triple and the collection it is a part of is not covered.
-
-<em>Conjunctive Graph</em>: This refers to the 'top-level' Graph. It is the aggregation of all the contexts within it and is also the appropriate, absolute boundary for closed world assumptions / models. This distinction is the low-hanging fruit of RDF along the path to the semantic web and most of its value is in (corporate/enterprise) real-world problems:
-
-For the sake of persistence, Conjunctive Graphs must be distinguished by identifiers (that may not necessarily be RDF identifiers or may be an RDF identifier normalized - SHA1/MD5 perhaps - for database naming purposes ) which could be referenced to indicate conjunctive queries (queries made across the entire conjunctive graph) or appear as nodes in asserted statements. In this latter case, such statements could be interpreted as being made about the entire 'known' universe. For example:
-
-  <urn:uuid:conjunctive-graph-foo> rdf:type :ConjunctiveGraph
-  <urn:uuid:conjunctive-graph-foo> rdf:type log:Truth
-  <urn:uuid:conjunctive-graph-foo> :persistedBy :MySQL
-
-_Terms_: Terms are the kinds of objects that can appear in a quoted/asserted triple. This includes those that are core to RDF:
-
-* Blank Nodes
-* URI References
-* Literals (which consist of a literal value, datatype and language tag)
-
-_Nodes_: Nodes are a subset of the Terms that the underlying store actually persists. The set of such Terms depends on whether or not the store is formula-aware. Stores that aren't formula-aware would only persist those terms core to the RDF Model, and those that are formula-aware would be able to persist the N3 extensions as well. However, utility terms that only serve the purpose for matching nodes by term-patterns probably will only be terms and not nodes.
-
-The set of nodes of an RDF graph is the set of subjects and objects of triples in the graph.
-
-<em>Context-aware</em>: An RDF store capable of storing statements within contexts is considered context-aware. Essentially, such a store is able to partition the RDF model it represents into individual, named, and addressable sub-graphs.
-
-<em>Formula-aware</em>: An RDF store capable of distinguishing between statements that are asserted and statements that are quoted is considered formula-aware.
-
-Such a store is responsible for maintaining this separation and ensuring that queries against the entire model (the aggregation of all the contexts - specified by not limiting a 'query' to a specifically name context) do not include quoted statements. Also, it is responsible for distinguishing universal quantifiers (variables).
-
-These 2 additional concepts (formulae and variables) must be thought of as core extensions and distinguishable from the other terms of a triple (for the sake of the persistence roundtrip - at the very least). It's worth noting that the 'scope' of universal quantifiers (variables) and existential quantifiers (BNodes) is the formula (or context - to be specific) in which their statements reside. Beyond this, a Formula-aware store behaves the same as a Context-aware store.
-
-<em>Conjunctive Query</em>: Any query that doesn't limit the store to search within a named context only. Such a query expects a context-aware store to search the entire asserted universe (the conjunctive graph). A formula-aware store is expected not to include quoted statements when matching such a query.
-
-<em>Transactional Store</em>: An RDF store capable of providing transactional integrity to the RDF operations performed on it.
-
-=== Parsers
 Instantiate a parser and parse source, specifying type and base-URL
 
-  use RdfContext
+  use RDF::RDFa
   p = Parser.new
-  graph = p.parse(input, "http://example.com", :type => :rdfxml)
-
-or, instantiate a type-specific parser:
-
-  p = RdfaParser.new
   graph = p.parse(input, "http://example.com")
-
-or, parse directly into a graph
-
-  g = Graph.new(:identifier => "http://example.com", :store => :sqlite3_store)
-  g.parse(input, "http://example.com", :type => :rdfxml)
-
-=== Serializers
-AbstractSerializer class for XML, N-Triples and Turtle serializers. Turtle based on RecursiveSerializer.
-May be called from Graph via Graph#serialize, or instantiated and run separately:
-
-  g = Graph.new
-  s = TurtleSerializer.new(g)
-  stream = StringIO.new
-  s.serialize(stream, , "http://base.example.com/")
-
-=== Data Stores
-RdfContext defines three datastores:
-
-ListStore:: simple non-context aware datastore based on Array
-MemoryStore:: context aware datastore using multiple hashes to optimize triple lookkup
-SQLite3Store:: context aware datastore using a SQLite3 database to create a persistent storage model
-
-Additional stores may be created by sub-classing _AbstractStore_ or _AbstractSQLStore_.
-
-==== Database/Transactional stores
-An RDF store should provide standard interfaces for the management of database connections. Such interfaces are standard to most database management systems (Oracle, MySQL, Berkeley DB, Postgres, etc..) The following methods are defined to provide this capability:
-
-*open*:: Opens the store specified by the options. If :create is true a store will be created if it does not already exist. If *create* is false and a store does not already exist an exception is raised. An exception is also raised if a store exists, but there is insufficient permissions to open the store.
-*close*:: This closes the database connection. The commit_pending_transaction parameter specifies whether to commit all pending transactions before closing (if the store is transactional).
-*destroy*:: This destroys the instance of the store identified by the options.
-
-The configuration hash is understood by the store implementation and represents all the necessary parameters needed to locate an individual instance of a store. The open function needs to fail intelligently in order to clearly express that a store (identified by the given configuration string) already exists or that there is no store (at the location specified by the configuration string) depending on the value of create.
-
-==== Triple Interfaces
-An RDF store could provide a standard set of interfaces for the manipulation, management, and/or retrieval of its contained triples (asserted or quoted):
-
-*add*:: Adds the given statement to a specific context or to the model. The quoted argument is interpreted by formula-aware stores to indicate this statement is quoted/hypothetical. It should be an error to not specify a context and have the quoted argument be True. It should also be an error for the quoted argument to be True when the store is not formula-aware.
-*remove*:: Remove a triple, or pattern from a specific or all contexts.
-*triples*:: Returns an closure over all the triples (within the conjunctive graph or just the given context) matching the given pattern or an array of triples. The pattern is specified by providing explicit statement terms (which are used to match against nodes in the underlying store), or nil - which indicates a wildcard. This function can be thought of as the primary mechanism for producing triples with nodes that match the corresponding terms and term pattern provided. A conjunctive query can be indicated by either providing a value of nil for context or the identifier associated with the Conjunctive Graph.
-*size*:: Number of statements in the store. This should only account for non-quoted (asserted) statements if the context is not specified, otherwise it should return the number of statements in the formula or context given.
-
-==== Formula / Context Interfaces
-
-These interfaces work on contexts and formulae (for stores that are formula-aware) interchangeably.
-*contexts*:: Closure or list over all contexts in the graph. If triple is specified, it returns all contexts the triple is in.
-
-== Dependencies:
-
-* Addressable
-* Treetop
-* Whatlanguage
-* nokogiri
-* builder
-
-=== For testing
-* Redland/Rasqal
-* ActiveSupport
-
-== INSTALL:
-
-* sudo gem install rdf_context
-
-== TODO:
-* Testing
-  * RDFa updates for new tests and non XHTML representations.
-* Graphs
-  * n3 semantics including variables and formulae
-* Reasoner/inference engine
-* SPARQL
-* RDFS logic and RDF entailment tests
 
 == Resources:
 * Distiller[http://kellogg-assoc/distiller]
-* RDoc[http://rdoc.info/projects/gkellogg/rdf_context]
-* History[http://github.com/gkellogg/rdf_context/blob/master/History.txt]
+* RDoc[http://rdoc.info/projects/gkellogg/rdf-rdfa]
+* History[http://github.com/gkellogg/rdf-rdfa/blob/master/History.txt]
 
 == LICENSE:
 
 (The MIT License)
 
 Copyright (c) 2009-2010 Gregg Kellogg
-
-Copyright (c) 2008 Tom Morris and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -228,7 +53,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 == FEEDBACK
 
 * gregg@kellogg-assoc.com
-* gemcutter.org/rdf_context
-* github.com/gkellogg/rdf_context
+* rubygems.org/rdf-rdfa
+* github.com/gkellogg/rdf-rdfa
 * gkellogg.lighthouseapp.com for bug reports
 * public-rdf-ruby mailing list on w3.org

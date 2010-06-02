@@ -1,7 +1,7 @@
 require 'nokogiri'
 require 'rdf'
 
-module RDFa
+module RDF::RDFa
   ##
   # An RDFa parser in Ruby
   #
