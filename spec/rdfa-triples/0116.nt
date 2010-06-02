@@ -1,0 +1,2 @@
+# This is a negative test case, the following triple should not be generated.
+#<$TCPATH/0116.xhtml> <http://www.w3.org/1999/xhtml/vocab#next> "invalid property" .

@@ -1,0 +1,3 @@
+<$TCPATH/0114.xhtml> <http://www.w3.org/1999/xhtml/vocab#up> <$TCPATH/rdfa-xhtml1-test-manifest.rdf> .
+<$TCPATH/0114.xhtml> <http://www.w3.org/1999/xhtml/vocab#prev> <$TCPATH/0113.xhtml> .
+<$TCPATH/0114.xhtml> <http://creativecommons.org/ns#attributionURL> <http://www.w3.org/> .
