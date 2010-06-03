@@ -16,9 +16,11 @@ Install with 'gem install rdf-rdfa'
 == Usage:
 Instantiate a parser and parse source, specifying type and base-URL
 
-  use RDF::RDFa
-  p = Parser.new
-  graph = p.parse(input, "http://example.com")
+  RDF::RDFa::Reader.open("etc/foaf.html") do |reader|
+    reader.each_statement do |statement|
+      puts statement.inspect
+    end
+  end
 
 == Resources:
 * Distiller[http://kellogg-assoc/distiller]
