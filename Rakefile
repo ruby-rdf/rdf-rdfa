@@ -12,12 +12,13 @@ begin
     gemspec.email = "gregg@kellogg-assoc.com"
     gemspec.homepage = "http://github.com/gkellogg/rdf-rdfa"
     gemspec.authors = ["Gregg Kellogg", "Nicholas Humfrey"]
-    gemspec.add_dependency('nokogiri', '>= 1.3.3')
     gemspec.add_dependency('rdf', '>= 0.1.6')
+    gemspec.add_dependency('nokogiri', '>= 1.3.3')
+    gemspec.add_dependency('patron', '>= 0.4.6')
     gemspec.add_development_dependency('rspec')
     gemspec.add_development_dependency('rdf-spec')
     gemspec.add_development_dependency('activesupport', '>= 2.3.0')
-    gemspec.extra_rdoc_files     = %w(README.rdoc History.txt)
+    gemspec.extra_rdoc_files     = %w(README.rdoc History.txt AUTHORS)
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

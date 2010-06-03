@@ -1,6 +1,34 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-describe "RDFa parser" do
+describe RDF::RDFa::Format do
+  it "should be discoverable" do
+    formats = [
+      RDF::Format.for(:rdfa),
+      RDF::Format.for("etc/foaf.html"),
+      RDF::Format.for(:file_name      => "etc/foaf.html"),
+      RDF::Format.for(:file_extension => "html"),
+      RDF::Format.for(:file_extension => "xhtml"),
+      RDF::Format.for(:content_type   => "text/html"),
+      RDF::Format.for(:content_type   => "application/xhtml+xml"),
+    ]
+    formats.each { |format| format.should == RDF::RDFa::Format }
+  end
+end
+
+describe "RDF::RDFa::Reader" do
+  it "should be discoverable" do
+    readers = [
+      RDF::Reader.for(:rdfa),
+      RDF::Reader.for("etc/foaf.html"),
+      RDF::Reader.for(:file_name      => "etc/foaf.html"),
+      RDF::Reader.for(:file_extension => "html"),
+      RDF::Reader.for(:file_extension => "xhtml"),
+      RDF::Reader.for(:content_type   => "text/html"),
+      RDF::Reader.for(:content_type   => "application/xhtml+xml"),
+    ]
+    readers.each { |reader| reader.should == RDF::RDFa::Reader }
+  end
+
    it "should parse simple doc" do
     sampledoc = <<-EOF;
     <?xml version="1.0" encoding="UTF-8"?>
