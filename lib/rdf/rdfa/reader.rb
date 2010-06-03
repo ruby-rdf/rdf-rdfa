@@ -6,10 +6,7 @@ module RDF::RDFa
   ##
   # An RDFa parser in Ruby
   #
-  # Ben Adida
-  # 2008-05-07
-  # Gregg Kellogg
-  # 2009-08-04
+  # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
     format Format
     autoload :VERSION,   'rdf/rdfa/version'

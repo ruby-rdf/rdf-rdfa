@@ -1,3 +1,4 @@
+$:.unshift(File.dirname(__FILE__)) unless $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 require 'rdf'
 
 module RDF
@@ -27,9 +28,9 @@ module RDF
   # @see http://www.w3.org/TR/2010/WD-rdfa-core-20100422/
   # @see http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/
   #
-  # @author [Arto Bendiken](http://ar.to/)
+  # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   module RDFa
-    require 'rdf/rdfa/format'
+    require 'rdfa/format'
     autoload :Reader,  'rdf/rdfa/reader'
     autoload :Writer,  'rdf/rdfa/writer'
     autoload :VERSION, 'rdf/rdfa/version'

@@ -44,7 +44,6 @@ describe "RDF::RDFa::Reader" do
     </html>
     EOF
 
-    # FIXME: base URIs arn't working
     reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
     reader.graph.size.should == 1
     reader.graph.should have_object("Mark Birbeck")
@@ -91,7 +90,7 @@ describe "RDF::RDFa::Reader" do
     reader.graph.should have_object("Albert Einstein")
     reader.graph.should have_object(
       RDF::Literal("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time",
-        :datatype => RDF::URI('http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'))
+        :datatype => RDF.XMLLiteral)
     )
   end
 
