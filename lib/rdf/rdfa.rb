@@ -14,24 +14,17 @@ module RDF
   #     end
   #   end
   #
-  # @example Serializing RDF statements into a XHTML+RDFa file
-  #   RDF::RDFa::Writer.open("etc/test.xml") do |writer|
-  #     reader.each_statement do |statement|
-  #       writer << statement
-  #     end
-  #   end
-  #
   # @see http://rdf.rubyforge.org/
   # @see http://www.w3.org/TR/xhtml-rdfa-primer/
   # @see http://www.w3.org/2010/02/rdfa/wiki/Main_Page
   # @see http://www.w3.org/TR/2010/WD-rdfa-core-20100422/
   # @see http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/
   #
-  # @author [Arto Bendiken](http://ar.to/)
+  # @author Gregg Kellogg
   module RDFa
     require 'rdf/rdfa/format'
+    require 'rdf/rdfa/vocab'
     autoload :Reader,  'rdf/rdfa/reader'
-    autoload :Writer,  'rdf/rdfa/writer'
     autoload :VERSION, 'rdf/rdfa/version'
   end
-end\
+end

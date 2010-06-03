@@ -1,6 +1,4 @@
 require 'nokogiri'  # FIXME: Implement using different modules as in RDF::TriX
-require 'rdf'
-require 'rdf/rdfa/vocab'
 
 module RDF::RDFa
   ##
@@ -12,8 +10,6 @@ module RDF::RDFa
   # 2009-08-04
   class Reader < RDF::Reader
     format Format
-    autoload :Namespace, 'rdf/rdfa/reader/namespace'
-    autoload :VERSION,   'rdf/rdfa/version'
   
     NC_REGEXP = Regexp.new(
       %{^
