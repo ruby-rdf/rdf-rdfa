@@ -1,8 +1,8 @@
 module RDFa
   module VERSION
     MAJOR = 0
-    MINOR = 1
-    TINY  = 0
+    MINOR = 0
+    TINY  = 2
     EXTRA = nil
 
     STRING = [MAJOR, MINOR, TINY].join('.')

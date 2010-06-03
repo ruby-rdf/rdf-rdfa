@@ -17,7 +17,7 @@ describe "RDFa parser" do
     EOF
 
     # FIXME: base URIs arn't working
-    reader = RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
+    reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
     reader.graph.size.should == 1
     reader.graph.should have_object("Mark Birbeck")
   end
@@ -34,7 +34,7 @@ describe "RDFa parser" do
     </html>
     EOF
 
-    reader = RDFa::Reader.new(sampledoc, :strict => true)
+    reader = RDF::RDFa::Reader.new(sampledoc, :strict => true)
     reader.graph.size.should == 1
     reader.graph.should have_triple([RDF::Node('photo'), RDF::DC11.creator, "Mark Birbeck"])
   end
@@ -57,7 +57,7 @@ describe "RDFa parser" do
     </html>
     EOF
 
-    reader = RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
+    reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
     reader.graph.size.should == 2
 
     reader.graph.should have_object("Albert Einstein")
@@ -87,60 +87,60 @@ describe "RDFa parser" do
     </html>
     EOF
 
-    reader = RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
+    reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
 
     reader.graph.size.should == 3
     reader.graph.should have_object("Ralph Swick")
     reader.graph.should have_object("Manu Sporny")
   end
   
-#   def self.test_cases(suite)
-#     RdfaHelper::TestCase.test_cases(suite)
-#   end
-#
-#   # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
-#   %w(xhtml html4 html5).each do |suite|
-#     describe "w3c #{suite} testcases" do
-#       describe "that are approved" do
-#         test_cases(suite).each do |t|
-#           puts t.inspect
-#           next unless t.status == "approved"
-#           #next unless t.name =~ /0140/
-#           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
-#             #puts t.input
-#             #puts t.results
-#             begin
-#               t.run_test do |rdfa_string, rdfa_parser|
-#                 rdfa_parser.parse(rdfa_string, t.informationResourceInput, :debug => [])
-#               end
-#             rescue SparqlException => e
-#               pending(e.message) { raise }
-#             end
-#           end
-#         end
-#       end
-#       describe "that are unreviewed" do
-#         test_cases(suite).each do |t|
-#           next unless t.status == "unreviewed"
-#           #next unless t.name =~ /0185/
-#           #puts t.inspect
-#           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
-#             begin
-#               t.run_test do |rdfa_string, rdfa_parser|
-#                 rdfa_parser.parse(rdfa_string, t.informationResourceInput, :debug => [])
-#               end
-#             rescue SparqlException => e
-#               pending(e.message) { raise }
-#             rescue Spec::Expectations::ExpectationNotMetError => e
-#               if t.name =~ /01[789]\d/
-#                 raise
-#               else
-#                 pending() {  raise }
-#               end
-#             end
-#           end
-#         end
-#       end
-#    end
-#  end
+   def self.test_cases(suite)
+     [] #RdfaHelper::TestCase.test_cases(suite)
+   end
+
+   # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
+   %w(xhtml html4 html5).each do |suite|
+     describe "w3c #{suite} testcases" do
+       describe "that are approved" do
+         test_cases(suite).each do |t|
+           puts t.inspect
+           next unless t.status == "approved"
+           #next unless t.name =~ /0140/
+           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
+             #puts t.input
+             #puts t.results
+             begin
+               t.run_test do |rdfa_string, rdfa_parser|
+                 rdfa_parser.parse(rdfa_string, t.informationResourceInput, :debug => [])
+               end
+             rescue SparqlException => e
+               pending(e.message) { raise }
+             end
+           end
+         end
+       end
+       describe "that are unreviewed" do
+         test_cases(suite).each do |t|
+           next unless t.status == "unreviewed"
+           #next unless t.name =~ /0185/
+           #puts t.inspect
+           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
+             begin
+               t.run_test do |rdfa_string, rdfa_parser|
+                 rdfa_parser.parse(rdfa_string, t.informationResourceInput, :debug => [])
+               end
+             rescue SparqlException => e
+               pending(e.message) { raise }
+             rescue Spec::Expectations::ExpectationNotMetError => e
+               if t.name =~ /01[789]\d/
+                 raise
+               else
+                 pending() {  raise }
+               end
+             end
+           end
+         end
+       end
+    end
+  end
 end

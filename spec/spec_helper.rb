@@ -3,6 +3,9 @@ $:.unshift File.dirname(__FILE__)
 
 require 'rubygems'
 require 'spec'
-require 'rdfa/reader'
+require 'rdf/rdfa'
+require 'rdf/spec'
 
-include RDFa
+Spec::Runner.configure do |config|
+  config.include(RDF::Spec::Matchers)
+end

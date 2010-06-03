@@ -1,2 +1,7 @@
+=== 0.0.2
+* Remove dependency on Namespace
+* Changed to RDF::RDFa, and moved files accordingly.
+* Added vocab definitions for RDA, XHV, XML, XSI and OWL
+
 === 0.0.1
-First port from RdfContext version 0.5.4
+* First port from RdfContext version 0.5.4

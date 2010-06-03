@@ -1,20 +1,19 @@
-require 'nokogiri'
+require 'nokogiri'  # FIXME: Implement using different modules as in RDF::TriX
 require 'rdf'
+require 'rdf/rdfa/vocab'
 
 module RDF::RDFa
   ##
   # An RDFa parser in Ruby
-  #
-  # Based on processing rules described here:
-  #   file:///Users/gregg/Projects/rdf_context/RDFa%20Core%201.1.html#sequence
   #
   # Ben Adida
   # 2008-05-07
   # Gregg Kellogg
   # 2009-08-04
   class Reader < RDF::Reader
-    autoload :Namespace, 'rdfa/reader/namespace'
-    autoload :VERSION,   'rdfa/reader/version'
+    format Format
+    autoload :Namespace, 'rdf/rdfa/reader/namespace'
+    autoload :VERSION,   'rdf/rdfa/version'
   
     NC_REGEXP = Regexp.new(
       %{^
@@ -29,24 +28,8 @@ module RDF::RDFa
       $},
       Regexp::EXTENDED)
   
-    #XML_LITERAL = Literal::Encoding.xmlliteral
     XML_LITERAL = RDF['XMLLiteral']
     
-    
-    # FIXME: use RDF::URI.qname instead
-    RDF_NS      = Namespace.new("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf")
-    RDFA_NS     = Namespace.new("http://www.w3.org/ns/rdfa#", "rdfa")
-    RDFS_NS     = Namespace.new("http://www.w3.org/2000/01/rdf-schema#", "rdfs")
-    XHV_NS      = Namespace.new("http://www.w3.org/1999/xhtml/vocab#", "xhv")
-    XML_NS      = Namespace.new("http://www.w3.org/XML/1998/namespace", "xml")
-    XSD_NS      = Namespace.new("http://www.w3.org/2001/XMLSchema#", "xsd")
-    XSI_NS      = Namespace.new("http://www.w3.org/2001/XMLSchema-instance", "xsi")
-    XH_MAPPING  = {"" => Namespace.new("http://www.w3.org/1999/xhtml/vocab\#", nil)}
-  
-
-    require 'rdfa/format'
-    format RDFa::Format
-
     attr_reader :debug
 
     ##
@@ -124,8 +107,6 @@ module RDF::RDFa
       end
     end
 
-
-
     # Parse XHTML+RDFa document from a string or input stream to closure or graph.
     #
     # If the parser is called with a block, triples are passed to the block rather
@@ -159,8 +140,6 @@ module RDF::RDFa
         @base_uri = RDF::URI.parse(@base_uri) if @base_uri.is_a?(String)
         @named_bnodes = {}
         @@vocabulary_cache ||= {}
-        @nsbinding = {}
-        @uri_binding = {}
 
         @doc = case input
         when Nokogiri::HTML::Document then input
@@ -183,14 +162,13 @@ module RDF::RDFa
         @host_defaults = {}
         @host_defaults = case @host_language
         when :xhtml
-          bind(XHV_NS)
           {
-            :vocabulary => XHV_NS.uri,
-            :prefix     => XHV_NS,
+            :vocabulary => RDF::XHV["uri"],
+            :prefix     => "xhv",
             :term_mappings => %w(
               alternate appendix bookmark cite chapter contents copyright first glossary help icon index
               last license meta next p3pv1 prev role section stylesheet subsection start top up
-              ).inject({}) { |hash, term| hash[term] = XHV_NS.send("#{term}_"); hash },
+              ).inject({}) { |hash, term| hash[term] = RDF::XHV[term]; hash },
           }
         else
           {}
@@ -203,6 +181,7 @@ module RDF::RDFa
     end
 
 
+    # XXX Invoke the parser, and allow add_triple to make the callback?
     ##
     # Iterates the given block for each RDF statement in the input.
     #
@@ -223,27 +202,6 @@ module RDF::RDFa
     # @return [void]
     def each_triple(&block)
       @graph.each_triple(&block)
-    end
-
-    # Bind namespace to store, returns bound namespace
-    def bind(namespace)
-      # Over-write an empty prefix
-      uri = namespace.uri.to_s
-      @uri_binding.delete(uri)
-      @nsbinding.delete_if {|prefix, ns| namespace.prefix == prefix}
-
-      @uri_binding[uri] = namespace
-      @nsbinding[namespace.prefix.to_s] = namespace
-    end
-
-    # Namespace for prefix
-    def namespace(prefix)
-      @nsbinding[prefix.to_s]
-    end
-    
-    # Prefix for namespace
-    def prefix(namespace)
-      namespace.is_a?(Namespace) ? @uri_binding[namespace.uri.to_s].prefix : @uri_binding[namespace].prefix
     end
     
     private
@@ -266,26 +224,19 @@ module RDF::RDFa
       @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
     end
 
-    # add a triple, object can be literal or URI or bnode
-    #
-    # If the parser is called with a block, triples are passed to the block rather
-    # than added to the graph.
+    # add a statement, object can be literal or URI or bnode
     #
     # @param [Nokogiri::XML::Node, any] node:: XML Node or string for showing context
-    # @param [URI, BNode] subject:: the subject of the triple
-    # @param [URI] predicate:: the predicate of the triple
-    # @param [URI, BNode, Literal] object:: the object of the triple
-    # @return [Array]:: An array of the triples (leaky abstraction? consider returning the graph instead)
-    # @raise [Error]:: Checks parameter types and raises if they are incorrect if parsing mode is _strict_.
+    # @param [URI, BNode] subject:: the subject of the statement
+    # @param [URI] predicate:: the predicate of the statement
+    # @param [URI, BNode, Literal] object:: the object of the statement
+    # @return [Statement]:: Added statement
+    # @raise [Exception]:: Checks parameter types and raises if they are incorrect if parsing mode is _strict_.
     def add_triple(node, subject, predicate, object)
-      triple = RDF::Statement.new(subject, predicate, object)
-      add_debug(node, "triple: #{triple}")
-      if @callback
-        @callback.call(triple)  # Perform yield to saved block
-      else
-        @graph << triple
-      end
-      triple
+      statement = RDF::Statement.new(subject, predicate, object)
+      add_debug(node, "statement: #{statement}")
+      @graph << statement
+      statement
     # FIXME: rescue RdfException => e
     rescue Exception => e
       add_debug(node, "add_triple raised #{e.class}: #{e.message}")
@@ -355,9 +306,9 @@ module RDF::RDFa
               
               # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
               # predicates sharing the same subject, no mapping is created.
-              uri = props[RDFA_NS.uri.to_s]
-              term = props[RDFA_NS.term_.to_s]
-              prefix = props[RDFA_NS.prefix_.to_s]
+              uri = props[RDF::RDFA["uri"].to_s]
+              term = props[RDF::RDFA["term"].to_s]
+              prefix = props[RDF::RDFA["prefix"].to_s]
               add_debug(element, "extract_mappings: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}")
 
               next if !uri || (!term && !prefix)
@@ -377,7 +328,7 @@ module RDF::RDFa
               # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
               # URI mappings after transforming the 'prefix' component to lower-case.
               # For every extracted
-              um[prefix.to_s.downcase] = bind(Namespace.new(uri.to_s, prefix.to_s.downcase)) if prefix
+              um[prefix.to_s.downcase] = uri.to_s if prefix
             
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
@@ -406,7 +357,7 @@ module RDF::RDFa
       element.namespaces.each do |attr_name, attr_value|
         begin
           abbr, prefix = attr_name.split(":")
-          uri_mappings[prefix.to_s.downcase] = bind(Namespace.new(attr_value, prefix.to_s.downcase)) if abbr.downcase == "xmlns" && prefix
+          uri_mappings[prefix.to_s.downcase] = attr_value if abbr.downcase == "xmlns" && prefix
         # FIXME: rescue RdfException => e
         rescue Exception => e
           add_debug(element, "extract_mappings raised #{e.class}: #{e.message}")
@@ -425,7 +376,7 @@ module RDF::RDFa
         next unless prefix.match(/:$/)
         prefix.chop!
         
-        uri_mappings[prefix] = bind(Namespace.new(uri, prefix))
+        uri_mappings[prefix] = uri
       end
       
       add_debug(element, "uri_mappings: #{uri_mappings.values.map{|ns|ns.to_s}.join(", ")}")
@@ -498,8 +449,8 @@ module RDF::RDFa
       #   attribute in no namespace must be ignored for the purposes of determining the element's
       #   language.
       language = case
-      when element.at_xpath("@xml:lang", "xml" => XML_NS.uri.to_s)
-        element.at_xpath("@xml:lang", "xml" => XML_NS.uri.to_s).to_s
+      when element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s)
+        element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s).to_s
       when element.at_xpath("lang")
         element.at_xpath("lang").to_s
       else
@@ -765,7 +716,7 @@ module RDF::RDFa
 
     # From section 6. CURIE Syntax Definition
     def curie_to_resource_or_bnode(element, curie, uri_mappings, subject)
-      # URI mappings for CURIEs default to XH_MAPPING, rather than the default doc namespace
+      # URI mappings for CURIEs default to XHV, rather than the default doc namespace
       prefix, reference = curie.to_s.split(":")
 
       # consider the bnode situation
