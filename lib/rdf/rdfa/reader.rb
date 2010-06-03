@@ -124,8 +124,7 @@ module RDF::RDFa
     # @yield  [reader]
     # @yieldparam [Reader] reader
     def initialize(input = $stdin, options = {}, &block)
-      super
-      
+      super do
         @graph = RDF::Graph.new
         @debug = options[:debug]
         @strict = options[:strict]
@@ -170,6 +169,7 @@ module RDF::RDFa
         parse_whole_document(@doc, @base_uri)
 
         block.call(self) if block_given?
+      end
     end
 
 
