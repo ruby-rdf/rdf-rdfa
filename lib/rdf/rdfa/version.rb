@@ -1,4 +1,4 @@
-module RDF::RDFaVERSION
+module RDF::RDFa::VERSION
   MAJOR = 0
   MINOR = 0
   TINY  = 3
