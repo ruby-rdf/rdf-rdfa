@@ -1,6 +1,34 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-describe "RDFa parser" do
+describe RDF::RDFa::Format do
+  it "should be discoverable" do
+    formats = [
+      RDF::Format.for(:rdfa),
+      RDF::Format.for("etc/foaf.html"),
+      RDF::Format.for(:file_name      => "etc/foaf.html"),
+      RDF::Format.for(:file_extension => "html"),
+      RDF::Format.for(:file_extension => "xhtml"),
+      RDF::Format.for(:content_type   => "text/html"),
+      RDF::Format.for(:content_type   => "application/xhtml+xml"),
+    ]
+    formats.each { |format| format.should == RDF::RDFa::Format }
+  end
+end
+
+describe "RDF::RDFa::Reader" do
+  it "should be discoverable" do
+    readers = [
+      RDF::Reader.for(:rdfa),
+      RDF::Reader.for("etc/foaf.html"),
+      RDF::Reader.for(:file_name      => "etc/foaf.html"),
+      RDF::Reader.for(:file_extension => "html"),
+      RDF::Reader.for(:file_extension => "xhtml"),
+      RDF::Reader.for(:content_type   => "text/html"),
+      RDF::Reader.for(:content_type   => "application/xhtml+xml"),
+    ]
+    readers.each { |reader| reader.should == RDF::RDFa::Reader }
+  end
+
    it "should parse simple doc" do
     sampledoc = <<-EOF;
     <?xml version="1.0" encoding="UTF-8"?>
@@ -16,7 +44,6 @@ describe "RDFa parser" do
     </html>
     EOF
 
-    # FIXME: base URIs arn't working
     reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
     reader.graph.size.should == 1
     reader.graph.should have_object("Mark Birbeck")
@@ -63,7 +90,7 @@ describe "RDFa parser" do
     reader.graph.should have_object("Albert Einstein")
     reader.graph.should have_object(
       RDF::Literal("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time",
-        :datatype => RDF::URI('http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'))
+        :datatype => RDF.XMLLiteral)
     )
   end
 

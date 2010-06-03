@@ -4,10 +4,7 @@ module RDF::RDFa
   ##
   # An RDFa parser in Ruby
   #
-  # Ben Adida
-  # 2008-05-07
-  # Gregg Kellogg
-  # 2009-08-04
+  # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
     format Format
   
@@ -324,12 +321,12 @@ module RDF::RDFa
               # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
               # URI mappings after transforming the 'prefix' component to lower-case.
               # For every extracted
-              um[prefix.to_s.downcase] = uri.to_s if prefix
+              um[prefix.to_s.downcase] = RDF::URI.new(uri) if prefix
             
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-              tm[term.to_s] = RDF::URI.new(uri.to_s) if term
+              tm[term.to_s] = RDF::URI.new(uri) if term
             end
           rescue ParserException
             add_debug(element, "extract_mappings: profile subject #{subject.to_s}: #{e.message}")
@@ -353,7 +350,7 @@ module RDF::RDFa
       element.namespaces.each do |attr_name, attr_value|
         begin
           abbr, prefix = attr_name.split(":")
-          uri_mappings[prefix.to_s.downcase] = attr_value if abbr.downcase == "xmlns" && prefix
+          uri_mappings[prefix.to_s.downcase] = RDF::URI.new(attr_value) if abbr.downcase == "xmlns" && prefix
         # FIXME: rescue RdfException => e
         rescue Exception => e
           add_debug(element, "extract_mappings raised #{e.class}: #{e.message}")
@@ -372,7 +369,7 @@ module RDF::RDFa
         next unless prefix.match(/:$/)
         prefix.chop!
         
-        uri_mappings[prefix] = uri
+        uri_mappings[prefix] = RDF::URI.new(uri)
       end
       
       add_debug(element, "uri_mappings: #{uri_mappings.values.map{|ns|ns.to_s}.join(", ")}")
@@ -428,7 +425,7 @@ module RDF::RDFa
           # Set default_vocabulary to host language default
           @host_defaults.fetch(:voabulary, nil)
         else
-          vocab.to_s
+          RDF::URI.new(vocab)
         end
         add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")
       end
@@ -682,7 +679,7 @@ module RDF::RDFa
           add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
         else
           #FIXME: uri = URIRef.new(value, evaluation_context.base)
-          uri = RDF::URI.new(value)
+          uri = RDF::URI.new(evaluation_context.base + value)
           add_debug(element, "process_uri: #{value} => URI => <#{uri}>")
         end
         uri
@@ -703,7 +700,7 @@ module RDF::RDFa
         options[:term_mappings][value.to_s.downcase]
       when options[:vocab]
         # Otherwise, if there is a local default vocabulary the URI is obtained by concatenating that value and the term.
-        options[:vocab] + value
+        options[:vocab].join(value)
       else
         # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
         nil
@@ -723,18 +720,18 @@ module RDF::RDFa
       elsif curie.to_s.match(/^:/)
         # Default prefix
         if uri_mappings[""]
-          uri_mappings[""].send("#{reference}_")
+          uri_mappings[""].join(reference)
         elsif @host_defaults[:prefix]
-          @host_defaults[:prefix].send("#{reference}_")
+          @host_defaults[:prefix].join(reference)
         end
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
         nil
       else
-        # XXX Spec Confusion, are prefixes always downcased?
+        # Prefixes always downcased
         ns = uri_mappings[prefix.to_s.downcase]
         if ns
-          ns + reference
+          ns.join(reference)
         else
           add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix.downcase}")
           nil
