@@ -7,7 +7,7 @@ module RDF::RDFa
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
     format Format
-  
+    
     NC_REGEXP = Regexp.new(
       %{^
         (?!\\\\u0301)             # &#x301; is a non-spacing acute accent.
@@ -100,29 +100,17 @@ module RDF::RDFa
       end
     end
 
-    # Parse XHTML+RDFa document from a string or input stream to closure or graph.
-    #
-    # If the parser is called with a block, triples are passed to the block rather
-    # than added to the graph.
-    #
-    # Optionally, the stream may be a Nokogiri::HTML::Document or Nokogiri::XML::Document
-    # With a block, yeilds each statement with URI, BNode or Literal elements
-    #
-    # @param  [IO] stream:: the HTML+RDFa IO stream, string, Nokogiri::HTML::Document or Nokogiri::XML::Document
-    # @param [String] uri:: the URI of the document
-    # @param [Hash] options:: Parser options, one of
-    # <em>options[:debug]</em>:: Array to place debug messages
-    # <em>options[:strict]</em>:: Raise Error if true, continue with lax parsing, otherwise
-    # @return [Graph]:: Returns the graph containing parsed triples
-    # @raise [RDF::ReaderError]:: Raises RDF::ReaderError if _strict_
-
     ##
     # Initializes the RDFa reader instance.
     #
-    # @param  [IO, File, String]       input
-    # @param  [Hash{Symbol => Object}] options
+    # @param  [IO, File, String]::       input
+    # @param  [Hash{Symbol => Object}]:: options
+    # <em>options[:debug]</em>:: Array to place debug messages
+    # <em>options[:strict]</em>:: Raise Error if true, continue with lax parsing, otherwise
+    # <em>options[:base_uri]</em>:: Base URI to use for relative URIs.
     # @yield  [reader]
     # @yieldparam [Reader] reader
+    # @raise [RDF::ReaderError]:: Raises RDF::ReaderError if _strict_
     def initialize(input = $stdin, options = {}, &block)
       super do
         @graph = RDF::Graph.new
