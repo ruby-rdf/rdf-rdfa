@@ -1,0 +1,10 @@
+--title "RDF::RDFa - RDFa Support for RDF.rb"
+--output-dir doc/yard
+--protected
+--no-private
+--hide-void-return
+--markup rdoc
+--readme README.rdoc
+-
+AUTHORS
+VERSION
