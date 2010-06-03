@@ -675,6 +675,7 @@ module RDF::RDFa
         if uri
           add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
         else
+          ## FIXME: throw exception if there is no base uri set?
           uri = RDF::URI.new(evaluation_context.base + value)
           add_debug(element, "process_uri: #{value} => URI => <#{uri}>")
         end
