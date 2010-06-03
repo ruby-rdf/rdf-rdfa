@@ -36,6 +36,7 @@ Spec::Rake::SpecTask.new("spec:rcov") do |spec|
   spec.libs << 'lib' << 'spec'
   spec.pattern = 'spec/*_spec.rb'
   spec.rcov = true
+  spec.rcov_opts = ['-x', '/Library', '-x', '/System/Library', '-x', 'spec']
 end
 
 desc "Generate HTML report specs"
