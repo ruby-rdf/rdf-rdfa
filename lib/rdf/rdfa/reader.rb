@@ -114,7 +114,7 @@ module RDF::RDFa
     # <em>options[:debug]</em>:: Array to place debug messages
     # <em>options[:strict]</em>:: Raise Error if true, continue with lax parsing, otherwise
     # @return [Graph]:: Returns the graph containing parsed triples
-    # @raise [Error]:: Raises RdfError if _strict_
+    # @raise [RDF::ReaderError]:: Raises RDF::ReaderError if _strict_
 
     ##
     # Initializes the RDFa reader instance.
@@ -131,7 +131,6 @@ module RDF::RDFa
         @strict = options[:strict]
         @base_uri = options[:base_uri]
         @base_uri = RDF::URI.parse(@base_uri) if @base_uri.is_a?(String)
-        @named_bnodes = {}
         @@vocabulary_cache ||= {}
 
         @doc = case input
@@ -140,7 +139,7 @@ module RDF::RDFa
         else   Nokogiri::XML.parse(input, @base_uri.to_s)
         end
         
-        raise ParserException, "Empty document" if @doc.nil? && @strict
+        raise RDF::ReaderError, "Empty document" if @doc.nil? && @strict
         @callback = block
   
         # Determine host language
@@ -224,14 +223,13 @@ module RDF::RDFa
     # @param [URI] predicate:: the predicate of the statement
     # @param [URI, BNode, Literal] object:: the object of the statement
     # @return [Statement]:: Added statement
-    # @raise [Exception]:: Checks parameter types and raises if they are incorrect if parsing mode is _strict_.
+    # @raise [ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _strict_.
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
       add_debug(node, "statement: #{statement}")
       @graph << statement
       statement
-    # FIXME: rescue RdfException => e
-    rescue Exception => e
+    rescue ReaderError => e
       add_debug(node, "add_triple raised #{e.class}: #{e.message}")
       puts e.backtrace if $DEBUG
       raise if @strict
@@ -305,16 +303,16 @@ module RDF::RDFa
               add_debug(element, "extract_mappings: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}")
 
               next if !uri || (!term && !prefix)
-              raise ParserException, "multi-valued rdf:uri" if uri.length != 1
-              raise ParserException, "multi-valued rdf:term." if term && term.length != 1
-              raise ParserException, "multi-valued rdf:prefix" if prefix && prefix.length != 1
+              raise RDF::ReaderError, "multi-valued rdf:uri" if uri.length != 1
+              raise RDF::ReaderError, "multi-valued rdf:term." if term && term.length != 1
+              raise RDF::ReaderError, "multi-valued rdf:prefix" if prefix && prefix.length != 1
             
               uri = uri.first
               term = term.first if term
               prefix = prefix.first if prefix
-              raise ParserException, "rdf:uri must be a Literal" unless uri.is_a?(Literal)
-              raise ParserException, "rdf:term must be a Literal" unless term.nil? || term.is_a?(Literal)
-              raise ParserException, "rdf:prefix must be a Literal" unless prefix.nil? || prefix.is_a?(Literal)
+              raise RDF::ReaderError, "rdf:uri must be a Literal" unless uri.is_a?(Literal)
+              raise RDF::ReaderError, "rdf:term must be a Literal" unless term.nil? || term.is_a?(Literal)
+              raise RDF::ReaderError, "rdf:prefix must be a Literal" unless prefix.nil? || prefix.is_a?(Literal)
             
               # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
               # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the
@@ -328,7 +326,7 @@ module RDF::RDFa
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
               tm[term.to_s] = RDF::URI.new(uri) if term
             end
-          rescue ParserException
+          rescue RDF::ReaderError
             add_debug(element, "extract_mappings: profile subject #{subject.to_s}: #{e.message}")
             raise if @strict
           rescue RuntimeError => e
@@ -351,8 +349,7 @@ module RDF::RDFa
         begin
           abbr, prefix = attr_name.split(":")
           uri_mappings[prefix.to_s.downcase] = RDF::URI.new(attr_value) if abbr.downcase == "xmlns" && prefix
-        # FIXME: rescue RdfException => e
-        rescue Exception => e
+        rescue ReaderError => e
           add_debug(element, "extract_mappings raised #{e.class}: #{e.message}")
           raise if @strict
         end
@@ -380,7 +377,7 @@ module RDF::RDFa
     def traverse(element, evaluation_context)
       if element.nil?
         add_debug(element, "traverse nil element")
-        raise ParserException, "Can't parse nil element" if @strict
+        raise RDF::ReaderError, "Can't parse nil element" if @strict
         return nil
       end
       
@@ -678,7 +675,6 @@ module RDF::RDFa
         if uri
           add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
         else
-          #FIXME: uri = URIRef.new(value, evaluation_context.base)
           uri = RDF::URI.new(evaluation_context.base + value)
           add_debug(element, "process_uri: #{value} => URI => <#{uri}>")
         end
@@ -714,9 +710,7 @@ module RDF::RDFa
 
       # consider the bnode situation
       if prefix == "_"
-        # we force a non-nil name, otherwise it generates a new name
-        # FIXME: BNode.new(reference || "", @named_bnodes)
-        RDF::Node.new(reference || nil)
+        RDF::Node.new(reference)
       elsif curie.to_s.match(/^:/)
         # Default prefix
         if uri_mappings[""]
