@@ -532,7 +532,7 @@ module RDF::RDFa
         types = process_uris(element, typeof, evaluation_context, :uri_mappings => uri_mappings, :term_mappings => term_mappings, :vocab => default_vocabulary)
         add_debug(element, "typeof: #{typeof}")
         types.each do |one_type|
-          add_triple(element, new_subject, RDF_TYPE, one_type)
+          add_triple(element, new_subject, RDF.type, one_type)
         end
       end
     
