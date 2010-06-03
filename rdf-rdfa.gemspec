@@ -5,29 +5,36 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rdf-rdfa}
-  s.version = "0.0.1"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Gregg Kellogg", "Nicholas Humfrey"]
-  s.date = %q{2010-06-02}
+  s.authors = ["Gregg Kellogg"]
+  s.date = %q{2010-06-03}
   s.description = %q{    RDF::RDFa is an RDFa parser for Ruby using the RDF.rb library suite.
 }
   s.email = %q{gregg@kellogg-assoc.com}
   s.extra_rdoc_files = [
-    "History.txt",
+    "AUTHORS",
+     "History.txt",
      "README.rdoc"
   ]
   s.files = [
-    "README.rdoc",
+    "AUTHORS",
+     "History.txt",
+     "README.rdoc",
      "Rakefile",
      "VERSION",
+     "etc/foaf.html",
+     "etc/xhv.html",
      "example.rb",
-     "lib/rdfa/format.rb",
-     "lib/rdfa/reader.rb",
-     "lib/rdfa/reader/exceptions.rb",
-     "lib/rdfa/reader/namespace.rb",
-     "lib/rdfa/reader/version.rb",
-     "spec/namespaces_spec.rb",
+     "lib/rdf/rdfa.rb",
+     "lib/rdf/rdfa/format.rb",
+     "lib/rdf/rdfa/reader.rb",
+     "lib/rdf/rdfa/version.rb",
+     "lib/rdf/rdfa/vocab.rb",
+     "pkg/.gitignore",
+     "rdf-rdfa.gemspec",
+     "script/console",
      "spec/rdfa-triples/0001.nt",
      "spec/rdfa-triples/0006.nt",
      "spec/rdfa-triples/0007.nt",
@@ -141,19 +148,18 @@ Gem::Specification.new do |s|
      "spec/rdfa-triples/0126.nt",
      "spec/rdfa-triples/1001.nt",
      "spec/rdfa_helper.rb",
-     "spec/rdfa_parser_spec.rb",
+     "spec/rdfa_reader_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/gkellogg/rdf-rdfa}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{RDFa parser for RDF.rb.}
   s.test_files = [
-    "spec/namespaces_spec.rb",
-     "spec/rdfa_helper.rb",
-     "spec/rdfa_parser_spec.rb",
+    "spec/rdfa_helper.rb",
+     "spec/rdfa_reader_spec.rb",
      "spec/spec_helper.rb"
   ]
 
@@ -161,21 +167,27 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<nokogiri>, [">= 1.3.3"])
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rdf>, [">= 0.1.6"])
+      s.add_runtime_dependency(%q<nokogiri>, [">= 1.3.3"])
+      s.add_runtime_dependency(%q<patron>, [">= 0.4.6"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<rdf-spec>, [">= 0"])
       s.add_development_dependency(%q<activesupport>, [">= 2.3.0"])
     else
-      s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
       s.add_dependency(%q<rdf>, [">= 0.1.6"])
+      s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
+      s.add_dependency(%q<patron>, [">= 0.4.6"])
       s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<rdf-spec>, [">= 0"])
       s.add_dependency(%q<activesupport>, [">= 2.3.0"])
     end
   else
-    s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
     s.add_dependency(%q<rdf>, [">= 0.1.6"])
+    s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
+    s.add_dependency(%q<patron>, [">= 0.4.6"])
     s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<rdf-spec>, [">= 0"])
     s.add_dependency(%q<activesupport>, [">= 2.3.0"])
   end
 end

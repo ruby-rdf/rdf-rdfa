@@ -4,12 +4,14 @@ RDFa parser for RDF.rb.
 
 == DESCRIPTION:
 
-RDF::RDFa is an RDFa parser for Ruby using the RDF.rb library suite.
+RDF::RDFa is an RDFa reader for Ruby using the RDF.rb library suite.
 
 == FEATURES:
-RDF::RDFa parses RDFa into a Graph object.
+RDF::RDFa parses RDFa into statements or triples.
 
-* Fully compliant XHTML/RDFa 1.0 parser.
+* Fully compliant XHTML/RDFa 1.1 parser.
+* Uses Nokogiri for parsing XHTML
+* RDFa tests use SPARQL for most tests due to Rasqal limitations. Other tests compare directly against N-triples.
 
 Install with 'gem install rdf-rdfa'
 
@@ -22,7 +24,20 @@ Instantiate a parser and parse source, specifying type and base-URL
     end
   end
 
+== Dependencies
+  * [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.1.6)
+  * [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.3.3)
+  * [Patron](http://rubygems.org/gems/patron) (>= 0.4.6) -- For RDFa profiles
+
+== TODO
+* Add support for LibXML and REXML bindings, and use the best available
+* Consider a SAX-based parser for improved performance
+* Port SPARQL tests to native SPARQL processor, when one becomes available.
+* Add generic XHTML+RDFa Writer
+* Only parse profiles if Patron included, don't force otherwise
+
 == Resources:
+* RDF.rb[http://rdf.rubyforge.org/]   
 * Distiller[http://kellogg-assoc/distiller]
 * RDoc[http://rdoc.info/projects/gkellogg/rdf-rdfa]
 * History[http://github.com/gkellogg/rdf-rdfa/blob/master/History.txt]

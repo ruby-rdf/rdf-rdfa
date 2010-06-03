@@ -5,9 +5,9 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "rdf-rdfa"
-    gemspec.summary = "RDFa parser for RDF.rb."
+    gemspec.summary = "RDFa reader for RDF.rb."
     gemspec.description = <<-DESCRIPTION
-    RDF::RDFa is an RDFa parser for Ruby using the RDF.rb library suite.
+    RDF::RDFa is an RDFa reader for Ruby using the RDF.rb library suite.
     DESCRIPTION
     gemspec.email = "gregg@kellogg-assoc.com"
     gemspec.homepage = "http://github.com/gkellogg/rdf-rdfa"
