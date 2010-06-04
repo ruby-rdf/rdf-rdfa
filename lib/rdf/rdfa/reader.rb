@@ -266,41 +266,22 @@ module RDF::RDFa
             um = @@vocabulary_cache[profile][:uri_mappings]
             tm = @@vocabulary_cache[profile][:term_mappings]
             add_debug(element, "extract_mappings: profile open <#{profile}>")
-            require 'patron' unless defined?(Patron)
-            sess = Patron::Session.new
-            sess.timeout = 10
-            resp = sess.get(profile)
-            raise RuntimeError, "HTTP returned status #{resp.status} when reading #{profile}" if resp.status >= 400
-      
-            # Parse profile, and extract mappings from graph
-            old_debug, old_verbose, = $DEBUG, $verbose
-            $DEBUG, $verbose = false, false
-            p_graph = Parser.parse(resp.body, profile)
-            ttl = p_graph.serialize(:format => :ttl) if @debug || $DEBUG
+            
+            p_graph = RDF::Graph.load(profile)
+            ttl = p_graph.dump(:format => :turtle) if @debug || $DEBUG
             $DEBUG, $verbose = old_debug, old_verbose
             add_debug(element, ttl) if ttl
-            p_graph.subjects.each do |subject|
-              props = p_graph.properties(subject)
-              #puts props.inspect
-              
-              # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
-              # predicates sharing the same subject, no mapping is created.
-              uri = props[RDF::RDFA["uri"].to_s]
-              term = props[RDF::RDFA["term"].to_s]
-              prefix = props[RDF::RDFA["prefix"].to_s]
+            p_graph.each_subject do |subject|
+              # If one of the objects is not a Literal no mapping is created.
+              uri = p_graph.first([subject, RDF::RDFA.uri, nil])
+              term = p_graph.first([subject, RDF::RDFA.term, nil])
+              prefix = p_graph.first([subject, RDF::RDFA.uri, nil])
               add_debug(element, "extract_mappings: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}")
 
               next if !uri || (!term && !prefix)
-              raise RDF::ReaderError, "multi-valued rdf:uri" if uri.length != 1
-              raise RDF::ReaderError, "multi-valued rdf:term." if term && term.length != 1
-              raise RDF::ReaderError, "multi-valued rdf:prefix" if prefix && prefix.length != 1
-            
-              uri = uri.first
-              term = term.first if term
-              prefix = prefix.first if prefix
-              raise RDF::ReaderError, "rdf:uri must be a Literal" unless uri.is_a?(Literal)
-              raise RDF::ReaderError, "rdf:term must be a Literal" unless term.nil? || term.is_a?(Literal)
-              raise RDF::ReaderError, "rdf:prefix must be a Literal" unless prefix.nil? || prefix.is_a?(Literal)
+              raise RDF::ReaderError, "rdf:uri must be a Literal" unless uri.is_a?(RDF::Literal)
+              raise RDF::ReaderError, "rdf:term must be a Literal" unless term.nil? || term.is_a?(RDF::Literal)
+              raise RDF::ReaderError, "rdf:prefix must be a Literal" unless prefix.nil? || prefix.is_a?(RDF::Literal)
             
               # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
               # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the
