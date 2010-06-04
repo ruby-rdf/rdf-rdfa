@@ -195,7 +195,6 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
-
   context "parsing a document that uses the typeof attribute" do
     before :each do
       sampledoc = <<-EOF
@@ -235,6 +234,38 @@ describe "RDF::RDFa::Reader" do
         RDF::FOAF.name,
         RDF::Literal("John Doe")
       ])
+    end
+  end
+
+  context "parsing a document with a <base> tag in the <head>" do
+    before :each do
+      sampledoc = <<-EOF
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0"
+          xmlns:dc="http://purl.org/dc/elements/1.1/">
+       <head>
+          <base href="http://www.example.org/"></base>
+          <title>Test 0072</title>
+       </head>
+       <body>
+          <p about="faq">
+             Learn more by reading the example.org
+             <span property="dc:title">Example FAQ</span>.
+          </p>
+       </body>
+      </html>
+      EOF
+
+      @reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072.xhtml", :strict => true)
+    end
+
+    it "should return 1 triple" do
+      @reader.graph.size.should == 1
+    end
+
+    it "should have the subject of the triple relative to the URI in base" do
+      @reader.graph.should have_subject RDF::URI('http://www.example.org/faq')
     end
   end
 
