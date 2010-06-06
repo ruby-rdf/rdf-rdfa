@@ -267,15 +267,16 @@ module RDF::RDFa
             tm = @@vocabulary_cache[profile][:term_mappings]
             add_debug(element, "extract_mappings: profile open <#{profile}>")
             
-            p_graph = RDF::Graph.load(profile)
-            ttl = p_graph.dump(:format => :turtle) if @debug || $DEBUG
+            old_debug, old_verbose, = $DEBUG, $verbose
+            $DEBUG, $verbose = false, false
+            # FIXME: format shouldn't need to be specified here
+            p_graph = RDF::Graph.load(profile, :base_uri => profile, :format => :rdfa)
             $DEBUG, $verbose = old_debug, old_verbose
-            add_debug(element, ttl) if ttl
             p_graph.each_subject do |subject|
               # If one of the objects is not a Literal no mapping is created.
-              uri = p_graph.first([subject, RDF::RDFA.uri, nil])
-              term = p_graph.first([subject, RDF::RDFA.term, nil])
-              prefix = p_graph.first([subject, RDF::RDFA.uri, nil])
+               uri = p_graph.first([subject, RDF::RDFA['uri'], nil])
+              term = p_graph.first([subject, RDF::RDFA['term'], nil])
+              prefix = p_graph.first([subject, RDF::RDFA['prefix'], nil])
               add_debug(element, "extract_mappings: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}")
 
               next if !uri || (!term && !prefix)
