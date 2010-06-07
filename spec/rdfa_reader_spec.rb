@@ -270,7 +270,49 @@ describe "RDF::RDFa::Reader" do
   end
 
 
-  context "parsing a document with a profile attribute in the <head>" do
+  context "parsing a document with a profile containing a prefix mapping" do
+    before :each do
+      sampledoc = <<-EOF
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0">
+        <head profile="http://www.w3.org/2007/08/pyRdfa/profiles/basic">
+          <title>Test</title>
+          <base href="http://example.org/"/>
+        </head>
+        <body>
+        <div about="#me">
+          <p>
+            <span property="foaf:name">Ivan Herman</span>
+          </p>
+        </div>
+        </body>
+      </html>
+      EOF
+      
+      # FIXME: mock out the HTTP request
+      @reader = RDF::RDFa::Reader.new(sampledoc, :strict => true)
+      @statement = @reader.graph.statements.first
+    end
+
+    it "should return 1 triple" do
+      @reader.graph.size.should == 1
+    end
+
+    it "should have a subject of http://example.org/#me" do
+      @statement.subject.should == RDF::URI('http://example.org/#me')
+    end
+
+    it "should have a predicate of foaf:name" do
+      @statement.predicate.should == RDF::FOAF.name
+    end
+
+    it "should have an object with the literal 'Ivan Herman'" do
+      @statement.object.should == RDF::Literal('Ivan Herman')
+    end
+  end
+
+  context "parsing a document with a profile containing a term mapping" do
     before :each do
       sampledoc = <<-EOF
       <?xml version="1.0" encoding="UTF-8"?>
@@ -289,7 +331,7 @@ describe "RDF::RDFa::Reader" do
         </body>
       </html>
       EOF
-
+      
       # FIXME: mock out the HTTP request
       @reader = RDF::RDFa::Reader.new(sampledoc, :strict => true)
       @statement = @reader.graph.statements.first

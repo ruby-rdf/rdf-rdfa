@@ -86,9 +86,9 @@ module RDF::RDFa
 
       # Copy this Evaluation Context
       def initialize_copy(from)
-          # clone the evaluation context correctly
-          @uri_mappings = from.uri_mappings.clone
-          @incomplete_triples = from.incomplete_triples.clone
+        # clone the evaluation context correctly
+        @uri_mappings = from.uri_mappings.clone
+        @incomplete_triples = from.incomplete_triples.clone
       end
       
       def inspect
@@ -274,9 +274,9 @@ module RDF::RDFa
             $DEBUG, $verbose = old_debug, old_verbose
             p_graph.each_subject do |subject|
               # If one of the objects is not a Literal no mapping is created.
-               uri = p_graph.first([subject, RDF::RDFA['uri'], nil])
-              term = p_graph.first([subject, RDF::RDFA['term'], nil])
-              prefix = p_graph.first([subject, RDF::RDFA['prefix'], nil])
+              uri = p_graph.first_object([subject, RDF::RDFA['uri'], nil])
+              term = p_graph.first_object([subject, RDF::RDFA['term'], nil])
+              prefix = p_graph.first_object([subject, RDF::RDFA['prefix'], nil])
               add_debug(element, "extract_mappings: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}")
 
               next if !uri || (!term && !prefix)
@@ -289,16 +289,17 @@ module RDF::RDFa
               # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
               # URI mappings after transforming the 'prefix' component to lower-case.
               # For every extracted
-              um[prefix.to_s.downcase] = uri if prefix
+              um[prefix.value.downcase] = uri.value if prefix
             
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-              tm[term.to_s] = RDF::URI.new(uri) if term
+              tm[term.value] = RDF::URI.new(uri.value) if term
             end
-          rescue RDF::ReaderError
-            add_debug(element, "extract_mappings: profile subject #{subject.to_s}: #{e.message}")
-            raise if @strict
+          # FIXME: subject isn't in scope here
+          #rescue RDF::ReaderError
+          #  add_debug(element, "extract_mappings: profile subject #{subject.to_s}: #{e.message}")
+          #  raise if @strict
           rescue RuntimeError => e
             add_debug(element, "extract_mappings: profile: #{e.message}")
             raise if @strict
@@ -339,8 +340,8 @@ module RDF::RDFa
         uri_mappings[prefix] = uri
       end
       
-      add_debug(element, "uri_mappings: #{uri_mappings.values.map{|ns|ns.to_s}.join(", ")}")
-      add_debug(element, "term_mappings: #{term_mappings.keys.join(", ")}")
+      add_debug(element, "uri_mappings: #{uri_mappings.map{|k,v|"#{k}='#{v}'"}.join(", ")}")
+      add_debug(element, "term_mappings: #{term_mappings.map{|k,v|"#{k}='#{v}'"}.join(", ")}")
     end
 
     # The recursive helper function
