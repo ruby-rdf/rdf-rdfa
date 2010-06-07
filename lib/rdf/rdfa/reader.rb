@@ -142,7 +142,7 @@ module RDF::RDFa
         @host_defaults = case @host_language
         when :xhtml
           {
-            :vocabulary => RDF::XHV["uri"],
+            :vocabulary => RDF::XHV.to_s,
             :prefix     => "xhv",
             :term_mappings => %w(
               alternate appendix bookmark cite chapter contents copyright first glossary help icon index
@@ -288,7 +288,7 @@ module RDF::RDFa
               # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
               # URI mappings after transforming the 'prefix' component to lower-case.
               # For every extracted
-              um[prefix.to_s.downcase] = RDF::URI.new(uri) if prefix
+              um[prefix.to_s.downcase] = uri if prefix
             
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
@@ -317,7 +317,7 @@ module RDF::RDFa
       element.namespaces.each do |attr_name, attr_value|
         begin
           abbr, prefix = attr_name.split(":")
-          uri_mappings[prefix.to_s.downcase] = RDF::URI.new(attr_value) if abbr.downcase == "xmlns" && prefix
+          uri_mappings[prefix.to_s.downcase] = attr_value.to_s if abbr.downcase == "xmlns" && prefix
         rescue ReaderError => e
           add_debug(element, "extract_mappings raised #{e.class}: #{e.message}")
           raise if @strict
@@ -335,7 +335,7 @@ module RDF::RDFa
         next unless prefix.match(/:$/)
         prefix.chop!
         
-        uri_mappings[prefix] = RDF::URI.new(uri)
+        uri_mappings[prefix] = uri
       end
       
       add_debug(element, "uri_mappings: #{uri_mappings.values.map{|ns|ns.to_s}.join(", ")}")
@@ -391,7 +391,7 @@ module RDF::RDFa
           # Set default_vocabulary to host language default
           @host_defaults.fetch(:voabulary, nil)
         else
-          RDF::URI.new(vocab)
+          vocab.to_s
         end
         add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")
       end
@@ -666,7 +666,7 @@ module RDF::RDFa
         options[:term_mappings][value.to_s.downcase]
       when options[:vocab]
         # Otherwise, if there is a local default vocabulary the URI is obtained by concatenating that value and the term.
-        options[:vocab].join(value)
+        RDF::URI.new(options[:vocab] + value)
       else
         # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
         nil
@@ -684,9 +684,9 @@ module RDF::RDFa
       elsif curie.to_s.match(/^:/)
         # Default prefix
         if uri_mappings[""]
-          uri_mappings[""].join(reference)
+          RDF::URI.new(uri_mappings[""] + reference)
         elsif @host_defaults[:prefix]
-          @host_defaults[:prefix].join(reference)
+          RDF::URI.new(@host_defaults[:prefix] + reference)
         end
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
@@ -695,7 +695,7 @@ module RDF::RDFa
         # Prefixes always downcased
         ns = uri_mappings[prefix.to_s.downcase]
         if ns
-          ns.join(reference)
+          RDF::URI.new(ns +reference)
         else
           add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix.downcase}")
           nil
