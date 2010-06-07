@@ -170,14 +170,12 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rdf>, [">= 0.1.6"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.3.3"])
-      s.add_runtime_dependency(%q<patron>, [">= 0.4.6"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<rdf-spec>, [">= 0"])
       s.add_development_dependency(%q<activesupport>, [">= 2.3.0"])
     else
       s.add_dependency(%q<rdf>, [">= 0.1.6"])
       s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
-      s.add_dependency(%q<patron>, [">= 0.4.6"])
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<rdf-spec>, [">= 0"])
       s.add_dependency(%q<activesupport>, [">= 2.3.0"])
@@ -185,7 +183,6 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<rdf>, [">= 0.1.6"])
     s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
-    s.add_dependency(%q<patron>, [">= 0.4.6"])
     s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<rdf-spec>, [">= 0"])
     s.add_dependency(%q<activesupport>, [">= 2.3.0"])
