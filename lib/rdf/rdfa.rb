@@ -1,4 +1,4 @@
-$:.unshift(File.dirname(__FILE__)) unless $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..')))
 require 'rdf'
 
 module RDF
@@ -23,8 +23,8 @@ module RDF
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   module RDFa
-    require 'rdfa/format'
-    require 'rdfa/vocab'
+    require 'rdf/rdfa/format'
+    require 'rdf/rdfa/vocab'
     autoload :Reader,  'rdf/rdfa/reader'
     autoload :VERSION, 'rdf/rdfa/version'
   end
