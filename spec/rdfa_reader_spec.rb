@@ -318,11 +318,11 @@ describe "RDF::RDFa::Reader" do
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0">
-        <head profile="http://www.w3.org/2007/08/pyRdfa/profiles/foaf">
+        <head>
           <title>Test</title>
           <base href="http://example.org/"/>
         </head>
-        <body>
+        <body profile="http://www.w3.org/2007/08/pyRdfa/profiles/foaf">
         <div about="#me">
           <p>
             <span property="name">Ivan Herman</span>
@@ -332,6 +332,17 @@ describe "RDF::RDFa::Reader" do
       </html>
       EOF
       
+      foaf = File.open(File.join(File.dirname(__FILE__), "..", "etc", "foaf.html"))
+      foaf_graph = RDF::Graph.new
+      RDF::RDFa::Reader.new(foaf,
+                  :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf").each do |statement|
+        foaf_graph << statement
+      end
+      
+      RDF::Graph.stub!(:load).with("http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
+                      :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
+                      :format => :rdfa).and_return(foaf_graph)
+
       # FIXME: mock out the HTTP request
       @reader = RDF::RDFa::Reader.new(sampledoc, :strict => true)
       @statement = @reader.graph.statements.first
