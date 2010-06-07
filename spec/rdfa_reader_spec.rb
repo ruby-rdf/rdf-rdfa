@@ -15,7 +15,7 @@ describe RDF::RDFa::Format do
   end
 end
 
-describe "RDF::RDFa::Reader" do
+describe RDF::RDFa::Reader do
   it "should be discoverable" do
     readers = [
       RDF::Reader.for(:rdfa),
@@ -45,12 +45,12 @@ describe "RDF::RDFa::Reader" do
       </html>
       EOF
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
-      @statement = @reader.graph.statements.first
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
+      @statement = @graph.statements.first
     end
 
     it "should return 1 triple" do
-      @reader.graph.size.should == 1
+      @graph.size.should == 1
     end
 
     it "should have a subject with an expanded URI" do
@@ -79,12 +79,12 @@ describe "RDF::RDFa::Reader" do
       </html>
       EOF
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :strict => true)
-      @statement = @reader.graph.statements.first
+      @graph = parse(sampledoc, :strict => true)
+      @statement = @graph.statements.first
     end
 
     it "should return 1 triple" do
-      @reader.graph.size.should == 1
+      @graph.size.should == 1
     end
 
     it "should have a Blank Node named 'photo' as the subject of the triple" do
@@ -119,15 +119,15 @@ describe "RDF::RDFa::Reader" do
       </html>
       EOF
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
     end
 
     it "should return 2 triples" do
-      @reader.graph.size.should == 2
+      @graph.size.should == 2
     end
 
     it "should have a triple for the dc:creator of the document" do
-      @reader.graph.should have_triple([
+      @graph.should have_triple([
         RDF::URI('http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml'),
         RDF::DC11.creator,
         "Albert Einstein"
@@ -135,7 +135,7 @@ describe "RDF::RDFa::Reader" do
     end
 
     it "should have an XML Literal for the dc:title of the document" do
-      @reader.graph.should have_triple([
+      @graph.should have_triple([
         RDF::URI('http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml'),
         RDF::DC11.title,
         RDF::Literal("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time", :datatype => RDF.XMLLiteral)
@@ -163,15 +163,15 @@ describe "RDF::RDFa::Reader" do
       </html>
       EOF
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017.xhtml", :strict => true)
     end
 
     it "should return 3 triples" do
-      @reader.graph.size.should == 3
+      @graph.size.should == 3
     end
 
     it "should have a triple for the foaf:name of BNode A" do
-      @reader.graph.should have_triple([
+      @graph.should have_triple([
         RDF::Node('a'),
         RDF::FOAF.name,
         "Manu Sporny"
@@ -179,7 +179,7 @@ describe "RDF::RDFa::Reader" do
     end
 
     it "should have a triple for the foaf:name of BNode B" do
-      @reader.graph.should have_triple([
+      @graph.should have_triple([
         RDF::Node('b'),
         RDF::FOAF.name,
         "Ralph Swick"
@@ -187,7 +187,7 @@ describe "RDF::RDFa::Reader" do
     end
 
     it "should have a triple for BNode A knows BNode B" do
-      @reader.graph.should have_triple([
+      @graph.should have_triple([
         RDF::Node('a'),
         RDF::FOAF.knows,
         RDF::Node('b'),
@@ -213,15 +213,15 @@ describe "RDF::RDFa::Reader" do
       </html>
       EOF
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049.xhtml", :strict => true)
     end
 
     it "should return 2 triples" do
-      @reader.graph.size.should == 2
+      @graph.size.should == 2
     end
 
     it "should have a triple stating that #me is of type foaf:Person" do
-      @reader.graph.should have_triple([
+      @graph.should have_triple([
         RDF::URI('http://www.example.org/#me'),
         RDF.type,
         RDF::FOAF.Person
@@ -229,7 +229,7 @@ describe "RDF::RDFa::Reader" do
     end
 
     it "should have a triple stating that #me has name 'John Doe'" do
-      @reader.graph.should have_triple([
+      @graph.should have_triple([
         RDF::URI('http://www.example.org/#me'),
         RDF::FOAF.name,
         RDF::Literal("John Doe")
@@ -257,15 +257,15 @@ describe "RDF::RDFa::Reader" do
       </html>
       EOF
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072.xhtml", :strict => true)
     end
 
     it "should return 1 triple" do
-      @reader.graph.size.should == 1
+      @graph.size.should == 1
     end
 
     it "should have the subject of the triple relative to the URI in base" do
-      @reader.graph.should have_subject RDF::URI('http://www.example.org/faq')
+      @graph.should have_subject RDF::URI('http://www.example.org/faq')
     end
   end
 
@@ -301,12 +301,12 @@ describe "RDF::RDFa::Reader" do
                       :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/basic",
                       :format => :rdfa).and_return(basic_graph)
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :strict => true)
-      @statement = @reader.graph.statements.first
+      @graph = parse(sampledoc, :strict => true)
+      @statement = @graph.statements.first
     end
 
     it "should return 1 triple" do
-      @reader.graph.size.should == 1
+      @graph.size.should == 1
     end
 
     it "should have a subject of http://example.org/#me" do
@@ -354,12 +354,12 @@ describe "RDF::RDFa::Reader" do
                       :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
                       :format => :rdfa).and_return(foaf_graph)
 
-      @reader = RDF::RDFa::Reader.new(sampledoc, :strict => true)
-      @statement = @reader.graph.statements.first
+      @graph = parse(sampledoc, :strict => true)
+      @statement = @graph.statements.first
     end
 
     it "should return 1 triple" do
-      @reader.graph.size.should == 1
+      @graph.size.should == 1
     end
 
     it "should have a subject of http://example.org/#me" do
@@ -424,4 +424,14 @@ describe "RDF::RDFa::Reader" do
       end
    end
  end
+
+  def parse(input, options)
+    @debug = []
+    graph = RDF::Graph.new
+    RDF::RDFa::Reader.new(input, options.merge(:debug => @debug)).each do |statement|
+      graph << statement
+    end
+    graph
+  end
+
 end
