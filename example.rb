@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-$:.unshift(File.join(File.dirname(__FILE__), 'lib'))
-
 require 'rubygems'
 require 'rdf/rdfa'
 
@@ -19,8 +17,7 @@ data = <<-EOF;
   </html>
 EOF
 
-RDF::RDFa::Reader.new(data, :base_uri => 'http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml') do |reader|
-  reader.each_statement do |statement|
-    statement.inspect!
-  end
+reader = RDF::RDFa::Reader.new(data, :base_uri => 'http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml')
+reader.each_statement do |statement|
+  statement.inspect!
 end

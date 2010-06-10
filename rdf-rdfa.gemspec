@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gregg Kellogg"]
-  s.date = %q{2010-06-03}
-  s.description = %q{    RDF::RDFa is an RDFa parser for Ruby using the RDF.rb library suite.
+  s.date = %q{2010-06-10}
+  s.description = %q{    RDF::RDFa is an RDFa reader for Ruby using the RDF.rb library suite.
 }
   s.email = %q{gregg@kellogg-assoc.com}
   s.extra_rdoc_files = [
@@ -19,7 +19,9 @@ Gem::Specification.new do |s|
      "README.rdoc"
   ]
   s.files = [
-    "AUTHORS",
+    ".gitignore",
+     ".yardopts",
+     "AUTHORS",
      "History.txt",
      "README.rdoc",
      "Rakefile",
@@ -156,9 +158,10 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.summary = %q{RDFa parser for RDF.rb.}
+  s.summary = %q{RDFa reader for RDF.rb.}
   s.test_files = [
-    "spec/rdfa_helper.rb",
+    "spec/matchers.rb",
+     "spec/rdfa_helper.rb",
      "spec/rdfa_reader_spec.rb",
      "spec/spec_helper.rb"
   ]

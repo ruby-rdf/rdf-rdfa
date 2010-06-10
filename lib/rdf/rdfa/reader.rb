@@ -113,11 +113,9 @@ module RDF::RDFa
     # @raise [RDF::ReaderError]:: Raises RDF::ReaderError if _strict_
     def initialize(input = $stdin, options = {}, &block)
       super do
-        @graph = RDF::Graph.new
         @debug = options[:debug]
         @strict = options[:strict]
-        @base_uri = options[:base_uri]
-        @base_uri = RDF::URI.parse(@base_uri) if @base_uri.is_a?(String)
+        @base_uri = RDF::URI.new(options[:base_uri])
         @@vocabulary_cache ||= {}
 
         @doc = case input
@@ -126,36 +124,8 @@ module RDF::RDFa
         else   Nokogiri::XML.parse(input, @base_uri.to_s)
         end
         
-        raise RDF::ReaderError, "Empty document" if @doc.nil? && @strict
-        @callback = block
-  
-        # Determine host language
-        # XXX - right now only XHTML defined
-        @host_language = case @doc.root.attributes["version"].to_s
-        when /XHTML+RDFa/ then :xhtml
-        end
-        
-        # If none found, assume xhtml
-        @host_language ||= :xhtml
-        
-        @host_defaults = {}
-        @host_defaults = case @host_language
-        when :xhtml
-          {
-            :vocabulary => RDF::XHV.to_s,
-            :prefix     => "xhv",
-            :term_mappings => %w(
-              alternate appendix bookmark cite chapter contents copyright first glossary help icon index
-              last license meta next p3pv1 prev role section stylesheet subsection start top up
-              ).inject({}) { |hash, term| hash[term] = RDF::XHV[term]; hash },
-          }
-        else
-          {}
-        end
-        
-        # parse
-        parse_whole_document(@doc, @base_uri)
-
+        raise RDF::ReaderError, "Synax errors:\n#{@doc.errors}" if !@doc.errors.empty? && @strict
+        raise RDF::ReaderError, "Empty document" if (@doc.nil? || @doc.root.nil?) && @strict
         block.call(self) if block_given?
       end
     end
@@ -169,7 +139,34 @@ module RDF::RDFa
     # @yieldparam [RDF::Statement] statement
     # @return [void]
     def each_statement(&block)
-      @graph.each_statement(&block)
+      @callback = block
+
+      # Determine host language
+      # XXX - right now only XHTML defined
+      @host_language = case @doc.root.attributes["version"].to_s
+      when /XHTML+RDFa/ then :xhtml
+      end
+      
+      # If none found, assume xhtml
+      @host_language ||= :xhtml
+      
+      @host_defaults = {}
+      @host_defaults = case @host_language
+      when :xhtml
+        {
+          :vocabulary => RDF::XHV.to_s,
+          :prefix     => "xhv",
+          :term_mappings => %w(
+            alternate appendix bookmark cite chapter contents copyright first glossary help icon index
+            last license meta next p3pv1 prev role section stylesheet subsection start top up
+            ).inject({}) { |hash, term| hash[term] = RDF::XHV[term]; hash },
+        }
+      else
+        {}
+      end
+      
+      # parse
+      parse_whole_document(@doc, @base_uri)
     end
 
     ##
@@ -181,7 +178,9 @@ module RDF::RDFa
     # @yieldparam [RDF::Value]    object
     # @return [void]
     def each_triple(&block)
-      @graph.each_triple(&block)
+      each_statement do |statement|
+        block.call(*statement.to_triple)
+      end
     end
     
     private
@@ -215,12 +214,7 @@ module RDF::RDFa
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
       add_debug(node, "statement: #{statement}")
-      @graph << statement
-      statement
-    rescue ReaderError => e
-      add_debug(node, "add_triple raised #{e.class}: #{e.message}")
-      puts e.backtrace if $DEBUG
-      raise if @strict
+      @callback.call(statement)
     end
 
   

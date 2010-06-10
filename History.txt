@@ -1,3 +1,6 @@
+=== 0.0.3
+* Removed interal graph in Reader and implement each_triple & each_statement to perform parsing
+
 === 0.0.2
 * Remove dependency on Namespace
 * Changed to RDF::RDFa, and moved files accordingly.
