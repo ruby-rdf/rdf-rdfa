@@ -14,7 +14,6 @@ begin
     gemspec.authors = ["Gregg Kellogg"]
     gemspec.add_dependency('rdf', '>= 0.1.6')
     gemspec.add_dependency('nokogiri', '>= 1.3.3')
-    gemspec.add_dependency('patron', '>= 0.4.6')
     gemspec.add_development_dependency('rspec')
     gemspec.add_development_dependency('rdf-spec')
     gemspec.add_development_dependency('activesupport', '>= 2.3.0')

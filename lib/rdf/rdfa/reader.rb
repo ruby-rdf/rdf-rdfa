@@ -23,12 +23,6 @@ module RDF::RDFa
   
     XML_LITERAL = RDF['XMLLiteral']
     
-    attr_reader :debug
-
-    ##
-    # @return [RDF::Graph]
-    attr_reader :graph
-
     # Host language, One of:
     #   :xhtml_rdfa_1_0
     #   :xhtml_rdfa_1_1

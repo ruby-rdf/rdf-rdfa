@@ -322,11 +322,11 @@ EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0">
-  <head profile="http://www.w3.org/2007/08/pyRdfa/profiles/basic">
+  <head>
     <title>Test</title>
     <base href="http://example.org/"/>
   </head>
-  <body>
+  <body profile="http://www.w3.org/2007/08/pyRdfa/profiles/basic">
   <div about="#me">
     <p>
       <span property="foaf:name">Ivan Herman</span>
@@ -336,7 +336,17 @@ EOF
 </html>
 EOF
       
-      # FIXME: mock out the HTTP request
+      basic = File.open(File.join(File.dirname(__FILE__), "..", "etc", "basic.html"))
+      basic_graph = RDF::Graph.new
+      RDF::RDFa::Reader.new(basic,
+                  :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/basic").each do |statement|
+        basic_graph << statement
+      end
+      
+      RDF::Graph.stub!(:load).with("http://www.w3.org/2007/08/pyRdfa/profiles/basic",
+                      :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/basic",
+                      :format => :rdfa).and_return(basic_graph)
+
       @graph = parse(sampledoc, :strict => true)
       @statement = @graph.statements.first
     end
@@ -389,7 +399,6 @@ EOF
                       :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
                       :format => :rdfa).and_return(foaf_graph)
 
-      # FIXME: mock out the HTTP request
       @graph = parse(sampledoc, :strict => true)
       @statement = @graph.statements.first
     end
@@ -458,9 +467,9 @@ EOF
           end
         end
       end
-    end
-  end
-  
+   end
+ end
+
   def parse(input, options)
     @debug = []
     graph = RDF::Graph.new
@@ -469,4 +478,5 @@ EOF
     end
     graph
   end
+
 end
