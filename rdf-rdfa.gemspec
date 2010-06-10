@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
      "pkg/.gitignore",
      "rdf-rdfa.gemspec",
      "script/console",
+     "spec/matchers.rb",
      "spec/rdfa-triples/0001.nt",
      "spec/rdfa-triples/0006.nt",
      "spec/rdfa-triples/0007.nt",
