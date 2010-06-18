@@ -1,4 +1,5 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
+require 'rdfa_helper'
 
 describe RDF::RDFa::Format do
   it "should be discoverable" do
@@ -421,23 +422,26 @@ EOF
   end
 
   def self.test_cases(suite)
-     [] #RdfaHelper::TestCase.test_cases(suite)
+    RdfaHelper::TestCase.test_cases(suite)
   end
 
   # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
-  %w(xhtml html4 html5).each do |suite|
+  %w(xhtml).each do |suite| # html4 html5
     describe "w3c #{suite} testcases" do
       describe "that are approved" do
         test_cases(suite).each do |t|
-          puts t.inspect
           next unless t.status == "approved"
-          #next unless t.name =~ /0140/
+          #next unless t.name =~ /0001/
           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
             #puts t.input
             #puts t.results
             begin
-              t.run_test do |rdfa_string, rdfa_parser|
-                rdfa_parser.parse(rdfa_string, t.informationResourceInput, :debug => [])
+              t.run_test do |rdfa_string|
+                t.debug = []
+                parse(rdfa_string,
+                    :base_uri => t.informationResourceInput,
+                    :strict => true,
+                    :debug => t.debug)
               end
             rescue SparqlException => e
               pending(e.message) { raise }
@@ -452,8 +456,12 @@ EOF
           #puts t.inspect
           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
             begin
-              t.run_test do |rdfa_string, rdfa_parser|
-                rdfa_parser.parse(rdfa_string, t.informationResourceInput, :debug => [])
+              t.run_test do |rdfa_string|
+                t.debug = []
+                parse(rdfa_string,
+                    :base_uri => t.informationResourceInput,
+                    :strict => true,
+                    :debug => t.debug)
               end
             rescue SparqlException => e
               pending(e.message) { raise }
@@ -471,7 +479,7 @@ EOF
  end
 
   def parse(input, options)
-    @debug = []
+    @debug = options[:debug] || []
     graph = RDF::Graph.new
     RDF::RDFa::Reader.new(input, options.merge(:debug => @debug)).each do |statement|
       graph << statement

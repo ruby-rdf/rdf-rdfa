@@ -1,3 +1,8 @@
+=== 0.2.0
+* Updates for RDF 0.2.0
+  * Use URI#intern instead of URI#new
+  * Change use of Graph#predicates and Graph#objects to use as enumerables
+
 === 0.0.3
 * Removed interal graph in Reader and implement each_triple & each_statement to perform parsing
 

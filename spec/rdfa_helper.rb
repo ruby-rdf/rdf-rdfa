@@ -1,8 +1,17 @@
+require 'rdf/rdfxml'
+autoload :YAML, "yaml"
+autoload :CGI, 'cgi'
+
+RDFA_DIR = File.join(File.dirname(__FILE__), 'rdfa-test-suite')
+RDFA_NT_DIR = File.join(File.dirname(__FILE__), 'rdfa-triples')
+RDFA_MANIFEST_URL = "http://rdfa.digitalbazaar.com/test-suite/"
+RDFA_TEST_CASE_URL = "#{RDFA_MANIFEST_URL}test-cases/"
+
+class SparqlException < IOError; end
+
 module RdfaHelper
   # Class representing test cases in format http://www.w3.org/2006/03/test-description#
   class TestCase
-    include Matchers
-    
     HTMLRE = Regexp.new('([0-9]{4,4})\.xhtml')
     TCPATHRE = Regexp.compile('\$TCPATH')
     
@@ -18,6 +27,7 @@ module RdfaHelper
     attr_accessor :specificationReference
     attr_accessor :expectedResults
     attr_accessor :parser
+    attr_accessor :debug
     
     @@suite = ""
     
@@ -25,19 +35,22 @@ module RdfaHelper
       self.suite = suite
       self.expectedResults = true
       statements.each do |statement|
-        next if statement.subject.is_a?(BNode)
-        #next unless statement.subject.uri.to_s.match(/0001/)
-        unless self.about
-          self.about = Addressable::URI.parse(statement.subject.uri.to_s)
-          self.name = statement.subject.short_name || self.about
-        end
+        next if statement.subject.is_a?(RDF::Node)
+        pred = statement.predicate.to_s.split(/[\#\/]/).last
+        obj  = statement.object.is_a?(RDF::Literal) ? statement.object.value : statement.object.to_s
         
-        if statement.predicate.short_name == "expectedResults"
-          self.expectedResults = statement.object.contents == "true"
+        puts "#{pred}: #{obj}" if $DEBUG
+
+        unless self.about
+          self.about = statement.subject
+          self.name = self.about.to_s.split(/[\#\/]/).last || self.about
+        end
+
+        if pred == "expectedResults"
+          self.expectedResults = obj == "true"
           #puts "expectedResults = #{statement.object.literal.value}"
-        elsif self.respond_to?("#{statement.predicate.short_name}=")
-          self.send("#{statement.predicate.short_name}=", statement.object.to_s)
-          #puts "#{statement.predicate.uri.short_name} = #{s.to_s}"
+        elsif self.respond_to?("#{pred}=")
+          self.send("#{pred}=", obj)
         end
       end
     end
@@ -132,8 +145,7 @@ module RdfaHelper
       rdfa_string = input
       
       # Run
-      @parser = RdfaParser::RdfaParser.new(:graph => Graph.new(:identifier => about))
-      yield(rdfa_string, @parser)
+      graph = yield(rdfa_string)
 
       query_string = results
 
@@ -141,19 +153,19 @@ module RdfaHelper
       
       if (query_string.match(/UNION|OPTIONAL/) || title.match(/XML/)) && triples
         # Check triples, as Rasql doesn't implement UNION
-        @parser.graph.should be_equivalent_graph(triples, self)
+        graph.should be_equivalent_graph(triples, self)
       elsif $redland_enabled
         # Run SPARQL query
-        @parser.graph.should pass_query(query_string, self)
+        graph.should pass_query(query_string, self)
       else
         raise SparqlException, "Query skipped, Redland not installed"
       end
 
-      @parser.graph.to_rdfxml.should be_valid_xml
+      graph.to_rdfxml.should be_valid_xml
     end
     
     def trace
-      @parser.debug.to_a.join("\n")
+      @debug.to_a.join("\n")
     end
     
     def self.test_cases(suite)
@@ -163,26 +175,41 @@ module RdfaHelper
       @suite = suite # Process the given test suite
       @manifest_url = "#{RDFA_MANIFEST_URL}#{suite}-manifest.rdf"
       
-      manifest_str = File.read(File.join(RDFA_DIR, "#{suite}-manifest.rdf"))
-      parser = RdfXmlParser.new
+      manifest_file = File.join(RDFA_DIR, "#{suite}-manifest.rdf")
+      yaml_file = File.join(File.dirname(__FILE__), "#{suite}-manifest.yml")
       
-      begin
-        parser.parse(manifest_str, @manifest_url)
-      rescue
-        raise "Parse error: #{$!}\n\t#{parser.debug.to_a.join("\t\n")}\n\n"
+      @test_cases = unless File.file?(yaml_file)
+        puts "parse #{manifest_file} @#{Time.now}"
+        graph = RDF::Graph.load(manifest_file, :base_uri => @manifest_url)
+        puts "parsed #{graph.size} statements @#{Time.now}"
+
+        graph.subjects.map do |subj|
+          t = TestCase.new(graph.query(:subject => subj), suite)
+          t.name ? t : nil
+        end.
+          compact.
+          sort_by{|t| t.name.to_s}
+      else
+        # Read tests from Manifest.yml
+        self.from_yaml(yaml_file)
       end
-      graph = parser.graph
-      
-      # Group by subject
-      test_hash = graph.triples.inject({}) do |hash, st|
-        a = hash[st.subject] ||= []
-        a << st
-        hash
+    end
+    
+    def self.to_yaml(suite, file)
+      test_cases = self.test_cases(suite)
+      puts "write test cases to #{file}"
+      File.open(file, 'w') do |out|
+        YAML.dump(test_cases, out )
       end
-      
-      @test_cases = test_hash.values.map {|statements| TestCase.new(statements, suite)}.
-        compact.
-        sort_by{|t| t.name }
+    end
+    
+    def self.from_yaml(file)
+      YAML::add_private_type("RdfaHelper::TestCase") do |type, val|
+        TestCase.new( val )
+      end
+      File.open(file, 'r') do |input|
+        @test_cases = YAML.load(input)
+      end
     end
   end
 end

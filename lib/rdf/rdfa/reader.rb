@@ -109,7 +109,7 @@ module RDF::RDFa
       super do
         @debug = options[:debug]
         @strict = options[:strict]
-        @base_uri = RDF::URI.new(options[:base_uri])
+        @base_uri = RDF::URI.intern(options[:base_uri])
         @@vocabulary_cache ||= {}
 
         @doc = case input
@@ -221,7 +221,7 @@ module RDF::RDFa
         base = base_el.attributes['href']
         # Strip any fragment from base
         base = base.to_s.split("#").first
-        @base_uri = RDF::URI.new(base)
+        @base_uri = RDF::URI.intern(base)
         add_debug(base_el, "parse_whole_doc: base='#{base}'")
       end
 
@@ -282,7 +282,7 @@ module RDF::RDFa
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-              tm[term.value] = RDF::URI.new(uri.value) if term
+              tm[term.value] = RDF::URI.intern(uri.value) if term
             end
           # FIXME: subject isn't in scope here
           #rescue RDF::ReaderError
@@ -439,7 +439,7 @@ module RDF::RDFa
             # From XHTML+RDFa 1.1:
             # if no URI is provided, then first check to see if the element is the head or body element.
             # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-            new_subject = RDF::URI.new(evaluation_context.base)
+            new_subject = RDF::URI.intern(evaluation_context.base)
           elsif element.attributes['typeof']
             new_subject = RDF::Node.new
           else
@@ -465,7 +465,7 @@ module RDF::RDFa
             # From XHTML+RDFa 1.1:
             # if no URI is provided, then first check to see if the element is the head or body element.
             # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-            new_subject = RDF::URI.new(evaluation_context.base)
+            new_subject = RDF::URI.intern(evaluation_context.base)
           elsif element.attributes['typeof']
             new_subject = RDF::Node.new
           else
@@ -635,7 +635,7 @@ module RDF::RDFa
           add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
         else
           ## FIXME: throw exception if there is no base uri set?
-          uri = RDF::URI.new(evaluation_context.base + value)
+          uri = RDF::URI.intern(evaluation_context.base + value)
           add_debug(element, "process_uri: #{value} => URI => <#{uri}>")
         end
         uri
@@ -656,7 +656,7 @@ module RDF::RDFa
         options[:term_mappings][value.to_s.downcase]
       when options[:vocab]
         # Otherwise, if there is a local default vocabulary the URI is obtained by concatenating that value and the term.
-        RDF::URI.new(options[:vocab] + value)
+        RDF::URI.intern(options[:vocab] + value)
       else
         # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
         nil
@@ -674,9 +674,9 @@ module RDF::RDFa
       elsif curie.to_s.match(/^:/)
         # Default prefix
         if uri_mappings[""]
-          RDF::URI.new(uri_mappings[""] + reference)
+          RDF::URI.intern(uri_mappings[""] + reference)
         elsif @host_defaults[:prefix]
-          RDF::URI.new(@host_defaults[:prefix] + reference)
+          RDF::URI.intern(@host_defaults[:prefix] + reference)
         end
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
@@ -685,7 +685,7 @@ module RDF::RDFa
         # Prefixes always downcased
         ns = uri_mappings[prefix.to_s.downcase]
         if ns
-          RDF::URI.new(ns +reference)
+          RDF::URI.intern(ns +reference)
         else
           add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix.downcase}")
           nil

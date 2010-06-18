@@ -2,51 +2,16 @@ module Matchers
   class BeEquivalentGraph
     Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument)
     def normalize(graph)
-      case @info.compare
-      when :array
-        array = case graph
-        when Graph, Parser
-          graph = graph.graph if graph.respond_to?(:graph)
-          anon = "a"
-          anon_ctx = {}
-          graph.triples.collect {|triple| triple.to_ntriples }.each do |t|
-            t.gsub(/_:nbn\d+[a-z]+N/, "_:").
-            gsub!(/_:bn\d+[a-z]+/) do |bn|
-              # Normalize anon BNodes
-              if anon_ctx[bn]
-                anon_ctx[bn]
-              else
-                anon_ctx[bn] = anon
-                anon = anon.succ
-              end
-              "_:#{anon_ctx[bn]}"
-            end
-          end.sort
-        when Array
-          graph.sort
-        else
-          graph.to_s.split("\n").
-            map {|t| t.gsub(/^\s*(.*)\s*$/, '\1')}.
-            reject {|t2| t2.match(/^\s*$/)}.
-            compact.
-            sort.
-            uniq
-        end
-        
-        # Implement to_ntriples on array, to simplify logic later
-        def array.to_ntriples; self.join("\n") + "\n"; end
-        array
+      case graph
+      when RDF::Graph then graph
+      when IO, StringIO
+        RDF::Graph.new.load(graph, :base_uri => @info.about)
       else
-        case graph
-        when Graph then graph
-        when Parser then graph.graph
-        when IO, StringIO
-          Parser.parse(graph, @info.about)
-        else
-          parser = Parser.new(:struct => true)
-          fmt = parser.detect_format(graph.to_s)
-          parser.parse(graph.to_s, @info.about, :type => fmt)
-        end
+        # Figure out which parser to use
+        g = RDF::Graph.new
+        reader_class = detect_format(graph)
+        reader_class.new(graph, :base_uri => @info.about).each {|s| g << s}
+        g
       end
     end
     
@@ -54,10 +19,12 @@ module Matchers
       @info = if info.respond_to?(:about)
         info
       elsif info.is_a?(Hash)
-        identifier = info[:identifier] || expected.is_a?(Graph) ? expected.identifier : info[:about]
-        Info.new(identifier, info[:information] || "", info[:trace], info[:compare])
+        identifier = info[:identifier] || expected.is_a?(RDF::Graph) ? expected.context : info[:about]
+        trace = info[:trace]
+        trace = trace.join("\n") if trace.is_a?(Array)
+        Info.new(identifier, info[:information] || "", trace, info[:compare])
       else
-        Info.new(expected.is_a?(Graph) ? expected.identifier : info, info.to_s)
+        Info.new(expected.is_a?(RDF::Graph) ? expected.context : info, info.to_s)
       end
       @expected = normalize(expected)
     end
@@ -68,15 +35,13 @@ module Matchers
     end
 
     def failure_message_for_should
-      info = @info.respond_to?(:information) ? @info.information : ""
-      if @expected.is_a?(Graph) && @actual.size != @expected.size
+      info = @info.respond_to?(:information) ? @info.information : @info.inspect
+      if @expected.is_a?(RDF::Graph) && @actual.size != @expected.size
         "Graph entry count differs:\nexpected: #{@expected.size}\nactual:   #{@actual.size}"
       elsif @expected.is_a?(Array) && @actual.size != @expected.length
         "Graph entry count differs:\nexpected: #{@expected.length}\nactual:   #{@actual.size}"
-      elsif @expected.is_a?(Graph) && @actual.identifier != @expected.identifier
-        "Graph identifiers differ:\nexpected: #{@expected.identifier}\nactual:   #{@actual.identifier}"
       else
-        "Graph differs#{@info.compare == :array ? '(array)' : ''}\n"
+        "Graph differs"
       end +
       "\n#{info + "\n" unless info.empty?}" +
       (@info.inputDocument ? "Input file: #{@info.inputDocument}\n" : "") +
@@ -101,6 +66,7 @@ module Matchers
         @expected = expected
         @query = Redland::Query.new(expected)
         @info = info
+        #puts "PassQuery: expected #{expected.inspect}"
       end
       def matches?(actual)
         @actual = actual
