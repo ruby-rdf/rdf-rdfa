@@ -17,6 +17,49 @@ describe RDF::RDFa::Format do
 end
 
 describe "RDF::RDFa::Reader" do
+  before(:all) do
+    # Don't load external profiles when testing
+    {
+      "basic" => {
+        :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/basic",
+        :format => :rdfa,
+        :file => File.join(File.dirname(__FILE__), "..", "etc", "basic.html"),
+      },
+      "foaf" => {
+        :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
+        :format => :rdfa,
+        :file => File.join(File.dirname(__FILE__), "..", "etc", "foaf.html"),
+      },
+      "xhv" => {
+        :base_uri => "http://www.w3.org/1999/xhtml/vocab",
+        :format => :rdfa,
+        :file => File.join(File.dirname(__FILE__), "..", "etc", "xhv.html"),
+      },
+      "profile" => {
+        :base_uri => "http://www.w3.org/2005/10/profile",
+        :format => :rdfa,
+        :value => "PROFILE",
+      },
+      "hcard" => {
+        :base_uri => "http://microformats.org/profiles/hcard",
+        :format => :rdfa,
+        :value => "HCARD",
+      },
+    }.each_pair do |name, opts|
+      if opts[:file]
+        graph = RDF::Graph.new
+        RDF::Reader.for(opts[:format]).new(File.read(opts[:file]),
+                    :base_uri => opts[:base_uri]).each do |statement|
+          graph << statement
+        end
+        opts[:value] = graph
+      end
+      RDF::Graph.stub!(:load).with(opts[:base_uri],
+                      :base_uri => opts[:base_uri],
+                      :format => opts[:format]).and_return(opts[:value])
+    end
+  end
+  
   context "discovery" do
     {
       "html" => RDF::Reader.for(:rdfa),
@@ -337,17 +380,6 @@ EOF
 </html>
 EOF
       
-      basic = File.open(File.join(File.dirname(__FILE__), "..", "etc", "basic.html"))
-      basic_graph = RDF::Graph.new
-      RDF::RDFa::Reader.new(basic,
-                  :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/basic").each do |statement|
-        basic_graph << statement
-      end
-      
-      RDF::Graph.stub!(:load).with("http://www.w3.org/2007/08/pyRdfa/profiles/basic",
-                      :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/basic",
-                      :format => :rdfa).and_return(basic_graph)
-
       @graph = parse(sampledoc, :strict => true)
       @statement = @graph.statements.first
     end
@@ -389,17 +421,6 @@ EOF
 </html>
 EOF
       
-      foaf = File.open(File.join(File.dirname(__FILE__), "..", "etc", "foaf.html"))
-      foaf_graph = RDF::Graph.new
-      RDF::RDFa::Reader.new(foaf,
-                  :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf").each do |statement|
-        foaf_graph << statement
-      end
-      
-      RDF::Graph.stub!(:load).with("http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
-                      :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
-                      :format => :rdfa).and_return(foaf_graph)
-
       @graph = parse(sampledoc, :strict => true)
       @statement = @graph.statements.first
     end

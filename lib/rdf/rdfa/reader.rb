@@ -244,9 +244,12 @@ module RDF::RDFa
       # If @profile is present, its value is processed as defined in RDFa Profiles.
       element.attributes['profile'].to_s.split(/\s/).each do |profile|
         # Don't try to open ourselves!
-        if @base_uri == profile
-          add_debug(element, "extract_mappings: skip recursive profile <#{profile}>")
+        if @@vocabulary_cache[profile]
+          add_debug(element, "extract_mappings: cached profile <#{profile}>")
           @@vocabulary_cache[profile]
+        elsif @base_uri.to_s == profile
+          add_debug(element, "extract_mappings: skip recursive profile <#{profile}>")
+          next
         elsif @@vocabulary_cache.has_key?(profile)
           add_debug(element, "extract_mappings: skip previously parsed profile <#{profile}>")
         else
@@ -263,7 +266,9 @@ module RDF::RDFa
             old_debug, old_verbose, = $DEBUG, $verbose
             $DEBUG, $verbose = false, false
             # FIXME: format shouldn't need to be specified here
-            p_graph = RDF::Graph.load(profile, :base_uri => profile, :format => :rdfa)
+            puts "load :base_uri => #{profile}, :format => #{RDF::Format.for(profile) || :rdfa}"
+            p_graph = RDF::Graph.load(profile, :base_uri => profile, :format => RDF::Format.for(profile) || :rdfa)
+            puts p_graph.inspect
             $DEBUG, $verbose = old_debug, old_verbose
             p_graph.each_subject do |subject|
               # If one of the objects is not a Literal no mapping is created.
