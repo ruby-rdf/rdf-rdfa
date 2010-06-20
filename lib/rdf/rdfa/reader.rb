@@ -21,8 +21,6 @@ module RDF::RDFa
       $},
       Regexp::EXTENDED)
   
-    XML_LITERAL = RDF['XMLLiteral']
-    
     # Host language, One of:
     #   :xhtml_rdfa_1_0
     #   :xhtml_rdfa_1_1
@@ -71,9 +69,9 @@ module RDF::RDFa
         @base = base
         @parent_subject = @base
         @parent_object = nil
-        @uri_mappings = {}
         @incomplete_triples = []
         @language = nil
+        @uri_mappings = host_defaults.fetch(:uri_mappings, {})
         @term_mappings = host_defaults.fetch(:term_mappings, {})
         @default_voabulary = host_defaults.fetch(:voabulary, nil)
       end
@@ -150,6 +148,7 @@ module RDF::RDFa
         {
           :vocabulary => RDF::XHV.to_s,
           :prefix     => "xhv",
+          :uri_mappings => {"xhv" => RDF::XHV.to_s}, # RDF::XHTML is wrong
           :term_mappings => %w(
             alternate appendix bookmark cite chapter contents copyright first glossary help icon index
             last license meta next p3pv1 prev role section stylesheet subsection start top up
@@ -179,6 +178,12 @@ module RDF::RDFa
     
     private
 
+    # Keep track of allocated BNodes
+    def bnode(value = nil)
+      @bnode_cache ||= {}
+      @bnode_cache[value.to_s] ||= RDF::Node.new(value)
+    end
+    
     # Figure out the document path, if it is a Nokogiri::XML::Element or Attribute
     def node_path(node)
       case node
@@ -528,7 +533,7 @@ module RDF::RDFa
       
         # the following 3 IF clauses should be mutually exclusive. Written as is to prevent extensive indentation.
         type_resource = process_uri(element, type, evaluation_context, :uri_mappings => uri_mappings, :term_mappings => term_mappings, :vocab => default_vocabulary) if type
-        if type and !type.empty? and (type_resource.to_s != XML_LITERAL.to_s)
+        if type and !type.empty? and (type_resource.to_s != RDF['XMLLiteral'].to_s)
           # typed literal
           add_debug(element, "[Step 11] typed literal")
           current_object_literal = RDF::Literal.new(content || element.inner_text, :datatype => type_resource, :language => language)
@@ -536,10 +541,10 @@ module RDF::RDFa
           # plain literal
           add_debug(element, "[Step 11] plain literal")
           current_object_literal = RDF::Literal.new(content || element.inner_text, :language => language)
-        elsif children_node_types != [Nokogiri::XML::Text] and (type == nil or type_resource.to_s == XML_LITERAL.to_s)
+        elsif children_node_types != [Nokogiri::XML::Text] and (type == nil or type_resource.to_s == RDF['XMLLiteral'].to_s)
           # XML Literal
           add_debug(element, "[Step 11] XML Literal: #{element.inner_html}")
-          current_object_literal = RDF::Literal.new(element.inner_html, :datatype => XML_LITERAL, :language => language, :namespaces => uri_mappings)
+          current_object_literal = RDF::Literal.xmlliteral(element.inner_html, :language => language, :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"))
           recurse = false
         end
       
@@ -635,7 +640,7 @@ module RDF::RDFa
           add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
         else
           ## FIXME: throw exception if there is no base uri set?
-          uri = RDF::URI.intern(evaluation_context.base + value)
+          uri = RDF::URI.intern(RDF::URI.intern(evaluation_context.base).join(value))
           add_debug(element, "process_uri: #{value} => URI => <#{uri}>")
         end
         uri
@@ -670,13 +675,13 @@ module RDF::RDFa
 
       # consider the bnode situation
       if prefix == "_"
-        RDF::Node.new(reference)
+        bnode(reference)
       elsif curie.to_s.match(/^:/)
         # Default prefix
         if uri_mappings[""]
           RDF::URI.intern(uri_mappings[""] + reference)
         elsif @host_defaults[:prefix]
-          RDF::URI.intern(@host_defaults[:prefix] + reference)
+          RDF::URI.intern(uri_mappings[@host_defaults[:prefix]] + reference)
         end
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
