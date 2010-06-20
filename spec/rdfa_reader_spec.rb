@@ -186,7 +186,7 @@ EOF
       @graph.should have_triple([
         RDF::URI('http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml'),
         RDF::DC11.title,
-        RDF::Literal("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time", :datatype => RDF.XMLLiteral)
+        RDF::Literal("E = mc<sup xmlns=\"http://www.w3.org/1999/xhtml\">2</sup>: The Most Urgent Problem of Our Time", :datatype => RDF.XMLLiteral)
       ])
     end
   end
