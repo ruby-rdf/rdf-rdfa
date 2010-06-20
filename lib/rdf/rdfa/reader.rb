@@ -688,9 +688,9 @@ module RDF::RDFa
       elsif curie.to_s.match(/^:/)
         # Default prefix
         if uri_mappings[""]
-          RDF::URI.intern(uri_mappings[""] + reference)
+          RDF::URI.intern(uri_mappings[""] + reference.to_s)
         elsif @host_defaults[:prefix]
-          RDF::URI.intern(uri_mappings[@host_defaults[:prefix]] + reference)
+          RDF::URI.intern(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
         end
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
@@ -699,7 +699,7 @@ module RDF::RDFa
         # Prefixes always downcased
         ns = uri_mappings[prefix.to_s.downcase]
         if ns
-          RDF::URI.intern(ns +reference)
+          RDF::URI.intern(ns + reference.to_s)
         else
           add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix.downcase}")
           nil
