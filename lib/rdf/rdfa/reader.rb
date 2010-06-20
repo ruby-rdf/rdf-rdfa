@@ -419,7 +419,8 @@ module RDF::RDFa
       else
         language
       end
-      add_debug(element, "HTML5 [3.2.3.3] traverse, lang: #{language}") if attrs['lang']
+      language = nil if language.to_s.empty?
+      add_debug(element, "HTML5 [3.2.3.3] traverse, lang: #{language || 'nil'}") if attrs['lang']
     
       # rels and revs
       rels = process_uris(element, rel, evaluation_context, :uri_mappings => uri_mappings, :term_mappings => term_mappings, :vocab => default_vocabulary)
@@ -545,11 +546,11 @@ module RDF::RDFa
         if type and !type.empty? and (type_resource.to_s != RDF['XMLLiteral'].to_s)
           # typed literal
           add_debug(element, "[Step 11] typed literal")
-          current_object_literal = RDF::Literal.new(content || element.inner_text, :datatype => type_resource, :language => language)
+          current_object_literal = RDF::Literal.new(content || element.inner_text.to_s, :datatype => type_resource, :language => language)
         elsif content or (children_node_types == [Nokogiri::XML::Text]) or (element.children.length == 0) or (type == '')
           # plain literal
           add_debug(element, "[Step 11] plain literal")
-          current_object_literal = RDF::Literal.new(content || element.inner_text, :language => language)
+          current_object_literal = RDF::Literal.new(content || element.inner_text.to_s, :language => language)
         elsif children_node_types != [Nokogiri::XML::Text] and (type == nil or type_resource.to_s == RDF['XMLLiteral'].to_s)
           # XML Literal
           add_debug(element, "[Step 11] XML Literal: #{element.inner_html}")
