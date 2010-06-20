@@ -243,11 +243,15 @@ module RDF::RDFa
       # local list of URI mappings via @profile.
       # If @profile is present, its value is processed as defined in RDFa Profiles.
       element.attributes['profile'].to_s.split(/\s/).each do |profile|
-        # Don't try to open ourselves!
-        if @@vocabulary_cache[profile]
+        if node_path(element) == "/html/head"
+          # Don't try to open ourselves!
+          add_debug(element, "extract_mappings: skip head profile <#{profile}>")
+          next
+        elsif @@vocabulary_cache[profile]
           add_debug(element, "extract_mappings: cached profile <#{profile}>")
           @@vocabulary_cache[profile]
         elsif @base_uri.to_s == profile
+          # Don't try to open ourselves!
           add_debug(element, "extract_mappings: skip recursive profile <#{profile}>")
           next
         elsif @@vocabulary_cache.has_key?(profile)
