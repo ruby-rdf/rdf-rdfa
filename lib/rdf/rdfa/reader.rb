@@ -122,8 +122,6 @@ module RDF::RDFa
       end
     end
 
-
-    # XXX Invoke the parser, and allow add_triple to make the callback?
     ##
     # Iterates the given block for each RDF statement in the input.
     #
@@ -270,7 +268,6 @@ module RDF::RDFa
             old_debug, old_verbose, = $DEBUG, $verbose
             $DEBUG, $verbose = false, false
             # FIXME: format shouldn't need to be specified here
-            puts "load :base_uri => #{profile}, :format => #{RDF::Format.for(profile) || :rdfa}"
             p_graph = RDF::Graph.load(profile, :base_uri => profile, :format => RDF::Format.for(profile) || :rdfa)
             puts p_graph.inspect
             $DEBUG, $verbose = old_debug, old_verbose
@@ -331,7 +328,6 @@ module RDF::RDFa
       # Set mappings from @prefix
       # prefix is a whitespace separated list of prefix-name URI pairs of the form
       #   NCName ':' ' '+ xs:anyURI
-      # SPEC Confusion: prefix is forced to lower-case in @profile, but not specified here.
       mappings = element.attributes["prefix"].to_s.split(/\s+/)
       while mappings.length > 0 do
         prefix, uri = mappings.shift.downcase, mappings.shift
