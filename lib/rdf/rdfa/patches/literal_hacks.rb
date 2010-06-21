@@ -44,7 +44,7 @@ module RDF
       # Add already mapped namespaces and language
       l.value = contents.map do |c|
         if c.is_a?(Nokogiri::XML::Element)
-          c = Nokogiri::XML.parse(c.dup.to_s).root
+          c = Nokogiri::XML.parse(c.dup.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS)).root
           # Gather namespaces from self and decendant nodes
           c.traverse do |n|
             ns = n.namespace
