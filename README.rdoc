@@ -25,16 +25,14 @@ Instantiate a parser and parse source, specifying type and base-URL
   end
 
 == Dependencies
-  * [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.1.6)
+  * [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.2.0)
   * [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.3.3)
-  * [Patron](http://rubygems.org/gems/patron) (>= 0.4.6) -- For RDFa profiles
 
 == TODO
 * Add support for LibXML and REXML bindings, and use the best available
 * Consider a SAX-based parser for improved performance
 * Port SPARQL tests to native SPARQL processor, when one becomes available.
 * Add generic XHTML+RDFa Writer
-* Only parse profiles if Patron included, don't force otherwise
 
 == Resources:
 * RDF.rb[http://rdf.rubyforge.org/]   

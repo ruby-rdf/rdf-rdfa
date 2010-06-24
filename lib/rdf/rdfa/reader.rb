@@ -95,11 +95,11 @@ module RDF::RDFa
     ##
     # Initializes the RDFa reader instance.
     #
-    # @param  [IO, File, String]::       input
-    # @param  [Hash{Symbol => Object}]:: options
-    # <em>options[:debug]</em>:: Array to place debug messages
-    # <em>options[:strict]</em>:: Raise Error if true, continue with lax parsing, otherwise
-    # <em>options[:base_uri]</em>:: Base URI to use for relative URIs.
+    # @param  [Nokogiri::HTML::Document, Nokogiri::XML::Document, IO, File, String]       input
+    # @option options [Array] :debug (nil) Array to place debug messages
+    # @option options [Boolean] :strict (false) Raise Error if true, continue with lax parsing, otherwise
+    # @option options [Boolean] :base_uri (nil) Base URI to use for relative URIs.
+    # @return [reader]
     # @yield  [reader]
     # @yieldparam [Reader] reader
     # @raise [RDF::ReaderError]:: Raises RDF::ReaderError if _strict_
