@@ -269,7 +269,7 @@ module RDF::RDFa
             $DEBUG, $verbose = false, false
             # FIXME: format shouldn't need to be specified here
             p_graph = RDF::Graph.load(profile, :base_uri => profile, :format => RDF::Format.for(profile) || :rdfa)
-            puts p_graph.inspect
+            puts p_graph.inspect if old_debug
             $DEBUG, $verbose = old_debug, old_verbose
             p_graph.each_subject do |subject|
               # If one of the objects is not a Literal no mapping is created.
@@ -539,7 +539,7 @@ module RDF::RDFa
       
         # the following 3 IF clauses should be mutually exclusive. Written as is to prevent extensive indentation.
         type_resource = process_uri(element, type, evaluation_context, :uri_mappings => uri_mappings, :term_mappings => term_mappings, :vocab => default_vocabulary) if type
-        if type and !type.empty? and (type_resource.to_s != RDF['XMLLiteral'].to_s)
+        if type and !type.empty? and (type_resource.to_s != RDF.XMLLiteral.to_s)
           # typed literal
           add_debug(element, "[Step 11] typed literal")
           current_object_literal = RDF::Literal.new(content || element.inner_text.to_s, :datatype => type_resource, :language => language)
@@ -547,10 +547,10 @@ module RDF::RDFa
           # plain literal
           add_debug(element, "[Step 11] plain literal")
           current_object_literal = RDF::Literal.new(content || element.inner_text.to_s, :language => language)
-        elsif children_node_types != [Nokogiri::XML::Text] and (type == nil or type_resource.to_s == RDF['XMLLiteral'].to_s)
+        elsif children_node_types != [Nokogiri::XML::Text] and (type == nil or type_resource.to_s == RDF.XMLLiteral.to_s)
           # XML Literal
           add_debug(element, "[Step 11] XML Literal: #{element.inner_html}")
-          current_object_literal = RDF::Literal.xmlliteral(element.inner_html, :language => language, :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"))
+          current_object_literal = RDF::Literal.new(element.inner_html, :datatype => RDF.XMLLiteral, :language => language, :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"))
           recurse = false
         end
       

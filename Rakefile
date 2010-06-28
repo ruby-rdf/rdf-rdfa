@@ -13,11 +13,11 @@ begin
     gemspec.email = "gregg@kellogg-assoc.com"
     gemspec.homepage = "http://github.com/gkellogg/rdf-rdfa"
     gemspec.authors = ["Gregg Kellogg"]
-    gemspec.add_dependency('rdf', '>= 0.2.0')
+    gemspec.add_dependency('rdf', '>= 0.2.1')
     gemspec.add_dependency('nokogiri', '>= 1.3.3')
     gemspec.add_development_dependency('rspec')
-    gemspec.add_development_dependency('rdf-spec', '>= 0.2.0')
-    gemspec.add_development_dependency('rdf-rdfxml', '>= 0.2.0')
+    gemspec.add_development_dependency('rdf-spec', '>= 0.2.1')
+    gemspec.add_development_dependency('rdf-rdfxml', '>= 0.2.1')
     gemspec.add_development_dependency('rdf-isomorphic')
     gemspec.add_development_dependency('yard')
     gemspec.extra_rdoc_files     = %w(README.rdoc History.txt AUTHORS CONTRIBUTORS)

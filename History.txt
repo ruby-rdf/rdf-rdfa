@@ -1,3 +1,6 @@
+=== 0.2.1
+* Update for RDF 0.2.1
+
 === 0.2.0
 * Updates for RDF 0.2.0
   * Use URI#intern instead of URI#new
