@@ -3,6 +3,7 @@ $:.unshift File.dirname(__FILE__)
 
 require 'rubygems'
 require 'spec'
+require 'bigdecimal'  # XXX Remove Me
 require 'rdf/rdfa'
 require 'rdf/spec'
 require 'rdf/isomorphic'
