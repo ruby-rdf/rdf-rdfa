@@ -5,8 +5,8 @@ module RDF::RDFa
   # An RDFa parser in Ruby
   #
   # Based on processing rules described here:
-  #   RDFa 1.0: http://www.w3.org/TR/rdfa-syntax/#s_model
-  #   RDFa 1.1: http://www.w3.org/2010/02/rdfa/drafts/2010/ED-rdfa-core-20100705/
+  # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
+  # @see http://www.w3.org/2010/02/rdfa/drafts/2010/ED-rdfa-core-20100705/ RDFa 1.1
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
@@ -25,49 +25,78 @@ module RDF::RDFa
       $},
       Regexp::EXTENDED)
   
-    # Host language, One of:
-    #   :xhtml_rdfa_1_0
-    #   :xhtml_rdfa_1_1
+    # Host language
+    # @return [:xhtml]
     attr_reader :host_language
     
     # The Recursive Baggage
+    # @private
     class EvaluationContext # :nodoc:
-      # The base. This will usually be the URL of the document being processed,
+      # The base.
+      #
+      # This will usually be the URL of the document being processed,
       # but it could be some other URL, set by some other mechanism,
       # such as the (X)HTML base element. The important thing is that it establishes
       # a URL against which relative paths can be resolved.
+      #
+      # @return [URI]
       attr :base, true
       # The parent subject.
+      #
       # The initial value will be the same as the initial value of base,
       # but it will usually change during the course of processing.
+      #
+      # @return [URI]
       attr :parent_subject, true
       # The parent object.
+      #
       # In some situations the object of a statement becomes the subject of any nested statements,
       # and this property is used to convey this value.
       # Note that this value may be a bnode, since in some situations a number of nested statements
       # are grouped together on one bnode.
       # This means that the bnode must be set in the containing statement and passed down,
       # and this property is used to convey this value.
+      #
+      # @return URI
       attr :parent_object, true
       # A list of current, in-scope URI mappings.
+      #
+      # @return [Hash{Symbol => String}]
       attr :uri_mappings, true
-      # A list of incomplete triples. A triple can be incomplete when no object resource
+      # A list of incomplete triples.
+      #
+      # A triple can be incomplete when no object resource
       # is provided alongside a predicate that requires a resource (i.e., @rel or @rev).
       # The triples can be completed when a resource becomes available,
       # which will be when the next subject is specified (part of the process called chaining).
+      #
+      # @return [Array<Array<URI, Resource>>]
       attr :incomplete_triples, true
       # The language. Note that there is no default language.
+      #
+      # @return [Symbol]
       attr :language, true
       # The term mappings, a list of terms and their associated URIs.
+      #
       # This specification does not define an initial list.
       # Host Languages may define an initial list.
       # If a Host Language provides an initial list, it should do so via an RDFa Profile document.
+      #
+      # @return [Hash{Symbol => URI}]
       attr :term_mappings, true
-      # The default vocabulary, a value to use as the prefix URI when a term is used.
+      # The default vocabulary
+      #
+      # A value to use as the prefix URI when a term is used.
       # This specification does not define an initial setting for the default vocabulary.
       # Host Languages may define an initial setting.
+      #
+      # @return [URI]
       attr :default_vocabulary, true
 
+      # @param [String] base
+      # @param [Hash] host_defaults
+      # @option host_defaults [Hash{String => URI}] :term_mappings Hash of NCName => URI
+      # @option host_defaults [Hash{String => URI}] :vocabulary Hash of prefix => URI
       def initialize(base, host_defaults)
         # Initialize the evaluation context, [5.1]
         @base = base
@@ -77,10 +106,12 @@ module RDF::RDFa
         @language = nil
         @uri_mappings = host_defaults.fetch(:uri_mappings, {})
         @term_mappings = host_defaults.fetch(:term_mappings, {})
-        @default_voabulary = host_defaults.fetch(:voabulary, nil)
+        @default_vocabulary = host_defaults.fetch(:vocabulary, nil)
       end
 
       # Copy this Evaluation Context
+      #
+      # @param [EvaluationContext] from
       def initialize_copy(from)
         # clone the evaluation context correctly
         @uri_mappings = from.uri_mappings.clone
@@ -99,13 +130,13 @@ module RDF::RDFa
     ##
     # Initializes the RDFa reader instance.
     #
-    # @param  [Nokogiri::HTML::Document, Nokogiri::XML::Document, IO, File, String]       input
+    # @param  [Nokogiri::HTML::Document, Nokogiri::XML::Document, #read, #to_s]       input
     # @option options [Array] :debug (nil) Array to place debug messages
     # @option options [Boolean] :strict (false) Raise Error if true, continue with lax parsing, otherwise
     # @option options [Boolean] :base_uri (nil) Base URI to use for relative URIs.
     # @return [reader]
     # @yield  [reader]
-    # @yieldparam [Reader] reader
+    # @yieldparam [RDF::Reader] reader
     # @raise [RDF::ReaderError]:: Raises RDF::ReaderError if _strict_
     def initialize(input = $stdin, options = {}, &block)
       super do
@@ -146,6 +177,8 @@ module RDF::RDFa
       # If none found, assume xhtml
       @host_language ||= :xhtml
       
+      @version = version.to_s.match(/RDFa 1.0/) ? :rdfa_1_0 : :rdfa_1_1
+
       @host_defaults = {}
       @host_defaults = case @host_language
       when :xhtml
@@ -162,7 +195,8 @@ module RDF::RDFa
         {}
       end
       
-      @version = version.to_s.match(/RDFa 1.0/) ? :rdfa_1_0 : :rdfa_1_1
+      @host_defaults.delete(:vocabulary) if @version == :rdfa_1_0
+      
       add_debug(@doc, "version = #{@version},  host_language = #{@host_language}")
 
       # parse
@@ -406,9 +440,9 @@ module RDF::RDFa
       unless vocab.nil?
         default_vocabulary = if vocab.to_s.empty?
           # Set default_vocabulary to host language default
-          @host_defaults.fetch(:voabulary, nil)
+          @host_defaults.fetch(:vocabulary, nil)
         else
-          vocab.to_s
+          RDF::URI.intern(vocab)
         end
         add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")
       end
