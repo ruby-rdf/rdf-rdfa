@@ -112,7 +112,7 @@ module RDF; class Literal
 
             # Add lanuage
             if language && c["lang"].to_s.empty?
-              c["xml:lang"] = language
+              c["xml:lang"] = language.to_s
             end
           end
           c
@@ -143,5 +143,5 @@ module RDF; class Literal
       # Fixme
     end
     
-  end unless defined?(::RDF::Literal::XML)# class XML
+  end # class XML
 end; end
