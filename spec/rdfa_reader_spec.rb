@@ -1,3 +1,4 @@
+$:.unshift "."
 require File.join(File.dirname(__FILE__), 'spec_helper')
 require 'rdfa_helper'
 
@@ -78,7 +79,7 @@ describe "RDF::RDFa::Reader" do
     before(:each) do
       @sampledoc = <<-EOF;
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:dc="http://purl.org/dc/elements/1.1/">
 <head>
@@ -124,7 +125,7 @@ EOF
     before :each do
       sampledoc = <<-EOF;
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:dc="http://purl.org/dc/elements/1.1/">
 <head>
@@ -161,7 +162,7 @@ EOF
     before :each do
       sampledoc = <<-EOF;
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:dc="http://purl.org/dc/elements/1.1/">
 <body>
@@ -195,7 +196,7 @@ EOF
     before :each do
       sampledoc = <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:dc="http://purl.org/dc/elements/1.1/">
   <head>
@@ -238,8 +239,8 @@ EOF
     before :each do
       sampledoc = <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
       xmlns:foaf="http://xmlns.com/foaf/0.1/">
   <head>
   <title>Test 0017</title>
@@ -290,8 +291,8 @@ EOF
     before :each do
       sampledoc = <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
       xmlns:foaf="http://xmlns.com/foaf/0.1/">
   <head>
     <title>Test 0049</title>
@@ -332,8 +333,8 @@ EOF
     before :each do
       sampledoc = <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
     xmlns:dc="http://purl.org/dc/elements/1.1/">
  <head>
     <base href="http://www.example.org/"></base>
@@ -364,8 +365,8 @@ EOF
     before :each do
       sampledoc = <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
   <head>
     <title>Test</title>
     <base href="http://example.org/"/>
@@ -405,8 +406,8 @@ EOF
     before :each do
       sampledoc = <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
   <head>
     <title>Test</title>
     <base href="http://example.org/"/>
@@ -447,7 +448,7 @@ EOF
   end
 
   # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
-  %w(xhtml).each do |suite| # html4 html5
+  %w(xhtml xhtml11).each do |suite| # html4 html5
     describe "w3c #{suite} testcases" do
       describe "that are approved" do
         test_cases(suite).each do |t|
@@ -461,7 +462,6 @@ EOF
                 t.debug = []
                 parse(rdfa_string,
                     :base_uri => t.informationResourceInput,
-                    :strict => true,
                     :debug => t.debug)
               end
             rescue SparqlException => e
@@ -481,7 +481,6 @@ EOF
                 t.debug = []
                 parse(rdfa_string,
                     :base_uri => t.informationResourceInput,
-                    :strict => true,
                     :debug => t.debug)
               end
             rescue SparqlException => e

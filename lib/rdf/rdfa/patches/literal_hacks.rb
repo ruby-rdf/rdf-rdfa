@@ -20,10 +20,9 @@ module RDF; class Literal
     ##
     # @param  [Object] value
     # @option options [String] :lexical (nil)
-    # @option options [Hash] :namespaces (nil)
-    # @option options [Hash] :namespaces ({})
+    # @option options [Hash] :namespaces ({}) Use :__default__ or "" to declare default namespace
     # @option options [Symbol] :language (nil)
-    # @option options [Symbol] :library (:nokogiri, :libxml, or :rexml)
+    # @option options [:nokogiri, :libxml, or :rexml] :library
     def initialize(value, options = {})
       options[:namespaces] ||= {}
 
@@ -69,7 +68,8 @@ module RDF; class Literal
     def parse_value(value, options)
       ns_hash = {}
       options[:namespaces].each_pair do |prefix, uri|
-        attr = prefix.to_s.empty? ? "xmlns" : "xmlns:#{prefix}"
+        prefix = prefix == :__default__ ? "" : prefix.to_s
+        attr = prefix.empty? ? "xmlns" : "xmlns:#{prefix}"
         ns_hash[attr] = uri.to_s
       end
       ns_strs = []
@@ -94,10 +94,18 @@ module RDF; class Literal
     
     # Nokogiri implementations
     if defined?(::Nokogiri)
+      # A somewhat half-hearted attempt at C14N.
+      # Main problem is that it promotes all namespaces to top element, instead of demoting them
+      # to the required element, and does not properly order either namespaces or attributes.
+      #
+      # An open-issue in Nokogiri is to add support for C14N from the underlying libxml2 libraries.
       def parse_value_nokogiri(value, ns_strs, language)
-        return value if value.is_a?(Nokogiri::XML::NodeSet)
-        # Add inherited namespaces to created root element so that they're inherited to sub-elements
-        elements = Nokogiri::XML::Document.parse("<foo #{ns_strs.join(" ")}>#{value.to_s}</foo>").root.children
+        elements = if value.is_a?(Nokogiri::XML::NodeSet)
+          value
+        else
+          # Add inherited namespaces to created root element so that they're inherited to sub-elements
+          Nokogiri::XML::Document.parse("<foo #{ns_strs.join(" ")}>#{value.to_s}</foo>").root.children
+        end
 
         elements.map do |c|
           if c.is_a?(Nokogiri::XML::Element)
@@ -110,7 +118,7 @@ module RDF; class Literal
               c[prefix] = ns.href.to_s unless c.namespaces[prefix]
             end
 
-            # Add lanuage
+            # Add language
             if language && c["lang"].to_s.empty?
               c["xml:lang"] = language.to_s
             end
@@ -125,6 +133,7 @@ module RDF; class Literal
     end   # Nokogiri
     
     if defined?(::LibXML)
+      # This should use Document#canonicalize if as and when it is available in libxml-ruby
       def parse_value_libxml(value, ns_strs, language)
         # Fixme
       end
@@ -135,6 +144,8 @@ module RDF; class Literal
     end   # LibXML
     
     # REXML
+    # This could make use of the XMLCanonicalizer gem (http://rubygems.org/gems/XMLCanonicalizer)
+    # But, it hasn't been touched since 2007 and relies on log4r.
     def parse_value_rexml(value, ns_strs, language)
       # Fixme
     end

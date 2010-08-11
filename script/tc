@@ -1,16 +1,14 @@
 #!/usr/bin/env ruby -s
 require 'rubygems'
-$:.unshift(File.join(File.dirname(__FILE__), "..", 'lib'))
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/rdfa'
 require 'spec/rdfa_helper'
 require 'getoptlong'
 
-
-
 def run_tc(tc)
   puts "run #{tc.name}"
   puts RDF::Writer.for($format.to_sym).buffer { |writer|
-    RDF::RDFa::Reader.new(tc.input, :base_uri => tc.informationResourceInput, :strict => true).each do |statement|
+    RDF::RDFa::Reader.new(tc.input, :base_uri => tc.informationResourceInput, :strict => $strict).each do |statement|
       writer << statement
     end
   }
@@ -18,12 +16,14 @@ end
 
 $verbose = false
 $format = :ntriples
+$strict = false
 suite = "xhtml"
 opts = GetoptLong.new(
   ["--debug", GetoptLong::NO_ARGUMENT],
   ["--verbose", GetoptLong::NO_ARGUMENT],
   ["--quiet", GetoptLong::NO_ARGUMENT],
   ["--suite", GetoptLong::OPTIONAL_ARGUMENT],
+  ["--strict", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT]
 )
 opts.each do |opt, arg|
@@ -33,6 +33,7 @@ opts.each do |opt, arg|
   when '--debug' then $DEBUG = true
   when '--format' then $format = arg
   when '--suite' then suite = arg
+  when '--strict' then $strict = true
   end
 end
 

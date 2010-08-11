@@ -109,6 +109,12 @@ module RdfaHelper
         %(<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">\n) +
         %(<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.0"\n)
         head + "#{namespaces}>\n#{body.gsub(TCPATHRE, tcpath)}\n</html>"
+      when "xhtml11"
+        head = "" +
+        %(<?xml version="1.0" encoding="UTF-8"?>\n) +
+        %(<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">\n) +
+        %(<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"\n)
+        head + "#{namespaces}>\n#{body.gsub(TCPATHRE, tcpath)}\n</html>"
       when "html4"
         head ="" +
         %(<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n) +
@@ -128,13 +134,13 @@ module RdfaHelper
       f = self.name + ".sparql"
       body = File.read(File.join(RDFA_DIR, "tests", f)).gsub(TCPATHRE, tcpath)
       
-      suite == "xhtml" ? body : body.gsub(HTMLRE, '\1.html')
+      suite =~ /xhtml/ ? body : body.gsub(HTMLRE, '\1.html')
     end
     
     def triples
       f = self.name + ".nt"
       body = File.read(File.join(RDFA_NT_DIR, f)).gsub(TCPATHRE, tcpath)
-      suite == "xhtml" ? body : body.gsub(HTMLRE, '\1.html')
+      suite =~ /xhtml/ ? body : body.gsub(HTMLRE, '\1.html')
     end
     
     def inputDocument; self.name + ".txt"; end
