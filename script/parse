@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby -s
+require 'rubygems'
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
+require 'rdf/rdfa'
+require 'getoptlong'
+
+def parse(input, base)
+  puts RDF::Writer.for($format.to_sym).buffer { |writer|
+    RDF::RDFa::Reader.new(input, :base_uri => base, :strict => true).each do |statement|
+      writer << statement
+    end
+  }
+end
+
+mode = ARGV.shift
+raise "Mode must be one of 'parse'" unless mode == "parse"
+
+$verbose = false
+$format = :ntriples
+base_uri  = "http://example.com"
+input = nil
+
+opts = GetoptLong.new(
+  ["--debug", GetoptLong::NO_ARGUMENT],
+  ["--verbose", GetoptLong::NO_ARGUMENT],
+  ["--quiet", GetoptLong::NO_ARGUMENT],
+  ["--format", GetoptLong::REQUIRED_ARGUMENT],
+  ["--execute", "-e", GetoptLong::REQUIRED_ARGUMENT],
+  ["--uri", GetoptLong::REQUIRED_ARGUMENT]
+)
+opts.each do |opt, arg|
+  case opt
+  when '--verbose' then $verbose = true
+  when '--quiet' then $quiet = true
+  when '--debug' then $DEBUG = true
+  when '--execute' then input = arg
+  when '--format' then $format = arg
+  when '--uri' then base_uri = arg
+  end
+end
+
+if ARGV.empty?
+  s = input ? input : $stdin.read
+  parse(StringIO.new(s), base_uri)
+else
+  ARGV.each do |test_file|
+    parse(File.open(test_file), base_uri)
+  end
+end
