@@ -1,3 +1,15 @@
+=== 0.2.2
+* Ruby 1.9.2 compatibility
+* Added script/parse as command-line option for parsing files.
+* Add back support for RDFa 1.0 as well as RDFa 1.1. Parser checks @version to determine which
+* Update RDFa processing to WD-rdfa-core-20100803 semantics
+  * Added Processor Graph and required output
+  * Reverse order of processing profiles
+  * Don't process element if any profile fails
+  * XMLLiterals must be explicitly specified as @datatype
+  * TERMorCURIEorAbsURI requires an absolute URI, not document relative
+  * Extract a new default vocabulary from @profile.
+
 === 0.2.1
 * Update for RDF 0.2.1
 
@@ -7,7 +19,7 @@
   * Change use of Graph#predicates and Graph#objects to use as enumerables
 
 === 0.0.3
-* Removed interal graph in Reader and implement each_triple & each_statement to perform parsing
+* Removed internal graph in Reader and implement each_triple & each_statement to perform parsing
 
 === 0.0.2
 * Remove dependency on Namespace
