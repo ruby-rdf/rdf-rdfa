@@ -102,7 +102,7 @@ module RDF::RDFa
       # @return [URI]
       attr :default_vocabulary, true
 
-      # @param [String] base
+      # @param [RDF::URI] base
       # @param [Hash] host_defaults
       # @option host_defaults [Hash{String => URI}] :term_mappings Hash of NCName => URI
       # @option host_defaults [Hash{String => URI}] :vocabulary Hash of prefix => URI
@@ -113,7 +113,7 @@ module RDF::RDFa
         @parent_object = nil
         @incomplete_triples = []
         @language = nil
-        @uri_mappings = host_defaults.fetch(:uri_mappings, {}).merge("rdf" => RDF.to_uri.to_s)
+        @uri_mappings = host_defaults.fetch(:uri_mappings, {})
         @term_mappings = host_defaults.fetch(:term_mappings, {})
         @default_vocabulary = host_defaults.fetch(:vocabulary, nil)
       end
@@ -248,15 +248,15 @@ module RDF::RDFa
       add_processor_message(node, message, RDF::RDFA.InformationalMessage)
     end
 
-    def add_info(node, message, process_class = RDFA_NS.InformationalMessage)
+    def add_info(node, message, process_class = RDF::RDFA.InformationalMessage)
        add_processor_message(node, message, process_class)
      end
 
-     def add_warning(node, message, process_class = RDFA_NS.MiscellaneousWarning)
+     def add_warning(node, message, process_class = RDF::RDFA.MiscellaneousWarning)
        add_processor_message(node, message, process_class)
      end
 
-     def add_error(node, message, process_class = RDFA_NS.MiscellaneousError)
+     def add_error(node, message, process_class = RDF::RDFA.MiscellaneousError)
        add_processor_message(node, message, process_class)
        raise ParserException, message if @strict
      end
@@ -285,7 +285,7 @@ module RDF::RDFa
     # @raise [ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _strict_.
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
-      add_debug(node, "statement: #{statement}")
+      add_debug(node, "statement: #{statement.to_ntriples}")
       @callback.call(statement)
     end
 
@@ -304,7 +304,7 @@ module RDF::RDFa
       end
 
       # initialize the evaluation context with the appropriate base
-      evaluation_context = EvaluationContext.new(base, @host_defaults)
+      evaluation_context = EvaluationContext.new(@base_uri, @host_defaults)
 
       traverse(doc.root, evaluation_context)
     end
@@ -555,7 +555,7 @@ module RDF::RDFa
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-          RDF::URI.intern(evaluation_context.base)
+          evaluation_context.base
         elsif element.attributes['typeof']
           RDF::Node.new
         else
@@ -580,7 +580,7 @@ module RDF::RDFa
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-          RDF::URI.intern(evaluation_context.base)
+          evaluation_context.base
         elsif element.attributes['typeof']
           RDF::Node.new
         else
@@ -666,7 +666,7 @@ module RDF::RDFa
                               :term_mappings => term_mappings,
                               :vocab => default_vocabulary,
                               :restrictions => TERMorCURIEorAbsURI[@version]) unless datatype.to_s.empty?
-        current_object_literal = if datatype && datatype.to_s != RDF.XMLLiteral.to_s
+        current_object_literal = if !datatype.to_s.empty? && datatype.to_s != RDF.XMLLiteral.to_s
           # typed literal
           add_debug(element, "[Step 11] typed literal (#{datatype})")
           RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language)
@@ -787,12 +787,16 @@ module RDF::RDFa
           add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
         elsif @version == :rdfa_1_0 && value.to_s.match(/^xml/i)
           # Special case to not allow anything starting with XML to be treated as a URI
-        else
+        elsif restrictions.include?(:absuri) || restrictions.include?(:uri)
           begin
             # AbsURI does not use xml:base
-            uri = RDF::URI.intern(RDF::URI.intern(evaluation_context.base).join(value))
+            uri = if restrictions.include?(:absuri)
+              RDF::URI.intern(value)
+            else
+              evaluation_context.base.join(Addressable::URI.parse(value))
+            end
           rescue Addressable::URI::InvalidURIError => e
-            add_warning(element, "Malformed prefix #{value}", RDFA_NS.UndefinedPrefixError)
+            add_warning(element, "Malformed prefix #{value}", RDF::RDFA.UndefinedPrefixError)
           rescue RDF::ReaderError => e
             add_debug(element, e.message)
             if value.to_s =~ /^\(^\w\):/
@@ -847,7 +851,7 @@ module RDF::RDFa
         elsif @host_defaults[:prefix]
           RDF::URI.intern(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
         else
-          #add_warning(element, "Default namespace prefix is not defined", RDFA_NS.UndefinedPrefixError)
+          #add_warning(element, "Default namespace prefix is not defined", RDF::RDFA.UndefinedPrefixError)
           nil
         end
       elsif !curie.to_s.match(/:/)
