@@ -686,7 +686,7 @@ module RDF::RDFa
             # plain literal
             add_debug(element, "[Step 11 (1.0)] plain literal")
             RDF::Literal.new(content || element.inner_text.to_s, :language => language)
-          elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == XML_LITERAL.to_s)
+          elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
             # XML Literal
             add_debug(element, "[Step 11 (1.0)] XML Literal: #{element.inner_html}")
             recurse = false
