@@ -26,6 +26,7 @@ module RDF
     require 'rdf/rdfa/format'
     require 'rdf/rdfa/vocab'
     require 'rdf/rdfa/patches/literal_hacks'
+    require 'rdf/rdfa/patches/nokogiri_hacks'
     require 'rdf/rdfa/patches/uri_hacks'
     autoload :Reader,  'rdf/rdfa/reader'
     autoload :VERSION, 'rdf/rdfa/version'
