@@ -8,7 +8,10 @@ require 'getoptlong'
 def run_tc(tc)
   puts "run #{tc.name}"
   puts RDF::Writer.for($format.to_sym).buffer { |writer|
-    RDF::RDFa::Reader.new(tc.input, :base_uri => tc.informationResourceInput, :strict => $strict).each do |statement|
+    RDF::RDFa::Reader.new(tc.input,
+      :base_uri => tc.informationResourceInput,
+      :strict => $strict,
+      :version => tc.version).each do |statement|
       writer << statement
     end
   }

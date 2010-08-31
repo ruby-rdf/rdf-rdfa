@@ -121,7 +121,7 @@ EOF
     end
   end
 
-  context "paring a simple doc" do
+  context "parsing a simple doc" do
     before :each do
       sampledoc = <<-EOF;
 <?xml version="1.0" encoding="UTF-8"?>
@@ -205,7 +205,7 @@ EOF
   <body>
     <div about="">
       Author: <span property="dc:creator">Albert Einstein</span>
-      <h2 property="dc:title">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
+      <h2 property="dc:title" datatype="rdf:XMLLiteral">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
   </div>
   </body>
 </html>

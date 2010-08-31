@@ -146,6 +146,10 @@ module RdfaHelper
     def inputDocument; self.name + ".txt"; end
     def outputDocument; self.name + ".sparql"; end
 
+    def version
+      suite == "xhtml11" ? :rdfa_1_1 : :rdfa_1_0
+    end
+    
     # Run test case, yields input for parser to create triples
     def run_test
       rdfa_string = input
