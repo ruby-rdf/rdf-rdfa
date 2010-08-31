@@ -113,7 +113,7 @@ module RDF::RDFa
         @parent_object = nil
         @incomplete_triples = []
         @language = nil
-        @uri_mappings = host_defaults.fetch(:uri_mappings, {})
+        @uri_mappings = host_defaults.fetch(:uri_mappings, {}).merge("rdf" => RDF.to_uri.to_s)
         @term_mappings = host_defaults.fetch(:term_mappings, {})
         @default_vocabulary = host_defaults.fetch(:vocabulary, nil)
       end
@@ -235,9 +235,8 @@ module RDF::RDFa
     # Figure out the document path, if it is a Nokogiri::XML::Element or Attribute
     def node_path(node)
       case node
-      when Nokogiri::XML::Element, Nokogiri::XML::Attr then "#{node_path(node.parent)}/#{node.name}"
-      when String then node
-      else ""
+      when Nokogiri::XML::Node then node.display_path
+      else node.to_s
       end
     end
     
@@ -669,7 +668,7 @@ module RDF::RDFa
                               :restrictions => TERMorCURIEorAbsURI[@version]) unless datatype.to_s.empty?
         current_object_literal = if datatype && datatype.to_s != RDF.XMLLiteral.to_s
           # typed literal
-          add_debug(element, "[Step 11] typed literal")
+          add_debug(element, "[Step 11] typed literal (#{datatype})")
           RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language)
         elsif @version == :rdfa_1_1
           if datatype.to_s == RDF.XMLLiteral.to_s
@@ -792,6 +791,8 @@ module RDF::RDFa
           begin
             # AbsURI does not use xml:base
             uri = RDF::URI.intern(RDF::URI.intern(evaluation_context.base).join(value))
+          rescue Addressable::URI::InvalidURIError => e
+            add_warning(element, "Malformed prefix #{value}", RDFA_NS.UndefinedPrefixError)
           rescue RDF::ReaderError => e
             add_debug(element, e.message)
             if value.to_s =~ /^\(^\w\):/
