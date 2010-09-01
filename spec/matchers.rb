@@ -77,7 +77,7 @@ module Matchers
 
         @results = @query.execute(model)
         #puts "Redland query results: #{@results.inspect}"
-        if @expected_results
+        if @expected_results && @results
           @results.is_boolean? && @results.get_boolean?
         else
           @results.nil? || @results.is_boolean? && !@results.get_boolean?

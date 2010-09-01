@@ -17,6 +17,10 @@ module RDF::RDFa
       :rdfa_1_1 => [:safe_curie, :curie, :term, :uri, :bnode],
     }
     TERMorCURIEorAbsURI = {
+      :rdfa_1_0 => [:term, :curie],
+      :rdfa_1_1 => [:term, :curie, :absuri],
+    }
+    TERMorCURIEorAbsURIprop = {
       :rdfa_1_0 => [:curie],
       :rdfa_1_1 => [:term, :curie, :absuri],
     }
@@ -519,12 +523,12 @@ module RDF::RDFa
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
-                          :restrictions => SafeCURIEorCURIEorURI[@version])
+                          :restrictions => TERMorCURIEorAbsURI[@version])
       revs = process_uris(element, rev, evaluation_context,
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
-                          :restrictions => SafeCURIEorCURIEorURI[@version])
+                          :restrictions => TERMorCURIEorAbsURI[@version])
     
       add_debug(element, "traverse, about: #{about.nil? ? 'nil' : about}, src: #{src.nil? ? 'nil' : src}, resource: #{resource.nil? ? 'nil' : resource}, href: #{href.nil? ? 'nil' : href}")
       add_debug(element, "traverse, property: #{property.nil? ? 'nil' : property}, typeof: #{typeof.nil? ? 'nil' : typeof}, datatype: #{datatype.nil? ? 'nil' : datatype}, content: #{content.nil? ? 'nil' : content}")
@@ -647,7 +651,7 @@ module RDF::RDFa
                                   :uri_mappings => uri_mappings,
                                   :term_mappings => term_mappings,
                                   :vocab => default_vocabulary,
-                                  :restrictions => TERMorCURIEorAbsURI[@version])
+                                  :restrictions => TERMorCURIEorAbsURIprop[@version])
 
         properties.reject! do |p|
           if p.is_a?(RDF::URI)
