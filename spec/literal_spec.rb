@@ -122,7 +122,9 @@ describe RDF::Literal do
                         "my" => "http://my.example.org/",
                       })
 
-          l.to_s.should == "\n      <html:h1 xmlns:html=\"http://NoHTML.example.org\">\n        <b xmlns=\"http://www.w3.org/1999/xhtml\">John</b>\n      </html:h1>\n   "
+          pending("XML C14N") do
+            l.to_s.should == "\n      <html:h1 xmlns:html=\"http://NoHTML.example.org\">\n        <b xmlns=\"http://www.w3.org/1999/xhtml\">John</b>\n      </html:h1>\n   "
+          end
         end
 
         it "should reproduce test002" do
@@ -195,7 +197,9 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        l.to_s.should == "Some text here in <strong xmlns=\"http://www.w3.org/1999/xhtml\">bold</strong> and an svg rectangle: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
+        pending("XML C14N") do
+          l.to_s.should == "Some text here in <strong xmlns=\"http://www.w3.org/1999/xhtml\">bold</strong> and an svg rectangle: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
+        end
       end
 
       it "should reproduce 0101: XMLLiteral with explicit namespace and xml:lang" do
@@ -206,7 +210,9 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        l.to_s.should == "Du texte ici en <strong xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"fr\">gras</strong> et un rectangle en svg: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\" xml:lang=\"fr\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
+        pending("XML C14N") do
+          l.to_s.should == "Du texte ici en <strong xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"fr\">gras</strong> et un rectangle en svg: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\" xml:lang=\"fr\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
+        end
       end
 
       it "should reproduce test 0102: XMLLiteral with explicit namespace and xml:lang; not overwriting existing langs" do
@@ -217,7 +223,9 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        l.to_s.should == "Du texte ici en <strong xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"fr\">gras</strong> et un rectangle en svg: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\" xml:lang=\"hu\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
+        pending("XML C14N") do
+          l.to_s.should == "Du texte ici en <strong xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"fr\">gras</strong> et un rectangle en svg: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\" xml:lang=\"hu\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
+        end
       end
 
       it "should reproduce test 0103: XMLLiteral with explicit namespace; not overwriting local namespaces" do
@@ -228,7 +236,9 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        l.to_s.should == "Some text here in <strong xmlns=\"http://www.w3.org/1999/xhtml\">bold</strong> and an svg rectangle: <svg xmlns=\"http://www.w3.org/2000/svg\"><rect height=\"100\" width=\"200\"></rect></svg>"
+        pending("XML C14N") do
+          l.to_s.should == "Some text here in <strong xmlns=\"http://www.w3.org/1999/xhtml\">bold</strong> and an svg rectangle: <svg xmlns=\"http://www.w3.org/2000/svg\"><rect height=\"100\" width=\"200\"></rect></svg>"
+        end
       end
     end
   end if defined?(::Nokogiri)
