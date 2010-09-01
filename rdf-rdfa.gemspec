@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rdf-rdfa}
-  s.version = "0.2.1"
+  s.version = "0.2.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gregg Kellogg"]
-  s.date = %q{2010-06-28}
+  s.date = %q{2010-09-01}
   s.description = %q{    RDF::RDFa is an RDFa reader for Ruby using the RDF.rb library suite.
 }
   s.email = %q{gregg@kellogg-assoc.com}
@@ -35,6 +35,7 @@ Gem::Specification.new do |s|
      "lib/rdf/rdfa.rb",
      "lib/rdf/rdfa/format.rb",
      "lib/rdf/rdfa/patches/literal_hacks.rb",
+     "lib/rdf/rdfa/patches/nokogiri_hacks.rb",
      "lib/rdf/rdfa/patches/uri_hacks.rb",
      "lib/rdf/rdfa/reader.rb",
      "lib/rdf/rdfa/version.rb",
@@ -42,9 +43,11 @@ Gem::Specification.new do |s|
      "pkg/.gitignore",
      "rdf-rdfa.gemspec",
      "script/console",
+     "script/parse",
      "script/tc",
      "spec/html4-manifest.yml",
      "spec/html5-manifest.yml",
+     "spec/literal_spec.rb",
      "spec/matchers.rb",
      "spec/rdfa-triples/0001.nt",
      "spec/rdfa-triples/0006.nt",
@@ -162,15 +165,17 @@ Gem::Specification.new do |s|
      "spec/rdfa_reader_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
-     "spec/xhtml-manifest.yml"
+     "spec/xhtml-manifest.yml",
+     "spec/xhtml11-manifest.yml"
   ]
   s.homepage = %q{http://github.com/gkellogg/rdf-rdfa}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{RDFa reader for RDF.rb.}
   s.test_files = [
-    "spec/matchers.rb",
+    "spec/literal_spec.rb",
+     "spec/matchers.rb",
      "spec/rdfa_helper.rb",
      "spec/rdfa_reader_spec.rb",
      "spec/spec_helper.rb"
@@ -180,7 +185,7 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rdf>, [">= 0.2.1"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.3.3"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
