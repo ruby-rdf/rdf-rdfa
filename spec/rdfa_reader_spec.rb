@@ -18,49 +18,6 @@ describe RDF::RDFa::Format do
 end
 
 describe "RDF::RDFa::Reader" do
-  before(:all) do
-    # Don't load external profiles when testing
-    {
-      "basic" => {
-        :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/basic",
-        :format => :rdfa,
-        :file => File.join(File.dirname(__FILE__), "..", "etc", "basic.html"),
-      },
-      "foaf" => {
-        :base_uri => "http://www.w3.org/2007/08/pyRdfa/profiles/foaf",
-        :format => :rdfa,
-        :file => File.join(File.dirname(__FILE__), "..", "etc", "foaf.html"),
-      },
-      "xhv" => {
-        :base_uri => "http://www.w3.org/1999/xhtml/vocab",
-        :format => :rdfa,
-        :file => File.join(File.dirname(__FILE__), "..", "etc", "xhv.html"),
-      },
-      "profile" => {
-        :base_uri => "http://www.w3.org/2005/10/profile",
-        :format => :rdfa,
-        :value => "PROFILE",
-      },
-      "hcard" => {
-        :base_uri => "http://microformats.org/profiles/hcard",
-        :format => :rdfa,
-        :value => "HCARD",
-      },
-    }.each_pair do |name, opts|
-      if opts[:file]
-        graph = RDF::Graph.new
-        RDF::Reader.for(opts[:format]).new(File.read(opts[:file]),
-                    :base_uri => opts[:base_uri]).each do |statement|
-          graph << statement
-        end
-        opts[:value] = graph
-      end
-      RDF::Graph.stub!(:load).with(opts[:base_uri],
-                      :base_uri => opts[:base_uri],
-                      :format => opts[:format]).and_return(opts[:value])
-    end
-  end
-  
   context "discovery" do
     {
       "html" => RDF::Reader.for(:rdfa),
@@ -372,7 +329,7 @@ EOF
     <title>Test</title>
     <base href="http://example.org/"/>
   </head>
-  <body profile="http://www.w3.org/2007/08/pyRdfa/profiles/basic">
+  <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/basic">
   <div about="#me">
     <p>
       <span property="foaf:name">Ivan Herman</span>
