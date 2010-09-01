@@ -796,10 +796,14 @@ module RDF::RDFa
         elsif restrictions.include?(:absuri) || restrictions.include?(:uri)
           begin
             # AbsURI does not use xml:base
-            uri = if restrictions.include?(:absuri)
-              RDF::URI.intern(value)
+            if restrictions.include?(:absuri)
+              uri = RDF::URI.intern(value)
+              unless uri.absolute?
+                uri = nil
+                raise RDF::ReaderError, "Relative URI #{value}" 
+              end
             else
-              evaluation_context.base.join(Addressable::URI.parse(value))
+              uri = evaluation_context.base.join(Addressable::URI.parse(value))
             end
           rescue Addressable::URI::InvalidURIError => e
             add_warning(element, "Malformed prefix #{value}", RDF::RDFA.UndefinedPrefixError)
