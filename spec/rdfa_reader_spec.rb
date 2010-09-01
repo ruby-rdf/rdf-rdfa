@@ -370,7 +370,7 @@ EOF
     <title>Test</title>
     <base href="http://example.org/"/>
   </head>
-  <body profile="http://www.w3.org/2007/08/pyRdfa/profiles/foaf">
+  <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/foaf">
   <div about="#me">
     <p>
       <span property="name">Ivan Herman</span>

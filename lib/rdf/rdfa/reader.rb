@@ -333,7 +333,10 @@ module RDF::RDFa
             # Parse profile, and extract mappings from graph
             old_debug, old_verbose, = ::RDF::RDFa::debug?, $verbose
             ::RDF::RDFa::debug, $verbose = false, false
-            p_graph = RDF::Graph.load(profile, :base_uri => profile, :format => RDF::Format.for(profile) || :rdfa)
+            # Fixme, RDF isn't smart enough to figure this out from MIME-Type
+            load_opts = {:base_uri => profile}
+            load_opts[:format] = :rdfa unless RDF::Format.for(:file_name => profile)
+            p_graph = RDF::Graph.load(profile, load_opts)
             ::RDF::RDFa::debug, $verbose = old_debug, old_verbose
             p_graph.subjects.each do |subject|
               # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
@@ -349,7 +352,7 @@ module RDF::RDFa
               raise RDF::ReaderError, "rdf:prefix #{prefix.inspect} must be a Literal" unless prefix.nil? || prefix.is_a?(RDF::Literal)
               raise RDF::ReaderError, "rdf:vocabulary #{vocab.inspect} must be a Literal" unless vocab.nil? || vocab.is_a?(RDF::Literal)
 
-              @@vocabulary_cache[profile][:default_vocabulary] = vocab if vocab
+              @@vocabulary_cache[profile][:default_vocabulary] = vocab.value if vocab
               
               # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
               # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the

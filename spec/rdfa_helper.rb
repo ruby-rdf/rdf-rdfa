@@ -225,20 +225,32 @@ module RdfaHelper
   end
 end
 
-module OpenURI
-  #alias_method :open_uri_orig, :open_uri
-  def self.open_uri(uri, *args)
-    case uri.to_s
-    when %r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+)
-      file = uri.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+),
-        File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'tests'))
-      File.open(file)
-    when "http://www.w3.org/1999/xhtml/vocab"
-      file = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
-      File.open(file)
-    when "http://www.w3.org/2005/10/profile"
-      "PROFILE"
-    else raise Exception, "No such file #{uri}"
+module RDF
+  class Graph
+    def self.load(url, options = {}, &block)
+      url = case url.to_s
+      when %r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+)
+        file = url.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+),
+          File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'tests'))
+        file
+      when "http://www.w3.org/1999/xhtml/vocab"
+        file = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
+        file
+      when "http://www.w3.org/2005/10/profile"
+        file = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
+      else
+        url
+      end
+
+      self.new(url, options) do |graph|
+        graph.load! unless graph.unnamed?
+        if block_given?
+          case block.arity
+            when 1 then block.call(graph)
+            else graph.instance_eval(&block)
+          end
+        end
+      end
     end
   end
 end
