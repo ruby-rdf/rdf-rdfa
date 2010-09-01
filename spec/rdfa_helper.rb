@@ -40,7 +40,7 @@ module RdfaHelper
         pred = statement.predicate.to_s.split(/[\#\/]/).last
         obj  = statement.object.is_a?(RDF::Literal) ? statement.object.value : statement.object.to_s
         
-        puts "#{pred}: #{obj}" if $DEBUG
+        puts "#{pred}: #{obj}" if ::RDF::RDFa::debug?
 
         unless self.about
           self.about = statement.subject

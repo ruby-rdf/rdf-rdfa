@@ -34,7 +34,7 @@ opts.each do |opt, arg|
   case opt
   when '--verbose' then $verbose = true
   when '--quiet' then $quiet = true
-  when '--debug' then $DEBUG = true
+  when '--debug' then ::RDF::RDFa::debug = true
   when '--format' then $format = arg
   when '--suite' then suite = arg
   when '--strict' then $strict = true

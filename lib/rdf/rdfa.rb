@@ -30,5 +30,8 @@ module RDF
     require 'rdf/rdfa/patches/uri_hacks'
     autoload :Reader,  'rdf/rdfa/reader'
     autoload :VERSION, 'rdf/rdfa/version'
+    
+    def self.debug?; @debug; end
+    def self.debug=(value); @debug = value; end
   end
 end

@@ -6,7 +6,7 @@ module RDF::RDFa
   #
   # Based on processing rules described here:
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/2010/02/rdfa/drafts/2010/ED-rdfa-core-20100705/ RDFa 1.1
+  # @see http://www.w3.org/2010/02/rdfa/drafts/2010/ED-rdfa-core-20100803/ RDFa 1.1
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
@@ -262,7 +262,7 @@ module RDF::RDFa
      end
 
      def add_processor_message(node, message, process_class)
-       puts "#{node_path(node)}: #{message}" if $DEBUG
+       puts "#{node_path(node)}: #{message}" if ::RDF::RDFa::debug?
        @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
        if @processor_graph
          @processor_sequence ||= 0
@@ -321,7 +321,6 @@ module RDF::RDFa
           add_debug(element, "process_profile: skip previously parsed profile <#{profile}>")
         else
           begin
-            add_debug(element, "process_profile: parse profile <#{profile}>")
             @@vocabulary_cache[profile] = {
               :uri_mappings => {},
               :term_mappings => {},
@@ -329,13 +328,13 @@ module RDF::RDFa
             }
             um = @@vocabulary_cache[profile][:uri_mappings]
             tm = @@vocabulary_cache[profile][:term_mappings]
-            add_debug(element, "process_profile: profile open <#{profile}>")
+            add_debug(element, "process_profile: parse profile <#{profile}>")
       
             # Parse profile, and extract mappings from graph
-            old_debug, old_verbose, = $DEBUG, $verbose
-            $DEBUG, $verbose = false, false
+            old_debug, old_verbose, = ::RDF::RDFa::debug?, $verbose
+            ::RDF::RDFa::debug, $verbose = false, false
             p_graph = RDF::Graph.load(profile, :base_uri => profile, :format => RDF::Format.for(profile) || :rdfa)
-            $DEBUG, $verbose = old_debug, old_verbose
+            ::RDF::RDFa::debug, $verbose = old_debug, old_verbose
             p_graph.subjects.each do |subject|
               # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
               # predicates sharing the same subject, no mapping is created.
