@@ -18,7 +18,7 @@ describe RDF::RDFa::Format do
 end
 
 describe "RDF::RDFa::Reader" do
-  context "discovery" do
+  describe "discovery" do
     {
       "html" => RDF::Reader.for(:rdfa),
       "etc/foaf.html" => RDF::Reader.for("etc/foaf.html"),
@@ -32,21 +32,20 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
-  context :interface do
+  describe :interface do
     before(:each) do
-      @sampledoc = <<-EOF;
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:dc="http://purl.org/dc/elements/1.1/">
-<head>
-  <title>Test 0001</title>
-</head>
-<body>
-  <p>This photo was taken by <span class="author" about="photo1.jpg" property="dc:creator">Mark Birbeck</span>.</p>
-</body>
-</html>
-EOF
+      @sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:dc="http://purl.org/dc/elements/1.1/">
+        <head>
+          <title>Test 0001</title>
+        </head>
+        <body>
+          <p>This photo was taken by <span class="author" about="photo1.jpg" property="dc:creator">Mark Birbeck</span>.</p>
+        </body>
+        </html>
+        )
     end
 
     it "should yield reader" do
@@ -78,21 +77,20 @@ EOF
     end
   end
 
-  context "parsing a simple doc" do
+  describe "parsing a simple doc" do
     before :each do
-      sampledoc = <<-EOF;
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:dc="http://purl.org/dc/elements/1.1/">
-<head>
-  <title>Test 0001</title>
-</head>
-<body>
-  <p>This photo was taken by <span class="author" about="photo1.jpg" property="dc:creator">Mark Birbeck</span>.</p>
-</body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:dc="http://purl.org/dc/elements/1.1/">
+        <head>
+          <title>Test 0001</title>
+        </head>
+        <body>
+          <p>This photo was taken by <span class="author" about="photo1.jpg" property="dc:creator">Mark Birbeck</span>.</p>
+        </body>
+        </html>
+        )
 
       @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
       @statement = @graph.statements.first
@@ -115,18 +113,17 @@ EOF
     end
   end
 
-  context "parsing a simple doc without a base URI" do
+  describe "parsing a simple doc without a base URI" do
     before :each do
-      sampledoc = <<-EOF;
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:dc="http://purl.org/dc/elements/1.1/">
-<body>
-  <p>This photo was taken by <span class="author" about="_:photo" property="dc:creator">Mark Birbeck</span>.</p>
-</body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:dc="http://purl.org/dc/elements/1.1/">
+        <body>
+          <p>This photo was taken by <span class="author" about="_:photo" property="dc:creator">Mark Birbeck</span>.</p>
+        </body>
+        </html>
+        )
 
       @graph = parse(sampledoc, :strict => true)
       @statement = @graph.statements.first
@@ -149,25 +146,24 @@ EOF
     end
   end
 
-  context "parsing a document containing an XML Literal" do
+  describe "parsing a document containing an XML Literal" do
     before :each do
-      sampledoc = <<-EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:dc="http://purl.org/dc/elements/1.1/"
-      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <head>
-    <title>Test 0011</title>
-  </head>
-  <body>
-    <div about="">
-      Author: <span property="dc:creator">Albert Einstein</span>
-      <h2 property="dc:title" datatype="rdf:XMLLiteral">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
-  </div>
-  </body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:dc="http://purl.org/dc/elements/1.1/"
+              xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <head>
+            <title>Test 0011</title>
+          </head>
+          <body>
+            <div about="">
+              Author: <span property="dc:creator">Albert Einstein</span>
+              <h2 property="dc:title" datatype="rdf:XMLLiteral">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
+          </div>
+          </body>
+        </html>
+        )
 
       @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
     end
@@ -193,25 +189,24 @@ EOF
     end
   end
 
-  context "parsing a document containing sereral bnodes" do
+  describe "parsing a document containing sereral bnodes" do
     before :each do
-      sampledoc = <<-EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
-      xmlns:foaf="http://xmlns.com/foaf/0.1/">
-  <head>
-  <title>Test 0017</title>
-  </head>
-  <body>
-     <p>
-          <span about="[_:a]" property="foaf:name">Manu Sporny</span>
-           <span about="[_:a]" rel="foaf:knows" resource="[_:b]">knows</span>
-           <span about="[_:b]" property="foaf:name">Ralph Swick</span>.
-        </p>
-  </body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
+              xmlns:foaf="http://xmlns.com/foaf/0.1/">
+          <head>
+          <title>Test 0017</title>
+          </head>
+          <body>
+             <p>
+                  <span about="[_:a]" property="foaf:name">Manu Sporny</span>
+                   <span about="[_:a]" rel="foaf:knows" resource="[_:b]">knows</span>
+                   <span about="[_:b]" property="foaf:name">Ralph Swick</span>.
+                </p>
+          </body>
+        </html>
+        )
 
       @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017.xhtml", :strict => true)
     end
@@ -245,23 +240,22 @@ EOF
     end
   end
 
-  context "parsing a document that uses the typeof attribute" do
+  describe "parsing a document that uses the typeof attribute" do
     before :each do
-      sampledoc = <<-EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
-      xmlns:foaf="http://xmlns.com/foaf/0.1/">
-  <head>
-    <title>Test 0049</title>
-  </head>
-  <body>
-    <div about="http://www.example.org/#me" typeof="foaf:Person">
-      <p property="foaf:name">John Doe</p>
-    </div>
-  </body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
+              xmlns:foaf="http://xmlns.com/foaf/0.1/">
+          <head>
+            <title>Test 0049</title>
+          </head>
+          <body>
+            <div about="http://www.example.org/#me" typeof="foaf:Person">
+              <p property="foaf:name">John Doe</p>
+            </div>
+          </body>
+        </html>
+        )
 
       @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049.xhtml", :strict => true)
     end
@@ -287,25 +281,24 @@ EOF
     end
   end
 
-  context "parsing a document with a <base> tag in the <head>" do
+  describe "parsing a document with a <base> tag in the <head>" do
     before :each do
-      sampledoc = <<-EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
-    xmlns:dc="http://purl.org/dc/elements/1.1/">
- <head>
-    <base href="http://www.example.org/"></base>
-    <title>Test 0072</title>
- </head>
- <body>
-    <p about="faq">
-       Learn more by reading the example.org
-       <span property="dc:title">Example FAQ</span>.
-    </p>
- </body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
+            xmlns:dc="http://purl.org/dc/elements/1.1/">
+         <head>
+            <base href="http://www.example.org/"></base>
+            <title>Test 0072</title>
+         </head>
+         <body>
+            <p about="faq">
+               Learn more by reading the example.org
+               <span property="dc:title">Example FAQ</span>.
+            </p>
+         </body>
+        </html>
+        )
 
       @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072.xhtml", :strict => true)
     end
@@ -319,25 +312,24 @@ EOF
     end
   end
 
-  context "parsing a document with a profile containing a prefix mapping" do
+  describe "parsing a document with a profile containing a prefix mapping" do
     before :each do
-      sampledoc = <<-EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
-  <head>
-    <title>Test</title>
-    <base href="http://example.org/"/>
-  </head>
-  <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/basic">
-  <div about="#me">
-    <p>
-      <span property="foaf:name">Ivan Herman</span>
-    </p>
-  </div>
-  </body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
+          <head>
+            <title>Test</title>
+            <base href="http://example.org/"/>
+          </head>
+          <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/basic">
+          <div about="#me">
+            <p>
+              <span property="foaf:name">Ivan Herman</span>
+            </p>
+          </div>
+          </body>
+        </html>
+        )
       
       @graph = parse(sampledoc, :strict => true)
       @statement = @graph.statements.first
@@ -360,25 +352,24 @@ EOF
     end
   end
 
-  context "parsing a document with a profile containing a term mapping" do
+  describe "parsing a document with a profile containing a term mapping" do
     before :each do
-      sampledoc = <<-EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
-  <head>
-    <title>Test</title>
-    <base href="http://example.org/"/>
-  </head>
-  <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/foaf">
-  <div about="#me">
-    <p>
-      <span property="name">Ivan Herman</span>
-    </p>
-  </div>
-  </body>
-</html>
-EOF
+      sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
+          <head>
+            <title>Test</title>
+            <base href="http://example.org/"/>
+          </head>
+          <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/foaf">
+          <div about="#me">
+            <p>
+              <span property="name">Ivan Herman</span>
+            </p>
+          </div>
+          </body>
+        </html>
+      )
       
       @graph = parse(sampledoc, :strict => true)
       @statement = @graph.statements.first
@@ -401,6 +392,129 @@ EOF
     end
   end
 
+  describe :profiles do
+    before(:all) do
+      FileUtils.mkdir(TMP_DIR)
+      File.open(File.join(TMP_DIR, "profile.html"), "w") do |f|
+        f.write(%(<?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE html>
+          <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Test mappings</title>
+            </head>
+            <body prefix="rdfa: http://www.w3.org/ns/rdfa#">
+              <p typeof=""><span property="rdfa:uri">#{RDF::DC}</span><span property="rdfa:prefix">dc</span></p>
+              <p typeof=""><span property="rdfa:uri">#{RDF::DC.title}</span><span property="rdfa:term">title</span></p>
+            </body>
+          </html>
+          )
+        )
+      end
+
+      @doc = %(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml">
+          <body profile="http://example.com/profile">
+            <div about ="http://example.com/doc" typeof="dc:Agent">
+              <p property="title">A particular agent</p>
+            </div>
+          </body>
+        </html>
+        )
+    end
+
+    before(:each) do
+      @profile_repository = RDF::Repository.new(:title => "Test Profile Repository")
+      @debug = []
+      @reader = RDF::RDFa::Reader.new(@doc, :profile_repository => @profile_repository, :debug => @debug, :strict => true)
+    end
+    
+    after(:all) do
+      FileUtils.rm_rf(TMP_DIR)
+    end
+    
+    describe "new profile" do
+      before(:each) do
+        # Clear vocabulary cache
+        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+        @graph = RDF::Graph.new
+        @reader.each do |statement|
+          @graph << statement
+        end
+      end
+      
+      describe "profile graph" do
+        it "should have context http://example.com/profile" do
+          @profile_repository.should have_context(RDF::URI.intern("http://example.com/profile"))
+        end
+      end
+      
+      describe "processed graph" do
+        it "should have type dc:Agent" do
+          @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF.type, RDF::DC.Agent))
+        end
+      
+        it "should have property dc:title" do
+          @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF::DC.title, RDF::Literal.new("A particular agent")))
+        end
+      end
+    end
+    
+    describe "cached profile" do
+      before(:each) do
+        # Clear vocabulary cache
+        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+        @reader.each {|s|}
+      end
+      
+      it "should not re-parse profile" do
+        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+        RDF::Reader.should_not_receive(:open).with("http://example.com/profile")
+        RDF::RDFa::Reader.new(@doc, :profile_repository => @profile_repository).each {|p|}
+      end
+      
+      it "should create vocab_cache" do
+        RDF::RDFa::Reader.send(:class_variable_get, :@@vocabulary_cache).should be_a(Hash)
+      end
+    end
+    
+    describe "profile content" do
+      before(:each) do
+        bn_p = RDF::Node.new("prefix")
+        bn_t = RDF::Node.new("term")
+        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.prefix, RDF::Literal.new("dc"))
+        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.uri, RDF::Literal.new(RDF::DC.to_s))
+        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.term, RDF::Literal.new("title"))
+        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.uri, RDF::Literal.new(RDF::DC.title.to_s))
+
+        # Clear vocabulary cache
+        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+      end
+
+      it "should not recieve RDF::Reader.open" do
+        RDF::Reader.should_not_receive(:open).with("http://example.com/profile")
+      end
+
+      it "should have type dc:Agent" do
+        @graph = RDF::Graph.new
+        @reader.each do |statement|
+          @graph << statement
+        end
+
+        @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF.type, RDF::DC.Agent))
+      end
+    
+      it "should have property dc:title" do
+        @graph = RDF::Graph.new
+        @reader.each do |statement|
+          @graph << statement
+        end
+
+        @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF::DC.title, RDF::Literal.new("A particular agent")))
+      end
+    end
+  end
+  
   def self.test_cases(suite)
     RdfaHelper::TestCase.test_cases(suite)
   end

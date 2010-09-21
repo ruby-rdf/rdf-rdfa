@@ -40,6 +40,8 @@ Spec::Runner.configure do |config|
   config.include(RDF::Spec::Matchers)
 end
 
+TMP_DIR = File.join(File.expand_path(File.dirname(__FILE__)), "tmp")
+
 # Heuristically detect the input stream
 def detect_format(stream)
   # Got to look into the file to see

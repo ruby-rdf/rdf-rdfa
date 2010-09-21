@@ -225,32 +225,33 @@ module RdfaHelper
   end
 end
 
+# Stub RDF::Reader.open
 module RDF
-  class Graph
-    def self.load(url, options = {}, &block)
-      url = case url.to_s
-      when %r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+)
-        file = url.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+),
-          File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'tests'))
-        file
-      when "http://www.w3.org/1999/xhtml/vocab"
-        file = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
-        file
-      when "http://www.w3.org/2005/10/profile"
-        file = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
-      else
-        url
-      end
+  class Reader
+    class << self
+      alias orig_open open
+    end
 
-      self.new(url, options) do |graph|
-        graph.load! unless graph.unnamed?
-        if block_given?
-          case block.arity
-            when 1 then block.call(graph)
-            else graph.instance_eval(&block)
-          end
-        end
+    def self.stub_file(filename)
+      case filename.to_s
+      when %r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+)
+        filename.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+),
+          File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'tests'))
+      when "http://www.w3.org/1999/xhtml/vocab"
+        File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
+      when "http://www.w3.org/2005/10/profile"
+        File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
+      when "http://example.com/profile"
+        File.join(TMP_DIR, "profile.html")
+      else
+        filename
       end
+    end
+    
+    def self.open(filename, options = {}, &block)
+      filename = ::RDF::Reader.stub_file(filename)
+      options[:format] ||= :rdfa
+      orig_open(filename, options, &block)
     end
   end
 end

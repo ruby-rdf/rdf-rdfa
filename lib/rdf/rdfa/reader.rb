@@ -42,6 +42,18 @@ module RDF::RDFa
     # @return [:xhtml]
     attr_reader :host_language
     
+    # Host language
+    # @return [:xhtml]
+    attr_reader :host_language
+
+    # Version
+    # @return [:rdfa_1_0, :rdfa_1_1]
+    attr_reader :version
+    
+    # Repository finding and storing parsed profiles
+    # @return [RdfContext::Graph]
+    attr_accessor :profile_repository
+    
     # The Recursive Baggage
     # @private
     class EvaluationContext # :nodoc:
@@ -146,6 +158,7 @@ module RDF::RDFa
     # @param  [Nokogiri::HTML::Document, Nokogiri::XML::Document, #read, #to_s]       input
     # @option options [Array] :debug (nil) Array to place debug messages
     # @option options [Graph] :processor_graph (nil) Graph to record information, warnings and errors.
+    # @option options [Repository] :profile_repository (nil) Repository to save profile graphs.
     # @option options [Boolean] :strict (false) Raise Error if true, continue with lax parsing, otherwise
     # @option options [Boolean] :base_uri (nil) Base URI to use for relative URIs.
     # @option options [:rdfa_1_0, :rdfa_1_1] :version (:rdfa_1_1) Parser version information
@@ -163,6 +176,8 @@ module RDF::RDFa
 
         @version = options[:version] ? options[:version].to_sym : :rdfa_1_1
         @host_language = options[:host_language] || :xhtml
+        @profile_repository = options[:profile_repository] || RDF::Repository.new(:title => "RDFa Profiles")
+        raise ReaderError, "Profile Repository must support context" unless @profile_repository.supports?(:context)
 
         @doc = case input
         when Nokogiri::HTML::Document then input
@@ -262,7 +277,7 @@ module RDF::RDFa
 
      def add_error(node, message, process_class = RDF::RDFA.MiscellaneousError)
        add_processor_message(node, message, process_class)
-       raise ParserException, message if @strict
+       raise RDF::ReaderError, message if @strict
      end
 
      def add_processor_message(node, message, process_class)
@@ -318,13 +333,34 @@ module RDF::RDFa
     # Yields each mapping
     def process_profile(element)
       element.attributes['profile'].to_s.split(/\s/).reverse.each do |profile|
+        profile = RDF::URI.intern(profile)
         # Don't try to open ourselves!
-        if @uri == profile
+        if @base_uri == profile
           add_debug(element, "process_profile: skip recursive profile <#{profile}>")
         elsif @@vocabulary_cache.has_key?(profile)
           add_debug(element, "process_profile: skip previously parsed profile <#{profile}>")
         else
           begin
+            unless @profile_repository.has_context?(profile)
+              add_debug(element, "process_profile: retrieve profile <#{profile}>")
+              # Parse profile, and extract mappings from graph
+              old_debug, old_verbose, = ::RDF::RDFa::debug?, $verbose
+              ::RDF::RDFa::debug, $verbose = false, false
+              # Fixme, RDF isn't smart enough to figure this out from MIME-Type
+              load_opts = {:base_uri => profile}
+              load_opts[:format] = :rdfa unless RDF::Format.for(:file_name => profile)
+              
+              # Store triples in repository with profile URI as context
+              add_debug(element, "process_profile: parse profile <#{profile}>")
+              Reader.open(profile, load_opts) do |reader|
+                reader.each_statement do |statement|
+                  statement = statement.dup
+                  statement.context = profile
+                  @profile_repository << statement
+                end
+              end
+              ::RDF::RDFa::debug, $verbose = old_debug, old_verbose
+            end
             @@vocabulary_cache[profile] = {
               :uri_mappings => {},
               :term_mappings => {},
@@ -332,47 +368,41 @@ module RDF::RDFa
             }
             um = @@vocabulary_cache[profile][:uri_mappings]
             tm = @@vocabulary_cache[profile][:term_mappings]
-            add_debug(element, "process_profile: parse profile <#{profile}>")
-      
-            # Parse profile, and extract mappings from graph
-            old_debug, old_verbose, = ::RDF::RDFa::debug?, $verbose
-            ::RDF::RDFa::debug, $verbose = false, false
-            # Fixme, RDF isn't smart enough to figure this out from MIME-Type
-            load_opts = {:base_uri => profile}
-            load_opts[:format] = :rdfa unless RDF::Format.for(:file_name => profile)
-            p_graph = RDF::Graph.load(profile, load_opts)
-            ::RDF::RDFa::debug, $verbose = old_debug, old_verbose
-            p_graph.subjects.each do |subject|
+
+            resource_info = {}
+            @profile_repository.query(:context => profile).each do |statement|
+              res = resource_info[statement.subject] ||= {}
+              raise RDF::ReaderError, "#{statement.object.inspect} must be a Literal" unless statement.object.is_a?(RDF::Literal)
+              %w(uri term prefix vocabulary).each do |term|
+                res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
+              end
+            end
+            resource_info.values.each do |res|
               # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
               # predicates sharing the same subject, no mapping is created.
-              uri = p_graph.first_object([subject, RDF::RDFA['uri'], nil])
-              term = p_graph.first_object([subject, RDF::RDFA['term'], nil])
-              prefix = p_graph.first_object([subject, RDF::RDFA['prefix'], nil])
-              vocab = p_graph.first_object([subject, RDF::RDFA['vocabulary'], nil])
+              uri = res["uri"]
+              term = res["term"]
+              prefix = res["prefix"]
+              vocab = res["vocabulary"]
               add_debug(element, "process_profile: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}")
 
-              raise RDF::ReaderError, "rdf:uri #{uri.inspect} must be a Literal" unless uri.nil? || uri.is_a?(RDF::Literal)
-              raise RDF::ReaderError, "rdf:term #{term.inspect} must be a Literal" unless term.nil? || term.is_a?(RDF::Literal)
-              raise RDF::ReaderError, "rdf:prefix #{prefix.inspect} must be a Literal" unless prefix.nil? || prefix.is_a?(RDF::Literal)
-              raise RDF::ReaderError, "rdf:vocabulary #{vocab.inspect} must be a Literal" unless vocab.nil? || vocab.is_a?(RDF::Literal)
-
-              @@vocabulary_cache[profile][:default_vocabulary] = vocab.value if vocab
+              @@vocabulary_cache[profile][:default_vocabulary] = vocab if vocab
               
               # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
               # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the
               # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
               # URI mappings after transforming the 'prefix' component to lower-case.
               # For every extracted
-              um[prefix.value.downcase] = uri.value if prefix && prefix.value != "_"
+              um[prefix.downcase] = uri if uri && prefix && prefix != "_"
             
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-              tm[term.value.downcase] = RDF::URI.intern(uri.value) if term
+              tm[term.downcase] = RDF::URI.intern(uri) if term && uri
             end
-          rescue RDF::ReaderError => e
-            add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
-            raise # Incase we're not in strict mode, we need to be sure processing stops
+          #rescue Exception => e
+          #  add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
+          #  raise # Incase we're not in strict mode, we need to be sure processing stops
           end
         end
         profile_mappings = @@vocabulary_cache[profile]
