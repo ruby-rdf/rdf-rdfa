@@ -332,8 +332,11 @@ module RDF::RDFa
     #
     # Yields each mapping
     def process_profile(element)
-      element.attributes['profile'].to_s.split(/\s/).reverse.each do |profile|
-        profile = RDF::URI.intern(profile)
+      element.attributes['profile'].to_s.
+        split(/\s/).
+        reverse.
+        map {|profile| RDF::URI.intern(profile)}.
+        each do |profile|
         # Don't try to open ourselves!
         if @base_uri == profile
           add_debug(element, "process_profile: skip recursive profile <#{profile}>")
@@ -342,24 +345,15 @@ module RDF::RDFa
         else
           begin
             unless @profile_repository.has_context?(profile)
-              add_debug(element, "process_profile: retrieve profile <#{profile}>")
+              add_debug(element, "process_profile: parse profile <#{profile}>")
               # Parse profile, and extract mappings from graph
-              old_debug, old_verbose, = ::RDF::RDFa::debug?, $verbose
-              ::RDF::RDFa::debug, $verbose = false, false
+
               # Fixme, RDF isn't smart enough to figure this out from MIME-Type
-              load_opts = {:base_uri => profile}
+              load_opts = {:base_uri => profile, :context => profile}
               load_opts[:format] = :rdfa unless RDF::Format.for(:file_name => profile)
               
               # Store triples in repository with profile URI as context
-              add_debug(element, "process_profile: parse profile <#{profile}>")
-              Reader.open(profile, load_opts) do |reader|
-                reader.each_statement do |statement|
-                  statement = statement.dup
-                  statement.context = profile
-                  @profile_repository << statement
-                end
-              end
-              ::RDF::RDFa::debug, $verbose = old_debug, old_verbose
+              @profile_repository.load(profile, load_opts)
             end
             @@vocabulary_cache[profile] = {
               :uri_mappings => {},

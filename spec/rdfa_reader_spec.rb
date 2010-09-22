@@ -445,7 +445,7 @@ describe "RDF::RDFa::Reader" do
       
       describe "profile graph" do
         it "should have context http://example.com/profile" do
-          @profile_repository.should have_context(RDF::URI.intern("http://example.com/profile"))
+          @profile_repository.should have_context(RDF::URI.new("http://example.com/profile"))
         end
       end
       
@@ -456,6 +456,12 @@ describe "RDF::RDFa::Reader" do
       
         it "should have property dc:title" do
           @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF::DC.title, RDF::Literal.new("A particular agent")))
+        end
+      end
+      
+      describe "profile repository" do
+        it "should have statements" do
+          @profile_repository.query(:context => RDF::URI.new("http://example.com/profile")).count.should == 4
         end
       end
     end
