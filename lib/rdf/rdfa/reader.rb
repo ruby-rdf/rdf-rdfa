@@ -176,6 +176,7 @@ module RDF::RDFa
 
         @version = options[:version] ? options[:version].to_sym : :rdfa_1_1
         @host_language = options[:host_language] || :xhtml
+        @processor_graph = options[:processor_graph]
         @profile_repository = options[:profile_repository] || RDF::Repository.new(:title => "RDFa Profiles")
         raise ReaderError, "Profile Repository must support context" unless @profile_repository.supports?(:context)
 
