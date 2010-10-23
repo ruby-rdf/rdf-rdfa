@@ -1,4 +1,5 @@
 module RDF
+  class PTR < Vocabulary("http://www.w3.org/2009/pointers#"); end
   class RDFA < Vocabulary("http://www.w3.org/ns/rdfa#"); end
   class XHV < Vocabulary("http://www.w3.org/1999/xhtml/vocab#"); end
   class XML < Vocabulary("http://www.w3.org/XML/1998/namespace"); end

@@ -186,8 +186,8 @@ module RDF::RDFa
         else   Nokogiri::XML.parse(input, @base_uri.to_s)
         end
         
-        add_error(nil, "Empty document", RDF::RDFA.HostLanguageMarkupError) if (@doc.nil? || @doc.root.nil?)
-        add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.HostLanguageMarkupError) unless @doc.errors.empty?
+        add_error(nil, "Empty document", RDF::RDFA.DocumentError) if (@doc.nil? || @doc.root.nil?)
+        add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) unless @doc.errors.empty?
 
         block.call(self) if block_given?
       end
@@ -265,18 +265,18 @@ module RDF::RDFa
     # @param [XML Node, any] node:: XML Node or string for showing context
     # @param [String] message::
     def add_debug(node, message)
-      add_processor_message(node, message, RDF::RDFA.InformationalMessage)
+      add_processor_message(node, message, RDF::RDFA.Info)
     end
 
-    def add_info(node, message, process_class = RDF::RDFA.InformationalMessage)
+    def add_info(node, message, process_class = RDF::RDFA.Info)
        add_processor_message(node, message, process_class)
      end
 
-     def add_warning(node, message, process_class = RDF::RDFA.MiscellaneousWarning)
+     def add_warning(node, message, process_class = RDF::RDFA.Warning)
        add_processor_message(node, message, process_class)
      end
 
-     def add_error(node, message, process_class = RDF::RDFA.MiscellaneousError)
+     def add_error(node, message, process_class = RDF::RDFA.Error)
        add_processor_message(node, message, process_class)
        raise RDF::ReaderError, message if @strict
      end
@@ -289,9 +289,13 @@ module RDF::RDFa
          n = RDF::Node.new
          @processor_graph << RDF::Statement.new(n, RDF["type"], process_class)
          @processor_graph << RDF::Statement.new(n, RDF::DC.description, message)
-         @processor_graph << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now.to_date))
+         @processor_graph << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
          @processor_graph << RDF::Statement.new(n, RDF::RDFA.sequence, RDF::Literal::Integer.new(@processor_sequence += 1))
-         @processor_graph << RDF::Statement.new(n, RDF::RDFA.source, node_path(node))
+         @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, @base_uri)
+         nc = RDF::Node.new
+         @processor_graph << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
+         @processor_graph << RDF::Statement.new(nc, RDF::PTR.expression, node.path)
+         @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, nc)
        end
      end
 
@@ -831,11 +835,11 @@ module RDF::RDFa
               uri = evaluation_context.base.join(Addressable::URI.parse(value))
             end
           rescue Addressable::URI::InvalidURIError => e
-            add_warning(element, "Malformed prefix #{value}", RDF::RDFA.UndefinedPrefixError)
+            add_warning(element, "Malformed prefix #{value}", RDF::RDFA.UnresolvedCURIE)
           rescue RDF::ReaderError => e
             add_debug(element, e.message)
             if value.to_s =~ /^\(^\w\):/
-              add_warning(element, "Undefined prefix #{$1}", RDF::RDFA.UndefinedPrefixError)
+              add_warning(element, "Undefined prefix #{$1}", RDF::RDFA.UnresolvedCURIE)
             else
               add_warning(element, "Relative URI #{value}")
             end
@@ -863,7 +867,7 @@ module RDF::RDFa
         RDF::URI.intern(options[:vocab] + value)
       else
         # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
-        add_warning(element, "Term #{value} is not defined", RDF::RDFA.UndefinedTermError)
+        add_warning(element, "Term #{value} is not defined", RDF::RDFA.UnresolvedTerm)
         nil
       end
     end
@@ -886,7 +890,7 @@ module RDF::RDFa
         elsif @host_defaults[:prefix]
           RDF::URI.intern(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
         else
-          #add_warning(element, "Default namespace prefix is not defined", RDF::RDFA.UndefinedPrefixError)
+          #add_warning(element, "Default namespace prefix is not defined", RDF::RDFA.UnresolvedCURIE)
           nil
         end
       elsif !curie.to_s.match(/:/)
