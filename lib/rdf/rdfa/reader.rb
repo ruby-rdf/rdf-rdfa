@@ -6,7 +6,7 @@ module RDF::RDFa
   #
   # Based on processing rules described here:
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/2010/02/rdfa/drafts/2010/ED-rdfa-core-20100803/ RDFa 1.1
+  # @see http://www.w3.org/2010/02/rdfa/drafts/2010/WD-rdfa-core-20101026/ RDFa 1.1
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
@@ -84,6 +84,10 @@ module RDF::RDFa
       #
       # @return URI
       attr :parent_object, true
+      # A list of current, in-scope profiles.
+      #
+      # @return [Array<URI>]
+      attr :profiles, true
       # A list of current, in-scope URI mappings.
       #
       # @return [Hash{Symbol => String}]
@@ -127,6 +131,7 @@ module RDF::RDFa
         @base = base
         @parent_subject = @base
         @parent_object = nil
+        @profiles = []
         @incomplete_triples = []
         @language = nil
         @uri_mappings = host_defaults.fetch(:uri_mappings, {})
@@ -141,6 +146,7 @@ module RDF::RDFa
         # clone the evaluation context correctly
         @uri_mappings = from.uri_mappings.clone
         @incomplete_triples = from.incomplete_triples.clone
+        @profiles = from.profiles.clone
       end
       
       def inspect
@@ -148,6 +154,7 @@ module RDF::RDFa
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
         v << "term_mappings[#{term_mappings.keys.length}]"
+        v << "profiles[#{profiles.length}]"
         v.join(",")
       end
     end
@@ -336,9 +343,8 @@ module RDF::RDFa
     # Parse and process URI mappings, Term mappings and a default vocabulary from @profile
     #
     # Yields each mapping
-    def process_profile(element)
-      element.attributes['profile'].to_s.
-        split(/\s/).
+    def process_profile(element, profiles)
+      profiles.
         reverse.
         map {|profile| RDF::URI.intern(profile)}.
         each do |profile|
@@ -397,7 +403,7 @@ module RDF::RDFa
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-              tm[term.downcase] = RDF::URI.intern(uri) if term && uri
+              tm[term] = RDF::URI.intern(uri) if term && uri
             end
           #rescue Exception => e
           #  add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
@@ -487,13 +493,14 @@ module RDF::RDFa
       content = attrs['content'].to_s if attrs['content']
       rel = attrs['rel'].to_s.strip if attrs['rel']
       rev = attrs['rev'].to_s.strip if attrs['rev']
+      profiles = attrs['profile'].to_s.split(/\s/)  # In-scope profiles in order for passing to XMLLiteral
 
       # Local term mappings [7.5 Steps 2]
       # Next the current element is parsed for any updates to the local term mappings and local list of URI mappings via @profile.
       # If @profile is present, its value is processed as defined in RDFa Profiles.
       unless @version == :rdfa_1_0
         begin
-          process_profile(element) do |which, value|
+          process_profile(element, profiles) do |which, value|
             add_debug(element, "[Step 2] traverse, #{which}: #{value.inspect}")
             case which
             when :uri_mappings        then uri_mappings.merge!(value)
@@ -509,6 +516,9 @@ module RDF::RDFa
           return
         end
       end
+
+      # Add on proviles from parent contexts to update new context
+      profiles += evaluation_context.profiles.clone
 
       # Default vocabulary [7.5 Step 3]
       # Next the current element is examined for any change to the default vocabulary via @vocab.
@@ -709,8 +719,21 @@ module RDF::RDFa
           if datatype.to_s == RDF.XMLLiteral.to_s
             # XML Literal
             add_debug(element, "[Step 11(1.1)] XML Literal: #{element.inner_html}")
-            recurse = false
-            RDF::Literal.new(element.inner_html, :datatype => RDF.XMLLiteral, :language => language, :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"))
+
+            # In order to maintain maximum portability of this literal, any children of the current node that are
+            # elements must have the current in scope profiles, default vocabulary, prefix mappings, and XML
+            # namespace declarations (if any) declared on the serialized element using their respective attributes.
+            # Since the child element node could also declare new prefix mappings or XML namespaces, the RDFa
+            # Processor must be careful to merge these together when generating the serialized element definition.
+            # For avoidance of doubt, any re-declarations on the child node must take precedence over declarations
+            # that were active on the current node.
+            RDF::Literal.new(element.inner_html,
+                            :datatype => RDF.XMLLiteral,
+                            :language => language,
+                            :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"),
+                            :profiles => profiles,
+                            :prefixes => uri_mappings,
+                            :default_vocabulary => default_vocabulary)
           else
             # plain literal
             add_debug(element, "[Step 11(1.1)] plain literal")
@@ -733,8 +756,6 @@ module RDF::RDFa
         properties.each do |p|
           add_triple(element, new_subject, p, current_object_literal)
         end
-        # SPEC CONFUSION: "the triple has been created" ==> there may be more than one
-        # set the recurse flag above in the IF about xmlliteral, as it is the only place that can happen
       end
     
       if not skip and new_subject && !evaluation_context.incomplete_triples.empty?
@@ -756,6 +777,7 @@ module RDF::RDFa
               uri_mappings == evaluation_context.uri_mappings &&
               term_mappings == evaluation_context.term_mappings &&
               default_vocabulary == evaluation_context.default_vocabulary &&
+              profiles == evaluation_context.profiles
             new_ec = evaluation_context
             add_debug(element, "[Step 13] skip: reused ec")
           else
@@ -764,6 +786,7 @@ module RDF::RDFa
             new_ec.uri_mappings = uri_mappings
             new_ec.term_mappings = term_mappings
             new_ec.default_vocabulary = default_vocabulary
+            new_ec.profiles = profiles
             add_debug(element, "[Step 13] skip: cloned ec")
           end
         else
@@ -776,6 +799,7 @@ module RDF::RDFa
           new_ec.language = language
           new_ec.term_mappings = term_mappings
           new_ec.default_vocabulary = default_vocabulary
+          new_ec.profiles = profiles
           add_debug(element, "[Step 13] new ec")
         end
       
@@ -857,12 +881,17 @@ module RDF::RDFa
     # <em>options[:term_mappings]</em>:: Term mappings
     # <em>options[:vocab]</em>:: Default vocabulary
     def process_term(element, value, options)
-      case
-      when options[:term_mappings].is_a?(Hash) && options[:term_mappings].has_key?(value.to_s.downcase)
-        # If the term is in the local term mappings, use the associated URI.
-        # XXX Spec Confusion: are terms always downcased? Or only for XHTML Vocab?
-        options[:term_mappings][value.to_s.downcase]
-      when options[:vocab]
+      if options[:term_mappings].is_a?(Hash)
+        # If the term is in the local term mappings, use the associated URI (case sensitive).
+        return options[:term_mappings][value.to_s] if options[:term_mappings].has_key?(value.to_s)
+        
+        # Otherwise, check for case-insensitive match
+        options[:term_mappings].each_pair do |term, uri|
+          return uri if term.downcase == value.to_s.downcase
+        end
+      end
+      
+      if options[:vocab]
         # Otherwise, if there is a local default vocabulary the URI is obtained by concatenating that value and the term.
         RDF::URI.intern(options[:vocab] + value)
       else

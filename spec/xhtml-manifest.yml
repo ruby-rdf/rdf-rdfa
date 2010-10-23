@@ -1,23 +1,22 @@
 --- 
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1400100368
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0001
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496613
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0001
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml
@@ -29,24 +28,23 @@
   suite: xhtml
   title: Predicate establishment with @property
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1037249641
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0002
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0002
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496614
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0002
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0002
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0002.xhtml
@@ -58,24 +56,23 @@
   suite: xhtml
   title: meta/@property
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -511816760
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0003
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0003
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496615
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0003
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0003
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0003.xhtml
@@ -87,24 +84,23 @@
   suite: xhtml
   title: meta/@property, no @about in parent
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1988775696
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0004
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0004
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496616
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0004
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0004
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0004.xhtml
@@ -116,24 +112,23 @@
   suite: xhtml
   title: "@xml:base"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 392324846
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0005
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0005
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496617
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0005
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0005
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0005.xhtml
@@ -145,24 +140,23 @@
   suite: xhtml
   title: CURIEs
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1128201490
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0006
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0006
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496618
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0006
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0006
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0006.xhtml
@@ -174,24 +168,23 @@
   suite: xhtml
   title: "@rel and @rev"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -2130421211
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0007
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0007
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496619
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0007
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0007
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0007.xhtml
@@ -203,24 +196,23 @@
   suite: xhtml
   title: "@rel, @rev, @property, @content"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -122738422
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0008
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0008
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496620
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0008
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0008
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0008.xhtml
@@ -232,24 +224,23 @@
   suite: xhtml
   title: empty string @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 874007575
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0009
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0009
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067496621
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0009
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0009
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0009.xhtml
@@ -261,24 +252,23 @@
   suite: xhtml
   title: "@rev"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -160437990
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0010
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0010
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564261
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0010
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0010
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0010.xhtml
@@ -290,24 +280,23 @@
   suite: xhtml
   title: "@rel, @rev, @href"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1033393652
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0011
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564262
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0011
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml
@@ -319,24 +308,23 @@
   suite: xhtml
   title: XMLLiteral
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1297879244
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0012
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0012
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564263
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0012
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0012
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0012.xhtml
@@ -348,24 +336,23 @@
   suite: xhtml
   title: "@xml:lang"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 45075105
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0013
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0013
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564264
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0013
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0013
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0013.xhtml
@@ -377,24 +364,23 @@
   suite: xhtml
   title: "@xml:lang inheritance"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 735052270
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0014
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0014
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564265
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0014
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0014
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0014.xhtml
@@ -406,24 +392,23 @@
   suite: xhtml
   title: "@datatype, xsd:integer"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -240187795
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0015
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0015
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564266
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0015
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0015
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0015.xhtml
@@ -435,24 +420,23 @@
   suite: xhtml
   title: meta and link
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 171788739
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0016
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0016
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564267
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0016
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0016
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0016.xhtml
@@ -464,24 +448,23 @@
   suite: xhtml
   title: Blank node, explicit
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1087138763
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0017
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564268
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0017
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Elias Torres
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017.xhtml
@@ -493,24 +476,23 @@
   suite: xhtml
   title: Related blanknodes
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1233959795
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0018
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0018
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564269
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0018
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0018
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0018.xhtml
@@ -522,24 +504,23 @@
   suite: xhtml
   title: "@rel for predicate"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -20930702
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0019
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0019
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067564270
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0019
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0019
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0019.xhtml
@@ -551,24 +532,23 @@
   suite: xhtml
   title: "@about for subject"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1403812793
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0020
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0020
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631910
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0020
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0020
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0020.xhtml
@@ -580,24 +560,23 @@
   suite: xhtml
   title: Inheriting @about for subject
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1425265354
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0021
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0021
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631911
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0021
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0021
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0021.xhtml
@@ -609,24 +588,23 @@
   suite: xhtml
   title: Subject inheritance with no @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1183986968
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0022
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0022
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631912
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0022
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0022
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0022.xhtml
@@ -638,24 +616,23 @@
   suite: xhtml
   title: meta with parent @id
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1736609117
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0023
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0023
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631913
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0023
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0023
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0023.xhtml
@@ -667,24 +644,23 @@
   suite: xhtml
   title: "@id does not generate subjects"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1213352286
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0024
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0024
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631914
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0024
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0024
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0024.xhtml
@@ -696,24 +672,23 @@
   suite: xhtml
   title: Ignore @id for non-meta and non-link
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 750229309
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0025
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0025
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631915
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0025
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0025
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ben Adida
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0025.xhtml
@@ -725,24 +700,23 @@
   suite: xhtml
   title: simple chaining test
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 69934270
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0026
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0026
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631916
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0026
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0026
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0026.xhtml
@@ -754,24 +728,23 @@
   suite: xhtml
   title: "@content"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1328749200
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0027
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0027
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631917
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0027
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0027
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0027.xhtml
@@ -783,24 +756,23 @@
   suite: xhtml
   title: "@content, ignore element content"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1928957079
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0028
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0028
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631918
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0028
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0028
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Wing Yung
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0028.xhtml
@@ -812,24 +784,23 @@
   suite: xhtml
   title: "@xml:lang and @datatype"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1004202389
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0029
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0029
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067631919
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0029
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0029
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Michael Hausenblas
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0029.xhtml
@@ -841,24 +812,23 @@
   suite: xhtml
   title: markup stripping with @datatype
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -347239453
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0030
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0030
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699559
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0030
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0030
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Michael Hausenblas
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0030.xhtml
@@ -870,24 +840,23 @@
   suite: xhtml
   title: omitted @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1572072938
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0031
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0031
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699560
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0031
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0031
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ralph Swick
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0031.xhtml
@@ -899,24 +868,23 @@
   suite: xhtml
   title: simple @resource
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 123630499
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0032
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0032
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699561
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0032
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0032
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ralph Swick
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0032.xhtml
@@ -928,24 +896,23 @@
   suite: xhtml
   title: "@resource overrides @href"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 94665072
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0033
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0033
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699562
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0033
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0033
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Michael Hausenblas
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0033.xhtml
@@ -957,24 +924,23 @@
   suite: xhtml
   title: simple chaining test with bNode
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 530452706
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0034
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0034
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699563
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0034
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0034
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Michael Hausenblas
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0034.xhtml
@@ -986,24 +952,23 @@
   suite: xhtml
   title: simple img[@src] test
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 946577923
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0035
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0035
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699564
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0035
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0035
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Michael Hausenblas
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0035.xhtml
@@ -1015,24 +980,23 @@
   suite: xhtml
   title: "@src/@href test"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1307303448
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0036
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0036
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699565
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0036
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0036
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Michael Hausenblas
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0036.xhtml
@@ -1044,24 +1008,23 @@
   suite: xhtml
   title: "@src/@resource test"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1359393334
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0037
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0037
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699566
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0037
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0037
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Steven Pemberton
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0037.xhtml
@@ -1073,24 +1036,23 @@
   suite: xhtml
   title: "@src/@href/@resource test"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1590006538
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0038
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0038
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699567
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0038
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0038
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Mark Birbeck
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0038.xhtml
@@ -1102,24 +1064,23 @@
   suite: xhtml
   title: "@rev - img[@src] test"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1830644753
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0039
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0039
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067699568
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0039
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0039
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Mark Birbeck
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0039.xhtml
@@ -1131,24 +1092,23 @@
   suite: xhtml
   title: "@rev - @src/@href test"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -984323613
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0040
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0040
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767208
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0040
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0040
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Mark Birbeck
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0040.xhtml
@@ -1160,24 +1120,23 @@
   suite: xhtml
   title: "@rev - @src/@resource test"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 768511744
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0041
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0041
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767209
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0041
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0041
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Mark Birbeck
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0041.xhtml
@@ -1189,24 +1148,23 @@
   suite: xhtml
   title: "@rev - @src/@href/@resource test"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1859157300
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0042
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0042
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767210
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0042
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0042
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ben Adida
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0042.xhtml
@@ -1218,24 +1176,23 @@
   suite: xhtml
   title: img[@src] test with omitted @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 562965727
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0043
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0043
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767211
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0043
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0043
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ben Adida
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0043.xhtml
@@ -1247,24 +1204,23 @@
   suite: xhtml
   title: "@src/@href test with omitted @about"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 493909502
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0044
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0044
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767212
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0044
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0044
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ben Adida
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0044.xhtml
@@ -1276,24 +1232,23 @@
   suite: xhtml
   title: "@src/@resource test with omitted @about"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -858400244
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0045
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0045
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767213
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0045
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0045
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ben Adida
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0045.xhtml
@@ -1305,24 +1260,23 @@
   suite: xhtml
   title: "@src/@href/@resource test with omitted @about"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1672070246
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0046
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0046
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767214
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0046
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0046
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0046.xhtml
@@ -1334,24 +1288,23 @@
   suite: xhtml
   title: "@typeof with @rel present, no @href, @resource, or @about"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1673011718
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0047
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0047
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767215
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0047
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0047
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0047.xhtml
@@ -1363,24 +1316,23 @@
   suite: xhtml
   title: "@typeof with @rel and @resource present, no @about"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1895902759
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0048
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0048
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767216
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0048
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0048
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0048.xhtml
@@ -1392,24 +1344,23 @@
   suite: xhtml
   title: "@typeof with @about and @rel present, no @resource"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 577761153
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0049
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067767217
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0049
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049.xhtml
@@ -1421,24 +1372,23 @@
   suite: xhtml
   title: "@typeof with @about, no @rel or @resource"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -141088342
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0050
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0050
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834857
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0050
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0050
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0050.xhtml
@@ -1450,24 +1400,23 @@
   suite: xhtml
   title: "@typeof without anything else"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 535145598
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0051
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0051
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834858
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0051
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0051
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0051.xhtml
@@ -1479,24 +1428,23 @@
   suite: xhtml
   title: "@typeof with a single @property"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -878238477
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0052
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0052
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834859
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0052
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0052
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0052.xhtml
@@ -1508,24 +1456,23 @@
   suite: xhtml
   title: "@typeof with @resource and nothing else"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1676232275
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0053
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0053
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834860
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0053
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0053
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0053.xhtml
@@ -1537,24 +1484,23 @@
   suite: xhtml
   title: "@typeof with @resource and nothing else, with a subelement"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 254307932
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0054
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0054
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834861
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0054
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0054
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Fabien Gandon
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0054.xhtml
@@ -1566,24 +1512,23 @@
   suite: xhtml
   title: multiple @property
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1660779122
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0055
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0055
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834862
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0055
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0055
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Fabien Gandon
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0055.xhtml
@@ -1595,24 +1540,23 @@
   suite: xhtml
   title: multiple @rel
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1028971581
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0056
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0056
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834863
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0056
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0056
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0056.xhtml
@@ -1624,24 +1568,23 @@
   suite: xhtml
   title: "@typeof applies to @about on same element with hanging rel"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 637886416
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0057
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0057
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834864
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0057
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0057
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0057.xhtml
@@ -1653,24 +1596,23 @@
   suite: xhtml
   title: hanging @rel creates multiple triples
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1079554982
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0058
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0058
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834865
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0058
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0058
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0058.xhtml
@@ -1682,24 +1624,23 @@
   suite: xhtml
   title: hanging @rel creates multiple triples, @typeof permutation
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 2093761856
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0059
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0059
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067834866
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0059
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0059
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0059.xhtml
@@ -1711,24 +1652,23 @@
   suite: xhtml
   title: multiple hanging @rels with multiple children
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -235933294
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0060
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0060
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902506
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0060
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0060
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0060.xhtml
@@ -1740,24 +1680,23 @@
   suite: xhtml
   title: UTF-8 conformance
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 183464078
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0061
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0061
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902507
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0061
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0061
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0061.xhtml
@@ -1769,24 +1708,23 @@
   suite: xhtml
   title: "@rel in head using reserved, non-prefixed XHTML value"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1121072348
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0062
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0062
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902508
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0062
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0062
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0062.xhtml
@@ -1798,24 +1736,23 @@
   suite: xhtml
   title: "@rev in head using reserved, non-prefixed XHTML value"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1958608053
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0063
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0063
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902509
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0063
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0063
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0063.xhtml
@@ -1827,24 +1764,23 @@
   suite: xhtml
   title: "@rel in head using reserved XHTML value and empty-prefix CURIE syntax"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1092093304
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0064
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0064
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902510
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0064
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0064
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0064.xhtml
@@ -1856,24 +1792,23 @@
   suite: xhtml
   title: "@about with safe CURIE"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 298249358
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0065
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0065
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902511
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0065
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0065
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0065.xhtml
@@ -1885,24 +1820,23 @@
   suite: xhtml
   title: "@rel with safe CURIE"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 2112067403
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0066
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0066
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902512
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0066
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0066
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0066.xhtml
@@ -1914,24 +1848,23 @@
   suite: xhtml
   title: "@about with @typeof in the head"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1962465137
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0067
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0067
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902513
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0067
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0067
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0067.xhtml
@@ -1943,24 +1876,23 @@
   suite: xhtml
   title: "@property in the head"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -2101214394
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0068
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0068
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902514
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0068
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0068
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0068.xhtml
@@ -1972,24 +1904,23 @@
   suite: xhtml
   title: Relative URI in @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1187820059
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0069
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0069
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067902515
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0069
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0069
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0069.xhtml
@@ -2001,24 +1932,23 @@
   suite: xhtml
   title: Relative URI in @href
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1171190434
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0070
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0070
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970155
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0070
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0070
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0070.xhtml
@@ -2030,24 +1960,23 @@
   suite: xhtml
   title: Relative URI in @resource
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 865332351
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0071
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0071
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970156
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0071
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0071
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0071.xhtml
@@ -2059,24 +1988,23 @@
   suite: xhtml
   title: No explicit @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1027473008
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0072
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970157
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0072
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072.xhtml
@@ -2088,24 +2016,23 @@
   suite: xhtml
   title: Relative URI in @about (with XHTML base in head)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1027024127
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0073
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0073
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970158
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0073
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0073
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0073.xhtml
@@ -2117,24 +2044,23 @@
   suite: xhtml
   title: Relative URI in @resource (with XHTML base in head)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1841756687
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0074
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0074
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970159
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0074
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0074
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0074.xhtml
@@ -2146,24 +2072,23 @@
   suite: xhtml
   title: Relative URI in @href (with XHTML base in head)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1079856521
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0075
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0075
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970160
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0075
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0075
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0075.xhtml
@@ -2175,24 +2100,23 @@
   suite: xhtml
   title: Reserved word 'license' in @rel with no explizit @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1014441928
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0076
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0076
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970161
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0076
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0076
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0076.xhtml
@@ -2204,24 +2128,23 @@
   suite: xhtml
   title: All reserved XHTML @rel values
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -961907262
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0077
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0077
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970162
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0077
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0077
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0077.xhtml
@@ -2233,24 +2156,23 @@
   suite: xhtml
   title: All reserved XHTML @rev values
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1195172707
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0078
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0078
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970163
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0078
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0078
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0078.xhtml
@@ -2262,24 +2184,23 @@
   suite: xhtml
   title: Multiple incomplete triples
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 2098307419
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0079
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0079
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2067970164
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0079
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0079
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0079.xhtml
@@ -2291,24 +2212,23 @@
   suite: xhtml
   title: "@resource and @href in completing incomplete triples"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1075336545
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0080
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0080
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037804
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0080
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0080
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0080.xhtml
@@ -2320,24 +2240,23 @@
   suite: xhtml
   title: "@about overrides @resource in incomplete triples"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -163717534
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0081
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0081
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037805
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0081
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0081
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0081.xhtml
@@ -2349,24 +2268,23 @@
   suite: xhtml
   title: multiple ways of handling incomplete triples (with @rev)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1486558643
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0082
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0082
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037806
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0082
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0082
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0082.xhtml
@@ -2378,24 +2296,23 @@
   suite: xhtml
   title: multiple ways of handling incomplete triples (with @rel and @rev)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 21776075
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0083
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0083
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037807
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0083
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0083
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0083.xhtml
@@ -2407,24 +2324,23 @@
   suite: xhtml
   title: multiple ways of handling incomplete triples (merged)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -192924316
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0084
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0084
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037808
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0084
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0084
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0084.xhtml
@@ -2436,24 +2352,23 @@
   suite: xhtml
   title: multiple ways of handling incomplete triples, this time with both @rel and @rev
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 476530359
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0085
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0085
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037809
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0085
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0085
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0085.xhtml
@@ -2465,24 +2380,23 @@
   suite: xhtml
   title: "@resource and @href in completing incomplete triples"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1420412641
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0086
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0086
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037810
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0086
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0086
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0086.xhtml
@@ -2494,24 +2408,23 @@
   suite: xhtml
   title: NO triple for a non-reserved @rel value
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 2096730546
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0087
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0087
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037811
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0087
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0087
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0087.xhtml
@@ -2523,24 +2436,23 @@
   suite: xhtml
   title: All reserved XHTML @rel values (with :xxx)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1025427484
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0088
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0088
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037812
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0088
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0088
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0088.xhtml
@@ -2552,24 +2464,23 @@
   suite: xhtml
   title: Interpretation of the CURIE "_:"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1767801341
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0089
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0089
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068037813
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0089
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0089
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0089.xhtml
@@ -2581,24 +2492,23 @@
   suite: xhtml
   title: "@src sets a new subject (@typeof)"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -877739649
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0090
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0090
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105453
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0090
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0090
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0090.xhtml
@@ -2610,24 +2520,23 @@
   suite: xhtml
   title: "@src sets a new subject (@rel/@href)"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 376831174
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0091
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0091
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105454
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0091
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0091
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0091.xhtml
@@ -2639,24 +2548,23 @@
   suite: xhtml
   title: Non-reserved, un-prefixed CURIE in @property
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 971827216
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0092
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0092
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105455
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0092
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0092
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0092.xhtml
@@ -2668,24 +2576,23 @@
   suite: xhtml
   title: Tests XMLLiteral content with explicit @datatype
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 902677601
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0093
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0093
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105456
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0093
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0093
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0093.xhtml
@@ -2697,24 +2604,23 @@
   suite: xhtml
   title: Tests XMLLiteral content with explicit @datatype (user-data-typed literal)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -694996723
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0094
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0094
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105457
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0094
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0094
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0094.xhtml
@@ -2726,24 +2632,23 @@
   suite: xhtml
   title: Tests XMLLiteral content with explicit @datatype (unusual prefix - bla:)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1866608748
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0095
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0095
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105458
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0095
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0095
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0095.xhtml
@@ -2755,24 +2660,23 @@
   suite: xhtml
   title: No triples with two nested @rel
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -608237987
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0096
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0096
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105459
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0096
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0096
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0096.xhtml
@@ -2784,24 +2688,23 @@
   suite: xhtml
   title: No triples with three nested @rel
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1877687848
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0097
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0097
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105460
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0097
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0097
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0097.xhtml
@@ -2813,24 +2716,23 @@
   suite: xhtml
   title: No triples with four nested @rel
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 204033908
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0098
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0098
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105461
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0098
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0098
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0098.xhtml
@@ -2842,24 +2744,23 @@
   suite: xhtml
   title: Single literal in nested pending triples
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 119381788
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0099
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0099
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2068105462
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0099
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0099
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0099.xhtml
@@ -2871,24 +2772,23 @@
   suite: xhtml
   title: Preservation of white space in literals
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 222241033
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0100
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0100
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016289
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0100
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0100
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0100.xhtml
@@ -2900,24 +2800,23 @@
   suite: xhtml
   title: XMLLiteral with explicit namespace
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1300804190
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0101
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0101
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016290
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0101
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0101
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0101.xhtml
@@ -2929,24 +2828,23 @@
   suite: xhtml
   title: XMLLiteral with explicit namespace and xml:lang
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1908768488
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0102
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0102
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016291
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0102
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0102
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0102.xhtml
@@ -2960,24 +2858,23 @@
   suite: xhtml
   title: XMLLiteral with explicit namespace and xml:lang; not overwriting existing langs
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1399567506
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0103
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0103
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016292
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0103
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0103
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ivan Herman
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0103.xhtml
@@ -2989,24 +2886,23 @@
   suite: xhtml
   title: XMLLiteral with explicit namespace; not overwriting local namespaces
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1586424973
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0104
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0104
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016293
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0104
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0104
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Fabien Gandon
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0104.xhtml
@@ -3018,24 +2914,23 @@
   suite: xhtml
   title: rdf:value
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1422890795
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0105
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0105
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016294
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0105
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0105
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0105.xhtml
@@ -3047,24 +2942,23 @@
   suite: xhtml
   title: inner @rel neither CURIE nor LinkType
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -902266173
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0106
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0106
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016295
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0106
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0106
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0106.xhtml
@@ -3076,24 +2970,23 @@
   suite: xhtml
   title: chaining with empty value in inner @rel
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1299060266
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0107
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0107
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016296
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0107
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0107
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0107.xhtml
@@ -3105,24 +2998,23 @@
   suite: xhtml
   title: no garbage collecting bnodes
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 550320367
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0108
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0108
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016297
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0108
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0108
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0108.xhtml
@@ -3134,24 +3026,23 @@
   suite: xhtml
   title: plain literal with datatype="" and xml:lang preservation
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -2066359694
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0109
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0109
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076016298
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0109
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0109
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0109.xhtml
@@ -3163,24 +3054,23 @@
   suite: xhtml
   title: Tests to ensure @xml:base is ignored
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1652348267
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0110
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0110
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083938
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0110
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0110
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0110.xhtml
@@ -3192,24 +3082,23 @@
   suite: xhtml
   title: bNode generated even though no nested @about exists
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 355161430
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0111
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0111
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083939
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0111
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0111
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0111.xhtml
@@ -3221,24 +3110,23 @@
   suite: xhtml
   title: two bNodes generated after three levels of nesting
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1638989989
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0112
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0112
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083940
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0112
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0112
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0112.xhtml
@@ -3250,24 +3138,23 @@
   suite: xhtml
   title: plain literal with datatype=""
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1258102514
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0113
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0113
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083941
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0113
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0113
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0113.xhtml
@@ -3279,24 +3166,23 @@
   suite: xhtml
   title: element with @property and no child nodes generates  empty plain literal
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1185785125
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0114
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0114
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083942
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0114
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0114
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0114.xhtml
@@ -3308,24 +3194,23 @@
   suite: xhtml
   title: Relative URI
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1931873310
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0115
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0115
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083943
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0115
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0115
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Toby Inkster
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0115.xhtml
@@ -3337,24 +3222,23 @@
   suite: xhtml
   title: XML Entities must be supported by RDFa parser
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -491302513
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0116
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0116
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083944
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0116
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0116
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Toby Inkster
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0116.xhtml
@@ -3366,24 +3250,23 @@
   suite: xhtml
   title: Reserved word used in @property should not generate triple
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -367729106
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0117
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0117
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083945
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0117
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0117
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0117.xhtml
@@ -3395,24 +3278,23 @@
   suite: xhtml
   title: Fragment identifiers stripped from BASE
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -759387601
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0118
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0118
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083946
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0118
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0118
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Ben Adida
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0118.xhtml
@@ -3430,24 +3312,23 @@
   suite: xhtml
   title: empty string "" is not equivalent to NULL - @about
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -481566660
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0119
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0119
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076083947
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0119
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0119
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0119.xhtml
@@ -3459,24 +3340,23 @@
   suite: xhtml
   title: "\"[prefix:]\" CURIE format is valid"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -179327430
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0120
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0120
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076151587
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0120
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0120
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0120.xhtml
@@ -3488,24 +3368,23 @@
   suite: xhtml
   title: "\"[:]\" CURIE format is valid"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 2043758382
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0121
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0121
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076151588
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0121
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0121
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0121.xhtml
@@ -3517,24 +3396,23 @@
   suite: xhtml
   title: "\"[]\" is a valid safe CURIE"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -490992338
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0122
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0122
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076151589
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0122
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0122
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Manu Sporny
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0122.xhtml
@@ -3546,24 +3424,23 @@
   suite: xhtml
   title: resource="[]" does not set the object since RDFa does not allow non-prefixed CURIEs
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1408016424
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0123
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0123
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076151590
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0123
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0123
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Shane P. McCarron
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0123.xhtml
@@ -3575,24 +3452,23 @@
   suite: xhtml
   title: case sensitivity in prefix names
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -2143329735
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0124
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0124
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076151591
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0124
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0124
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Shane P. McCarron
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0124.xhtml
@@ -3604,24 +3480,23 @@
   suite: xhtml
   title: XMLLiteral with explicit @datatype=''
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -865310461
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0125
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0125
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076151592
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0125
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0125
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Shane P. McCarron
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0125.xhtml
@@ -3633,24 +3508,23 @@
   suite: xhtml
   title: datatype XMLLiteral with other embedded RDFa
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1744261819
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0126
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0126
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076151593
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0126
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0126
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Shane P. McCarron
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0126.xhtml
@@ -3662,24 +3536,23 @@
   suite: xhtml
   title: Multiple @typeof values
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -76403579
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0131
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0131
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076219237
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0131
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0131
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0131.xhtml
@@ -3691,24 +3564,23 @@
   suite: xhtml
   title: Whitespace alternatives in attributes
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -138673937
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0134
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0134
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076219240
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0134
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0134
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0134.xhtml
@@ -3720,24 +3592,23 @@
   suite: xhtml
   title: Uppercase reserved words
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1001021827
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0140
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0140
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076286885
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0140
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0140
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0140.xhtml
@@ -3749,24 +3620,23 @@
   suite: xhtml
   title: Underscore is not allowed in xmlns
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -225157011
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0142
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0142
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076286887
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0142
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0142
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0142.xhtml
@@ -3778,24 +3648,23 @@
   suite: xhtml
   title: xmlns prefix 'xml' with correct URI
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 654011926
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0147
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0147
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076286892
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0147
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0147
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0147.xhtml
@@ -3807,24 +3676,23 @@
   suite: xhtml
   title: xmlns prefix 'xmlzzz' (reserved)
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 166652020
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0154
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0154
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076354538
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0154
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0154
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0154.xhtml
@@ -3836,24 +3704,23 @@
   suite: xhtml
   title: Invalid characters should not generate triples per XML 4th edition rules
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -1779520616
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0160
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0160
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076422183
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0160
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0160
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0160.xhtml
@@ -3865,24 +3732,23 @@
   suite: xhtml
   title: Undeclared prefix 'xml'
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1012153131
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0162
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0162
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076422185
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0162
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0162
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0162.xhtml
@@ -3894,24 +3760,23 @@
   suite: xhtml
   title: Undeclared prefix 'xmlns'
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 1016063505
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0164
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0164
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076422187
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0164
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0164
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Philip Taylor
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0164.xhtml
@@ -3923,24 +3788,23 @@
   suite: xhtml
   title: Undeclared common prefixes
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -346727691
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0172
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0172
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076489834
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0172
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0172
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: KANZAKI, Masahide
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0172.xhtml
@@ -3952,24 +3816,23 @@
   suite: xhtml
   title: "@datatype=\"\" generates plain literal in presence of child nodes"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 217387652
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0173
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0173
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076489835
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0173
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0173
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: KANZAKI, Masahide
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0173.xhtml
@@ -3981,24 +3844,23 @@
   suite: xhtml
   title: "@xml:lang=\"\" clears language setting"
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: 23443938
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/0174
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0174
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: -2076489836
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/0174
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0174
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: I. Stewartson
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0174.xhtml
@@ -4010,24 +3872,23 @@
   suite: xhtml
   title: Support single character prefix in CURIEs
 - !ruby/object:RdfaHelper::TestCase 
-  about: !ruby/object:RDF::URI 
-    uri: !ruby/object:Addressable::URI 
-      authority: rdfa.digitalbazaar.com
-      fragment: 
-      hash: -2076826790
-      host: rdfa.digitalbazaar.com
-      normalized_host: 
-      normalized_path: 
-      normalized_scheme: 
-      password: 
-      path: /test-suite/test-cases/xhtml1/1001
-      port: 
-      query: 
-      scheme: http
-      uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/1001
-      user: 
-      userinfo: 
-      validation_deferred: false
+  about: !ruby/object:Addressable::URI 
+    authority: rdfa.digitalbazaar.com
+    fragment: 
+    hash: 1556707862
+    host: rdfa.digitalbazaar.com
+    normalized_host: 
+    normalized_path: 
+    normalized_scheme: 
+    password: 
+    path: /test-suite/test-cases/xhtml1/1001
+    port: 
+    query: 
+    scheme: http
+    uri_string: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/1001
+    user: 
+    userinfo: 
+    validation_deferred: false
   contributor: Fabien Gandon
   expectedResults: true
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/1001.xhtml

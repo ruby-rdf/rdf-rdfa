@@ -191,7 +191,7 @@ module RdfaHelper
       
       @test_cases = unless File.file?(yaml_file)
         puts "parse #{manifest_file} @#{Time.now}"
-        graph = RDF::Graph.load(manifest_file, :base_uri => @manifest_url)
+        graph = RDF::Graph.load(manifest_file, :base_uri => @manifest_url, :format => :rdf)
         puts "parsed #{graph.size} statements @#{Time.now}"
 
         graph.subjects.map do |subj|
@@ -251,6 +251,7 @@ module RDF
     def self.open(filename, options = {}, &block)
       filename = ::RDF::Reader.stub_file(filename)
       options[:format] ||= :rdfa
+      puts "parse #{filename} with format #{options[:format]}"
       orig_open(filename, options, &block)
     end
   end

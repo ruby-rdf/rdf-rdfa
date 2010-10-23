@@ -22,6 +22,9 @@ module RDF; class Literal
     # @option options [String] :lexical (nil)
     # @option options [Hash] :namespaces ({}) Use :__default__ or "" to declare default namespace
     # @option options [Symbol] :language (nil)
+    # @option options [Array<URIRef>] :profiles ([]) Profiles to add to elements
+    # @option options [Hash] :prefixes (nil) Prefixes to add to elements
+    # @option options [String] :default_vocabulary (nil) Default vocabulary to add to elements
     # @option options [:nokogiri, :libxml, or :rexml] :library
     def initialize(value, options = {})
       options[:namespaces] ||= {}
@@ -76,9 +79,9 @@ module RDF; class Literal
       ns_hash.each_pair {|a, u| ns_strs << "#{a}=\"#{u}\""}
 
       case @library
-      when :nokogiri  then parse_value_nokogiri(value, ns_strs, options[:language])
-      when :libxml    then parse_value_libxml(value, ns_strs, options[:language])
-      when :rexml     then parse_value_rexml(value, ns_strs, options[:language])
+      when :nokogiri  then parse_value_nokogiri(value, ns_strs, options)
+      when :libxml    then parse_value_libxml(value, ns_strs, options)
+      when :rexml     then parse_value_rexml(value, ns_strs, options)
       else                 value.to_s
       end
     end
@@ -99,7 +102,7 @@ module RDF; class Literal
       # to the required element, and does not properly order either namespaces or attributes.
       #
       # An open-issue in Nokogiri is to add support for C14N from the underlying libxml2 libraries.
-      def parse_value_nokogiri(value, ns_strs, language)
+      def parse_value_nokogiri(value, ns_strs, options)
         elements = if value.is_a?(Nokogiri::XML::NodeSet)
           value
         else
@@ -111,16 +114,59 @@ module RDF; class Literal
           if c.is_a?(Nokogiri::XML::Element)
             c = Nokogiri::XML.parse(c.dup.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS)).root
             # Gather namespaces from self and decendant nodes
+            #
+            # prefix mappings
+            # Look for @xmlns and @prefix mappings. Add any other mappings from options[:prefixes]
+            # that aren't already defined on this node
+            defined_mappings = {}
+            prefix_mappings = {}
             c.traverse do |n|
               ns = n.namespace
               next unless ns
               prefix = ns.prefix ? "xmlns:#{ns.prefix}" : "xmlns"
+              defined_mappings[ns.prefix.to_s] = ns.href.to_s
               c[prefix] = ns.href.to_s unless c.namespaces[prefix]
             end
 
+            mappings = c["prefix"].to_s.split(/\s+/)
+            while mappings.length > 0 do
+              prefix, uri = mappings.shift.downcase, mappings.shift
+              #puts "uri_mappings prefix #{prefix} <#{uri}>"
+              next unless prefix.match(/:$/)
+              prefix.chop!
+
+              # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
+              next if prefix == "_"
+
+              defined_mappings[prefix] = uri
+              prefix_mappings[prefix] = uri
+            end
+
+            # Add prefixes, being careful to honor mappings defined on the element
+            if options[:prefixes]
+              options[:prefixes].each_pair do |p, uri|
+                prefix_mappings[p] = uri unless defined_mappings.has_key?(p)
+              end
+              if prefix_mappings.length
+                c["prefix"] = prefix_mappings.keys.sort.map {|p| "#{p}: #{prefix_mappings[p]}"}.join(" ")
+              end
+            end
+            
+            # Add profiles, being careful to honor profiles defined on the element
+            if options[:profiles].is_a?(Array) && options[:profiles].length > 0
+              profiles = c["profile"].to_s.split(" ")
+              profiles += options[:profiles]
+              c["profile"] = profiles.join(" ")
+            end
+            
+            # Add default vocabulary, being careful to honor any defined on the element
+            if options[:default_vocabulary] && !c["vocab"]
+              c["vocab"] = options[:default_vocabulary].to_s
+            end
+            
             # Add language
-            if language && c["lang"].to_s.empty?
-              c["xml:lang"] = language.to_s
+            if options[:language] && c["lang"].to_s.empty?
+              c["xml:lang"] = options[:language].to_s
             end
           end
           c

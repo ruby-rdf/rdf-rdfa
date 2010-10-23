@@ -184,7 +184,7 @@ describe "RDF::RDFa::Reader" do
       @graph.should have_triple([
         RDF::URI('http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml'),
         RDF::DC11.title,
-        RDF::Literal("E = mc<sup xmlns=\"http://www.w3.org/1999/xhtml\">2</sup>: The Most Urgent Problem of Our Time", :datatype => RDF.XMLLiteral)
+        RDF::Literal("E = mc<sup xmlns=\"http://www.w3.org/1999/xhtml\" prefix=\"dc: http://purl.org/dc/elements/1.1/ rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# xhv: http://www.w3.org/1999/xhtml/vocab#\" vocab=\"http://www.w3.org/1999/xhtml/vocab#\">2</sup>: The Most Urgent Problem of Our Time", :datatype => RDF.XMLLiteral)
       ])
     end
   end
