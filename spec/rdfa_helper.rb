@@ -251,7 +251,7 @@ module RDF
     def self.open(filename, options = {}, &block)
       filename = ::RDF::Reader.stub_file(filename)
       options[:format] ||= :rdfa
-      puts "parse #{filename} with format #{options[:format]}"
+      puts "parse #{filename} with format #{options[:format]}" if $verbose
       orig_open(filename, options, &block)
     end
   end

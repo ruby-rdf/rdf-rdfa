@@ -6,7 +6,7 @@ require 'getoptlong'
 
 def parse(input, base)
   puts RDF::Writer.for($format.to_sym).buffer { |writer|
-    RDF::RDFa::Reader.new(input, :base_uri => base, :strict => true).each do |statement|
+    RDF::RDFa::Reader.new(input, :base_uri => base, :validate => true).each do |statement|
       writer << statement
     end
   }

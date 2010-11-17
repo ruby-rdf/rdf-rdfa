@@ -92,7 +92,7 @@ describe "RDF::RDFa::Reader" do
         </html>
         )
 
-      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml", :validate => true)
       @statement = @graph.statements.first
     end
 
@@ -125,7 +125,7 @@ describe "RDF::RDFa::Reader" do
         </html>
         )
 
-      @graph = parse(sampledoc, :strict => true)
+      @graph = parse(sampledoc, :validate => true)
       @statement = @graph.statements.first
     end
 
@@ -165,7 +165,7 @@ describe "RDF::RDFa::Reader" do
         </html>
         )
 
-      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :validate => true)
     end
 
     it "should return 2 triples" do
@@ -208,7 +208,7 @@ describe "RDF::RDFa::Reader" do
         </html>
         )
 
-      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0017.xhtml", :validate => true)
     end
 
     it "should return 3 triples" do
@@ -257,7 +257,7 @@ describe "RDF::RDFa::Reader" do
         </html>
         )
 
-      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0049.xhtml", :validate => true)
     end
 
     it "should return 2 triples" do
@@ -300,7 +300,7 @@ describe "RDF::RDFa::Reader" do
         </html>
         )
 
-      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072.xhtml", :strict => true)
+      @graph = parse(sampledoc, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0072.xhtml", :validate => true)
     end
 
     it "should return 1 triple" do
@@ -331,7 +331,7 @@ describe "RDF::RDFa::Reader" do
         </html>
         )
       
-      @graph = parse(sampledoc, :strict => true)
+      @graph = parse(sampledoc, :validate => true)
       @statement = @graph.statements.first
     end
 
@@ -371,7 +371,7 @@ describe "RDF::RDFa::Reader" do
         </html>
       )
       
-      @graph = parse(sampledoc, :strict => true)
+      @graph = parse(sampledoc, :validate => true)
       @statement = @graph.statements.first
     end
 
@@ -426,7 +426,7 @@ describe "RDF::RDFa::Reader" do
     before(:each) do
       @profile_repository = RDF::Repository.new(:title => "Test Profile Repository")
       @debug = []
-      @reader = RDF::RDFa::Reader.new(@doc, :profile_repository => @profile_repository, :debug => @debug, :strict => true)
+      @reader = RDF::RDFa::Reader.new(@doc, :profile_repository => @profile_repository, :debug => @debug, :validate => true)
     end
     
     after(:all) do

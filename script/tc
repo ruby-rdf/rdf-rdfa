@@ -14,7 +14,7 @@ def run_tc(tc)
   RDF::Writer.for($format.to_sym).new do |writer|
     RDF::RDFa::Reader.new(tc.input,
       :base_uri => tc.informationResourceInput,
-      :strict => $strict,
+      :validate => $validate,
       :processor_graph => pg,
       :version => tc.version).each do |statement|
       writer << statement
@@ -34,14 +34,14 @@ end
 $verbose = false
 $format = :ntriples
 $pg_format = nil
-$strict = false
+$validate = false
 suite = "xhtml"
 opts = GetoptLong.new(
   ["--debug", GetoptLong::NO_ARGUMENT],
   ["--verbose", GetoptLong::NO_ARGUMENT],
   ["--quiet", GetoptLong::NO_ARGUMENT],
   ["--suite", GetoptLong::OPTIONAL_ARGUMENT],
-  ["--strict", GetoptLong::NO_ARGUMENT],
+  ["--validate", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
   ["--pg-format", GetoptLong::REQUIRED_ARGUMENT]
 )
@@ -53,7 +53,7 @@ opts.each do |opt, arg|
   when '--format' then $format = arg
   when '--pg-format' then $pg_format = arg
   when '--suite' then suite = arg
-  when '--strict' then $strict = true
+  when '--validate' then $validate = true
   end
 end
 

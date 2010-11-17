@@ -42,10 +42,6 @@ module RDF::RDFa
     # @return [:xhtml]
     attr_reader :host_language
     
-    # Host language
-    # @return [:xhtml]
-    attr_reader :host_language
-
     # Version
     # @return [:rdfa_1_0, :rdfa_1_1]
     attr_reader :version
@@ -162,23 +158,41 @@ module RDF::RDFa
     ##
     # Initializes the RDFa reader instance.
     #
-    # @param  [Nokogiri::HTML::Document, Nokogiri::XML::Document, #read, #to_s]       input
-    # @option options [Array] :debug (nil) Array to place debug messages
-    # @option options [Graph] :processor_graph (nil) Graph to record information, warnings and errors.
-    # @option options [Repository] :profile_repository (nil) Repository to save profile graphs.
-    # @option options [Boolean] :strict (false) Raise Error if true, continue with lax parsing, otherwise
-    # @option options [Boolean] :base_uri (nil) Base URI to use for relative URIs.
-    # @option options [:rdfa_1_0, :rdfa_1_1] :version (:rdfa_1_1) Parser version information
-    # @option options [:xhtml] :host_language (:xhtml) Host Language
+    # @param  [Nokogiri::HTML::Document, Nokogiri::XML::Document, IO, File, String] input
+    #   the input stream to read
+    # @param  [Hash{Symbol => Object}] options
+    #   any additional options
+    # @option options [Encoding] :encoding     (Encoding::UTF_8)
+    #   the encoding of the input stream (Ruby 1.9+)
+    # @option options [Boolean]  :validate     (false)
+    #   whether to validate the parsed statements and values
+    # @option options [Boolean]  :canonicalize (false)
+    #   whether to canonicalize parsed literals
+    # @option options [Boolean]  :intern       (true)
+    #   whether to intern all parsed URIs
+    # @option options [Hash]     :prefixes     (Hash.new)
+    #   the prefix mappings to use (not supported by all readers)
+    # @option options [#to_s]    :base_uri     (nil)
+    #   the base URI to use when resolving relative URIs
+    # @option options [:xhtml] :host_language (:xhtml)
+    #   Host Language
+    # @option options [:rdfa_1_0, :rdfa_1_1] :version (:rdfa_1_1)
+    #   Parser version information
+    # @option options [Graph]    :processor_graph (nil)
+    #   Graph to record information, warnings and errors.
+    # @option options [Repository] :profile_repository (nil)
+    #   Repository to save profile graphs.
+    # @option options [Array] :debug
+    #   Array to place debug messages
     # @return [reader]
-    # @yield  [reader]
-    # @yieldparam [RDF::Reader] reader
-    # @raise [RDF::ReaderError]:: Raises RDF::ReaderError if _strict_
+    # @yield  [reader] `self`
+    # @yieldparam  [RDF::Reader] reader
+    # @yieldreturn [void] ignored
+    # @raise [Error]:: Raises RDF::ReaderError if _validate_
     def initialize(input = $stdin, options = {}, &block)
       super do
         @debug = options[:debug]
-        @strict = options[:strict]
-        @base_uri = RDF::URI.intern(options[:base_uri])
+        @base_uri = uri(options[:base_uri])
         @@vocabulary_cache ||= {}
 
         @version = options[:version] ? options[:version].to_sym : :rdfa_1_1
@@ -194,7 +208,8 @@ module RDF::RDFa
         end
         
         add_error(nil, "Empty document", RDF::RDFA.DocumentError) if (@doc.nil? || @doc.root.nil?)
-        add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) unless @doc.errors.empty?
+        add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
+        add_error("Empty document") if (@doc.nil? || @doc.root.nil?) && validate?
 
         block.call(self) if block_given?
       end
@@ -285,7 +300,7 @@ module RDF::RDFa
 
      def add_error(node, message, process_class = RDF::RDFA.Error)
        add_processor_message(node, message, process_class)
-       raise RDF::ReaderError, message if @strict
+       raise RDF::ReaderError, message if validate?
      end
 
      def add_processor_message(node, message, process_class)
@@ -313,10 +328,10 @@ module RDF::RDFa
     # @param [URI] predicate:: the predicate of the statement
     # @param [URI, BNode, Literal] object:: the object of the statement
     # @return [Statement]:: Added statement
-    # @raise [ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _strict_.
+    # @raise [ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
-      add_debug(node, "statement: #{statement.to_ntriples}")
+      add_debug(node, "statement: #{RDF::NTriples.serialize(statement)}")
       @callback.call(statement)
     end
 
@@ -330,7 +345,7 @@ module RDF::RDFa
         base = base_el.attributes['href']
         # Strip any fragment from base
         base = base.to_s.split("#").first
-        @base_uri = RDF::URI.intern(base)
+        @base_uri = uri(base)
         add_debug(base_el, "parse_whole_doc: base='#{base}'")
       end
 
@@ -346,7 +361,7 @@ module RDF::RDFa
     def process_profile(element, profiles)
       profiles.
         reverse.
-        map {|profile| RDF::URI.intern(profile)}.
+        map {|profile| uri(profile)}.
         each do |profile|
         # Don't try to open ourselves!
         if @base_uri == profile
@@ -358,13 +373,8 @@ module RDF::RDFa
             unless @profile_repository.has_context?(profile)
               add_debug(element, "process_profile: parse profile <#{profile}>")
               # Parse profile, and extract mappings from graph
-
-              # Fixme, RDF isn't smart enough to figure this out from MIME-Type
-              load_opts = {:base_uri => profile, :context => profile}
-              load_opts[:format] = :rdfa unless RDF::Format.for(:file_name => profile)
-              
               # Store triples in repository with profile URI as context
-              @profile_repository.load(profile, load_opts)
+              @profile_repository.load(profile, :base_uri => profile, :context => profile)
             end
             @@vocabulary_cache[profile] = {
               :uri_mappings => {},
@@ -403,7 +413,7 @@ module RDF::RDFa
               # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
               # mapping from the object literal of the rdfa:term predicate to the object literal of the
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-              tm[term] = RDF::URI.intern(uri) if term && uri
+              tm[term] = uri(uri) if term && uri
             end
           #rescue Exception => e
           #  add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
@@ -458,7 +468,7 @@ module RDF::RDFa
     def traverse(element, evaluation_context)
       if element.nil?
         add_debug(element, "traverse nil element")
-        raise RDF::ReaderError, "Can't parse nil element" if @strict
+        raise RDF::ReaderError, "Can't parse nil element" if validate?
         return nil
       end
       
@@ -512,7 +522,7 @@ module RDF::RDFa
           # Skip this element and all sub-elements
           # If any referenced RDFa Profile is not available, then the current element and its children must not place any
           # triples in the default graph .
-          raise if @strict
+          raise if validate?
           return
         end
       end
@@ -530,7 +540,7 @@ module RDF::RDFa
           add_debug(element, "[Step 2] traverse, reset default_vocaulary to #{@host_defaults.fetch(:vocabulary, nil).inspect}")
           @host_defaults.fetch(:vocabulary, nil)
         else
-          RDF::URI.intern(vocab)
+          uri(vocab)
         end
         add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")
       end
@@ -697,7 +707,7 @@ module RDF::RDFa
             false
           else
             add_debug(element, "Illegal predicate: #{p.inspect}")
-            raise RDF::ReaderError, "predicate #{p.inspect} must be a URI" if @strict
+            raise RDF::ReaderError, "predicate #{p.inspect} must be a URI" if validate?
             true
           end
         end
@@ -711,45 +721,60 @@ module RDF::RDFa
                               :term_mappings => term_mappings,
                               :vocab => default_vocabulary,
                               :restrictions => TERMorCURIEorAbsURI[@version]) unless datatype.to_s.empty?
-        current_object_literal = if !datatype.to_s.empty? && datatype.to_s != RDF.XMLLiteral.to_s
-          # typed literal
-          add_debug(element, "[Step 11] typed literal (#{datatype})")
-          RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language)
-        elsif @version == :rdfa_1_1
-          if datatype.to_s == RDF.XMLLiteral.to_s
-            # XML Literal
-            add_debug(element, "[Step 11(1.1)] XML Literal: #{element.inner_html}")
+        begin
+          current_object_literal = if !datatype.to_s.empty? && datatype.to_s != RDF.XMLLiteral.to_s
+            # typed literal
+            add_debug(element, "[Step 11] typed literal (#{datatype})")
+            RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+          elsif @version == :rdfa_1_1
+            if datatype.to_s == RDF.XMLLiteral.to_s
+              # XML Literal
+              add_debug(element, "[Step 11(1.1)] XML Literal: #{element.inner_html}")
 
-            # In order to maintain maximum portability of this literal, any children of the current node that are
-            # elements must have the current in scope profiles, default vocabulary, prefix mappings, and XML
-            # namespace declarations (if any) declared on the serialized element using their respective attributes.
-            # Since the child element node could also declare new prefix mappings or XML namespaces, the RDFa
-            # Processor must be careful to merge these together when generating the serialized element definition.
-            # For avoidance of doubt, any re-declarations on the child node must take precedence over declarations
-            # that were active on the current node.
-            RDF::Literal.new(element.inner_html,
-                            :datatype => RDF.XMLLiteral,
-                            :language => language,
-                            :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"),
-                            :profiles => profiles,
-                            :prefixes => uri_mappings,
-                            :default_vocabulary => default_vocabulary)
+              # In order to maintain maximum portability of this literal, any children of the current node that are
+              # elements must have the current in scope profiles, default vocabulary, prefix mappings, and XML
+              # namespace declarations (if any) declared on the serialized element using their respective attributes.
+              # Since the child element node could also declare new prefix mappings or XML namespaces, the RDFa
+              # Processor must be careful to merge these together when generating the serialized element definition.
+              # For avoidance of doubt, any re-declarations on the child node must take precedence over declarations
+              # that were active on the current node.
+              begin
+                RDF::Literal.new(element.inner_html,
+                                :datatype => RDF.XMLLiteral,
+                                :language => language,
+                                :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"),
+                                :profiles => profiles,
+                                :prefixes => uri_mappings,
+                                :default_vocabulary => default_vocabulary,
+                                :validate => validate?,
+                                :canonicalize => canonicalize?)
+              rescue ArgumentError => e
+                add_error(element, e.message)
+              end
+            else
+              # plain literal
+              add_debug(element, "[Step 11(1.1)] plain literal")
+              RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            end
           else
-            # plain literal
-            add_debug(element, "[Step 11(1.1)] plain literal")
-            RDF::Literal.new(content || element.inner_text.to_s, :language => language)
+            if content || (children_node_types == [Nokogiri::XML::Text]) || (element.children.length == 0) || datatype == ""
+              # plain literal
+              add_debug(element, "[Step 11 (1.0)] plain literal")
+              RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
+              # XML Literal
+              add_debug(element, "[Step 11 (1.0)] XML Literal: #{element.inner_html}")
+              recurse = false
+              RDF::Literal.new(element.inner_html,
+                               :datatype => RDF.XMLLiteral,
+                               :language => language,
+                               :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"),
+                               :validate => validate?,
+                               :canonicalize => canonicalize?)
+            end
           end
-        else
-          if content || (children_node_types == [Nokogiri::XML::Text]) || (element.children.length == 0) || datatype == ""
-            # plain literal
-            add_debug(element, "[Step 11 (1.0)] plain literal")
-            RDF::Literal.new(content || element.inner_text.to_s, :language => language)
-          elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
-            # XML Literal
-            add_debug(element, "[Step 11 (1.0)] XML Literal: #{element.inner_html}")
-            recurse = false
-            RDF::Literal.new(element.inner_html, :datatype => RDF.XMLLiteral, :language => language, :namespaces => uri_mappings.merge("" => "http://www.w3.org/1999/xhtml"))
-          end
+        rescue ArgumentError => e
+          add_error(element, e.message)
         end
 
       # add each property
@@ -850,13 +875,13 @@ module RDF::RDFa
           begin
             # AbsURI does not use xml:base
             if restrictions.include?(:absuri)
-              uri = RDF::URI.intern(value)
+              uri = uri(value)
               unless uri.absolute?
                 uri = nil
                 raise RDF::ReaderError, "Relative URI #{value}" 
               end
             else
-              uri = evaluation_context.base.join(Addressable::URI.parse(value))
+              uri = uri(evaluation_context.base, Addressable::URI.parse(value))
             end
           rescue Addressable::URI::InvalidURIError => e
             add_warning(element, "Malformed prefix #{value}", RDF::RDFA.UnresolvedCURIE)
@@ -893,7 +918,7 @@ module RDF::RDFa
       
       if options[:vocab]
         # Otherwise, if there is a local default vocabulary the URI is obtained by concatenating that value and the term.
-        RDF::URI.intern(options[:vocab] + value)
+        uri(options[:vocab] + value)
       else
         # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
         add_warning(element, "Term #{value} is not defined", RDF::RDFA.UnresolvedTerm)
@@ -915,9 +940,9 @@ module RDF::RDFa
         add_debug(element, "curie_to_resource_or_bnode: default prefix: defined? #{!!uri_mappings[""]}, defaults: #{@host_defaults[:prefix]}")
         # Default prefix
         if uri_mappings[""]
-          RDF::URI.intern(uri_mappings[""] + reference.to_s)
+          uri(uri_mappings[""] + reference.to_s)
         elsif @host_defaults[:prefix]
-          RDF::URI.intern(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
+          uri(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
         else
           #add_warning(element, "Default namespace prefix is not defined", RDF::RDFA.UnresolvedCURIE)
           nil
@@ -930,12 +955,21 @@ module RDF::RDFa
         prefix = prefix.to_s.downcase unless @version == :rdfa_1_0
         ns = uri_mappings[prefix.to_s]
         if ns
-          RDF::URI.intern(ns + reference.to_s)
+          uri(ns + reference.to_s)
         else
           #add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix}")
           nil
         end
       end
+    end
+
+    def uri(value, append = nil)
+      value = RDF::URI.new(value)
+      value = value.join(append) if append
+      value.validate! if validate?
+      value.canonicalize! if canonicalize?
+      value = RDF::URI.intern(value) if intern?
+      value
     end
   end
 end

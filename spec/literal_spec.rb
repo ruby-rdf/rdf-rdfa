@@ -1,7 +1,6 @@
 # coding: utf-8
 $:.unshift "."
 require File.join(File.dirname(__FILE__), 'spec_helper')
-require 'nokogiri'
 
 describe RDF::Literal do
   require 'nokogiri' rescue nil
@@ -122,7 +121,7 @@ describe RDF::Literal do
                         "my" => "http://my.example.org/",
                       })
 
-          pending("XML C14N") do
+          pending do
             l.to_s.should == "\n      <html:h1 xmlns:html=\"http://NoHTML.example.org\">\n        <b xmlns=\"http://www.w3.org/1999/xhtml\">John</b>\n      </html:h1>\n   "
           end
         end
@@ -197,7 +196,7 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        pending("XML C14N") do
+        pending do
           l.to_s.should == "Some text here in <strong xmlns=\"http://www.w3.org/1999/xhtml\">bold</strong> and an svg rectangle: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
         end
       end
@@ -210,7 +209,7 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        pending("XML C14N") do
+        pending do
           l.to_s.should == "Du texte ici en <strong xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"fr\">gras</strong> et un rectangle en svg: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\" xml:lang=\"fr\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
         end
       end
@@ -223,7 +222,7 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        pending("XML C14N") do
+        pending do
           l.to_s.should == "Du texte ici en <strong xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"fr\">gras</strong> et un rectangle en svg: <svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\" xml:lang=\"hu\"><svg:rect svg:height=\"100\" svg:width=\"200\"></svg:rect></svg:svg>"
         end
       end
@@ -236,7 +235,7 @@ describe RDF::Literal do
                       "svg" => "http://www.w3.org/2000/svg",
                     })
 
-        pending("XML C14N") do
+        pending do
           l.to_s.should == "Some text here in <strong xmlns=\"http://www.w3.org/1999/xhtml\">bold</strong> and an svg rectangle: <svg xmlns=\"http://www.w3.org/2000/svg\"><rect height=\"100\" width=\"200\"></rect></svg>"
         end
       end
