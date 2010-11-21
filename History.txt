@@ -5,6 +5,7 @@
   * Added :canonicalize, and :intern options.
   * Change :strict option to :validate.
   * Add check to ensure that predicates are not literals, it's not legal in any RDF variant.
+  * Collect prefixes when extracting mappings.
 * Added :profile_repository option to RDF::RDFa::Reader.initialize. This MUST be an RDF::Repository and will be used to save profiles that are encountered.
   * Fixme, for now, retrieval should include HTTP headers and perform appropriate HTTP cache control and check for potential updates.
 * Update to 2010-10-26 LC version of RDFa Core 1.1

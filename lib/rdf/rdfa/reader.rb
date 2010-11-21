@@ -155,6 +155,13 @@ module RDF::RDFa
       end
     end
 
+    # FIXME: temporary patch until fixed in RDF.rb
+    # Allow for nil prefix mapping
+    def prefix(name, uri = nil)
+      name = name.to_s.empty? ? nil : (name.respond_to?(:to_sym) ? name.to_sym : name.to_s.to_sym)
+      uri.nil? ? prefixes[name] : prefixes[name] = (uri.respond_to?(:to_sym) ? uri.to_sym : uri.to_s.to_sym)
+    end
+
     ##
     # Initializes the RDFa reader instance.
     #
@@ -246,6 +253,11 @@ module RDF::RDFa
       
       @host_defaults.delete(:vocabulary) if @version == :rdfa_1_0
       
+      # Add prefix definitions from host defaults
+      @host_defaults[:uri_mappings].each_pair do |prefix, value|
+        prefix(prefix, value)
+      end
+
       add_debug(@doc, "version = #{@version},  host_language = #{@host_language}")
 
       # parse
@@ -351,7 +363,7 @@ module RDF::RDFa
 
       # initialize the evaluation context with the appropriate base
       evaluation_context = EvaluationContext.new(@base_uri, @host_defaults)
-
+      
       traverse(doc.root, evaluation_context)
     end
   
@@ -421,6 +433,12 @@ module RDF::RDFa
           end
         end
         profile_mappings = @@vocabulary_cache[profile]
+        
+        # Add URI Mappings to prefixes
+        profile_mappings[:uri_mappings].each_pair do |prefix, value|
+          prefix(prefix, value)
+        end
+        
         yield :uri_mappings, profile_mappings[:uri_mappings] unless profile_mappings[:uri_mappings].empty?
         yield :term_mappings, profile_mappings[:term_mappings] unless profile_mappings[:term_mappings].empty?
         yield :default_vocabulary, profile_mappings[:default_vocabulary] if profile_mappings[:default_vocabulary]
@@ -442,6 +460,7 @@ module RDF::RDFa
         pfx_lc = (@version == :rdfa_1_0 || ns.prefix.nil?) ? ns.prefix : ns.prefix.to_s.downcase
         if ns.prefix
           uri_mappings[pfx_lc] = ns.href
+          prefix(pfx_lc, ns.href)
           add_debug(element, "extract_mappings: xmlns:#{ns.prefix} => <#{ns.href}>")
         end
       end
@@ -460,6 +479,7 @@ module RDF::RDFa
         next if prefix == "_"
 
         uri_mappings[prefix] = uri
+        prefix(prefix, uri)
         add_debug(element, "extract_mappings: prefix #{prefix} => <#{uri}>")
       end unless @version == :rdfa_1_0
     end
