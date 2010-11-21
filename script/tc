@@ -4,7 +4,7 @@ $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/n3'
 require 'rdf/rdfxml'
 require 'rdf/rdfa'
-require 'spec/rdfa_helper'
+require File.expand_path(File.join(File.dirname(__FILE__), "..", 'spec', 'rdfa_helper'))
 require 'getoptlong'
 
 def run_tc(tc)
