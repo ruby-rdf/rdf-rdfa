@@ -12,6 +12,9 @@
   * Deep processing of XMLLiterals
   * Case sensitive Terms
   * Updated processor graph vocabulary
+  * Upgrade for changes to RDFa 1.1 test suite
+  * For SVG, allow use of xml:base for non-HTML languages
+  * No longer pass vocabularies, prefixes or terms when creating XMLLiterals. Only namespaces derived via xmlns are passed to Literal#typed.
 
 === 0.2.2
 * Ruby 1.9.2 compatibility

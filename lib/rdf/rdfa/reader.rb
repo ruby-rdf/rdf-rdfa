@@ -203,7 +203,6 @@ module RDF::RDFa
         @@vocabulary_cache ||= {}
 
         @version = options[:version] ? options[:version].to_sym : :rdfa_1_1
-        @host_language = options[:host_language] || :xhtml
         @processor_graph = options[:processor_graph]
         @profile_repository = options[:profile_repository] || RDF::Repository.new(:title => "RDFa Profiles")
         raise ReaderError, "Profile Repository must support context" unless @profile_repository.supports?(:context)
@@ -214,6 +213,12 @@ module RDF::RDFa
         else   Nokogiri::XML.parse(input, @base_uri.to_s)
         end
         
+        @host_language = options[:host_language] || case @doc.root.name.downcase.to_sym
+        when :html  then :xhtml
+        when :svg   then :svg
+        else             :xhtml
+        end
+
         add_error(nil, "Empty document", RDF::RDFA.DocumentError) if (@doc.nil? || @doc.root.nil?)
         add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
         add_error("Empty document") if (@doc.nil? || @doc.root.nil?) && validate?
@@ -248,7 +253,9 @@ module RDF::RDFa
             ).inject({}) { |hash, term| hash[term] = RDF::XHV[term]; hash },
         }
       else
-        {}
+        {
+          :uri_mappings => {},
+        }
       end
       
       @host_defaults.delete(:vocabulary) if @version == :rdfa_1_0
@@ -351,14 +358,20 @@ module RDF::RDFa
     # Parsing an RDFa document (this is *not* the recursive method)
     def parse_whole_document(doc, base)
       # find if the document has a base element
-      # XXX - HTML specific
-      base_el = doc.css('html>head>base').first
-      if (base_el)
+      base = case @host_language
+      when :xhtml
+        base_el = doc.at_css("html>head>base")
+        base_el.attribute("href").to_s.split("#").first if base_el
+      else
+        doc.at_xpath("/css/@xml:base", "xml" => RDF::XML.to_s)
+      end
+      
+      if (base)
         base = base_el.attributes['href']
         # Strip any fragment from base
         base = base.to_s.split("#").first
         @base_uri = uri(base)
-        add_debug(base_el, "parse_whole_doc: base='#{base}'")
+        add_debug("", "parse_whole_doc: base='#{base}'")
       end
 
       # initialize the evaluation context with the appropriate base
@@ -631,6 +644,9 @@ module RDF::RDFa
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
+          evaluation_context.base
+        elsif @host_language == :svg && element == @doc.root && evaluation_context.base
+          # XXX Spec confusion, assume that this is true
           evaluation_context.base
         elsif element.attributes['typeof']
           RDF::Node.new
