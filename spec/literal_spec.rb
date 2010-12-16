@@ -72,7 +72,7 @@ describe RDF::Literal do
                       :dc => "http://purl.org/dc/terms/",
                     })
         }
-        it "should add namespace" do subject.to_s.should == "<svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\"></svg:svg>" end
+        it "should add namespace" do subject.to_s.should == "<svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:dc=\"http://purl.org/dc/terms/\"></svg:svg>" end
       end
 
       describe "and language with an existing language embedded" do
@@ -90,7 +90,7 @@ describe RDF::Literal do
     describe "with a default namespace" do
       subject {
         @new.call("foo <sup>bar</sup> baz!", :datatype => RDF.XMLLiteral,
-                      :namespaces => {:__default__ => RDF::DC.to_s})
+                      :namespaces => {"" => RDF::DC.to_s})
       }
 
       it "should add namespace" do subject.to_s.should == "foo <sup xmlns=\"http://purl.org/dc/terms/\">bar</sup> baz!" end
