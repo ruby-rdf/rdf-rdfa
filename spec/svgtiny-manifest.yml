@@ -1,0 +1,13 @@
+--- 
+- !ruby/object:RdfaHelper::TestCase 
+  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/svgtiny/0201
+  classification: http://www.w3.org/2006/03/test-description#required
+  contributor: Manu Sporny
+  expectedResults: true
+  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/svgtiny/0201.svg
+  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/svgtiny/0201.sparql
+  name: "0201"
+  purpose: Tests @property to establish the predicate; literal object is in the content of the element.
+  specificationReference: ""
+  suite: svgtiny
+  title: Expressing an attribute using @property
