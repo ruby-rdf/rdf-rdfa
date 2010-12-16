@@ -2,6 +2,8 @@
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/rdfa'
+require 'rdf/rdfxml'
+require 'rdf/n3'
 require 'getoptlong'
 
 def parse(input, base)

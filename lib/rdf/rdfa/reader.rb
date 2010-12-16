@@ -399,7 +399,7 @@ module RDF::RDFa
               add_debug(element, "process_profile: parse profile <#{profile}>")
               # Parse profile, and extract mappings from graph
               # Store triples in repository with profile URI as context
-              @profile_repository.load(profile, :base_uri => profile, :context => profile)
+              @profile_repository.load(profile.to_s, :base_uri => profile, :context => profile)
             end
             @@vocabulary_cache[profile] = {
               :uri_mappings => {},
