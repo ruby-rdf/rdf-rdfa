@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -s
+#!/usr/bin/env ruby
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/n3'
@@ -59,7 +59,7 @@ end
 
 test_cases = RdfaHelper::TestCase.test_cases(suite)
 
-test_cases = test_cases.detect do |tc|
+test_cases.each do |tc|
   next unless ARGV.empty? || ARGV.any? {|n| tc.name.match(/#{n}/)}
   run_tc(tc)
 end

@@ -888,6 +888,18 @@
   suite: xhtml
   title: "@resource and @href in completing incomplete triples"
 - !ruby/object:RdfaHelper::TestCase 
+  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0086
+  classification: http://www.w3.org/2006/03/test-description#buggy
+  contributor: Ivan Herman
+  expectedResults: false
+  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0086.xhtml
+  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0086.sparql
+  name: 0086
+  purpose: Test that NO triple should be generated for a non-reserved @rel value
+  specificationReference: 7.4.3 General Use of Terms in Attributes
+  suite: xhtml
+  title: NO triple for a non-reserved @rel value
+- !ruby/object:RdfaHelper::TestCase 
   about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0087
   classification: http://www.w3.org/2006/03/test-description#required
   contributor: Ivan Herman
@@ -1057,6 +1069,18 @@
   specificationReference: ""
   suite: xhtml
   title: rdf:value
+- !ruby/object:RdfaHelper::TestCase 
+  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0105
+  classification: http://www.w3.org/2006/03/test-description#buggy
+  contributor: Manu Sporny
+  expectedResults: true
+  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0105.xhtml
+  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0105.sparql
+  name: "0105"
+  purpose: Test the behavior of triple generation in a corner case where the inner @rel is neither a CURIE or a LinkType. This test effectively causes a rel="" to be inserted between the outer div subject and the inner @href, which halts chaining.
+  specificationReference: 7.4.3 General Use of Terms in Attributes
+  suite: xhtml
+  title: inner @rel neither CURIE nor LinkType
 - !ruby/object:RdfaHelper::TestCase 
   about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0106
   classification: http://www.w3.org/2006/03/test-description#required
@@ -1316,6 +1340,18 @@
   suite: xhtml
   title: Underscore is not allowed in xmlns
 - !ruby/object:RdfaHelper::TestCase 
+  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0142
+  classification: http://www.w3.org/2006/03/test-description#buggy
+  contributor: Philip Taylor
+  expectedResults: true
+  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0142.xhtml
+  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0142.sparql
+  name: "0142"
+  purpose: Ensures that RDFa processors allow a prefix named 'xml' with the correct URI.
+  specificationReference: ""
+  suite: xhtml
+  title: xmlns prefix 'xml' with correct URI
+- !ruby/object:RdfaHelper::TestCase 
   about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0147
   classification: http://www.w3.org/2006/03/test-description#required
   contributor: Philip Taylor
@@ -1340,8 +1376,32 @@
   suite: xhtml
   title: Invalid characters should not generate triples per XML 4th edition rules
 - !ruby/object:RdfaHelper::TestCase 
+  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0160
+  classification: http://www.w3.org/2006/03/test-description#buggy
+  contributor: Philip Taylor
+  expectedResults: false
+  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0160.xhtml
+  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0160.sparql
+  name: "0160"
+  purpose: Ensure that the undeclared prefix 'xml' is not used to generate any triples.
+  specificationReference: ""
+  suite: xhtml
+  title: Undeclared prefix 'xml'
+- !ruby/object:RdfaHelper::TestCase 
+  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0162
+  classification: http://www.w3.org/2006/03/test-description#buggy
+  contributor: Philip Taylor
+  expectedResults: false
+  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0162.xhtml
+  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0162.sparql
+  name: "0162"
+  purpose: Ensure that the undeclared prefix 'xmlns' is not used to generate any triples.
+  specificationReference: ""
+  suite: xhtml
+  title: Undeclared prefix 'xmlns'
+- !ruby/object:RdfaHelper::TestCase 
   about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0164
-  classification: http://www.w3.org/2006/03/test-description#required
+  classification: http://www.w3.org/2006/03/test-description#buggy
   contributor: Philip Taylor
   expectedResults: false
   informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0164.xhtml
@@ -1580,18 +1640,6 @@
   suite: xhtml
   title: Test term case insensitivity
 - !ruby/object:RdfaHelper::TestCase 
-  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0191
-  classification: http://www.w3.org/2006/03/test-description#required
-  contributor: Gregg Kellogg
-  expectedResults: true
-  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0191.xhtml
-  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0191.sparql
-  name: 0191
-  purpose: Test that a triple is generated for a non-reserved @rel value using the default vocabulary
-  specificationReference: ""
-  suite: xhtml
-  title: Triple is generated for a non-reserved @rel value (opposite of 0086)
-- !ruby/object:RdfaHelper::TestCase 
   about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0192
   classification: http://www.w3.org/2006/03/test-description#buggy
   contributor: Gregg Kellogg
@@ -1675,18 +1723,6 @@
   specificationReference: ""
   suite: xhtml
   title: datatype XMLLiteral with other embedded RDFa
-- !ruby/object:RdfaHelper::TestCase 
-  about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0199
-  classification: http://www.w3.org/2006/03/test-description#required
-  contributor: Gregg kellogg
-  expectedResults: true
-  informationResourceInput: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0199.xhtml
-  informationResourceResults: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0199.sparql
-  name: 0199
-  purpose: Checks to make sure profile is added to elements within an XMLLiteral.
-  specificationReference: ""
-  suite: xhtml
-  title: datatype XMLLiteral with profile and other embedded RDFa
 - !ruby/object:RdfaHelper::TestCase 
   about: http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0200
   classification: http://www.w3.org/2006/03/test-description#required
