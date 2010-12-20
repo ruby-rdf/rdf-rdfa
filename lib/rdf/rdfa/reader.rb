@@ -381,7 +381,7 @@ module RDF::RDFa
     def process_profile(element, profiles)
       profiles.
         reverse.
-        map {|profile| uri(profile)}.
+        map {|profile| uri(profile).normalize}.
         each do |profile|
         # Don't try to open ourselves!
         if @base_uri == profile
@@ -435,9 +435,9 @@ module RDF::RDFa
               # rdfa:uri predicate. Add or update this mapping in the local term mappings.
               tm[term] = uri(uri) if term && uri
             end
-          #rescue Exception => e
-          #  add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
-          #  raise # Incase we're not in strict mode, we need to be sure processing stops
+          rescue Exception => e
+            add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
+            raise # Incase we're not in strict mode, we need to be sure processing stops
           end
         end
         profile_mappings = @@vocabulary_cache[profile]
