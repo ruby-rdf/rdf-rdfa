@@ -246,6 +246,9 @@ module RDF
 
     def self.stub_file(filename)
       case filename.to_s
+      when %r(http://rdfa.digitalbazaar.com/test-suite/profile/\w+)
+        filename.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/profile/\w+),
+          File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile'))
       when %r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+)
         filename.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+),
           File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'tests'))

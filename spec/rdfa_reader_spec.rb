@@ -321,7 +321,7 @@ describe "RDF::RDFa::Reader" do
             <title>Test</title>
             <base href="http://example.org/"/>
           </head>
-          <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/basic">
+          <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../../profiles/basic">
           <div about="#me">
             <p>
               <span property="foaf:name">Ivan Herman</span>
@@ -361,7 +361,7 @@ describe "RDF::RDFa::Reader" do
             <title>Test</title>
             <base href="http://example.org/"/>
           </head>
-          <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../profiles/foaf">
+          <body profile="http://rdfa.digitalbazaar.com/test-suite/test-cases/tests/../../profiles/foaf">
           <div about="#me">
             <p>
               <span property="name">Ivan Herman</span>
