@@ -155,13 +155,6 @@ module RDF::RDFa
       end
     end
 
-    # FIXME: temporary patch until fixed in RDF.rb
-    # Allow for nil prefix mapping
-    def prefix(name, uri = nil)
-      name = name.to_s.empty? ? nil : (name.respond_to?(:to_sym) ? name.to_sym : name.to_s.to_sym)
-      uri.nil? ? prefixes[name] : prefixes[name] = (uri.respond_to?(:to_sym) ? uri.to_sym : uri.to_s.to_sym)
-    end
-
     ##
     # Initializes the RDFa reader instance.
     #
