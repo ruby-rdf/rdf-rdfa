@@ -2,10 +2,11 @@ $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift File.dirname(__FILE__)
 
 require 'rubygems'
-require 'spec'
+require 'rspec'
 require 'bigdecimal'  # XXX Remove Me
 require 'rdf/rdfa'
 require 'rdf/spec'
+require 'rdf/spec/matchers'
 require 'rdf/isomorphic'
 
 begin
@@ -36,8 +37,14 @@ module RDF
   end
 end
 
-Spec::Runner.configure do |config|
-  config.include(RDF::Spec::Matchers)
+::RSpec.configure do |c|
+  c.filter_run :focus => true
+  c.run_all_when_everything_filtered = true
+  c.exclusion_filter = {
+    :ruby => lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version.to_s}/) },
+  }
+  c.include(Matchers)
+  c.include(RDF::Spec::Matchers)
 end
 
 TMP_DIR = File.join(File.expand_path(File.dirname(__FILE__)), "tmp")

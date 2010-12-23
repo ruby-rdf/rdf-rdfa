@@ -543,7 +543,7 @@ describe "RDF::RDFa::Reader" do
                     :debug => t.debug,
                     :version => t.version)
               end
-            rescue Spec::Expectations::ExpectationNotMetError => e
+            rescue RSpec::Expectations::ExpectationNotMetError => e
               if t.input =~ /XMLLiteral/
                 pending("XMLLiteral canonicalization not implemented yet")
               else
@@ -572,7 +572,7 @@ describe "RDF::RDFa::Reader" do
               end
             rescue SparqlException => e
               pending(e.message) { raise }
-            rescue Spec::Expectations::ExpectationNotMetError => e
+            rescue RSpec::Expectations::ExpectationNotMetError => e
               if t.name =~ /01[789]\d/
                 raise
               else
@@ -599,7 +599,7 @@ describe "RDF::RDFa::Reader" do
               end
             rescue SparqlException => e
               pending(e.message) { raise }
-            rescue Spec::Expectations::ExpectationNotMetError => e
+            rescue RSpec::Expectations::ExpectationNotMetError => e
               if t.name =~ /01[789]\d/
                 raise
               else

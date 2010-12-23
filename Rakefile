@@ -15,7 +15,7 @@ begin
     gemspec.authors = ["Gregg Kellogg"]
     gemspec.add_dependency('rdf', '= 0.3.0.pre')
     gemspec.add_dependency('nokogiri', '>= 1.3.3')
-    gemspec.add_development_dependency('rspec', '~> 1.3.0')
+    gemspec.add_development_dependency('rspec', '>= 2.1.0')
     gemspec.add_development_dependency('rdf-spec', '>= 0.2.1')
     gemspec.add_development_dependency('rdf-rdfxml', '>= 0.2.1')
     gemspec.add_development_dependency('rdf-isomorphic')
@@ -27,25 +27,18 @@ rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/*_spec.rb']
-end
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec)
 
 desc "Run specs through RCov"
-Spec::Rake::SpecTask.new("spec:rcov") do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/*_spec.rb'
+RSpec::Core::RakeTask.new("spec:rcov") do |spec|
   spec.rcov = true
-  spec.rcov_opts = ['-x', '/Library', '-x', '/System/Library', '-x', 'spec']
+  spec.rcov_opts =  %q[--exclude "spec"]
 end
 
 desc "Generate HTML report specs"
-Spec::Rake::SpecTask.new("doc:spec") do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/*_spec.rb']
-  spec.spec_opts = ["--format", "html:doc/spec.html"]
+RSpec::Core::RakeTask.new("doc:spec") do |spec|
+  spec.rspec_opts = ["--format", "html", "-o", "doc/spec.html"]
 end
 
 YARD::Rake::YardocTask.new do |t|

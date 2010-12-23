@@ -18,6 +18,7 @@
   * No longer pass vocabularies, prefixes or terms when creating XMLLiterals. Only namespaces derived via xmlns are passed to Literal#typed.
 * Literal::XML
   * Add all in-scope namespaces, not just those that seem to be used.
+* RSpec 2 compatibility.
 
 === 0.2.2
 * Ruby 1.9.2 compatibility
