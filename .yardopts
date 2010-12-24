@@ -1,4 +1,4 @@
---title "RDF::RDFa - XHTML+RDFa Support for RDF.rb"
+--title "RDFa parser for RDF.rb."
 --output-dir doc/yard
 --protected
 --no-private
@@ -6,6 +6,8 @@
 --markup rdoc
 --readme README.rdoc
 -
+READEME.rdoc
 AUTHORS
+History.rdoc
 CONTRIBUTORS
 VERSION

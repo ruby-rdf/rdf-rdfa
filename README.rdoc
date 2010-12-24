@@ -37,7 +37,7 @@ Instantiate a parser and parse source, specifying type and base-URL
 == Resources:
 * RDF.rb[http://rdf.rubyforge.org/]   
 * Distiller[http://kellogg-assoc/distiller]
-* RDoc[http://rdoc.info/projects/gkellogg/rdf-rdfa]
+* RDoc[http://rdoc.info/github/gkellogg/rdf-rdfa]
 * History[http://github.com/gkellogg/rdf-rdfa/blob/master/History.txt]
 * "RDFa 1.1 Core"[http://www.w3.org/TR/2010/WD-rdfa-core-20100422/]
 * "XHTML+RDFa 1.1 Core"[http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/]
