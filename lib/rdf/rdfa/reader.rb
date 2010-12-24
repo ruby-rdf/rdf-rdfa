@@ -650,10 +650,10 @@ module RDF::RDFa
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-          base
+          uri(base)
         elsif @host_language != :xhtml && base
           # XXX Spec confusion, assume that this is true
-          base
+          uri(base)
         elsif element.attributes['typeof']
           RDF::Node.new
         else
@@ -678,7 +678,7 @@ module RDF::RDFa
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-          base
+          uri(base)
         elsif element.attributes['typeof']
           RDF::Node.new
         else
