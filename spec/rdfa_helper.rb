@@ -4,7 +4,6 @@ autoload :YAML, "yaml"
 autoload :CGI, 'cgi'
 
 RDFA_DIR = File.join(File.dirname(__FILE__), 'rdfa-test-suite')
-RDFA_NT_DIR = File.join(File.dirname(__FILE__), 'rdfa-triples')
 RDFA_MANIFEST_URL = "http://rdfa.digitalbazaar.com/test-suite/"
 RDFA_TEST_CASE_URL = "#{RDFA_MANIFEST_URL}test-cases/"
 
@@ -143,16 +142,6 @@ module RdfaHelper
       end
     end
     
-    def triples
-      f = self.name + ".nt"
-      body = File.read(File.join(RDFA_NT_DIR, f)).gsub(TCPATHRE, tcpath)
-      case suite
-      when /xhtml/  then body
-      when /svg/    then body.gsub(HTMLRE, '\1.svg')
-      else               body.gsub(HTMLRE, '\1.html')
-      end
-    end
-    
     def inputDocument; self.name + ".txt"; end
     def outputDocument; self.name + ".sparql"; end
 
@@ -169,12 +158,7 @@ module RdfaHelper
 
       query_string = results
 
-      triples = self.triples rescue nil
-      
-      if (query_string.match(/UNION|OPTIONAL/) || title.match(/XML/)) && triples
-        # Check triples, as Rasql doesn't implement UNION
-        graph.should be_equivalent_graph(triples, self)
-      elsif $redland_enabled
+      if $redland_enabled
         # Run SPARQL query
         graph.should pass_query(query_string, self)
       else
