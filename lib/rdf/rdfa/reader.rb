@@ -214,10 +214,13 @@ module RDF::RDFa
       self.profile_repository = options[:profile_repository] if options[:profile_repository]
     end
 
+    # @return [RDF::Repository]
     def profile_repository
       Profile.repository
     end
     
+    # @param [RDF::Repository] repo
+    # @return [RDF::Repository]
     def profile_repository=(repo)
       Profile.repository = repo
     end
