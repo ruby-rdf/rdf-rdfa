@@ -1,4 +1,4 @@
-=== 0.3.0.pre
+=== 0.3.0
 * RDF.rb 0.3.0 compatibility updates
   * Remove literal_normalization and qname_hacks, add back uri_hacks (until 0.3.0)
   * URI canonicalization and validation.
