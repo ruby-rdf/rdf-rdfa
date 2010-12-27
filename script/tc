@@ -11,7 +11,7 @@ def run_tc(tc)
   puts "run #{tc.name}"
   puts tc.input if $verbose
   pg = RDF::Graph.new if $pg_format
-  RDF::Writer.for($format.to_sym).new do |writer|
+  RDF::Writer.for($output_format.to_sym).new do |writer|
     RDF::RDFa::Reader.new(tc.input,
       :base_uri => tc.informationResourceInput,
       :validate => $validate,
@@ -32,7 +32,7 @@ def run_tc(tc)
 end
 
 $verbose = false
-$format = :ntriples
+$output_format = :ntriples
 $pg_format = nil
 $validate = false
 suite = "xhtml"
@@ -50,7 +50,7 @@ opts.each do |opt, arg|
   when '--verbose' then $verbose = true
   when '--quiet' then $quiet = true
   when '--debug' then ::RDF::RDFa::debug = true
-  when '--format' then $format = arg
+  when '--format' then $output_format = arg
   when '--pg-format' then $pg_format = arg
   when '--suite' then suite = arg
   when '--validate' then $validate = true
