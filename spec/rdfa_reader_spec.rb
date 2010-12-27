@@ -440,16 +440,10 @@ describe "RDF::RDFa::Reader" do
     describe "new profile" do
       before(:each) do
         # Clear vocabulary cache
-        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+        RDF::RDFa::Profile.cache.send(:initialize)
         @graph = RDF::Graph.new
         @reader.each do |statement|
           @graph << statement
-        end
-      end
-      
-      describe "profile graph" do
-        it "should have context http://example.com/profile" do
-          @profile_repository.should have_context(RDF::URI.new("http://example.com/profile"))
         end
       end
       
@@ -462,29 +456,23 @@ describe "RDF::RDFa::Reader" do
           @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF::DC.title, RDF::Literal.new("A particular agent")))
         end
       end
-      
-      describe "profile repository" do
-        it "should have statements" do
-          @profile_repository.query(:context => RDF::URI.new("http://example.com/profile")).count.should == 4
-        end
-      end
     end
     
     describe "cached profile" do
       before(:each) do
         # Clear vocabulary cache
-        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+        RDF::RDFa::Profile.cache.send(:initialize)
         @reader.each {|s|}
       end
       
       it "should not re-parse profile" do
-        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+        RDF::RDFa::Profile.cache.send(:initialize)
         RDF::Reader.should_not_receive(:open).with("http://example.com/profile")
         RDF::RDFa::Reader.new(@doc, :profile_repository => @profile_repository).each {|p|}
       end
       
       it "should create vocab_cache" do
-        RDF::RDFa::Reader.send(:class_variable_get, :@@vocabulary_cache).should be_a(Hash)
+        RDF::RDFa::Profile.cache.should be_a(RDF::Util::Cache)
       end
     end
     
@@ -498,7 +486,7 @@ describe "RDF::RDFa::Reader" do
         @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.uri, RDF::Literal.new(RDF::DC.title.to_s))
 
         # Clear vocabulary cache
-        RDF::RDFa::Reader.send(:class_variable_set, :@@vocabulary_cache, {})
+        RDF::RDFa::Profile.cache.send(:initialize)
       end
 
       it "should not recieve RDF::Reader.open" do
