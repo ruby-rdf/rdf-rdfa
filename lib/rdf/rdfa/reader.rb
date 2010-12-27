@@ -39,16 +39,12 @@ module RDF::RDFa
       Regexp::EXTENDED)
   
     # Host language
-    # @return [:xhtml]
+    # @return [:xhtml, :svg]
     attr_reader :host_language
     
     # Version
     # @return [:rdfa_1_0, :rdfa_1_1]
     attr_reader :version
-    
-    # Repository finding and storing parsed profiles
-    # @return [RdfContext::Graph]
-    attr_accessor :profile_repository
     
     # The Recursive Baggage
     # @private
@@ -193,12 +189,9 @@ module RDF::RDFa
       super do
         @debug = options[:debug]
         @base_uri = uri(options[:base_uri])
-        @@vocabulary_cache ||= {}
 
         @version = options[:version] ? options[:version].to_sym : :rdfa_1_1
         @processor_graph = options[:processor_graph]
-        @profile_repository = options[:profile_repository] || RDF::Repository.new(:title => "RDFa Profiles")
-        raise ReaderError, "Profile Repository must support context" unless @profile_repository.supports?(:context)
 
         @doc = case input
         when Nokogiri::HTML::Document then input
@@ -218,8 +211,17 @@ module RDF::RDFa
 
         block.call(self) if block_given?
       end
+      self.profile_repository = options[:profile_repository] if options[:profile_repository]
     end
 
+    def profile_repository
+      Profile.repository
+    end
+    
+    def profile_repository=(repo)
+      Profile.repository = repo
+    end
+    
     ##
     # Iterates the given block for each RDF statement in the input.
     #
@@ -243,7 +245,7 @@ module RDF::RDFa
           :term_mappings => %w(
             alternate appendix bookmark cite chapter contents copyright first glossary help icon index
             last license meta next p3pv1 prev role section stylesheet subsection start top up
-            ).inject({}) { |hash, term| hash[term] = RDF::XHV[term]; hash },
+            ).inject({}) { |hash, term| hash[term.to_sym] = RDF::XHV[term].to_s; hash },
         }
       else
         {
@@ -301,35 +303,35 @@ module RDF::RDFa
     end
 
     def add_info(node, message, process_class = RDF::RDFA.Info)
-       add_processor_message(node, message, process_class)
-     end
-
-     def add_warning(node, message, process_class = RDF::RDFA.Warning)
-       add_processor_message(node, message, process_class)
-     end
-
-     def add_error(node, message, process_class = RDF::RDFA.Error)
-       add_processor_message(node, message, process_class)
-       raise RDF::ReaderError, message if validate?
-     end
-
-     def add_processor_message(node, message, process_class)
-       puts "#{node_path(node)}: #{message}" if ::RDF::RDFa::debug?
-       @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
-       if @processor_graph
-         @processor_sequence ||= 0
-         n = RDF::Node.new
-         @processor_graph << RDF::Statement.new(n, RDF["type"], process_class)
-         @processor_graph << RDF::Statement.new(n, RDF::DC.description, message)
-         @processor_graph << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
-         @processor_graph << RDF::Statement.new(n, RDF::RDFA.sequence, RDF::Literal::Integer.new(@processor_sequence += 1))
-         @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, @base_uri)
-         nc = RDF::Node.new
-         @processor_graph << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
-         @processor_graph << RDF::Statement.new(nc, RDF::PTR.expression, node.path)
-         @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, nc)
-       end
-     end
+      add_processor_message(node, message, process_class)
+    end
+    
+    def add_warning(node, message, process_class = RDF::RDFA.Warning)
+      add_processor_message(node, message, process_class)
+    end
+    
+    def add_error(node, message, process_class = RDF::RDFA.Error)
+      add_processor_message(node, message, process_class)
+      raise RDF::ReaderError, message if validate?
+    end
+    
+    def add_processor_message(node, message, process_class)
+      puts "#{node_path(node)}: #{message}" if ::RDF::RDFa::debug?
+      @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
+      if @processor_graph
+        @processor_sequence ||= 0
+        n = RDF::Node.new
+        @processor_graph << RDF::Statement.new(n, RDF["type"], process_class)
+        @processor_graph << RDF::Statement.new(n, RDF::DC.description, message)
+        @processor_graph << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
+        @processor_graph << RDF::Statement.new(n, RDF::RDFA.sequence, RDF::Literal::Integer.new(@processor_sequence += 1))
+        @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, @base_uri)
+        nc = RDF::Node.new
+        @processor_graph << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
+        @processor_graph << RDF::Statement.new(nc, RDF::PTR.expression, node.path)
+        @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, nc)
+      end
+    end
 
     # add a statement, object can be literal or URI or bnode
     #
@@ -374,76 +376,26 @@ module RDF::RDFa
     def process_profile(element, profiles)
       profiles.
         reverse.
-        map {|profile| uri(profile).normalize}.
-        each do |profile|
+        map {|uri| uri(uri).normalize}.
+        each do |uri|
         # Don't try to open ourselves!
-        if @base_uri == profile
-          add_debug(element, "process_profile: skip recursive profile <#{profile}>")
-        elsif @@vocabulary_cache.has_key?(profile)
-          add_debug(element, "process_profile: skip previously parsed profile <#{profile}>")
-        else
-          begin
-            unless @profile_repository.has_context?(profile)
-              add_debug(element, "process_profile: parse profile <#{profile}>")
-              # Parse profile, and extract mappings from graph
-              # Store triples in repository with profile URI as context
-              @profile_repository.load(profile.to_s, :base_uri => profile, :context => profile)
-            end
-            @@vocabulary_cache[profile] = {
-              :uri_mappings => {},
-              :term_mappings => {},
-              :default_vocabulary => nil
-            }
-            um = @@vocabulary_cache[profile][:uri_mappings]
-            tm = @@vocabulary_cache[profile][:term_mappings]
-
-            resource_info = {}
-            @profile_repository.query(:context => profile).each do |statement|
-              res = resource_info[statement.subject] ||= {}
-              raise RDF::ReaderError, "#{statement.object.inspect} must be a Literal" unless statement.object.is_a?(RDF::Literal)
-              %w(uri term prefix vocabulary).each do |term|
-                res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
-              end
-            end
-            resource_info.values.each do |res|
-              # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
-              # predicates sharing the same subject, no mapping is created.
-              uri = res["uri"]
-              term = res["term"]
-              prefix = res["prefix"]
-              vocab = res["vocabulary"]
-              add_debug(element, "process_profile: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}")
-
-              @@vocabulary_cache[profile][:default_vocabulary] = vocab if vocab
-              
-              # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
-              # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the
-              # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
-              # URI mappings after transforming the 'prefix' component to lower-case.
-              # For every extracted
-              um[prefix.downcase] = uri if uri && prefix && prefix != "_"
-            
-              # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
-              # mapping from the object literal of the rdfa:term predicate to the object literal of the
-              # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-              tm[term] = uri(uri) if term && uri
-            end
-          rescue Exception => e
-            add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
-            raise # Incase we're not in strict mode, we need to be sure processing stops
-          end
+        if @base_uri == uri
+          add_debug(element, "process_profile: skip recursive profile <#{uri}>")
+          next
         end
-        profile_mappings = @@vocabulary_cache[profile]
-        
+
+        next unless profile = Profile.find(uri)
         # Add URI Mappings to prefixes
-        profile_mappings[:uri_mappings].each_pair do |prefix, value|
+        profile.prefixes.each_pair do |prefix, value|
           prefix(prefix, value)
         end
-        
-        yield :uri_mappings, profile_mappings[:uri_mappings] unless profile_mappings[:uri_mappings].empty?
-        yield :term_mappings, profile_mappings[:term_mappings] unless profile_mappings[:term_mappings].empty?
-        yield :default_vocabulary, profile_mappings[:default_vocabulary] if profile_mappings[:default_vocabulary]
+        yield :uri_mappings, profile.prefixes unless profile.prefixes.empty?
+        yield :term_mappings, profile.terms unless profile.terms.empty?
+        yield :default_vocabulary, profile.vocabulary if profile.vocabulary
       end
+    rescue Exception => e
+      add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
+      raise # In case we're not in strict mode, we need to be sure processing stops
     end
 
     # Extract the XMLNS mappings from an element
@@ -460,7 +412,7 @@ module RDF::RDFa
         # Downcase prefix for RDFa 1.1
         pfx_lc = (@version == :rdfa_1_0 || ns.prefix.nil?) ? ns.prefix : ns.prefix.to_s.downcase
         if ns.prefix
-          uri_mappings[pfx_lc] = ns.href
+          uri_mappings[pfx_lc.to_sym] = ns.href
           namespaces[pfx_lc] ||= ns.href
           prefix(pfx_lc, ns.href)
           add_debug(element, "extract_mappings: xmlns:#{ns.prefix} => <#{ns.href}>")
@@ -482,7 +434,7 @@ module RDF::RDFa
         # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
         next if prefix == "_"
 
-        uri_mappings[prefix] = uri
+        uri_mappings[prefix.to_s.empty? ? nil : prefix.to_s.to_sym] = uri
         prefix(prefix, uri)
         add_debug(element, "extract_mappings: prefix #{prefix} => <#{uri}>")
       end unless @version == :rdfa_1_0
@@ -948,11 +900,11 @@ module RDF::RDFa
     def process_term(element, value, options)
       if options[:term_mappings].is_a?(Hash)
         # If the term is in the local term mappings, use the associated URI (case sensitive).
-        return options[:term_mappings][value.to_s] if options[:term_mappings].has_key?(value.to_s)
+        return uri(options[:term_mappings][value.to_s.to_sym]) if options[:term_mappings].has_key?(value.to_s.to_sym)
         
         # Otherwise, check for case-insensitive match
         options[:term_mappings].each_pair do |term, uri|
-          return uri if term.downcase == value.to_s.downcase
+          return uri(uri) if term.to_s.downcase == value.to_s.downcase
         end
       end
       
@@ -979,8 +931,8 @@ module RDF::RDFa
       elsif curie.to_s.match(/^:/)
         add_debug(element, "curie_to_resource_or_bnode: default prefix: defined? #{!!uri_mappings[""]}, defaults: #{@host_defaults[:prefix]}")
         # Default prefix
-        if uri_mappings[""]
-          uri(uri_mappings[""] + reference.to_s)
+        if uri_mappings[nil]
+          uri(uri_mappings[nil] + reference.to_s)
         elsif @host_defaults[:prefix]
           uri(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
         else
@@ -993,11 +945,12 @@ module RDF::RDFa
       else
         # Prefixes always downcased
         prefix = prefix.to_s.downcase unless @version == :rdfa_1_0
-        ns = uri_mappings[prefix.to_s]
+        add_debug(element, "curie_to_resource_or_bnode check for #{prefix.to_s.to_sym.inspect} in #{uri_mappings.inspect}")
+        ns = uri_mappings[prefix.to_s.to_sym]
         if ns
           uri(ns + reference.to_s)
         else
-          #add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix}")
+          add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix}")
           nil
         end
       end

@@ -27,6 +27,7 @@ module RDF
     require 'rdf/rdfa/vocab'
     require 'rdf/rdfa/patches/literal_hacks'
     require 'rdf/rdfa/patches/nokogiri_hacks'
+    autoload :Profile,  'rdf/rdfa/profile'
     autoload :Reader,  'rdf/rdfa/reader'
     autoload :VERSION, 'rdf/rdfa/version'
     
