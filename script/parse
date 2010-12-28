@@ -2,20 +2,27 @@
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/rdfa'
-require 'rdf/rdfxml'
-require 'rdf/n3'
+require 'rdf/rdfxml' rescue nil
+require 'rdf/n3' rescue nil
 require 'getoptlong'
+require 'open-uri'
 
 def parse(input, base)
-  puts RDF::Writer.for($format.to_sym).buffer { |writer|
-    RDF::RDFa::Reader.new(input, :base_uri => base, :validate => true).each do |statement|
+  reader_class = RDF::Reader.for($input_format.to_sym)
+  writer_class = RDF::Writer.for($output_format.to_sym)
+  raise "Reader not found for #{$input_format}" unless reader_class
+  raise "Writer not found for #{$output_format}" unless writer_class
+  puts writer_class.buffer(:standard_prefixes => true, :use_datatypes => true) { |writer|
+    reader_class.new(input, :base_uri => base, :validate => $validate).each do |statement|
       writer << statement
     end
   }
 end
 
 $verbose = false
-$format = :ntriples
+$output_format = :ntriples
+$input_format = :rdfa
+$validate = false
 base_uri  = "http://example.com"
 input = nil
 
@@ -24,16 +31,20 @@ opts = GetoptLong.new(
   ["--verbose", GetoptLong::NO_ARGUMENT],
   ["--quiet", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
+  ["--input-format", GetoptLong::REQUIRED_ARGUMENT],
   ["--execute", "-e", GetoptLong::REQUIRED_ARGUMENT],
+  ["--validate", GetoptLong::NO_ARGUMENT],
   ["--uri", GetoptLong::REQUIRED_ARGUMENT]
 )
 opts.each do |opt, arg|
   case opt
   when '--verbose' then $verbose = true
   when '--quiet' then $quiet = true
+  when '--validate' then $validate = true
   when '--debug' then ::RDF::RDFa::debug = true
   when '--execute' then input = arg
-  when '--format' then $format = arg
+  when '--format' then $output_format = arg
+  when '--input-format' then $input_format = arg
   when '--uri' then base_uri = arg
   end
 end
@@ -43,6 +54,6 @@ if ARGV.empty?
   parse(StringIO.new(s), base_uri)
 else
   ARGV.each do |test_file|
-    parse(File.open(test_file), base_uri)
+    parse(Kernel.open(test_file), base_uri)
   end
 end
