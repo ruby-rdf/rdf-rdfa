@@ -1,5 +1,5 @@
 require 'nokogiri'  # FIXME: Implement using different modules as in RDF::TriX
-require 'rdf/rdfxml/patches/graph_properties'
+require 'rdf/rdfa/patches/graph_properties'
 
 module RDF::RDFa
   ##
@@ -95,7 +95,6 @@ module RDF::RDFa
         @uri_to_term_or_curie = {}
         @uri_to_prefix = {}
         @graph = RDF::Graph.new
-        raise ReaderError, "Profile Repository must support context" unless @profile_repository.supports?(:context)
 
         block.call(self) if block_given?
       end
@@ -154,21 +153,21 @@ module RDF::RDFa
 
       doc = Nokogiri::XML::Document.new
 
-      add_debug "\nserialize: graph: #{@graph.size}"
+      add_debug "\nserialize: graph size: #{@graph.size}"
 
       preprocess
 
-      add_debug "\nserialize: graph namespaces: #{prefixes.inspect}"
+      add_debug "\nserialize: graph prefixes: #{prefixes.inspect}"
 
       doc.root = Nokogiri::XML::Element.new("html", doc)
       doc.root.default_namespace = "http://www.w3.org/1999/xhtml"
       doc.root["xml:lang"] = @lang.to_s.downcase if @lang
 
-      head = Nokogiri::XML::Element.new("head", doc)
-      doc.root.add_child(head)
-
       # Base
       if @base_uri
+        head = Nokogiri::XML::Element.new("head", doc)
+        doc.root.add_child(head)
+
         base = Nokogiri::XML::Element.new("base", doc)
         base["href"] = @base_uri
         head.add_child(base)
@@ -181,11 +180,13 @@ module RDF::RDFa
       # within profiles
 
       # Profile and Prefixes
-      if prefixes = @options[:prefixes]
-        html["prefix"] = prefixes.keys.sort.map {|pk| "#{pk}: #{profiles[p_k]}"}.join(" ")
+      unless (prefixes = @options[:prefixes]).empty?
+        add_debug "serialize: add prefixes #{prefixes.inspect}"
+        doc.root["prefix"] = prefixes.keys.sort.map {|pk| "#{pk}: #{prefixes[p_k]}"}.join(" ")
       end
 
-      if profiles = @options[:profiles]
+      unless (profiles = @options[:profiles] || []).empty?
+        add_debug "serialize: add profiles #{profiles.inspect}"
         doc.root["profile"] = profiles.join(" ")
       end
 
@@ -212,7 +213,7 @@ module RDF::RDFa
       # Load profiles
       # Add terms and prefixes to local store for converting URIs
       # Keep track of vocabulary from left-most profile
-      [@options[:profiles]].flatten.reverse.each do |uri|
+      [@options[:profiles]].flatten.compact.reverse.each do |uri|
         prof = Profile.find(uri)
         prof.prefixes.each_pair do |k, v|
           @uri_to_prefix[v] = k
@@ -259,7 +260,7 @@ module RDF::RDFa
         end
       end
       
-      # Sort subjects by resources over bnodes, ref_counts and the subject URI itself
+      # Sort subjects by resources over nodes, ref_counts and the subject URI itself
       recursable = @subjects.keys.
         select {|s| !seen.include?(s)}.
         map {|r| [r.is_a?(RDF::Node) ? 1 : 0, ref_count(r), r]}.
@@ -271,12 +272,12 @@ module RDF::RDFa
     # Take a hash from predicate uris to lists of values.
     # Sort the lists of values.  Return a sorted list of properties.
     # @param [Hash{String => Array<Resource>}] properties A hash of Property to Resource mappings
-    # @return [Array<String>}] Ordered list of properties. Uses predicate_order.
+    # @return [Array<String>}] Ordered list of properties.
     def order_properties(properties)
       properties.keys.each do |k|
         properties[k] = properties[k].sort do |a, b|
-          a_li = a.is_a?(RDF::URI) && get_curie(a) && get_curie(a).last.to_s =~ /^_\d+$/ ? a.to_i : a.to_s
-          b_li = b.is_a?(RDF::URI) && get_curie(b) && get_curie(b).last.to_s =~ /^_\d+$/ ? b.to_i : b.to_s
+          a_li = a.is_a?(RDF::URI) && get_curie(a) && get_curie(a).to_s =~ /:_\d+$/ ? a.to_i : a.to_s
+          b_li = b.is_a?(RDF::URI) && get_curie(b) && get_curie(b).to_s =~ /:_\d+$/ ? b.to_i : b.to_s
           
           a_li <=> b_li
         end
@@ -285,17 +286,12 @@ module RDF::RDFa
       # Make sorted list of properties
       prop_list = []
       
-      predicate_order.each do |prop|
-        next unless properties[prop]
-        prop_list << prop.to_s
-      end
-      
       properties.keys.sort.each do |prop|
         next if prop_list.include?(prop.to_s)
         prop_list << prop.to_s
       end
       
-      add_debug "sort_properties: #{prop_list.to_sentence}"
+      add_debug "order_properties: #{prop_list.to_sentence}"
       prop_list
     end
 
@@ -343,28 +339,31 @@ module RDF::RDFa
 
       subject_done(subject)
       
-      resource_uri = get_curie(subject) unless subject.is_a?(BNode) && ref_count(subject) == 1
+      resource_uri = get_curie(subject) unless subject.is_a?(RDF::Node)
       
       properties = @graph.properties(subject)
       prop_list = order_properties(properties)
-      add_debug "subject: #{subject.inspect}, props: #{properties.inspect}"
+      add_debug "subject: #{resource_uri.inspect}, props: #{properties.inspect}"
       
-      typeof = [prop_list.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
+      typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
+      prop_list -= [RDF.type.to_s]
 
       node = Nokogiri::XML::Element.new(options[:div], parent_node.document)
       node["about"] = resource_uri if resource_uri
       node["typeof"] = typeof if typeof.length > 0
-      add_debug "subject: #{subject.inspect }, about: #{resource_uri}, typeof: #{typeof}" if $CMX_DEBUG
+      add_debug "subject: #{resource_uri.inspect}, about: #{resource_uri}, typeof: #{typeof}"
 
       # Output properties as unordered list
       prop_nodes = []
       @depth += 1
-      prop_list.each_pair do |pred, values|
+      prop_list.each do |pred|
+        values = properties[pred]
+        add_debug "subject: #{resource_uri.inspect}, pred: #{pred}, values: #{values.inspect}"
         if heading_predicates.include?(pred)
           # Add heading-type nodes
           values.each do |v|
             h = Nokogiri::XML::Element.new("h#{@depth}", parent_node.document)
-            h["property"] = v
+            h["property"] = v.to_s
             node.add_child(h)
           end
         else
@@ -376,15 +375,94 @@ module RDF::RDFa
       parent_node.add_child(node)
     end
     
+    # Write a predicate with one or more values.
+    #
+    # Values may be a combination of Literal and Resource (Node or URI).
+    #
+    # Multi-valued properties are generated with a _ul_ and _li_. Single-valued
+    # are generated with a span or anchor
     def predicate(pred, values, parent_node, options)
       add_debug "predicate: #{pred.inspect}, values: #{values}"
-      next if values.empty?
+      return if values.empty?
       
-      # Split values into literals and others
-      literals = values.select {|r| r.literal? }
-      resources = values - literals
+      list_type = "ul"  # FIXME, logic to determine if should use ordered list
       
+      case values.length
+      when 1
+        # Display with span or anchor
+        child = case object = values.first
+        when RDF::Node, RDF::URI
+          if is_done?(object) || !@subjects.include?(object)
+            # Show as reference to non-subject or previously serialized node
+            show_ref(object, parent_node, :predicate => pred, :div => object.node? ? "span" : "a")
+          else
+            node = Nokogiri::XML::Element.new(list_type, parent_node.document)
+            node["ref"] = get_curie(pred)
+            @depth += 1
+            subject(object, node, options.merge(:div => "li"))
+            @depth -= 1
+            parent_node.add_child(node)
+          end
+        else  # Literal
+          show_lit(object, parent_node, :predicate => pred, :div => "span")
+        end
+      else
+        node = Nokogiri::XML::Element.new(list_type, parent_node.document)
+        
+        # Use either or both of @property and @rel depending on if values include literals or uri/node
+        node["property"] = get_curie(pred) if values.any?(&:literal?)
+        node["rel"] = get_curie(pred) if values.any?(&:uri?) || values.any?(&:node?)
+        values.each do |object|
+          if object.literal?
+            show_lit(object, node, :div => "li")
+          elsif is_done?(object) || !@subjects.include?(object)
+            @depth += 1
+            subject(object, node, options.merge(:div => "li"))
+            @depth -= 1
+          else
+            show_ref(object, node, :div => "li")
+          end
+        end
+        parent_node.add_child(node)
+      end
+    end
+    
+    def show_ref(object, parent_node, options)
+      tag = options[:div] || "li"
       
+      node = Nokogiri::XML::Element.new(tag, parent_node.document)
+      node["rel"] = get_curie(options[:predicate]) if options[:predicate]
+      
+      if tag == "a"
+        node["href"] = object.to_s
+      else
+        node["resource"] = get_curie(object)
+      end
+      parent_node.add_child(node)
+    end
+    
+    def show_lit(object, parent_node, options)
+      tag = options[:div] || "li"
+      
+      node = Nokogiri::XML::Element.new(tag, parent_node.document)
+      node["property"] = get_curie(options[:predicate]) if options[:predicate]
+      
+      add_debug "show_lit: #{object.inspect}, typed: #{object.typed?.inspect}, XML: #{object.is_a?(RDF::Literal::XML)}"
+      if object.typed? && object.datatype != RDF::XSD.string
+        if object.is_a?(RDF::Literal::XML)
+          node.inner_html = object.to_s
+          node["datatype"] = get_curie(object.datatype)
+        else
+          node["content"] = object.to_s
+          node["datatype"] = get_curie(object.datatype) if @options[:use_datatypes]
+        end
+      else
+        node.content = object.to_s
+        node["xml:lang"] = object.language.to_s if object.language && object.language.to_s != @options[:language]
+        node["datatype"] = get_curie(object.datatype) if object.datatype && @options[:use_datatypes]
+      end
+      
+      parent_node.add_child(node)
     end
     
     # Mark a subject as done.
@@ -405,6 +483,7 @@ module RDF::RDFa
     #
     # @param [String] message::
     def add_debug(message)
+      STDERR.puts message if ::RDF::RDFa.debug?
       @debug << message if @debug.is_a?(Array)
     end
 
@@ -412,6 +491,7 @@ module RDF::RDFa
     # @param [URI,#to_s] uri
     # @return [String] value to use to identify URI
     def get_curie(uri)
+      return uri.to_s if uri.is_a?(RDF::Node)
       uri_s = uri.to_s
       uri = RDF::URI.intern(uri)
       return @uri_to_term_or_curie[uri] if @uri_to_term_or_curie.has_key?(uri)
@@ -445,6 +525,8 @@ module RDF::RDFa
       
       # Just use the URI
       @uri_to_term_or_curie[uri] = uri.to_s
+    rescue Addressable::URI::InvalidURIError => e
+      raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
     end
   end
 end
