@@ -1,0 +1,369 @@
+<?xml version="1.0"?><!--*- nxml -*-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head profile=
+"http://www.w3.org/2003/g/data-view http://purl.org/NET/erdf/profile">
+<meta name="generator" content=
+"HTML Tidy for Linux/x86 (vers 12 April 2005), see www.w3.org" />
+
+  <title>GRDDL Data Views: RDF expressed in XHTML and XML</title>
+  <link rel="stylesheet" href="style" type="text/css" />
+  <link rel="stylesheet" href="/StyleSheets/base" type=
+  "text/css" />
+  <link rel="schema.dc" href="http://purl.org/dc/elements/1.1/" />
+  <link rel="schema.doap" href="http://usefulinc.com/ns/doap#" />
+  <link rel="schema.foaf" href="http://xmlns.com/foaf/0.1/" />
+  <link rel="schema.grddl" href=
+  "http://www.w3.org/2003/g/data-view#" />
+  <link rel="schema.rddl" href="http://www.rddl.org/purposes#" />
+  <link rel="schema.rdfs" href=
+  "http://www.w3.org/2000/01/rdf-schema#" />
+  <link rel="schema.rdf" href=
+  "http://www.w3.org/1999/02/22-rdf-syntax-ns#" />
+  <link rel="schema.owl" href=
+  "http://www.w3.org/2002/07/owl#" />
+  <link rev="doap-homepage" href="#grddlProject" />
+  <link rel="foaf-maker" href="#grddl-wg" />
+
+  <!-- more local copy of eRDF transformation, while we work out
+       redirect/base details. -->
+  <link rel="transformation" href="http://www.w3.org/2001/sw/grddl-wg/td/extract-rdf.xsl" />
+
+  <link href="/People/Berners-Lee/general.css" rel="stylesheet"
+  type="text/css" />
+  <!-- base seems to be necessary for embedded RDF rev links -->
+  <base href="http://www.w3.org/2003/g/data-view" />
+</head>
+
+<body>
+  <div>
+    <a href="/"><img src="../../Icons/w3c_home" alt="W3C" height=
+    "48" width="72" /></a>
+  </div>
+
+  <div id="grddlProject">
+    <h1>GRDDL Data Views: Getting Started, Learning More</h1>
+
+    <p class="doap-shortdesc"><abbr title= "Gleaning Resource
+    Descriptions from Dialects of Languages">GRDDL</abbr> is a
+    technique for <dfn><b>g</b>leaning <b>r</b>esource
+    <b>d</b>escriptions from <b>d</b>ialects of
+    <b>l</b>anguages</dfn>. It's a way of extracting Semantic Web data
+    in <a href="/RDF/">RDF</a> from XML formats (especially XHTML
+    dialects or <a href=
+    "http://www.microformats.org/">microformats</a>) via
+    transformations identified by URIs and typically expressed in
+    XSLT. For full details, see the <a href="#grddl_spec">GRDDL
+    specification</a>.</p>
+
+    <blockquote>
+      <p class="status"><strong>Note:</strong> The <a
+      href="#grddl_spec">GRDDL specification</a> is a <a
+      href="http://www.w3.org/2005/10/Process-20051014/tr.html#RecsPR">W3C
+      Recommendation</a>. W3C welcomes <a
+      href="http://lists.w3.org/Archives/Public/public-grddl-comments/">comments
+      by email</a>, especially comments that reflect implementation
+      experience.</p>
+    </blockquote>
+
+    <p>To use GRDDL:</p>
+
+    <ol type="A">
+      <li>If you're using a dialect (<a href=
+      "http://purl.org/stuff/hdoap/profile">hDoap</a>, <a href=
+      "http://www.w3.org/2000/08/w3c-synd/">Site Summaries</a>,
+      <a href="http://purl.org/NET/erdf/profile">Embedded RDF</a>,
+      <a href="#moreDialects">etc.</a>) that already has an
+      established GRDDL-compatible profile:
+
+        <ol>
+          <li>Add the profile attribute:
+            <pre class="example">
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+  &lt;head <span style=
+"font-weight: bold">profile="http://purl.org/stuff/hdoap/profile"</span>&gt;
+    &lt;title&gt;My Project&lt;/title&gt;
+  &lt;/head&gt;
+    ...
+&lt;/html&gt;
+</pre>
+          </li>
+
+          <li id="check">Look at the data expressed as RDF using
+          the <a href="../11/rdf-in-xhtml-demo">online GRDDL demo
+          service</a>, and if you like, check its output with the
+          <a href="/RDF/Validator/">W3C RDF Validation service</a>,
+          or with a tool more customized for your data, like the
+          <a href="http://xml.mfd-consult.dk/foaf/explorer/">FOAF
+          explorer</a>.</li>
+
+          <li>Let the GRDDL Working Group know how you're using GRDDL
+          by sending mail to the <a rel="doap.mailing-list" href=
+          "http://lists.w3.org/Archives/Public/public-grddl-comments/"
+          >public-grddl-comments</a> list.</li>
+        </ol>
+      </li>
+
+      <li>If you're using an XHTML dialect (<a href=
+      "http://www.ietf.org/rfc/rfc2731.txt">Dublin Core
+      encoding</a>, <a href="http://geourl.org/add.html">GeoURL
+      markup</a>, <a href="#moreDialects">etc.</a>) that has an
+      existing transformation (<a href=
+      "/2000/06/dc-extract/dc-extract.xsl">dc-extract.xsl</a>,
+      <a href=
+      "../12/rdf-in-xhtml-xslts/grokGeoURL.xsl">grokGeoURL.xsl</a>)
+      ...
+
+        <ol>
+          <li>Make links from your XHTML data to the
+          transformation, using the <a href=
+          "#transformation">transformation</a> link type:
+            <pre class="example">
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+  &lt;head profile="http://www.w3.org/2003/g/data-view"&gt;
+    &lt;title&gt;Some Document&lt;/title&gt;
+    &lt;link rel="<strong>transformation</strong>"
+       href="<strong>http://www.w3.org/2000/06/dc-extract/dc-extract.xsl</strong>" /&gt;
+    &lt;meta name="DC.Subject"
+       content="ADAM; Simple Search; Index+; prototype" /&gt;
+    ...
+  &lt;/head&gt;
+  ...
+&lt;/html&gt;
+</pre>
+          </li>
+
+          <li>Reference the GRDDL profile to make it clear what
+          that transformation link type means:
+            <pre class="example">
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+  &lt;head <strong>profile="http://www.w3.org/2003/g/data-view"</strong>&gt;
+    &lt;title&gt;Some Document&lt;/title&gt;
+    ...
+</pre>
+          </li>
+
+          <li>Check your data and let us know how it went as
+          <a href="#check">above</a>.</li>
+        </ol>
+      </li>
+    </ol>
+
+    <h3>Questions?</h3>
+
+    <ul class="q-and-a">
+      <li>Q: How about more complete examples?
+
+        <p>
+	  The <a href="http://www.w3.org/TR/grddl-primer/">GRDDL primer</a>
+	  gives a number of examples in detail.
+	  Also, a <a href=
+        "../12/rdf-in-xhtml-xslts/complete-example.html">home page
+        for Joe Lambda</a> shows DC, geoURL, RSS as above plus
+        markup for <a href="http://www.foaf-project.org/">FOAF</a>
+        (using <a href=
+        "../12/rdf-in-xhtml-xslts/grokFOAF.xsl">grokFOAF.xsl</a>)
+        and <a href="http://creativecommons.org/licenses/">Creative
+        Commons Licenses</a> (using <a href=
+        "../12/rdf-in-xhtml-xslts/grokCC.xsl">grokCC.xsl</a>) that
+        you can probably figure out if you view source.</p>
+      </li>
+
+      <li id="moreDialects">Q: Where can I find out about existing
+      'ways' rather than duplicate similar work?
+
+        <p>A: The <a href=
+        "http://esw.w3.org/topic/CustomRdfDialects">CustomRdfDialects</a>
+        wiki topic provides an informal directory of existing
+        conventions.</p>
+      </li>
+    </ul>
+
+    <p>If you just want to use GRDDL, that's all you need to know.
+    If you're curious to learn more, read on...</p>
+  </div>
+
+  <div>
+    <h2 id="vocab_ref">GRDDL Namespace and Metadata Profile Reference</h2>
+
+<p>This document, <a rel="ns-claim" href="http://www.w3.org/2003/g/data-view">http://www.w3.org/2003/g/data-view</a>,
+is a metadata profile in the sense of the HTML specification, in section 
+<a href="/TR/1999/REC-html401-19991224/struct/global.html#h-7.4.4.3">7.4.4.3 Meta data profiles</a>.</p>
+
+<p>The following term is introduced here as an XHTML link relationship
+name and RDF property name:</p>
+
+<ul>
+  <li id="transformation" class="-rdf-Property">
+    <tt class="rdfs-label">transformation</tt>: <span
+    class="rdfs-comment">relates a source document to a
+    transformation, usually represented in <a
+    href="/TR/xslt">XSLT</a>, that relates the source document syntax
+    to the RDF graph syntax</span>.  domain: <a rel="rdfs-domain"
+    href="#RootNode">RootNode</a>; range: <a
+    rel="rdfs-range" href="#Transformation">Transformation</a>
+  </li>
+
+</ul>
+
+<p>The following terms are introduced here as RDF properties:</p>
+
+<ul>
+  <li id="namespaceTransformation" class="-rdf-Property">
+    <tt class="rdfs-label">namespaceTransformation</tt>: <span
+    class="rdfs-comment">relates a namespace to a transformation for
+    all documents in that namespace</span>.  range: <a
+    rel="rdfs-range" href="#Transformation">Transformation</a>
+  </li>
+
+  <li id="profileTransformation" class="-rdf-Property">
+    <tt class="rdfs-label">profileTransformation</tt>: <span
+    class="rdfs-comment">relates a profile document to a
+    transformation for all documents bearing that profile</span>.
+    range: <a rel="rdfs-range"
+    href="#Transformation">Transformation</a>
+  </li>
+
+  <li id="result" class="-rdf-Property">
+    <tt class="rdfs-label">result</tt>: <span class="rdfs-comment">an
+    RDF graph obtained from an information resource by directly
+    parsing a representation in the standard RDF/XML syntax or
+    indirectly by parsing some other dialect using a transformation
+    nominated by the document</span>. domain: <a rel="rdfs-domain"
+    href="#InformationResource">InformationResource</a>; range: <a
+    rel="rdfs-range" href="#RDFGraph">RDFGraph</a>
+  </li>
+
+  <li id="transformationProperty" class="-owl-FunctionalProperty">
+    <tt class="rdfs-label">transformationProperty</tt> <span
+    class="rdfs-comment">relates a transformation to the algorithm
+    specified by the property that computes an RDF graph from an XML
+    document node</span> domain: <a rel="rdfs-domain"
+    href="#Transformation">Transformation</a> range: <a
+    rel="rdfs-range"
+    href="#TransformationProperty">TransformationProperty</a>
+  </li>
+  <li id="Transformation" class="-rdfs-Class">
+    <tt class="rdfs-label">Transformation</tt> <span
+    class="rdfs-comment">an <a rel="rdfs-subClassOf"
+    href="#InformationResource">InformationResource</a> that specifies
+    a transformation from a set of XML documents to RDF graphs</span>
+    Each Transformation has at least one <a rel="owl-onProperty"
+    href="#transformationProperty">transformationProperty</a> that is
+    a <a rel="owl-someValuesFrom"
+    href="#TransformationProperty">TransformationProperty</a>.
+  </li>
+
+  <li id="TransformationProperty" class="-rdfs-Class">
+    <tt class="rdfs-label">TransformationProperty</tt>
+    <span class="rdfs-comment">a <a rel="rdfs-subClassOf"
+    href="http://www.w3.org/2002/07/owl#FunctionalProperty"
+    >FunctionalProperty</a> that relates
+    <a href="#RootNode">XML document root nodes</a> to
+    <a href="#RDFGraph">RDF graphs</a></span>
+  </li>
+
+</ul>
+
+<p>The following terms are bound to concepts from existing standards:</p>
+
+<ul>
+  <li id="RootNode" class="-rdfs-Class">
+    <tt class="rdfs-label">RootNode</tt> <span
+    class="rdfs-comment">the root of the tree in the XPath data
+    model</span>, per <a rel="rdfs-isDefinedBy"
+    href="http://www.w3.org/TR/1999/REC-xpath-19991116#root-node">section
+    5.1 Root Node in <cite>XML Path Language (XPath) Version
+    1.0</cite></a>
+  </li>
+
+  <li id="RDFGraph" class="-rdfs-Class">
+    <tt class="rdfs-label">RDFGraph</tt> <span class="rdfs-comment">a
+    set of RDF triples</span>, per <a rel="rdfs-isDefinedBy"
+    href="http://www.w3.org/TR/2004/REC-rdf-concepts-20040210/#dfn-rdf-graph">definition
+    in <cite>Resource Description Framework (RDF): Concepts and
+    Abstract Syntax</cite></a>
+
+  </li>
+
+  <li id="InformationResource" class="-rdfs-Class">
+    <tt class="rdfs-label">InformationResource</tt>
+    <span class="rdfs-comment">A resource which has the property that all of its essential characteristics can be conveyed in a message</span>, per <a rel="rdfs-isDefinedBy" href="http://www.w3.org/TR/2004/REC-webarch-20041215/#def-information-resource">definition in <cite>Architecture of the World Wide Web, Volume One</cite></a>
+  </li>
+
+</ul>
+
+    <p>We provide a <a href="../11/rdf-in-xhtml-processor">sample
+    GRDDL/XHTML implementation</a>, and a more complete <a href=
+    "rdf-in-xml-processor">sample GRDDL implementation</a> and a
+    technical specification, <a href=
+    "http://www.w3.org/TR/grddl/">Gleaning Resource Descriptions
+    from Dialects of Languages (GRDDL)</a>, as a specification.</p>
+
+    <h2>References</h2>
+
+    <ul>
+      <li id="grddl_spec">
+        <a href="http://www.w3.org/TR/grddl/" rel=
+        "rddl.normative-reference"><cite class="dc-title">Gleaning
+        Resource Descriptions from Dialects of Languages
+        (GRDDL)</cite>, W3C Recommendation <abbr
+        title="2007-09-11" class="dc.date">11 September 2007</abbr></a>
+      </li>
+
+      <li><a href="/TR/xslt" rel= "rddl.normative-reference"><cite
+      class="dc-title">XSL Transformations (XSLT) Version
+      1.0</cite> W3C Recommendation <abbr title="1999-11-16"
+      class="dc.date">16 November 1999</abbr></a>
+      </li>
+
+      <li><a href="http://www.w3.org/TR/rdf-concepts/" rel=
+      "rddl.normative-reference"><cite class="dc.title">Resource
+      Description Framework (RDF): Concepts and Abstract
+      Syntax</cite>, W3C Recommendation <abbr title="2004-02-10"
+      class="dc.date">10 February 2004</abbr></a></li>
+
+      <li id="WEBARCH">
+	<a href= "http://www.w3.org/TR/webarch/" ><cite
+	class="dc.title">Architecture of the World Wide Web, Volume
+	One</cite>, W3C Recommendation, <abbr class="dc.date"
+	title="2004-12-15">15 December 2004</abbr></a>
+      </li>
+
+    </ul>
+
+    <div>
+      <h2>Acknowledgements and Colophon</h2>
+
+      <p>This document uses <a href=
+      "http://purl.org/NET/erdf/profile">Embedded RDF</a> to encode
+      <a href="http://usefulinc.com/doap">Description of a Project
+      (DOAP)</a> data as well as RDF Schema data and one or two
+      <a href="http://www.tbray.org/tag/rddl4.html">RDDL</a>
+      properties. We have moved away from the RDDL syntax
+      itself.</p>
+
+      <p>This document was inspired by the <a href=
+      "http://gmpg.org/xfn/join">XFN getting started page</a>.
+      Previous versions used <a href= "http://gmpg.org/xmdp/">XMDP</a>
+      (with <a href=
+      "http://www.w3.org/2003/12/rdf-in-xhtml-xslts/grokXMDP.xsl"
+      >grokXMDP.xsl</a>), but in documenting domains and ranges of
+      properties, maintaining the XMDP convention of ids on the
+      <tt>dt</tt> rather than the <tt>dd</tt> element were too awkward
+      to maintain.</p>
+
+    </div>
+  </div>
+  <hr />
+
+  <address>
+    <span id="danc"><a rel="foaf-homepage" class="foaf-name" href=
+    "/People/Connolly/">Dan Connolly</a></span>
+    for <span id="grddl-wg"><a rel="foaf-homepage" href="http://www.w3.org/2001/sw-grddl-wg/">the GRDDL Working Group</a></span><br />
+    <small>$Revision: 1.47 $ of $Date: 2007/10/31 02:59:16 $ <!-- -->
+     by $Author: connolly $</small>
+  </address>
+</body>
+</html>
