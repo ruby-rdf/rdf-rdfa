@@ -384,7 +384,10 @@ module RDF::RDFa
           next
         end
 
+        old_debug = RDF::RDFa.debug?
+        RDF::RDFa.debug = false
         next unless profile = Profile.find(uri)
+        RDF::RDFa.debug = old_debug
         # Add URI Mappings to prefixes
         profile.prefixes.each_pair do |prefix, value|
           prefix(prefix, value)

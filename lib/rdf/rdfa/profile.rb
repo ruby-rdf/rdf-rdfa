@@ -101,7 +101,13 @@ module RDF::RDFa
     def self.find(uri)
       uri = RDF::URI.intern(uri)
       
-      cache[uri] ||= new(uri)
+      return cache[uri] unless cache[uri].nil?
+      
+      # Two part creation to prevent re-entrancy problems if p1 => p2 and p2 => p1
+      # Return something to make the caller happy if we're re-entered
+      cache[uri] = Struct.new(:prefixes, :terms, :vocabulary).new({}, {}, nil)
+      # Now do the actual load
+      cache[uri] = new(uri)
     rescue Exception => e
       raise ProfileError, "Error reading profile #{uri.inspect}: #{e.message}"
     end
