@@ -1,4 +1,8 @@
-=== 0.3.0.pre
+### 0.3.1
+* Bug fix relating to datatypes in literals being ignored.
+* Bug fix parsing non-RDFa profiles to ensure they don't cause processing to terminate (or recurse).
+
+### 0.3.0
 * RDF.rb 0.3.0 compatibility updates
   * Remove literal_normalization and qname_hacks, add back uri_hacks (until 0.3.0)
   * URI canonicalization and validation.
@@ -20,7 +24,7 @@
   * Add all in-scope namespaces, not just those that seem to be used.
 * RSpec 2 compatibility.
 
-=== 0.2.2
+### 0.2.2
 * Ruby 1.9.2 compatibility
 * Added script/parse as command-line option for parsing files.
 * Add back support for RDFa 1.0 as well as RDFa 1.1. Parser checks @version to determine which
@@ -32,21 +36,21 @@
   * TERMorCURIEorAbsURI requires an absolute URI, not document relative
   * Extract a new default vocabulary from @profile.
 
-=== 0.2.1
+### 0.2.1
 * Update for RDF 0.2.1
 
-=== 0.2.0
+### 0.2.0
 * Updates for RDF 0.2.0
   * Use URI#intern instead of URI#new
   * Change use of Graph#predicates and Graph#objects to use as enumerables
 
-=== 0.0.3
+### 0.0.3
 * Removed internal graph in Reader and implement each_triple & each_statement to perform parsing
 
-=== 0.0.2
+### 0.0.2
 * Remove dependency on Namespace
 * Changed to RDF::RDFa, and moved files accordingly.
 * Added vocab definitions for RDA, XHV, XML, XSI and OWL
 
-=== 0.0.1
+### 0.0.1
 * First port from RdfContext version 0.5.4

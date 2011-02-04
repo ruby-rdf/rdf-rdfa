@@ -41,7 +41,7 @@ module RDF::RDFa
       resource_info = {}
       repository.query(:context => uri).each do |statement|
         res = resource_info[statement.subject] ||= {}
-        raise ProfileError, "#{statement.object.inspect} must be a Literal" unless statement.object.is_a?(RDF::Literal)
+        next unless statement.object.is_a?(RDF::Literal)
         %w(uri term prefix vocabulary).each do |term|
           res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
         end
