@@ -3,11 +3,10 @@
 --protected
 --no-private
 --hide-void-return
---markup rdoc
---readme README.rdoc
+--markup markdown
+--readme README.md
 -
-READEME.rdoc
 AUTHORS
-History.rdoc
+History.md
 CONTRIBUTORS
 VERSION

@@ -20,7 +20,7 @@ begin
     gemspec.add_development_dependency('rdf-rdfxml', '>= 0.2.1')
     gemspec.add_development_dependency('rdf-isomorphic')
     gemspec.add_development_dependency('yard')
-    gemspec.extra_rdoc_files     = %w(README.rdoc History.rdoc AUTHORS CONTRIBUTORS)
+    gemspec.extra_rdoc_files     = %w(README.md History.md AUTHORS CONTRIBUTORS)
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
