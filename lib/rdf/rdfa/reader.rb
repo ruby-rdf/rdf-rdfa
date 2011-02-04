@@ -261,7 +261,7 @@ module RDF::RDFa
         prefix(prefix, value)
       end
 
-      add_debug(@doc, "version = #{@version},  host_language = #{@host_language}")
+      add_info(@doc, "version = #{@version},  host_language = #{@host_language}")
 
       # parse
       parse_whole_document(@doc, @base_uri)
@@ -291,7 +291,7 @@ module RDF::RDFa
     
     # Figure out the document path, if it is a Nokogiri::XML::Element or Attribute
     def node_path(node)
-      case node
+      "<#{@base_uri}>" + case node
       when Nokogiri::XML::Node then node.display_path
       else node.to_s
       end
@@ -346,7 +346,7 @@ module RDF::RDFa
     # @raise [ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
-      add_debug(node, "statement: #{RDF::NTriples.serialize(statement)}")
+      add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
       @callback.call(statement)
     end
 
@@ -371,6 +371,7 @@ module RDF::RDFa
       evaluation_context = EvaluationContext.new(base, @host_defaults)
       
       traverse(doc.root, evaluation_context)
+      add_debug("", "parse_whole_doc: traversal complete'")
     end
   
     # Parse and process URI mappings, Term mappings and a default vocabulary from @profile
@@ -387,7 +388,11 @@ module RDF::RDFa
           next
         end
 
+        old_debug = RDF::RDFa.debug?
+        #RDF::RDFa.debug = false
+        add_info(element, "process_profile: load <#{uri}>")
         next unless profile = Profile.find(uri)
+        RDF::RDFa.debug = old_debug
         # Add URI Mappings to prefixes
         profile.prefixes.each_pair do |prefix, value|
           prefix(prefix, value)
@@ -418,7 +423,7 @@ module RDF::RDFa
           uri_mappings[pfx_lc.to_sym] = ns.href
           namespaces[pfx_lc] ||= ns.href
           prefix(pfx_lc, ns.href)
-          add_debug(element, "extract_mappings: xmlns:#{ns.prefix} => <#{ns.href}>")
+          add_info(element, "extract_mappings: xmlns:#{ns.prefix} => <#{ns.href}>")
         else
           namespaces[""] ||= ns.href
         end
@@ -439,15 +444,14 @@ module RDF::RDFa
 
         uri_mappings[prefix.to_s.empty? ? nil : prefix.to_s.to_sym] = uri
         prefix(prefix, uri)
-        add_debug(element, "extract_mappings: prefix #{prefix} => <#{uri}>")
+        add_info(element, "extract_mappings: prefix #{prefix} => <#{uri}>")
       end unless @version == :rdfa_1_0
     end
 
     # The recursive helper function
     def traverse(element, evaluation_context)
       if element.nil?
-        add_debug(element, "traverse nil element")
-        raise RDF::ReaderError, "Can't parse nil element" if validate?
+        add_error(element, "Can't parse nil element")
         return nil
       end
       
@@ -704,8 +708,7 @@ module RDF::RDFa
           if p.is_a?(RDF::URI)
             false
           else
-            add_debug(element, "Illegal predicate: #{p.inspect}")
-            raise RDF::ReaderError, "predicate #{p.inspect} must be a URI" if validate?
+            add_debug(element, "predicate #{p.inspect} must be a URI")
             true
           end
         end
