@@ -23,6 +23,8 @@ Gem::Specification.new do |s|
     ".yardopts",
     "AUTHORS",
     "CONTRIBUTORS",
+    "History.md",
+    "README.md",
     "Rakefile",
     "VERSION",
     "etc/basic.html",
