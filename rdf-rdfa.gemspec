@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
     "script/console",
     "script/parse",
     "script/tc",
+    "script/yard-to-rubyforge",
     "spec/html4-manifest.yml",
     "spec/html5-manifest.yml",
     "spec/literal_spec.rb",
