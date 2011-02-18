@@ -3,17 +3,34 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 require 'rdfa_helper'
 
 describe RDF::RDFa::Format do
-  it "should be discoverable" do
+  it "should be discover 'rdfa'" do
     formats = [
       RDF::Format.for(:rdfa),
       RDF::Format.for("etc/foaf.html"),
       RDF::Format.for(:file_name      => "etc/foaf.html"),
       RDF::Format.for(:file_extension => "html"),
       RDF::Format.for(:file_extension => "xhtml"),
+      RDF::Format.for(:file_extension => "svg"),
       RDF::Format.for(:content_type   => "text/html"),
       RDF::Format.for(:content_type   => "application/xhtml+xml"),
+      RDF::Format.for(:content_type   => "image/svg+xml"),
     ]
     formats.each { |format| format.should == RDF::RDFa::Format }
+  end
+    
+  it "should discover 'html'" do
+    RDF::Format.for(:html).reader.should == RDF::RDFa::Reader
+    #RDF::Format.for(:html).writer.should == RDF::RDFa::Writer
+  end
+
+  it "should discover 'xhtml'" do
+    RDF::Format.for(:xhtml).reader.should == RDF::RDFa::Reader
+    #RDF::Format.for(:xhtml).writer.should == RDF::RDFa::Writer
+  end
+
+  it "should discover 'svg'" do
+    RDF::Format.for(:svg).reader.should == RDF::RDFa::Reader
+    #RDF::Format.for(:svg).writer.should == RDF::RDFa::Writer
   end
 end
 
