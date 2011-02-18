@@ -1,5 +1,5 @@
 ### 0.3.1.2
-* Assert :html and xhtml as a format types (by creating RDF::RDFa::HTML/XHTML as a sub-classs of Format that uses RDFa::Reader/Writer)
+* Assert :html and xhtml as a format types (by creating RDF::RDFa::HTML/XHTML as a sub-class of Format that uses RDFa::Reader/Writer)
 * Added :svg format, image/svg+xml and .svg as looks for RDFa parser as well.
 
 ### 0.3.1
