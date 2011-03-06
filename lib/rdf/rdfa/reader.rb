@@ -246,8 +246,6 @@ module RDF::RDFa
         @host_defaults = {
           :vocabulary   => nil,
           :uri_mappings => {},
-          :prefix       => "xhv",
-          :uri_mappings => {"xhv" => RDF::XHV.to_s},
           :profiles     => [],
         }
 
@@ -480,6 +478,11 @@ module RDF::RDFa
         next unless prefix.match(/:$/)
         prefix.chop!
         
+        unless prefix.match(NC_REGEXP)
+          add_error(element, "extract_mappings: Prefix #{prefix.inspect} does not match NCName production")
+          next
+        end
+
         # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
         next if prefix == "_"
 
@@ -558,9 +561,24 @@ module RDF::RDFa
           process_profile(element, profiles) do |which, value|
             add_debug(element, "[Step 2] traverse, #{which}: #{value.inspect}")
             case which
-            when :uri_mappings        then uri_mappings.merge!(value)
-            when :term_mappings       then term_mappings.merge!(value)
-            when :default_vocabulary  then default_vocabulary = value
+            when :uri_mappings
+              value.each do |k, v|
+                if k.to_s.match(NC_REGEXP)
+                  uri_mappings[k] = v
+                else
+                  add_error(element, "[Step 2] traverse: Prefix #{k.to_s.inspect} does not match NCName production")
+                end
+              end
+            when :term_mappings
+              value.each do |k, v|
+                if k.to_s.match(NC_REGEXP)
+                  term_mappings[k] = v
+                else
+                  add_error(element, "[Step 2] traverse: Term #{k.to_s.inspect} does not match NCName production")
+                end
+              end
+            when :default_vocabulary
+              default_vocabulary = value
             end
           end 
         rescue
@@ -976,16 +994,8 @@ module RDF::RDFa
         # As a special case, _: is also a valid reference for one specific bnode.
         bnode(reference)
       elsif curie.to_s.match(/^:/)
-        add_debug(element, "curie_to_resource_or_bnode: default prefix: defined? #{!!uri_mappings[""]}, defaults: #{@host_defaults[:prefix]}")
         # Default prefix
-        if uri_mappings[nil]
-          uri(uri_mappings[nil] + reference.to_s)
-        elsif @host_defaults[:prefix]
-          uri(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
-        else
-          #add_warning(element, "Default namespace prefix is not defined", RDF::RDFA.UnresolvedCURIE)
-          nil
-        end
+        RDF::XHV[reference.to_s]
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
         nil
