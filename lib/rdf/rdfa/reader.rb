@@ -346,7 +346,7 @@ module RDF::RDFa
     end
     
     def add_processor_message(node, message, process_class)
-      puts "#{node_path(node)}: #{message}" if ::RDF::RDFa::debug?
+      puts "#{node_path(node)}: #{message}" if ::RDF::RDFa.debug?
       @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
       if @processor_graph
         n = RDF::Node.new
@@ -425,10 +425,18 @@ module RDF::RDFa
         end
 
         old_debug = RDF::RDFa.debug?
-        RDF::RDFa.debug = false
-        add_info(element, "process_profile: load <#{uri}>")
-        next unless profile = Profile.find(uri)
-        RDF::RDFa.debug = old_debug
+        begin
+          add_info(element, "process_profile: load <#{uri}>")
+          RDF::RDFa.debug = false
+          profile = Profile.find(uri)
+        rescue Exception => e
+          RDF::RDFa.debug = old_debug
+          add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
+          raise # In case we're not in strict mode, we need to be sure processing stops
+        ensure
+          RDF::RDFa.debug = old_debug
+        end
+
         # Add URI Mappings to prefixes
         profile.prefixes.each_pair do |prefix, value|
           prefix(prefix, value)
@@ -437,9 +445,6 @@ module RDF::RDFa
         yield :term_mappings, profile.terms unless profile.terms.empty?
         yield :default_vocabulary, profile.vocabulary if profile.vocabulary
       end
-    rescue Exception => e
-      add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
-      raise # In case we're not in strict mode, we need to be sure processing stops
     end
 
     # Extract the XMLNS mappings from an element
