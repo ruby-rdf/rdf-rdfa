@@ -87,8 +87,8 @@ module RDF::RDFa
         Profile.load(uri)
         profile.parse(repository.query(:context => uri))
       end
-    #rescue Exception => e
-    #  raise ProfileError, e.message
+    rescue Exception => e
+      raise ProfileError, "Profile #{uri}: #{e.message}"
     end
 
     # Load profile into repository
