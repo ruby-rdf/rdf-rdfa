@@ -30,45 +30,18 @@ module RDF::RDFa
     # Parses the profile and places it in the repository and cache
     #
     # @param [RDF::URI, #to_s] uri URI of profile to be represented
-    def initialize(uri)
+    # @yield [profile]
+    # @yieldparam [RDF::RDFa::Profile] profile
+    # @yieldreturn [void] ignored
+    # @return [RDF::RDFa::Profile]
+    def initialize(uri, options = {}, &block)
       @uri = RDF::URI.intern(uri)
-      @prefixes = {}
-      @terms = {}
-      @vocabulary = nil
+      @prefixes = options.fetch(:prefixes, {})
+      @terms = options.fetch(:terms, {})
+      @vocabulary = options[:vocabulary]
       
-      Profile.load(@uri)
-
-      resource_info = {}
-      repository.query(:context => uri).each do |statement|
-        res = resource_info[statement.subject] ||= {}
-        next unless statement.object.is_a?(RDF::Literal)
-        %w(uri term prefix vocabulary).each do |term|
-          res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
-        end
-      end
-
-      resource_info.values.each do |res|
-        # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
-        # predicates sharing the same subject, no mapping is created.
-        uri = res["uri"]
-        term = res["term"]
-        prefix = res["prefix"]
-        vocab = res["vocabulary"]
-
-        @vocabulary = vocab if vocab
-        
-        # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
-        # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the
-        # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
-        # URI mappings after transforming the 'prefix' component to lower-case.
-        # For every extracted
-        prefix(prefix.downcase, uri) if uri && prefix && prefix != "_"
-      
-        # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
-        # mapping from the object literal of the rdfa:term predicate to the object literal of the
-        # rdfa:uri predicate. Add or update this mapping in the local term mappings.
-        term(term, uri) if term && uri
-      end
+      yield(self) if block_given?
+      self
     end
     
     ##
@@ -76,7 +49,9 @@ module RDF::RDFa
     # @private
     def self.cache
       require 'rdf/util/cache' unless defined?(::RDF::Util::Cache)
-      @cache ||= RDF::Util::Cache.new(-1)
+      @cache ||= begin
+        RDF::Util::Cache.new(-1)
+      end
     end
 
     ##
@@ -107,9 +82,13 @@ module RDF::RDFa
       # Return something to make the caller happy if we're re-entered
       cache[uri] = Struct.new(:prefixes, :terms, :vocabulary).new({}, {}, nil)
       # Now do the actual load
-      cache[uri] = new(uri)
-    rescue Exception => e
-      raise ProfileError, "Error reading profile #{uri.inspect}: #{e.message}"
+      cache[uri] = new(uri) do |profile|
+        STDERR.puts("process_profile: retrieve profile <#{uri}>") if RDF::RDFa.debug?
+        Profile.load(uri)
+        profile.parse(repository.query(:context => uri))
+      end
+    #rescue Exception => e
+    #  raise ProfileError, e.message
     end
 
     # Load profile into repository
@@ -166,6 +145,48 @@ module RDF::RDFa
       name = name.to_s.empty? ? nil : (name.respond_to?(:to_sym) ? name.to_sym : name.to_s.to_sym)
       uri.nil? ? terms[name] : terms[name] = uri
     end
+    
+    ##
+    # Extract vocabulary, prefix mappings and terms from a enumerable object into an instance
+    #
+    # @param [RDF::Enumerable, Enumerator] queryable
+    # @return [void] ignored
+    def parse(enumerable)
+      STDERR.puts("process_profile: parse profile <#{uri}>") if RDF::RDFa.debug?
+      resource_info = {}
+      enumerable.each do |statement|
+        res = resource_info[statement.subject] ||= {}
+        next unless statement.object.is_a?(RDF::Literal)
+        STDERR.puts("process_profile: statement=#{statement.inspect}") if RDF::RDFa.debug?
+        %w(uri term prefix vocabulary).each do |term|
+          res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
+        end
+      end
+
+      resource_info.values.each do |res|
+        # If one of the objects is not a Literal or if there are additional rdfa:uri or rdfa:term
+        # predicates sharing the same subject, no mapping is created.
+        uri = res["uri"]
+        term = res["term"]
+        prefix = res["prefix"]
+        vocab = res["vocabulary"]
+        STDERR.puts("process_profile: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}") if RDF::RDFa.debug?
+
+        @vocabulary = vocab if vocab
+        
+        # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
+        # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the
+        # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
+        # URI mappings after transforming the 'prefix' component to lower-case.
+        # For every extracted
+        prefix(prefix.downcase, uri) if uri && prefix && prefix != "_"
+      
+        # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
+        # mapping from the object literal of the rdfa:term predicate to the object literal of the
+        # rdfa:uri predicate. Add or update this mapping in the local term mappings.
+        term(term, uri) if term && uri
+      end
+    end
   end
 
   ##
@@ -173,3 +194,6 @@ module RDF::RDFa
   class ProfileError < IOError
   end # ProfileError
 end
+
+# Load cooked profiles
+Dir.glob(File.join(File.expand_path(File.dirname(__FILE__)), 'profile', '*')).each {|f| load f}
