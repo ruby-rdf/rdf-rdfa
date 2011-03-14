@@ -146,7 +146,7 @@ module RdfaHelper
     def outputDocument; self.name + ".sparql"; end
 
     def version
-      :rdfa_1_1
+      nil
     end
     
     # Run test case, yields input for parser to create triples
