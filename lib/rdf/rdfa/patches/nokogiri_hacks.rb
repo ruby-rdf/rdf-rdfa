@@ -14,3 +14,9 @@ class Nokogiri::XML::Node
     end
   end
 end
+
+class Nokogiri::XML::Document
+  def doctype
+    self.children.first.external_id rescue false
+  end
+end

@@ -228,9 +228,9 @@ module RDF::RDFa
         # Check for version of the processor to use:
         # * Check document type for "XHTML+RDFa 1.0"
         # * Check @version attribute on the html element for the value "XHTML+RDFa 1.0"
-        @version ||= :rdfa_1_0 if @doc.respond_to?(:internal_id) && doc.internal_id =~ /XHTML\+RDFa 1\.0/
-        @version ||= :rdfa_1_0 if @doc.root && @doc.root.attribute("version") =~ /XHTML\+RDFa 1\.0/
-        @version ||= :rdfa_1_1 if @doc.root && @doc.root.attribute("version") =~ /XHTML\+RDFa 1\.1/
+        @version ||= :rdfa_1_0 if @doc.doctype.to_s =~ /RDFa 1\.0/
+        @version ||= :rdfa_1_0 if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.0/
+        @version ||= :rdfa_1_1 if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.1/
         @version ||= :rdfa_1_1
 
         # Determine host language from element name
