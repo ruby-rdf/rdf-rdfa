@@ -31,7 +31,7 @@ module Matchers
 
     def matches?(actual)
       @actual = normalize(actual)
-      @actual == @expected
+      @actual.isomorphic_with?(@expected)
     end
 
     def failure_message_for_should
@@ -46,8 +46,8 @@ module Matchers
       "\n#{info + "\n" unless info.empty?}" +
       (@info.inputDocument ? "Input file: #{@info.inputDocument}\n" : "") +
       (@info.outputDocument ? "Output file: #{@info.outputDocument}\n" : "") +
-      "Unsorted Expected:\n#{@expected.to_ntriples}" +
-      "Unsorted Results:\n#{@actual.to_ntriples}" +
+      "Unsorted Expected:\n#{@expected.dump(:ntriples)}" +
+      "Unsorted Results:\n#{@actual.dump(:ntriples)}" +
       (@info.trace ? "\nDebug:\n#{@info.trace}" : "")
     end
     def negative_failure_message
@@ -73,7 +73,7 @@ module Matchers
         @expected_results = @info.respond_to?(:expectedResults) ? @info.expectedResults : true
         model = Redland::Model.new
         ntriples_parser = Redland::Parser.ntriples
-        ntriples_parser.parse_string_into_model(model, actual.to_ntriples, "http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/")
+        ntriples_parser.parse_string_into_model(model, actual.dump(:ntriples), "http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/")
 
         @results = @query.execute(model)
         #puts "Redland query results: #{@results.inspect}"
@@ -97,7 +97,7 @@ module Matchers
         end +
         "\n#{@expected}" +
         "\n#{@info.input}" +
-        "\nResults:\n#{@actual.to_ntriples}" +
+        "\nResults:\n#{@actual.dump(:ntriples)}" +
         "\nDebug:\n#{@info.trace}"
       end
     end
@@ -107,65 +107,5 @@ module Matchers
     end
   else
     def pass_query(expect, info = ""); false; end
-  end
-
-  class BeValidXML
-    def initialize(info)
-      @info = info
-    end
-    def matches?(actual)
-      @actual = actual
-      @doc = Nokogiri::XML.parse(actual)
-      @results = @doc.validate
-      @results.nil?
-    rescue
-      false
-    end
-    def failure_message_for_should
-      "#{@info + "\n" unless @info.empty?}" +
-      if @doc.nil?
-        "did not parse"
-      else
-        "\n#{@results}" +
-        "\nParsed:\n#{@doc}"
-      end   +
-        "\nActual:\n#{@actual}"
-    end
-  end
-  
-  def be_valid_xml(info = "")
-    BeValidXML.new(info)
-  end
-
-  class BeEquivalentXML
-    def initialize(expected, info)
-      @expected = expected
-      @info = info
-    end
-    
-    def matches?(actual)
-      @actual = actual
-
-      a = @actual.index("<") == 0 ? @actual : "<foo>#{@actual}</foo>"
-      e = @expected.index("<") == 0 ? @expected : "<foo>#{@expected}</foo>"
-      a_hash = ActiveSupport::XmlMini.parse(a)
-      e_hash = ActiveSupport::XmlMini.parse(e)
-      a_hash == e_hash
-    rescue
-      puts $!
-      @fault = $!.message
-      false
-    end
-
-    def failure_message_for_should
-      "#{@info + "\n" unless @info.empty?}" +
-      "Fault: #{@fault + "\n" if @fault}" +
-      "Expected:#{@expected}\n" +
-      "Actual:#{@actual}"
-    end
-  end
-  
-  def be_equivalent_xml(expected, info = "")
-    BeEquivalentXML.new(expected, info)
   end
 end

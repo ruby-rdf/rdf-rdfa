@@ -164,8 +164,6 @@ module RdfaHelper
       else
         raise SparqlException, "Query skipped, Redland not installed"
       end
-
-      graph.to_rdfxml.should be_valid_xml
     end
     
     def trace
