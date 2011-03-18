@@ -190,7 +190,7 @@ module RDF::RDFa
       # Profile and Prefixes
       unless prefixes.empty?
         add_debug "serialize: add prefixes #{prefixes.inspect}"
-        doc.root["prefix"] = prefixes.keys.sort.map {|pk| "#{pk}: #{prefixes[pk]}"}.join(" ")
+        doc.root["prefix"] = prefixes.keys.map {|pk| "#{pk}: #{prefixes[pk]}"}.sort.join(" ")
       end
 
       doc.write_xml_to(@output, :encoding => "UTF-8", :indent => 2)
