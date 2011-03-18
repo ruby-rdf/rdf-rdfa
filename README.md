@@ -1,21 +1,23 @@
 # RDF::RDFa reader/writer
 
-RDFa parser for RDF.rb.
+[RDFa][RDFa 1.1 Core] parser for RDF.rb.
 
 ## DESCRIPTION
-RDF::RDFa is an RDFa reader for Ruby using the [RDF.rb](http://rdf.rubyforge.org/) library suite.
+RDF::RDFa is an RDFa reader and writer for Ruby using the [RDF.rb][RDF.rb] library suite.
 
 ## FEATURES
-RDF::RDFa parses RDFa into statements or triples.
+RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 
-* Fully compliant XHTML/RDFa 1.1 parser.
-* Uses Nokogiri for parsing XHTML
-* RDFa tests use SPARQL for most tests due to Rasqal limitations. Other tests compare directly against N-triples.
+* Fully compliant RDFa 1.1 parser.
+* Writer to generate generic XHTML+RDFa.
+* Uses Nokogiri for parsing HTML/SVG
+* [RDFa tests][RDFa-test-suite] use SPARQL for most tests due to Rasqal limitations. Other tests compare directly against N-triples.
 
 Install with 'gem install rdf-rdfa'
 
 ## Usage
-Instantiate a parser and parse source, specifying type and base-URL
+
+### Reading RDF data in the XHTML+RDFa format
 
     RDF::RDFa::Reader.open("etc/foaf.html") do |reader|
       reader.each_statement do |statement|
@@ -23,8 +25,18 @@ Instantiate a parser and parse source, specifying type and base-URL
       end
     end
 
+### Writing RDF data using the XHTML+RDFa format
+
+    require 'rdf/rdfa'
+    
+    RDF::RDFa::Writer.open("hello.html") do |writer|
+      writer << RDF::Graph.new do |graph|
+        graph << [:hello, RDF::DC.title, "Hello, world!"]
+      end
+    end
+
 ## Dependencies
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.0)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.1)
 * [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.3.3)
 
 ## Documentation
@@ -45,47 +57,36 @@ Full documentation available on [RubyForge](http://rdf.rubyforge.org/rdfa)
 ## TODO
 * Add support for LibXML and REXML bindings, and use the best available
 * Consider a SAX-based parser for improved performance
-* Port SPARQL tests to native SPARQL processor, when one becomes available.
-* Add generic XHTML+RDFa Writer
+* Port SPARQL tests to native SPARQL processor, when released.
 
 ## Resources
-* [RDF.rb](http://rdf.rubyforge.org/) 
+* [RDF.rb][RDF.rb]
 * [Distiller](http://distiller.kellogg-assoc)
 * [Documentation](http://rdf.rubyforge.org/rdfa)
 * [History](file:file.History.html)
-* [RDFa 1.1 Core](http://www.w3.org/TR/2010/WD-rdfa-core-20100422/         "RDFa 1.1 Core")
-* [XHTML+RDFa 1.1 Core](http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/  "XHTML+RDFa 1.1 Core")
+* [RDFa 1.1 Core][RDFa 1.1 Core]
+* [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
 * [RDFa-test-suite](http://rdfa.digitalbazaar.com/test-suite/              "RDFa test suite")
 
-## LICENSE
+## AUTHOR
+* [Gregg Kellogg](http://github.com/gkellogg) - <http://kellogg-assoc.com/>
 
-(The MIT License)
+## CONTRIBUTORS
+* [Nicholas Humfrey](http://github.com/njh)
 
-Copyright (c) 2009-2010 Gregg Kellogg
+## License
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+This is free and unencumbered public domain software. For more information,
+see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 
 ## FEEDBACK
 
 * gregg@kellogg-assoc.com
-* rubygems.org/rdf-rdfa
-* github.com/gkellogg/rdf-rdfa
-* gkellogg.lighthouseapp.com for bug reports
+* <http://rubygems.org/rdf-rdfa>
+* <http://github.com/gkellogg/rdf-rdfa>
 * <http://lists.w3.org/Archives/Public/public-rdf-ruby/>
+
+[RDF.rb]:   http://rdf.rubyforge.org/
+[RDFa 1.1 Core]:    http://www.w3.org/TR/2010/WD-rdfa-core-20100422     "RDFa 1.1 Core"
+[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/   "XHTML+RDFa 1.1"
+[RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"

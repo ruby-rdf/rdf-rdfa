@@ -43,7 +43,7 @@ RSpec::Core::RakeTask.new("doc:spec") do |spec|
 end
 
 YARD::Rake::YardocTask.new do |t|
-  t.files   = %w(lib/**/*.rb README.rdoc History.txt AUTHORS CONTRIBUTORS)   # optional
+  t.files   = %w(lib/**/*.rb README.md History.md AUTHORS CONTRIBUTORS UNLICENSE)   # optional
 end
 
 desc "Generate RDF Core Manifest.yml"
