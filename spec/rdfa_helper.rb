@@ -146,7 +146,7 @@ module RdfaHelper
     def outputDocument; self.name + ".sparql"; end
 
     def version
-      :rdfa_1_1
+      nil
     end
     
     # Run test case, yields input for parser to create triples
@@ -164,8 +164,6 @@ module RdfaHelper
       else
         raise SparqlException, "Query skipped, Redland not installed"
       end
-
-      graph.to_rdfxml.should be_valid_xml
     end
     
     def trace
@@ -230,16 +228,16 @@ module RDF
 
     def self.stub_file(filename)
       case filename.to_s
-      when %r(http://rdfa.digitalbazaar.com/test-suite/profile/\w+)
-        filename.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/profile/\w+),
-          File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile'))
-      when %r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+)
-        filename.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/test-cases/\w+),
+      when %r(http://rdfa.digitalbazaar.com/test-suite/profiles/[\w\.]+)
+        filename.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/profiles),
+          File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profiles'))
+      when %r(http://rdfa.digitalbazaar.com/test-suite/test-cases/[\w\.]+)
+        filename.to_s.sub(%r(http://rdfa.digitalbazaar.com/test-suite/test-cases),
           File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'tests'))
       when "http://www.w3.org/1999/xhtml/vocab"
         File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
       when "http://www.w3.org/2005/10/profile"
-        File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'profile', "xhv")
+        File.join(File.expand_path(File.dirname(__FILE__)), '..', 'etc', "profile.html")
       when "http://example.com/profile"
         File.join(TMP_DIR, "profile.html")
       else

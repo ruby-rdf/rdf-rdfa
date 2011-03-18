@@ -24,6 +24,7 @@ module RDF::RDFa
     content_encoding 'utf-8'
 
     reader { RDF::RDFa::Reader }
+    writer { RDF::RDFa::Writer }
     XMLNS = 'http://www.w3.org/1999/xhtml'  # FIXME: This or XHV or none at all?
   end
 

@@ -1,5 +1,13 @@
+### 0.3.2
+* Added RDFa Writer, to perform generic serialization of RDF content to RDFa.
+* Update to pre-LC2 drafts of RDFa
+* Add support for cached profiles, and include cached profiles for XML+RDFa and XHTML+RDFa.
+  * Profiles are processed left to right
+  * Detect 1.0 using @version
+  * Automatically load profiles based on host language
+
 ### 0.3.1.2
-* Assert :html and xhtml as a format types (by creating RDF::RDFa::HTML/XHTML as a sub-classs of Format that uses RDFa::Reader/Writer)
+* Assert :html and xhtml as a format types (by creating RDF::RDFa::HTML/XHTML as a sub-class of Format that uses RDFa::Reader/Writer)
 * Added :svg format, image/svg+xml and .svg as looks for RDFa parser as well.
 
 ### 0.3.1

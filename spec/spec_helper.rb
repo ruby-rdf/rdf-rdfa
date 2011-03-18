@@ -18,25 +18,6 @@ require 'matchers'
 
 include Matchers
 
-module RDF
-  module Isomorphic
-    alias_method :==, :isomorphic_with?
-  end
-  class Graph
-    def to_ntriples
-      RDF::Writer.for(:ntriples).buffer do |writer|
-        writer << self
-      end
-    end
-
-    def to_rdfxml
-      RDF::Writer.for(:rdfxml).buffer do |writer|
-        writer << self
-      end
-    end
-  end
-end
-
 ::RSpec.configure do |c|
   c.filter_run :focus => true
   c.run_all_when_everything_filtered = true

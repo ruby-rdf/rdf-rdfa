@@ -20,17 +20,17 @@ describe RDF::RDFa::Format do
     
   it "should discover 'html'" do
     RDF::Format.for(:html).reader.should == RDF::RDFa::Reader
-    #RDF::Format.for(:html).writer.should == RDF::RDFa::Writer
+    RDF::Format.for(:html).writer.should == RDF::RDFa::Writer
   end
 
   it "should discover 'xhtml'" do
     RDF::Format.for(:xhtml).reader.should == RDF::RDFa::Reader
-    #RDF::Format.for(:xhtml).writer.should == RDF::RDFa::Writer
+    RDF::Format.for(:xhtml).writer.should == RDF::RDFa::Writer
   end
 
   it "should discover 'svg'" do
     RDF::Format.for(:svg).reader.should == RDF::RDFa::Reader
-    #RDF::Format.for(:svg).writer.should == RDF::RDFa::Writer
+    RDF::Format.for(:svg).writer.should == RDF::RDFa::Writer
   end
 end
 

@@ -6,7 +6,8 @@ module RDF::RDFa
   #
   # Based on processing rules described here:
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/2010/02/rdfa/drafts/2010/WD-rdfa-core-20101026/ RDFa 1.1
+  # @see http://www.w3.org/2010/02/rdfa/sources/rdfa-core/Overview.html RDFa 1.1
+  # @see http://www.w3.org/2010/02/rdfa/sources/xhtml-rdfa/Overview.html RDFa 1.1
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
@@ -190,24 +191,72 @@ module RDF::RDFa
         @debug = options[:debug]
         @base_uri = uri(options[:base_uri])
 
-        @version = options[:version] ? options[:version].to_sym : :rdfa_1_1
+        @host_language = options[:host_language]
         @processor_graph = options[:processor_graph]
 
         @doc = case input
-        when Nokogiri::HTML::Document then input
-        when Nokogiri::XML::Document then input
-        else   Nokogiri::XML.parse(input, @base_uri.to_s)
+        when Nokogiri::HTML::Document
+          @host_language ||= :xhtml
+        when Nokogiri::XML::Document
+          input
+        else
+          # Intuit from content type
+          @host_language ||= case input.respond_to?(:content_type) && input.content_type
+          when "text/xml", "application/xml"
+            :xml
+          when "text/html", "application/xhtml+xml"
+            :xhtml
+          when "image/svg+xml"
+            :svg
+          end
+          
+          # Intuit from file extension
+          @host_language ||= case input.respond_to?(:path) && File.extname(input.path.to_s)
+          when ".html", ".xhtml" then :xhtml
+          when ".svg"            then :svg
+          end
+ 
+          Nokogiri::XML.parse(input, @base_uri.to_s)
         end
         
-        @host_language = options[:host_language] || case @doc.root.name.downcase.to_sym
+        add_error(nil, "Empty document", RDF::RDFA.DocumentError) if (@doc.nil? || @doc.root.nil?)
+        add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
+        add_error("Empty document") if (@doc.nil? || @doc.root.nil?) && validate?
+
+        @version = options[:version] ? options[:version].to_sym : nil
+        
+        # Check for version of the processor to use:
+        # * Check document type for "XHTML+RDFa 1.0"
+        # * Check @version attribute on the html element for the value "XHTML+RDFa 1.0"
+        @version ||= :rdfa_1_0 if @doc.doctype.to_s =~ /RDFa 1\.0/
+        @version ||= :rdfa_1_0 if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.0/
+        @version ||= :rdfa_1_1 if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.1/
+        @version ||= :rdfa_1_1
+
+        # Determine host language from element name
+        @host_language ||= case @doc.root.name.downcase.to_sym
         when :html  then :xhtml
         when :svg   then :svg
         else             :xhtml
         end
 
-        add_error(nil, "Empty document", RDF::RDFA.DocumentError) if (@doc.nil? || @doc.root.nil?)
-        add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
-        add_error("Empty document") if (@doc.nil? || @doc.root.nil?) && validate?
+        # Section 4.2 RDFa Host Language Conformance
+        #
+        # The Host Language may require the automatic inclusion of one or more default RDFa Profiles.
+        @host_defaults = {
+          :vocabulary   => nil,
+          :uri_mappings => {},
+          :profiles     => [],
+        }
+
+        case @host_language
+        when :xml
+          @host_defaults[:profiles] = [XML_RDFA_PROFILE]
+        when :xhtml
+          @host_defaults[:profiles] = [XML_RDFA_PROFILE, XHTML_RDFA_PROFILE]
+        end
+
+        add_info(@doc, "version = #{@version},  host_language = #{@host_language}")
 
         block.call(self) if block_given?
       end
@@ -234,34 +283,10 @@ module RDF::RDFa
     def each_statement(&block)
       @callback = block
 
-      # Section 4.2 RDFa Host Language Conformance
-      #
-      # The Host Language may define a default RDFa Profile. If it does, the RDFa Profile triples that establish term or
-      # URI mappings associated with that profile must not change without changing the profile URI. RDFa Processors may
-      # embed, cache, or retrieve the RDFa Profile triples associated with that profile.
-      @host_defaults = case @host_language
-      when :xhtml
-        {
-          :vocabulary => nil,
-          :prefix     => "xhv",
-          :uri_mappings => {"xhv" => RDF::XHV.to_s}, # RDF::XHTML is wrong
-          :term_mappings => %w(
-            alternate appendix bookmark cite chapter contents copyright first glossary help icon index
-            last license meta next p3pv1 prev role section stylesheet subsection start top up
-            ).inject({}) { |hash, term| hash[term.to_sym] = RDF::XHV[term].to_s; hash },
-        }
-      else
-        {
-          :uri_mappings => {},
-        }
-      end
-      
       # Add prefix definitions from host defaults
       @host_defaults[:uri_mappings].each_pair do |prefix, value|
         prefix(prefix, value)
       end
-
-      add_info(@doc, "version = #{@version},  host_language = #{@host_language}")
 
       # parse
       parse_whole_document(@doc, @base_uri)
@@ -319,15 +344,13 @@ module RDF::RDFa
     end
     
     def add_processor_message(node, message, process_class)
-      puts "#{node_path(node)}: #{message}" if ::RDF::RDFa::debug?
+      puts "#{node_path(node)}: #{message}" if ::RDF::RDFa.debug?
       @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
       if @processor_graph
-        @processor_sequence ||= 0
         n = RDF::Node.new
         @processor_graph << RDF::Statement.new(n, RDF["type"], process_class)
         @processor_graph << RDF::Statement.new(n, RDF::DC.description, message)
         @processor_graph << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
-        @processor_graph << RDF::Statement.new(n, RDF::RDFA.sequence, RDF::Literal::Integer.new(@processor_sequence += 1))
         @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, @base_uri)
         nc = RDF::Node.new
         @processor_graph << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
@@ -370,6 +393,18 @@ module RDF::RDFa
       # initialize the evaluation context with the appropriate base
       evaluation_context = EvaluationContext.new(base, @host_defaults)
       
+      if @version != :rdfa_1_0
+        # Process default vocabularies
+        process_profile(doc.root, @host_defaults[:profiles]) do |which, value|
+          add_debug(doc.root, "parse_whole_document, #{which}: #{value.inspect}")
+          case which
+          when :uri_mappings        then evaluation_context.uri_mappings.merge!(value)
+          when :term_mappings       then evaluation_context.term_mappings.merge!(value)
+          when :default_vocabulary  then evaluation_context.default_vocabulary = value
+          end
+        end
+      end
+      
       traverse(doc.root, evaluation_context)
       add_debug("", "parse_whole_doc: traversal complete'")
     end
@@ -379,7 +414,6 @@ module RDF::RDFa
     # Yields each mapping
     def process_profile(element, profiles)
       profiles.
-        reverse.
         map {|uri| uri(uri).normalize}.
         each do |uri|
         # Don't try to open ourselves!
@@ -389,10 +423,18 @@ module RDF::RDFa
         end
 
         old_debug = RDF::RDFa.debug?
-        #RDF::RDFa.debug = false
-        add_info(element, "process_profile: load <#{uri}>")
-        next unless profile = Profile.find(uri)
-        RDF::RDFa.debug = old_debug
+        begin
+          add_info(element, "process_profile: load <#{uri}>")
+          RDF::RDFa.debug = false
+          profile = Profile.find(uri)
+        rescue Exception => e
+          RDF::RDFa.debug = old_debug
+          add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
+          raise # In case we're not in strict mode, we need to be sure processing stops
+        ensure
+          RDF::RDFa.debug = old_debug
+        end
+
         # Add URI Mappings to prefixes
         profile.prefixes.each_pair do |prefix, value|
           prefix(prefix, value)
@@ -401,9 +443,6 @@ module RDF::RDFa
         yield :term_mappings, profile.terms unless profile.terms.empty?
         yield :default_vocabulary, profile.vocabulary if profile.vocabulary
       end
-    rescue Exception => e
-      add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
-      raise # In case we're not in strict mode, we need to be sure processing stops
     end
 
     # Extract the XMLNS mappings from an element
@@ -432,13 +471,18 @@ module RDF::RDFa
       # Set mappings from @prefix
       # prefix is a whitespace separated list of prefix-name URI pairs of the form
       #   NCName ':' ' '+ xs:anyURI
-      mappings = element.attributes["prefix"].to_s.split(/\s+/)
+      mappings = element.attribute("prefix").to_s.strip.split(/\s+/)
       while mappings.length > 0 do
         prefix, uri = mappings.shift.downcase, mappings.shift
         #puts "uri_mappings prefix #{prefix} <#{uri}>"
         next unless prefix.match(/:$/)
         prefix.chop!
         
+        unless prefix.match(NC_REGEXP)
+          add_error(element, "extract_mappings: Prefix #{prefix.inspect} does not match NCName production")
+          next
+        end
+
         # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
         next if prefix == "_"
 
@@ -517,9 +561,24 @@ module RDF::RDFa
           process_profile(element, profiles) do |which, value|
             add_debug(element, "[Step 2] traverse, #{which}: #{value.inspect}")
             case which
-            when :uri_mappings        then uri_mappings.merge!(value)
-            when :term_mappings       then term_mappings.merge!(value)
-            when :default_vocabulary  then default_vocabulary = value
+            when :uri_mappings
+              value.each do |k, v|
+                if k.to_s.match(NC_REGEXP)
+                  uri_mappings[k] = v
+                else
+                  add_error(element, "[Step 2] traverse: Prefix #{k.to_s.inspect} does not match NCName production")
+                end
+              end
+            when :term_mappings
+              value.each do |k, v|
+                if k.to_s.match(NC_REGEXP)
+                  term_mappings[k] = v
+                else
+                  add_error(element, "[Step 2] traverse: Term #{k.to_s.inspect} does not match NCName production")
+                end
+              end
+            when :default_vocabulary
+              default_vocabulary = value
             end
           end 
         rescue
@@ -538,12 +597,12 @@ module RDF::RDFa
       unless vocab.nil?
         default_vocabulary = if vocab.to_s.empty?
           # Set default_vocabulary to host language default
-          add_debug(element, "[Step 2] traverse, reset default_vocaulary to #{@host_defaults.fetch(:vocabulary, nil).inspect}")
+          add_debug(element, "[Step 3] traverse, reset default_vocaulary to #{@host_defaults.fetch(:vocabulary, nil).inspect}")
           @host_defaults.fetch(:vocabulary, nil)
         else
           uri(vocab)
         end
-        add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")
+        add_debug(element, "[Step 3] traverse, default_vocaulary: #{default_vocabulary.inspect}")
       end
       
       # Local term mappings [7.5 Steps 4]
@@ -560,8 +619,8 @@ module RDF::RDFa
       language = case
       when element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s)
         element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s).to_s
-      when element.at_xpath("lang")
-        element.at_xpath("lang").to_s
+      when element.at_xpath("@lang")
+        element.at_xpath("@lang").to_s
       else
         language
       end
@@ -935,16 +994,8 @@ module RDF::RDFa
         # As a special case, _: is also a valid reference for one specific bnode.
         bnode(reference)
       elsif curie.to_s.match(/^:/)
-        add_debug(element, "curie_to_resource_or_bnode: default prefix: defined? #{!!uri_mappings[""]}, defaults: #{@host_defaults[:prefix]}")
         # Default prefix
-        if uri_mappings[nil]
-          uri(uri_mappings[nil] + reference.to_s)
-        elsif @host_defaults[:prefix]
-          uri(uri_mappings[@host_defaults[:prefix]] + reference.to_s)
-        else
-          #add_warning(element, "Default namespace prefix is not defined", RDF::RDFA.UnresolvedCURIE)
-          nil
-        end
+        RDF::XHV[reference.to_s]
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
         nil
