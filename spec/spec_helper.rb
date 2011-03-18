@@ -16,15 +16,12 @@ rescue LoadError
 end
 require 'matchers'
 
-include Matchers
-
 ::RSpec.configure do |c|
   c.filter_run :focus => true
   c.run_all_when_everything_filtered = true
   c.exclusion_filter = {
     :ruby => lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version.to_s}/) },
   }
-  c.include(Matchers)
   c.include(RDF::Spec::Matchers)
 end
 

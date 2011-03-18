@@ -542,16 +542,15 @@ describe "RDF::RDFa::Reader" do
           next unless t.classification =~ /required/
           #next unless t.name =~ /0001/
           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
-            #puts t.input
-            #puts t.results
             begin
-              t.run_test do |rdfa_string|
-                t.debug = []
-                parse(rdfa_string,
-                    :base_uri => t.informationResourceInput,
-                    :debug => t.debug,
-                    :version => t.version)
-              end
+              #puts t.input
+              #puts t.results
+              t.debug = []
+              graph = parse(t.input,
+                  :base_uri => t.informationResourceInput,
+                  :debug => t.debug,
+                  :version => t.version)
+              graph.should pass_query(t.results, t)
             rescue RSpec::Expectations::ExpectationNotMetError => e
               if t.input =~ /XMLLiteral/
                 pending("XMLLiteral canonicalization not implemented yet")
@@ -572,13 +571,12 @@ describe "RDF::RDFa::Reader" do
           #puts t.inspect
           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
             begin
-              t.run_test do |rdfa_string|
-                t.debug = []
-                parse(rdfa_string,
-                    :base_uri => t.informationResourceInput,
-                    :debug => t.debug,
-                    :version => t.version)
-              end
+              t.debug = []
+              graph = parse(t.input,
+                  :base_uri => t.informationResourceInput,
+                  :debug => t.debug,
+                  :version => t.version)
+              graph.should pass_query(t.results, t)
             rescue SparqlException => e
               pending(e.message) { raise }
             rescue RSpec::Expectations::ExpectationNotMetError => e
@@ -599,13 +597,12 @@ describe "RDF::RDFa::Reader" do
           #puts t.inspect
           specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
             begin
-              t.run_test do |rdfa_string|
-                t.debug = []
-                parse(rdfa_string,
-                    :base_uri => t.informationResourceInput,
-                    :debug => t.debug,
-                    :version => t.version)
-              end
+              t.debug = []
+              graph = parse(t.input,
+                  :base_uri => t.informationResourceInput,
+                  :debug => t.debug,
+                  :version => t.version)
+              graph.should pass_query(t.results, t)
             rescue SparqlException => e
               pending(e.message) { raise }
             rescue RSpec::Expectations::ExpectationNotMetError => e

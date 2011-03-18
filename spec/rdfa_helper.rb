@@ -1,5 +1,6 @@
 require 'rdf/rdfxml'
 require 'open-uri'
+
 autoload :YAML, "yaml"
 autoload :CGI, 'cgi'
 
@@ -147,23 +148,6 @@ module RdfaHelper
 
     def version
       nil
-    end
-    
-    # Run test case, yields input for parser to create triples
-    def run_test
-      rdfa_string = input
-      
-      # Run
-      graph = yield(rdfa_string)
-
-      query_string = results
-
-      if $redland_enabled
-        # Run SPARQL query
-        graph.should pass_query(query_string, self)
-      else
-        raise SparqlException, "Query skipped, Redland not installed"
-      end
     end
     
     def trace
