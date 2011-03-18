@@ -211,7 +211,7 @@ module RDF::RDFa
           end
           
           # Intuit from file extension
-          @host_language ||= case input.respond_to?(:path) && File.extname(input.path)
+          @host_language ||= case input.respond_to?(:path) && File.extname(input.path.to_s)
           when ".html", ".xhtml" then :xhtml
           when ".svg"            then :svg
           end
@@ -619,8 +619,8 @@ module RDF::RDFa
       language = case
       when element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s)
         element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s).to_s
-      when element.at_xpath("lang")
-        element.at_xpath("lang").to_s
+      when element.at_xpath("@lang")
+        element.at_xpath("@lang").to_s
       else
         language
       end
