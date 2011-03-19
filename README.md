@@ -86,7 +86,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 * <http://github.com/gkellogg/rdf-rdfa>
 * <http://lists.w3.org/Archives/Public/public-rdf-ruby/>
 
-[RDF.rb]:   http://rdf.rubyforge.org/
-[RDFa 1.1 Core]:    http://www.w3.org/TR/2010/WD-rdfa-core-20100422     "RDFa 1.1 Core"
+[RDF.rb]:           http://rdf.rubyforge.org/
+[RDFa 1.1 Core]:    http://www.w3.org/TR/2010/WD-rdfa-core-20100422/     "RDFa 1.1 Core"
 [XHTML+RDFa 1.1]:   http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/   "XHTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
