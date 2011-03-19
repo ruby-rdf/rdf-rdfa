@@ -1,4 +1,5 @@
 require 'rspec/matchers'
+require 'sparql/grammar'
 
 RSpec::Matchers.define :have_xpath do |xpath, value|
   match do |actual|
@@ -80,23 +81,10 @@ end
 RSpec::Matchers.define :pass_query do |expected, info|
   match do |actual|
     @expected_results = info.respond_to?(:expectedResults) ? info.expectedResults : true
-    if $redland_enabled
-      query = Redland::Query.new(expected)
+    query = SPARQL::Grammar.parse(expected)
+    @results = query.execute(actual)
 
-      model = Redland::Model.new
-      ntriples_parser = Redland::Parser.ntriples
-      ntriples_parser.parse_string_into_model(model, actual.dump(:ntriples), "http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/")
-
-      @results = query.execute(model)
-      #puts "Redland query results: #{@results.inspect}"
-      if @expected_results && @results
-        @results.is_boolean? && @results.get_boolean?
-      else
-        @results.nil? || @results.is_boolean? && !@results.get_boolean?
-      end
-    else
-      pending("Query skipped, Redland not installed") { fail }
-    end
+    @results.should == @expected_results ? RDF::Literal::TRUE : RDF::Literal::FALSE
   end
   
   failure_message_for_should do |actual|
@@ -104,7 +92,7 @@ RSpec::Matchers.define :pass_query do |expected, info|
     "#{information + "\n" unless information.empty?}" +
     if @results.nil?
       "Query failed to return results"
-    elsif !@results.is_boolean?
+    elsif !@results.is_a?(RDF::Literal::Boolean)
       "Query returned non-boolean results"
     elsif @expected_results
       "Query returned false"

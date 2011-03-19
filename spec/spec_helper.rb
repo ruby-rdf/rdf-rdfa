@@ -9,11 +9,6 @@ require 'rdf/spec'
 require 'rdf/spec/matchers'
 require 'rdf/isomorphic'
 
-begin
-  require 'rdf/redland'
-  $redland_enabled = true
-rescue LoadError
-end
 require 'matchers'
 
 ::RSpec.configure do |c|
