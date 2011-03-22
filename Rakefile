@@ -46,22 +46,4 @@ YARD::Rake::YardocTask.new do |t|
   t.files   = %w(lib/**/*.rb README.md History.md AUTHORS CONTRIBUTORS UNLICENSE)   # optional
 end
 
-desc "Generate RDF Core Manifest.yml"
-namespace :spec do
-  task :prepare do
-    $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
-    require 'rdf/rdfa'
-    require 'spec/rdfa_helper'
-    require 'fileutils'
-
-    %w(xhtml html4 html5 svgtiny).each do |suite|
-      yaml = manifest_file = File.join(File.dirname(__FILE__), "spec", "#{suite}-manifest.yml")
-      FileUtils.rm_f(yaml)
-      #RDF::RDFa.debug = true
-      RdfaHelper::TestCase.to_yaml(suite, yaml)
-      #RDF::RDFa.debug = false
-    end
-  end
-end
-
 task :default => :spec
