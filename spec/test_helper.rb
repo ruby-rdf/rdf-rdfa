@@ -27,12 +27,12 @@ module Fixtures
     include Spira::Resource
 
     type Test.TestCase
-    property :title,          :predicate => DC11.title,                     :type => XSD.string
+    property :title,          :predicate => DC11.title,                   :type => XSD.string
     property :purpose,        :predicate => Test.purpose,                 :type => XSD.string
     has_many :hostLanguage,   :predicate => RdfaTest.hostLanguage,        :type => XSD.string
     has_many :version,        :predicate => RdfaTest.rdfaVersion,         :type => XSD.string
-    property :expected,       :predicate => Test.expectedResults,         :type => XSD.boolean
-    property :contributor,    :predicate => DC11.contributor,               :type => XSD.string
+    property :expected,       :predicate => Test.expectedResults
+    property :contributor,    :predicate => DC11.contributor,             :type => XSD.string
     property :reference,      :predicate => Test.specificationRefference, :type => XSD.string
     property :classification, :predicate => Test.classification
     property :inputDocument,  :predicate => Test.informationResourceInput
@@ -47,7 +47,7 @@ module Fixtures
     end
     
     def expectedResults
-      expected == false ? RDF::Literal::FALSE : RDF::Literal::TRUE
+      RDF::Literal::Boolean.new(expected.nil? ? "true" : expected)
     end
     
     def name
