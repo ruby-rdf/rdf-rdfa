@@ -1,65 +1,95 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
-require 'rdf/n3'
-require 'rdf/rdfxml'
 require 'rdf/rdfa'
-require File.expand_path(File.join(File.dirname(__FILE__), "..", 'spec', 'rdfa_helper'))
+require 'sparql/grammar'
+require File.expand_path(File.join(File.dirname(__FILE__), "..", 'spec', 'spec_helper'))
+require File.expand_path(File.join(File.dirname(__FILE__), "..", 'spec', 'test_helper'))
 require 'getoptlong'
 
-def run_tc(tc)
-  puts "run #{tc.name}"
-  puts tc.input if $verbose
-  pg = RDF::Graph.new if $pg_format
-  RDF::Writer.for($output_format.to_sym).new do |writer|
-    RDF::RDFa::Reader.new(tc.input,
-      :base_uri => tc.informationResourceInput,
-      :validate => $validate,
-      :processor_graph => pg,
-      :version => tc.version).each do |statement|
-      writer << statement
+def run_tc(tc, options)
+  input_uri = tc.input(options[:host_language], options[:version])
+  results_uri = tc.results(options[:host_language], options[:version])
+
+  STDOUT.write "run #{tc.name}"
+
+  if options[:verbose]
+    puts("\nTestCase: #{tc.inspect}") 
+    puts("\nInput:\n" + Kernel.open(input_uri) {|f| f.read}) 
+    puts("\nQuery:\n" + Kernel.open(results_uri) {|f| f.read})
+  end
+
+  pg = RDF::Graph.new if options[:processor_graph]
+
+  begin
+    reader = RDF::RDFa::Reader.new(Kernel.open(input_uri),
+      :base_uri => input_uri,
+      :validate => options[:validate],
+      :processor_graph => pg)
+
+    graph = RDF::Graph.new << reader
+  rescue Exception => e
+    puts "#{"exception:" unless options[:quiet]}: #{e}"
+    if options[:quiet]
+      return
+    else
+      raise
     end
   end
-  puts ""
   
-  if pg
+  puts("\nResult:\n" + graph.dump(options[:format])) unless options[:quiet]
+  
+  begin
+    result = SPARQL::Grammar.parse(Kernel.open(results_uri)).execute(graph)
+  rescue Exception => e
+    puts "#{"exception:" unless options[:quiet]}: #{e}"
+    return
+  end
+  puts "#{"test result:" unless options[:quiet]} #{(result == (tc.expectedResults || true)) ? 'ok' : 'fail'}"
+  
+  if pg && !options[:quiet]
     puts "\nProcessor Graph:\n"
     puts pg.inspect
-    RDF::Writer.for($pg_format.to_sym).new do |writer|
+    RDF::Writer.for(options[:format]).new do |writer|
       writer << pg
     end
   end
 end
 
-$verbose = false
-$output_format = :ntriples
-$pg_format = nil
-$validate = false
-suite = "xhtml"
+options = {
+  :verbose         => false,
+  :quite           => false,
+  :validate        => false,
+  :format          => :ntriples,
+  :processor_graph => nil,
+  :host_language   => "xhtml1",
+  :version         => "rdfa1.1"
+}
+
 opts = GetoptLong.new(
   ["--debug", GetoptLong::NO_ARGUMENT],
   ["--verbose", GetoptLong::NO_ARGUMENT],
   ["--quiet", GetoptLong::NO_ARGUMENT],
-  ["--suite", GetoptLong::OPTIONAL_ARGUMENT],
+  ["--host-language", GetoptLong::OPTIONAL_ARGUMENT],
+  ["--version", GetoptLong::OPTIONAL_ARGUMENT],
   ["--validate", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
-  ["--pg-format", GetoptLong::REQUIRED_ARGUMENT]
+  ["--processor-graph", GetoptLong::NO_ARGUMENT]
 )
 opts.each do |opt, arg|
   case opt
-  when '--verbose' then $verbose = true
-  when '--quiet' then $quiet = true
+  when '--verbose' then options[:verbose] = true
+  when '--quiet' then options[:quiet] = true
   when '--debug' then ::RDF::RDFa::debug = true
-  when '--format' then $output_format = arg
-  when '--pg-format' then $pg_format = arg
-  when '--suite' then suite = arg
-  when '--validate' then $validate = true
+  when '--format' then options[:format] = arg.to_sym
+  when '--processor-graph' then options[:processor_graph] = true
+  when '--host-language' then options[:host_language] = arg
+  when '--version' then options[:version] = arg
+  when '--validate' then options[:validate] = true
   end
 end
 
-test_cases = RdfaHelper::TestCase.test_cases(suite)
-
-test_cases.each do |tc|
+Fixtures::TestCase.for_specific(options[:host_language], options[:version]) do |tc|
   next unless ARGV.empty? || ARGV.any? {|n| tc.name.match(/#{n}/)}
-  run_tc(tc)
+  run_tc(tc, options)
 end
