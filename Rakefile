@@ -18,7 +18,6 @@ begin
     gemspec.add_development_dependency('spira', '>= 0.0.12')
     gemspec.add_development_dependency('rspec', '>= 2.5.0')
     gemspec.add_development_dependency('rdf-spec', '>= 0.3.1')
-    gemspec.add_development_dependency('rdf-rdfxml', '>= 0.3.1')
     gemspec.add_development_dependency('rdf-isomorphic', '>= 0.3.4')
     gemspec.add_development_dependency('yard')
     gemspec.extra_rdoc_files     = %w(README.md History.md AUTHORS CONTRIBUTORS)
