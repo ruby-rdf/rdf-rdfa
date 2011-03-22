@@ -80,11 +80,11 @@ end
 
 RSpec::Matchers.define :pass_query do |expected, info|
   match do |actual|
-    @expected_results = info.respond_to?(:expectedResults) ? info.expectedResults : true
-    query = SPARQL::Grammar.parse(expected)
+    @expected = expected.read
+    query = SPARQL::Grammar.parse(@expected)
     @results = query.execute(actual)
 
-    @results.should == @expected_results ? RDF::Literal::TRUE : RDF::Literal::FALSE
+    @results.should == info.expectedResults
   end
   
   failure_message_for_should do |actual|
@@ -94,12 +94,12 @@ RSpec::Matchers.define :pass_query do |expected, info|
       "Query failed to return results"
     elsif !@results.is_a?(RDF::Literal::Boolean)
       "Query returned non-boolean results"
-    elsif @expected_results
+    elsif info.expectedResults
       "Query returned false"
     else
       "Query returned true (expected false)"
     end +
-    "\n#{expected}" +
+    "\n#{@expected}" +
     "\nResults:\n#{@actual.dump(:ntriples)}" +
     "\nDebug:\n#{info.trace}"
   end  
