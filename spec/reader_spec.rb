@@ -1,6 +1,5 @@
 $:.unshift "."
 require File.join(File.dirname(__FILE__), 'spec_helper')
-require 'rdfa_helper'
 
 describe RDF::RDFa::Format do
   it "should be discover 'rdfa'" do
@@ -414,64 +413,59 @@ describe "RDF::RDFa::Reader" do
   end
 
   describe :profiles do
-    before(:all) do
-      FileUtils.mkdir(TMP_DIR)
-      File.open(File.join(TMP_DIR, "profile.html"), "w") do |f|
-        f.write(%(<?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE html>
-          <html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-              <title>Test mappings</title>
-            </head>
-            <body prefix="rdfa: http://www.w3.org/ns/rdfa#">
-              <p typeof=""><span property="rdfa:uri">#{RDF::DC}</span><span property="rdfa:prefix">dc</span></p>
-              <p typeof=""><span property="rdfa:uri">#{RDF::DC.title}</span><span property="rdfa:term">title</span></p>
-            </body>
-          </html>
-          )
-        )
-      end
-
+    before(:each) do
+      @profile = StringIO.new(%q(<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml">
+          <head>
+            <title>Test mappings</title>
+          </head>
+          <body prefix="rdfa: http://www.w3.org/ns/rdfa#">
+            <p typeof=""><span property="rdfa:uri">http://example.org/</span><span property="rdfa:prefix">foo</span></p>
+            <p typeof=""><span property="rdfa:uri">http://example.org/title</span><span property="rdfa:term">title</span></p>
+          </body>
+        </html>
+      ))
+      def @profile.content_type; "text/html"; end
+      def @profile.base_uri; "http://example.com/profile"; end
+      
       @doc = %(<?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE html>
         <html xmlns="http://www.w3.org/1999/xhtml">
           <body profile="http://example.com/profile">
-            <div about ="http://example.com/doc" typeof="dc:Agent">
+            <div about="http://example.com/doc" typeof="foo:Agent">
               <p property="title">A particular agent</p>
             </div>
           </body>
         </html>
         )
-    end
 
-    before(:each) do
+      RDF::Util::File.stub!(:open_file).and_yield(@profile)
+
       @profile_repository = RDF::Repository.new(:title => "Test Profile Repository")
       @debug = []
       @reader = RDF::RDFa::Reader.new(@doc, :profile_repository => @profile_repository, :debug => @debug, :validate => true)
+      
+      @expected = RDF::Graph.new
+      @expected << [RDF::URI("http://example.com/doc"), RDF.type, RDF::URI("http://example.org/Agent")]
+      @expected << [RDF::URI("http://example.com/doc"), RDF::URI("http://example.org/title"), "A particular agent"]
     end
-    
-    after(:all) do
-      FileUtils.rm_rf(TMP_DIR)
+
+    it "parses profile" do
+      RDF::Reader.should_receive(:for).and_return(RDF::RDFa::Reader)
+      g = RDF::Graph.load(@profile)
+      g.count.should == 4
     end
-    
+
     describe "new profile" do
-      before(:each) do
+      subject do
         # Clear vocabulary cache
         RDF::RDFa::Profile.cache.send(:initialize)
-        @graph = RDF::Graph.new
-        @reader.each do |statement|
-          @graph << statement
-        end
+        RDF::Graph.new << @reader
       end
       
-      describe "processed graph" do
-        it "should have type dc:Agent" do
-          @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF.type, RDF::DC.Agent))
-        end
-      
-        it "should have property dc:title" do
-          @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF::DC.title, RDF::Literal.new("A particular agent")))
-        end
+      it "matches expected" do
+        subject.should be_equivalent_graph(@expected, :trace => @debug.join("\n"))
       end
     end
     
@@ -497,10 +491,11 @@ describe "RDF::RDFa::Reader" do
       before(:each) do
         bn_p = RDF::Node.new("prefix")
         bn_t = RDF::Node.new("term")
-        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.prefix, RDF::Literal.new("dc"))
-        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.uri, RDF::Literal.new(RDF::DC.to_s))
-        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.term, RDF::Literal.new("title"))
-        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.uri, RDF::Literal.new(RDF::DC.title.to_s))
+        ctx = RDF::URI("http://example.com/profile")
+        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.prefix, RDF::Literal.new("foo"), :context => ctx)
+        @profile_repository << RDF::Statement.new(bn_p, RDF::RDFA.uri, RDF::Literal.new("http://example.org/"), :context => ctx)
+        @profile_repository << RDF::Statement.new(bn_t, RDF::RDFA.term, RDF::Literal.new("title"), :context => ctx)
+        @profile_repository << RDF::Statement.new(bn_t, RDF::RDFA.uri, RDF::Literal.new("http://example.org/title"), :context => ctx)
 
         # Clear vocabulary cache
         RDF::RDFa::Profile.cache.send(:initialize)
@@ -508,115 +503,49 @@ describe "RDF::RDFa::Reader" do
 
       it "should not recieve RDF::Reader.open" do
         RDF::Reader.should_not_receive(:open).with("http://example.com/profile")
+        @reader.each {|s|}
       end
 
-      it "should have type dc:Agent" do
-        @graph = RDF::Graph.new
-        @reader.each do |statement|
-          @graph << statement
-        end
-
-        @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF.type, RDF::DC.Agent))
-      end
-    
-      it "should have property dc:title" do
-        @graph = RDF::Graph.new
-        @reader.each do |statement|
-          @graph << statement
-        end
-
-        @graph.should have_statement(RDF::Statement.new(RDF::URI.new("http://example.com/doc"), RDF::DC.title, RDF::Literal.new("A particular agent")))
+      it "matches expected" do
+        graph = RDF::Graph.new << @reader
+        graph.should be_equivalent_graph(@expected, :trace => @debug.join("\n"))
       end
     end
   end
   
-  def self.test_cases(suite)
-    RdfaHelper::TestCase.test_cases(suite)
-  end
-
   # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
-  %w(xhtml html5 html5 svgtiny).each do |suite| # html4 html5
-    describe "w3c #{suite} testcases" do
-      describe "that are required" do
-        test_cases(suite).each do |t|
-          next unless t.classification =~ /required/
-          #next unless t.name =~ /0001/
-          specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
-            begin
-              #puts t.input
-              #puts t.results
-              t.debug = []
-              graph = parse(t.input,
-                  :base_uri => t.informationResourceInput,
-                  :debug => t.debug,
-                  :version => t.version)
-              graph.should pass_query(t.results, t)
-            rescue RSpec::Expectations::ExpectationNotMetError => e
-              if t.input =~ /XMLLiteral/
-                pending("XMLLiteral canonicalization not implemented yet")
-              else
-                raise
-              end
-            rescue SparqlException => e
-              pending(e.message) { raise }
-            end
-          end
-        end
-      end
-
-      describe "that are optional" do
-        test_cases(suite).each do |t|
-          next unless t.classification =~ /optional/
-          #next unless t.name =~ /0185/
-          #puts t.inspect
-          specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
-            begin
-              t.debug = []
-              graph = parse(t.input,
-                  :base_uri => t.informationResourceInput,
-                  :debug => t.debug,
-                  :version => t.version)
-              graph.should pass_query(t.results, t)
-            rescue SparqlException => e
-              pending(e.message) { raise }
-            rescue RSpec::Expectations::ExpectationNotMetError => e
-              if t.name =~ /01[789]\d/
-                raise
-              else
-                pending() {  raise }
+  describe "w3c test cases" do
+    require 'test_helper'
+    
+    Fixtures::TestCase::HOST_LANGUAGE_VERSION_SETS.each do |(host_language, version)|
+      describe "for #{host_language} #{version}" do
+        %w(required optional buggy).each do |classification|
+          describe "that are #{classification}" do
+            Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
+              specify "test #{t.name}: #{t.title}#{",  (negative test)" if t.expectedResults.false?}" do
+                begin
+                  #puts t.input
+                  #puts t.results
+                  t.debug = []
+                  graph = RDF::Graph.load(t.input(host_language, version), :debug => t.debug)
+                  query = Kernel.open(t.results(host_language, version))
+                  graph.should pass_query(query, t)
+                rescue RSpec::Expectations::ExpectationNotMetError => e
+                  if false # t.input =~ /XMLLiteral/
+                    pending("XMLLiteral canonicalization not implemented yet")
+                  elsif classification != "required"
+                    pending("#{classification} test") {  raise }
+                  else
+                    raise
+                  end
+                end
               end
             end
           end
         end
       end
-
-      describe "that are buggy" do
-        test_cases(suite).each do |t|
-          next unless t.classification =~ /buggy/
-          #next unless t.name =~ /0185/
-          #puts t.inspect
-          specify "test #{t.name}: #{t.title}#{",  (negative test)" unless t.expectedResults}" do
-            begin
-              t.debug = []
-              graph = parse(t.input,
-                  :base_uri => t.informationResourceInput,
-                  :debug => t.debug,
-                  :version => t.version)
-              graph.should pass_query(t.results, t)
-            rescue SparqlException => e
-              pending(e.message) { raise }
-            rescue RSpec::Expectations::ExpectationNotMetError => e
-              if t.name =~ /01[789]\d/
-                raise
-              else
-                pending() {  raise }
-              end
-            end
-          end
-        end
-      end
-   end
- end
+    end
+  end
 
   def parse(input, options)
     @debug = options[:debug] || []
