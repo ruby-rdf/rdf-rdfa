@@ -13,6 +13,7 @@ def help
   puts "      --dump:               Dump raw output, otherwise serialize to Ruby"
   puts "      --debug:              Display detailed debug output"
   puts "      --verbose:            Verbose processing"
+  puts "      --output:             Write to file"
   puts "      --help,-?:            This message"
   exit(0)
 end
@@ -65,7 +66,7 @@ START
       unless hash.empty?
         output.puts %(  :#{t} => {)
           hash.keys.map(&:to_s).sort.each do |k|
-            v = hash[k]
+            v = hash[k.to_sym]
             output.printf(%(    %*s => %s,\n), -key_width, k.inspect, v.inspect)
           end
         output.puts %(  },)
