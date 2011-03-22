@@ -148,7 +148,7 @@ module RDF::RDFa
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
         v << "term_mappings[#{term_mappings.keys.length}]"
-        v.join(",")
+        v.join(", ")
       end
     end
 
@@ -354,7 +354,7 @@ module RDF::RDFa
         @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, @base_uri)
         nc = RDF::Node.new
         @processor_graph << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
-        @processor_graph << RDF::Statement.new(nc, RDF::PTR.expression, node.path)
+        @processor_graph << RDF::Statement.new(nc, RDF::PTR.expression, node.path) if node.respond_to?(:path)
         @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, nc)
       end
     end
