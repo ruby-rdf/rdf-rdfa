@@ -89,6 +89,7 @@ module RDF::RDFa
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
     def initialize(output = $stdout, options = {}, &block)
+      self.profile_repository = options[:profile_repository] if options[:profile_repository]
       super do
         @uri_to_term_or_curie = {}
         @uri_to_prefix = {}
@@ -96,7 +97,6 @@ module RDF::RDFa
 
         block.call(self) if block_given?
       end
-      self.profile_repository = options[:profile_repository] if options[:profile_repository]
     end
 
     # @return [RDF::Repository]

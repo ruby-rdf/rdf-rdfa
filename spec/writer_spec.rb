@@ -8,15 +8,12 @@ class EX < RDF::Vocabulary("http://example/"); end
 describe RDF::RDFa::Writer do
   before(:each) do
     @graph = RDF::Graph.new
-    @writer = RDF::RDFa::Writer
+    @writer = RDF::RDFa::Writer.new
   end
   
   it_should_behave_like RDF_Writer
   
   describe "#buffer" do
-    context "with base" do
-    end
-
     describe "prefix definitions" do
       subject do
         @graph << [EX.a, RDF::DC.title, "foo"]
@@ -336,18 +333,15 @@ describe RDF::RDFa::Writer do
       end
     end
 
-    require 'rdfa_helper'
-    def self.test_cases
-      RdfaHelper::TestCase.test_cases("xhtml")
-    end
-
     # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
     describe "w3c xhtml testcases" do
-      test_cases.each do |t|
-        next unless t.classification =~ /required/ && t.expectedResults
+      require 'test_helper'
+
+      Fixtures::TestCase.for_specific("xhtml1", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
         next if t.name == "0212"  # XMLLiteral equivalence
         specify "test #{t.name}: #{t.title}" do
-          @graph = parse(t.input, :base_uri => t.informationResourceInput, :format => :rdfa)
+          input = t.input("xhtml1", "rdfa1.1")
+          @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
           result = serialize
           graph2 = parse(result, :format => :rdfa)
           graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
@@ -371,7 +365,7 @@ describe RDF::RDFa::Writer do
   # Serialize  @graph to a string and compare against regexps
   def serialize(options = {})
     @debug = []
-    result = @writer.buffer({:debug => @debug, :standard_prefixes => true}.merge(options)) do |writer|
+    result = RDF::RDFa::Writer.buffer({:debug => @debug, :standard_prefixes => true}.merge(options)) do |writer|
       writer << @graph
     end
     require 'cgi'
