@@ -525,7 +525,7 @@ describe "RDF::RDFa::Reader" do
               specify "test #{t.name}: #{t.title}#{",  (negative test)" if t.expectedResults.false?}" do
                 begin
                   t.debug = []
-                  graph = RDF::Graph.load(t.input(host_language, version), :debug => t.debug)
+                  graph = RDF::Graph.load(t.input(host_language, version), :debug => t.debug, :format => :rdfa)
                   query = Kernel.open(t.results(host_language, version))
                   graph.should pass_query(query, t)
                 rescue RSpec::Expectations::ExpectationNotMetError => e
