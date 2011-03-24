@@ -67,25 +67,44 @@ options = {
 }
 
 opts = GetoptLong.new(
-  ["--debug", GetoptLong::NO_ARGUMENT],
-  ["--verbose", GetoptLong::NO_ARGUMENT],
-  ["--quiet", GetoptLong::NO_ARGUMENT],
-  ["--host-language", GetoptLong::OPTIONAL_ARGUMENT],
-  ["--version", GetoptLong::OPTIONAL_ARGUMENT],
-  ["--validate", GetoptLong::NO_ARGUMENT],
+  ["--help", "-?", GetoptLong::NO_ARGUMENT],
+  ["--dbg", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
-  ["--processor-graph", GetoptLong::NO_ARGUMENT]
+  ["--host-language", "-h", GetoptLong::OPTIONAL_ARGUMENT],
+  ["--processor-graph", GetoptLong::NO_ARGUMENT],
+  ["--quiet", GetoptLong::NO_ARGUMENT],
+  ["--validate", GetoptLong::NO_ARGUMENT],
+  ["--verbose", GetoptLong::NO_ARGUMENT],
+  ["--version", "-v", GetoptLong::OPTIONAL_ARGUMENT],
 )
+
+def help(options)
+  puts "Usage: #{$0} [options] [test-number ...]"
+  puts "Options:"
+  puts "      --dump:               Dump raw output, otherwise serialize to Ruby"
+  puts "      --debug:              Display detailed debug output"
+  puts "      --format:             Format for output, defaults to #{options[:format].inspect}"
+  puts "      --host-language:      Run for specified host language, defaults to #{options[:host_language]}"
+  puts "      --processor-graph:    Output processor graph"
+  puts "      --quiet:              Minimal output"
+  puts "      --validate:           Validate input"
+  puts "      --verbose:            Verbose processing"
+  puts "      --version:            Version of processor to use (rdf1.0, rdf1.1). Defaults to #{options[:version]}"
+  puts "      --help,-?:            This message"
+  exit(0)
+end
+
 opts.each do |opt, arg|
   case opt
-  when '--verbose' then options[:verbose] = true
-  when '--quiet' then options[:quiet] = true
-  when '--debug' then ::RDF::RDFa::debug = true
-  when '--format' then options[:format] = arg.to_sym
-  when '--processor-graph' then options[:processor_graph] = true
-  when '--host-language' then options[:host_language] = arg
-  when '--version' then options[:version] = arg
-  when '--validate' then options[:validate] = true
+  when '--help'             then help(options)
+  when '--verbose'          then options[:verbose] = true
+  when '--quiet'            then options[:quiet] = true
+  when '--dbg'              then ::RDF::RDFa::debug = true
+  when '--format'           then options[:format] = arg.to_sym
+  when '--processor-graph'  then options[:processor_graph] = true
+  when '--host-language'    then options[:host_language] = arg
+  when '--version'          then options[:version] = arg
+  when '--validate'         then options[:validate] = true
   end
 end
 
