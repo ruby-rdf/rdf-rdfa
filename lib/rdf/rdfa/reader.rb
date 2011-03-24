@@ -40,7 +40,7 @@ module RDF::RDFa
       Regexp::EXTENDED)
   
     # Host language
-    # @return [:xhtml, :svg]
+    # @return [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg]
     attr_reader :host_language
     
     # Version
@@ -171,7 +171,7 @@ module RDF::RDFa
     #   the prefix mappings to use (not supported by all readers)
     # @option options [#to_s]    :base_uri     (nil)
     #   the base URI to use when resolving relative URIs
-    # @option options [:xhtml] :host_language (:xhtml)
+    # @option options [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:xhtml1)
     #   Host Language
     # @option options [:rdfa_1_0, :rdfa_1_1] :version (:rdfa_1_1)
     #   Parser version information
@@ -196,24 +196,25 @@ module RDF::RDFa
 
         @doc = case input
         when Nokogiri::HTML::Document
-          @host_language ||= :xhtml
+          @host_language ||= :xhtml1
         when Nokogiri::XML::Document
           input
         else
           # Intuit from content type
           @host_language ||= case input.respond_to?(:content_type) && input.content_type
           when "text/xml", "application/xml"
-            :xml
+            :xml1
           when "text/html", "application/xhtml+xml"
-            :xhtml
+            :xhtml1
           when "image/svg+xml"
             :svg
           end
           
           # Intuit from file extension
           @host_language ||= case input.respond_to?(:path) && File.extname(input.path.to_s)
-          when ".html", ".xhtml" then :xhtml
-          when ".svg"            then :svg
+          when ".html"  then :html5
+          when ".xhtml" then :xhtml1
+          when ".svg"   then :svg
           end
  
           Nokogiri::XML.parse(input, @base_uri.to_s)
@@ -233,12 +234,22 @@ module RDF::RDFa
         @version ||= :rdfa_1_1 if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.1/
         @version ||= :rdfa_1_1
 
+        # Intuit host_language from doctype
+        @host_language ||= case @doc.doctype.to_s
+        when /html 4/i      then :html4
+        when /xhtml\+rdfa/i then :xhtml1
+        when /html/         then :html5
+        end
+        
         # Determine host language from element name
         @host_language ||= case @doc.root.name.downcase.to_sym
-        when :html  then :xhtml
+        when :html  then :xhtml1
         when :svg   then :svg
-        else             :xhtml
+        else             :xml
         end
+
+        # Otherwise, treat it as XML
+        @host_language ||= :xml1
 
         # Section 4.2 RDFa Host Language Conformance
         #
@@ -249,10 +260,18 @@ module RDF::RDFa
           :profiles     => [],
         }
 
+        if @version == :rdfa_1_0
+          # Add default term mappings
+          @host_defaults[:term_mappings] = %w(
+            alternate appendix bookmark cite chapter contents copyright first glossary help icon index
+            last license meta next p3pv1 prev role section stylesheet subsection start top up
+            ).inject({}) { |hash, term| hash[term] = RDF::XHV[term]; hash }
+        end
+
         case @host_language
-        when :xml
+        when :xml1, :svg
           @host_defaults[:profiles] = [XML_RDFA_PROFILE]
-        when :xhtml
+        when :xhtml1, :xhtml5, :html4, :html5
           @host_defaults[:profiles] = [XML_RDFA_PROFILE, XHTML_RDFA_PROFILE]
         end
 
@@ -378,7 +397,7 @@ module RDF::RDFa
     def parse_whole_document(doc, base)
       # find if the document has a base element
       case @host_language
-      when :xhtml
+      when :xhtml1, :xhtml5, :html4, :html5
         base_el = doc.at_css("html>head>base")
         base = base_el.attribute("href").to_s.split("#").first if base_el
       end
@@ -524,7 +543,7 @@ module RDF::RDFa
       href = attrs['href']
       vocab = attrs['vocab']
       xml_base = element.attribute_with_ns("base", RDF::XML.to_s)
-      base = xml_base.to_s if xml_base && @host_language != :xhtml
+      base = xml_base.to_s if xml_base && ![:xhtml1, :xhtml5, :html4, :html5].include?(@host_language)
       base ||= evaluation_context.base
 
       # Pull out the attributes needed for the skip test.
@@ -664,15 +683,12 @@ module RDF::RDFa
         # otherwise,
         #   if parent object is present, new subject is set to the value of parent object.
         # Additionally, if @property is not present then the skip element flag is set to 'true';
-        new_subject ||= if @host_language == :xhtml && element.name =~ /^(head|body)$/ && base
+        new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/ && base
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
           uri(base)
-        elsif @host_language != :xhtml && base
-          # XXX Spec confusion, assume that this is true
-          uri(base)
-        elsif element.attributes['typeof']
+        elsif typeof
           RDF::Node.new
         else
           # if it's null, it's null and nothing changes
@@ -692,7 +708,7 @@ module RDF::RDFa
                                   :restrictions => [:uri])
       
         # If no URI is provided then the first match from the following rules will apply
-        new_subject ||= if @host_language == :xhtml && element.name =~ /^(head|body)$/
+        new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
@@ -733,7 +749,7 @@ module RDF::RDFa
       end
     
       # Generate triples with given object [Step 9]
-      if current_object_resource
+      if new_subject and current_object_resource
         rels.each do |r|
           add_triple(element, new_subject, r, current_object_resource)
         end
@@ -833,9 +849,9 @@ module RDF::RDFa
           add_error(element, e.message)
         end
 
-      # add each property
+        # add each property
         properties.each do |p|
-          add_triple(element, new_subject, p, current_object_literal)
+          add_triple(element, new_subject, p, current_object_literal) if new_subject
         end
       end
     
