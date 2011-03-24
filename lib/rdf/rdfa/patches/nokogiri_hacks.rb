@@ -17,6 +17,6 @@ end
 
 class Nokogiri::XML::Document
   def doctype
-    self.children.first.external_id rescue false
+    self.children.first rescue false
   end
 end
