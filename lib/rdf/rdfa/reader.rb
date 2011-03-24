@@ -14,16 +14,16 @@ module RDF::RDFa
     format Format
     
     SafeCURIEorCURIEorURI = {
-      :rdfa_1_0 => [:term, :safe_curie, :uri, :bnode],
-      :rdfa_1_1 => [:safe_curie, :curie, :term, :uri, :bnode],
+      :"rdfa1.0" => [:term, :safe_curie, :uri, :bnode],
+      :"rdfa1.1" => [:safe_curie, :curie, :term, :uri, :bnode],
     }
     TERMorCURIEorAbsURI = {
-      :rdfa_1_0 => [:term, :curie],
-      :rdfa_1_1 => [:term, :curie, :absuri],
+      :"rdfa1.0" => [:term, :curie],
+      :"rdfa1.1" => [:term, :curie, :absuri],
     }
     TERMorCURIEorAbsURIprop = {
-      :rdfa_1_0 => [:curie],
-      :rdfa_1_1 => [:term, :curie, :absuri],
+      :"rdfa1.0" => [:curie],
+      :"rdfa1.1" => [:term, :curie, :absuri],
     }
 
     NC_REGEXP = Regexp.new(
@@ -44,7 +44,7 @@ module RDF::RDFa
     attr_reader :host_language
     
     # Version
-    # @return [:rdfa_1_0, :rdfa_1_1]
+    # @return [:"rdfa1.0", :"rdfa1.1"]
     attr_reader :version
     
     # The Recursive Baggage
@@ -173,7 +173,7 @@ module RDF::RDFa
     #   the base URI to use when resolving relative URIs
     # @option options [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:xhtml1)
     #   Host Language
-    # @option options [:rdfa_1_0, :rdfa_1_1] :version (:rdfa_1_1)
+    # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
     #   Parser version information
     # @option options [Graph]    :processor_graph (nil)
     #   Graph to record information, warnings and errors.
@@ -229,10 +229,10 @@ module RDF::RDFa
         # Check for version of the processor to use:
         # * Check document type for "XHTML+RDFa 1.0"
         # * Check @version attribute on the html element for the value "XHTML+RDFa 1.0"
-        @version ||= :rdfa_1_0 if @doc.doctype.to_s =~ /RDFa 1\.0/
-        @version ||= :rdfa_1_0 if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.0/
-        @version ||= :rdfa_1_1 if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.1/
-        @version ||= :rdfa_1_1
+        @version ||= :"rdfa1.0" if @doc.doctype.to_s =~ /RDFa 1\.0/
+        @version ||= :"rdfa1.0" if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.0/
+        @version ||= :"rdfa1.1" if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.1/
+        @version ||= :"rdfa1.1"
 
         # Intuit host_language from doctype
         @host_language ||= case @doc.doctype.to_s
@@ -260,7 +260,7 @@ module RDF::RDFa
           :profiles     => [],
         }
 
-        if @version == :rdfa_1_0
+        if @version == :"rdfa1.0"
           # Add default term mappings
           @host_defaults[:term_mappings] = %w(
             alternate appendix bookmark cite chapter contents copyright first glossary help icon index
@@ -400,6 +400,9 @@ module RDF::RDFa
       when :xhtml1, :xhtml5, :html4, :html5
         base_el = doc.at_css("html>head>base")
         base = base_el.attribute("href").to_s.split("#").first if base_el
+      else
+        xml_base = doc.root.attribute_with_ns("base", RDF::XML.to_s)
+        base = xml_base if xml_base
       end
       
       if (base)
@@ -412,7 +415,7 @@ module RDF::RDFa
       # initialize the evaluation context with the appropriate base
       evaluation_context = EvaluationContext.new(base, @host_defaults)
       
-      if @version != :rdfa_1_0
+      if @version != :"rdfa1.0"
         # Process default vocabularies
         process_profile(doc.root, @host_defaults[:profiles]) do |which, value|
           add_debug(doc.root, "parse_whole_document, #{which}: #{value.inspect}")
@@ -476,7 +479,7 @@ module RDF::RDFa
         next if ns.prefix == "_"
 
         # Downcase prefix for RDFa 1.1
-        pfx_lc = (@version == :rdfa_1_0 || ns.prefix.nil?) ? ns.prefix : ns.prefix.to_s.downcase
+        pfx_lc = (@version == :"rdfa1.0" || ns.prefix.nil?) ? ns.prefix : ns.prefix.to_s.downcase
         if ns.prefix
           uri_mappings[pfx_lc.to_sym] = ns.href
           namespaces[pfx_lc] ||= ns.href
@@ -508,7 +511,7 @@ module RDF::RDFa
         uri_mappings[prefix.to_s.empty? ? nil : prefix.to_s.to_sym] = uri
         prefix(prefix, uri)
         add_info(element, "extract_mappings: prefix #{prefix} => <#{uri}>")
-      end unless @version == :rdfa_1_0
+      end unless @version == :"rdfa1.0"
     end
 
     # The recursive helper function
@@ -575,7 +578,7 @@ module RDF::RDFa
       # Local term mappings [7.5 Steps 2]
       # Next the current element is parsed for any updates to the local term mappings and local list of URI mappings via @profile.
       # If @profile is present, its value is processed as defined in RDFa Profiles.
-      unless @version == :rdfa_1_0
+      unless @version == :"rdfa1.0"
         begin
           process_profile(element, profiles) do |which, value|
             add_debug(element, "[Step 2] traverse, #{which}: #{value.inspect}")
@@ -683,7 +686,9 @@ module RDF::RDFa
         # otherwise,
         #   if parent object is present, new subject is set to the value of parent object.
         # Additionally, if @property is not present then the skip element flag is set to 'true';
-        new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/ && base
+        new_subject ||= if element == @doc.root && base
+          uri(base)
+        elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
@@ -708,7 +713,9 @@ module RDF::RDFa
                                   :restrictions => [:uri])
       
         # If no URI is provided then the first match from the following rules will apply
-        new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+        new_subject ||= if element == @doc.root && base
+          uri(base)
+        elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
@@ -802,7 +809,7 @@ module RDF::RDFa
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
             RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
-          elsif @version == :rdfa_1_1
+          elsif @version == :"rdfa1.1"
             if datatype.to_s == RDF.XMLLiteral.to_s
               # XML Literal
               add_debug(element, "[Step 11(1.1)] XML Literal: #{element.inner_html}")
@@ -942,7 +949,7 @@ module RDF::RDFa
         uri = curie_to_resource_or_bnode(element, value, options[:uri_mappings], evaluation_context.parent_subject, restrictions)
         if uri
           add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
-        elsif @version == :rdfa_1_0 && value.to_s.match(/^xml/i)
+        elsif @version == :"rdfa1.0" && value.to_s.match(/^xml/i)
           # Special case to not allow anything starting with XML to be treated as a URI
         elsif restrictions.include?(:absuri) || restrictions.include?(:uri)
           begin
@@ -1017,7 +1024,7 @@ module RDF::RDFa
         nil
       else
         # Prefixes always downcased
-        prefix = prefix.to_s.downcase unless @version == :rdfa_1_0
+        prefix = prefix.to_s.downcase unless @version == :"rdfa1.0"
         add_debug(element, "curie_to_resource_or_bnode check for #{prefix.to_s.to_sym.inspect} in #{uri_mappings.inspect}")
         ns = uri_mappings[prefix.to_s.to_sym]
         if ns
