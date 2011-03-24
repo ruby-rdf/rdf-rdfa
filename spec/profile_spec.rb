@@ -31,6 +31,10 @@ describe RDF::RDFa::Profile do
       it "has 74 terms" do
         subject.terms.keys.length.should == 74
       end
+      
+      it "uses symbols for term lookup" do
+        subject.terms.keys.all? {|k| k.is_a?(Symbol)}.should be_true
+      end
 
       it "has no vocabulary" do
         subject.vocabulary.should be_nil
@@ -54,6 +58,10 @@ describe RDF::RDFa::Profile do
 
       it "has 6 prefixes" do
         subject.prefixes.keys.length.should == 6
+      end
+
+      it "uses symbols for prefix lookup" do
+        subject.prefixes.keys.all? {|k| k.is_a?(Symbol)}.should be_true
       end
     end
   end
