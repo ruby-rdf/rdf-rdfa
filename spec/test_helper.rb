@@ -5,14 +5,16 @@ require 'rdf/n3'
 require 'open-uri'
 
 module Fixtures
+  SUITE = RDF::URI("http://rdfa.digitalbazaar.com/test-suite/")
+
   class TestCase
     HTMLRE = Regexp.new('([0-9]{4,4})\.xhtml')
     TCPATHRE = Regexp.compile('\$TCPATH')
 
     HOST_LANGUAGE_VERSION_SETS = [
       ["xhtml1",      "rdfa1.1"],
-      ["html4",       "rdfa1.1"],
       ["xml1",        "rdfa1.1"],
+      ["html4",       "rdfa1.1"],
       ["html5",       "rdfa1.1"],
       ["xhtml5",      "rdfa1.1"],
       ["xhtml1",      "rdfa1.0"],
@@ -85,6 +87,11 @@ module Fixtures
     end
   end
 
-  repo = RDF::Repository.load("http://rdfa.digitalbazaar.com/test-suite/manifest.ttl", :format => :n3)
+  local_manifest = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'manifest.ttl')
+  repo = if File.exist?(local_manifest)
+    RDF::Repository.load(local_manifest, :base_uri => SUITE.join("manifest.ttl"), :format => :n3)
+  else
+    RDF::Repository.load(SUITE.join("manifest.ttl"), :format => :n3)
+  end
   Spira.add_repository! :default, repo
 end

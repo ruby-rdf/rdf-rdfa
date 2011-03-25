@@ -25,7 +25,8 @@ def run_tc(tc, options)
     reader = RDF::RDFa::Reader.new(Kernel.open(input_uri),
       :base_uri => input_uri,
       :validate => options[:validate],
-      :processor_graph => pg)
+      :processor_graph => pg,
+      :version => options[:version])
 
     graph = RDF::Graph.new << reader
   rescue Exception => e

@@ -1,9 +1,9 @@
 source "http://rubygems.org"
 gem 'rdf',              :git => "https://github.com/gkellogg/rdf.git", :branch => "query-algebra"
+gem 'nokogiri',         '>= 1.3.3'
 
 group :development do
   gem 'open-uri-cached',  '>= 0.0.3'
-  gem 'nokogiri',         '>= 1.3.3'
   gem 'rdf-spec',         :git => "https://github.com/gkellogg/rdf-spec.git", :branch => "query-algebra", :require => 'rdf/spec'
   gem 'rdf-isomorphic',   '>= 0.3.4', :require => 'rdf/isomorphic'
   gem 'rdf-n3',           '>= 0.3.1', :require => 'rdf/n3'
