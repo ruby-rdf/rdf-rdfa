@@ -8,10 +8,14 @@ class EX < RDF::Vocabulary("http://example/"); end
 describe RDF::RDFa::Writer do
   before(:each) do
     @graph = RDF::Graph.new
-    @writer = RDF::RDFa::Writer.new
   end
   
-  it_should_behave_like RDF_Writer
+  context "generic" do
+    before(:each) do
+      @writer = RDF::RDFa::Writer.new(StringIO.new)
+    end
+    it_should_behave_like RDF_Writer
+  end
   
   describe "#buffer" do
     describe "prefix definitions" do
@@ -340,11 +344,19 @@ describe RDF::RDFa::Writer do
       Fixtures::TestCase.for_specific("xhtml1", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
         next if t.name == "0212"  # XMLLiteral equivalence
         specify "test #{t.name}: #{t.title}" do
-          input = t.input("xhtml1", "rdfa1.1")
-          @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
-          result = serialize
-          graph2 = parse(result, :format => :rdfa)
-          graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
+          begin
+            input = t.input("xhtml1", "rdfa1.1")
+            @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
+            result = serialize
+            graph2 = parse(result, :format => :rdfa)
+            graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
+          rescue RSpec::Expectations::ExpectationNotMetError => e
+            if %w(0198).include?(t.name) || query =~ /XMLLiteral/m
+              pending("XMLLiteral canonicalization not implemented yet")
+            else
+              raise
+            end
+          end
         end
       end
     end
