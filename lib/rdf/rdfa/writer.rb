@@ -219,6 +219,7 @@ module RDF::RDFa
       (@options[:prefixes] || {}).each_pair do |k, v|
         @uri_to_prefix[RDF::URI.intern(v)] = k
       end
+      @options[:prefixes] = {}  # Will define actual used when matched
       
       # Process each statement to establish CURIEs and Terms
       @graph.each {|statement| preprocess_statement(statement)}
@@ -525,14 +526,24 @@ module RDF::RDFa
       @uri_to_prefix.keys.each do |u|
         if uri_s.index(u.to_s) == 0
           prefix = @uri_to_prefix[u]
+          prefix(prefix.to_sym, u)  # Define for output
           return @uri_to_term_or_curie[uri] = uri_s.sub(u.to_s, "#{prefix}:")
         end
       end
       
-      # Use a standard prefix
+      # Use standard profile prefixes
+      rdfcore_prof = RDF::RDFa::Profile.find(RDF::URI("http://www.w3.org/profile/rdfa-1.1"))
+      rdfcore_prof.prefixes.each do |pfx, u|
+        if uri_s.index(u.to_s) == 0
+          prefix(pfx, u)  # Define for output
+          return @uri_to_term_or_curie[uri] = uri_s.sub(u.to_s, "#{pfx}:")
+        end
+      end
+
+      # Use a standard prefix from RDF.rb
       if @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri_s.index(v.to_uri.to_s) == 0}
         prefix = vocab.__name__.to_s.split('::').last.downcase
-        prefix(prefix.to_sym, vocab.to_uri)
+        prefix(prefix.to_sym, vocab.to_uri) # Define for output
         return @uri_to_term_or_curie[uri] = uri_s.sub(vocab.to_uri.to_s, "#{prefix}:")
       end
       

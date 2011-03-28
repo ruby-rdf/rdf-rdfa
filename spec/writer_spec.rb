@@ -18,23 +18,18 @@ describe RDF::RDFa::Writer do
   end
   
   describe "#buffer" do
-    describe "prefix definitions" do
+    context "prefix definitions" do
       subject do
         @graph << [EX.a, RDF::DC.title, "foo"]
-        serialize
+        serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
       end
 
-      {
-        "/xhtml:html/@prefix" => %r(dc: http://purl.org/dc/terms/),
-        "/xhtml:html/@prefix" => %r(ex: http://example/),
-      }.each do |path, value|
-        it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value)
-        end
-      end
+      specify { subject.should have_xpath("/xhtml:html/@prefix", %r(dc: http://purl.org/dc/terms/))}
+      specify { subject.should have_xpath("/xhtml:html/@prefix", %r(ex: http://example/))}
+      specify { subject.should_not have_xpath("/xhtml:html/@prefix", %r(bibo:))}
     end
-    
-    describe "plain literal" do
+
+    context "plain literal" do
       subject do
         @graph << [EX.a, EX.b, "foo"]
         serialize
@@ -51,10 +46,10 @@ describe RDF::RDFa::Writer do
       end
     end
 
-    describe "dc:title" do
+    context "dc:title" do
       subject do
         @graph << [EX.a, RDF::DC.title, "foo"]
-        serialize
+        serialize(:prefixes => {:dc => RDF::DC.to_s})
       end
 
       {
@@ -70,7 +65,7 @@ describe RDF::RDFa::Writer do
     end
 
     context "typed resources" do
-      describe "typed resource" do
+      context "typed resource" do
         subject do
           @graph << [EX.a, RDF.type, EX.Type]
           serialize
@@ -86,7 +81,7 @@ describe RDF::RDFa::Writer do
         end
       end
 
-      describe "resource with two types" do
+      context "resource with two types" do
         subject do
           @graph << [EX.a, RDF.type, EX.t1]
           @graph << [EX.a, RDF.type, EX.t2]
@@ -105,10 +100,10 @@ describe RDF::RDFa::Writer do
     end
 
     context "languaged tagged literals" do
-      describe "literal with language and no default language" do
+      context "literal with language and no default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
-          serialize
+          serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
         end
 
         {
@@ -121,7 +116,7 @@ describe RDF::RDFa::Writer do
         end
       end
 
-      describe "literal with language and same default language" do
+      context "literal with language and same default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
           serialize(:lang => :en)
@@ -129,7 +124,6 @@ describe RDF::RDFa::Writer do
 
         {
           "/xhtml:html/@lang" => "en",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@property" => "dc:title",
           "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@lang" => false,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
@@ -138,7 +132,7 @@ describe RDF::RDFa::Writer do
         end
       end
 
-      describe "literal with language and different default language" do
+      context "literal with language and different default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
           serialize(:lang => :de)
@@ -146,7 +140,6 @@ describe RDF::RDFa::Writer do
 
         {
           "/xhtml:html/@lang" => "de",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@property" => "dc:title",
           "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@lang" => "en",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
@@ -175,7 +168,7 @@ describe RDF::RDFa::Writer do
         end
       end
 
-      describe "xsd:time" do
+      context "xsd:time" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::Time.new("12:34:56")]
           serialize
@@ -193,7 +186,7 @@ describe RDF::RDFa::Writer do
         end
       end
 
-      describe "xsd:dateTime" do
+      context "xsd:dateTime" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::DateTime.new("2011-03-18T12:34:56")]
           serialize
@@ -211,7 +204,7 @@ describe RDF::RDFa::Writer do
         end
       end
 
-      describe "rdf:XMLLiteral" do
+      context "rdf:XMLLiteral" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::XML.new("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time")]
           serialize
@@ -228,7 +221,7 @@ describe RDF::RDFa::Writer do
         end
       end
       
-      describe "xsd:string" do
+      context "xsd:string" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", :datatype => RDF::XSD.string)]
           serialize
@@ -245,7 +238,7 @@ describe RDF::RDFa::Writer do
         end
       end
       
-      describe "unknown" do
+      context "unknown" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", :datatype => EX.unknown)]
           serialize
