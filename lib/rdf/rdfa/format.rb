@@ -18,11 +18,8 @@ module RDF::RDFa
   #
   # @see http://www.w3.org/TR/rdf-testcases/#ntriples
   class Format < RDF::Format
-    content_type     'text/html', :extension => :html
-    content_type     'application/xhtml+xml', :extension => :xhtml
-    content_type     'image/svg+xml', :extension => :svg
     content_encoding 'utf-8'
-
+    content_type     'text/html', :extension => :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
     XMLNS = 'http://www.w3.org/1999/xhtml'  # FIXME: This or XHV or none at all?
@@ -37,6 +34,8 @@ module RDF::RDFa
   #   RDF::Format.for(:html).reader  # RDF::RDFa::Reader
   #   RDF::Format.for(:html).writer  # RDF::RDFa::Writer
   class HTML < RDF::Format
+    content_encoding 'utf-8'
+    content_type     'text/html', :extension => :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
@@ -50,6 +49,8 @@ module RDF::RDFa
   #   RDF::Format.for(:xhtml).reader  # RDF::RDFa::Reader
   #   RDF::Format.for(:xhtml).writer  # RDF::RDFa::Writer
   class XHTML < RDF::Format
+    content_encoding 'utf-8'
+    content_type     'application/xhtml+xml', :extension => :xhtml
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
@@ -63,6 +64,8 @@ module RDF::RDFa
   #   RDF::Format.for(:svg).reader  # RDF::RDFa::Reader
   #   RDF::Format.for(:svg).writer  # RDF::RDFa::Writer
   class SVG < RDF::Format
+    content_encoding 'utf-8'
+    content_type     'image/svg+xml', :extension => :svg
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
