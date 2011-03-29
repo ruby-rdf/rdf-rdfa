@@ -37,8 +37,8 @@ describe RDF::RDFa::Writer do
 
       {
         "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@property" => "ex:b",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/text()" => "foo",
+        "//xhtml:div[@class='property']/xhtml:span[@property]/@property" => "ex:b",
+        "//xhtml:div[@class='property']/xhtml:span[@property]/text()" => "foo",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value)
@@ -157,10 +157,10 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@property" => "ex:b",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@datatype" => "xsd:date",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@content" => "2011-03-18",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/text()" => "Friday, 18 March 2011",
+          "//xhtml:span[@property]/@property" => "ex:b",
+          "//xhtml:span[@property]/@datatype" => "xsd:date",
+          "//xhtml:span[@property]/@content" => "2011-03-18",
+          "//xhtml:span[@property]/text()" => "Friday, 18 March 2011",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             subject.should have_xpath(path, value)
@@ -175,10 +175,10 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@property" => "ex:b",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@datatype" => "xsd:time",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@content" => "12:34:56",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/text()" => /12:34:56/,
+          "//xhtml:span[@property]/@property" => "ex:b",
+          "//xhtml:span[@property]/@datatype" => "xsd:time",
+          "//xhtml:span[@property]/@content" => "12:34:56",
+          "//xhtml:span[@property]/text()" => /12:34:56/,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             subject.should have_xpath(path, value)
@@ -193,10 +193,10 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@property" => "ex:b",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@datatype" => "xsd:dateTime",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@content" => "2011-03-18T12:34:56",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/text()" => /12:34:56 \w+ on Friday, 18 March 2011/,
+          "//xhtml:span[@property]/@property" => "ex:b",
+          "//xhtml:span[@property]/@datatype" => "xsd:dateTime",
+          "//xhtml:span[@property]/@content" => "2011-03-18T12:34:56",
+          "//xhtml:span[@property]/text()" => /12:34:56 \w+ on Friday, 18 March 2011/,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             subject.should have_xpath(path, value)
@@ -211,9 +211,9 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@property" => "ex:b",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@datatype" => "rdf:XMLLiteral",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span" => %r(<span [^>]+>E = mc<sup>2</sup>: The Most Urgent Problem of Our Time<\/span>),
+          "//xhtml:span[@property]/@property" => "ex:b",
+          "//xhtml:span[@property]/@datatype" => "rdf:XMLLiteral",
+          "//xhtml:span[@property]" => %r(<span [^>]+>E = mc<sup>2</sup>: The Most Urgent Problem of Our Time<\/span>),
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             subject.should have_xpath(path, value)
@@ -228,9 +228,9 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@property" => "ex:b",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@datatype" => "xsd:string",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/text()" => "Albert Einstein",
+          "//xhtml:span[@property]/@property" => "ex:b",
+          "//xhtml:span[@property]/@datatype" => "xsd:string",
+          "//xhtml:span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             subject.should have_xpath(path, value)
@@ -245,9 +245,9 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@property" => "ex:b",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/@datatype" => "ex:unknown",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:span/text()" => "Albert Einstein",
+          "//xhtml:span[@property]/@property" => "ex:b",
+          "//xhtml:span[@property]/@datatype" => "ex:unknown",
+          "//xhtml:span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             subject.should have_xpath(path, value)
@@ -264,9 +264,9 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/@property" => "ex:b",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/xhtml:li[1]/text()" => "c",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/xhtml:li[2]/text()" => "d",
+        "//xhtml:ul/@property" => "ex:b",
+        "//xhtml:ul/xhtml:li[1]/text()" => "c",
+        "//xhtml:ul/xhtml:li[2]/text()" => "d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value)
@@ -281,9 +281,9 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:a/@rel" => "ex:b",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:a/@href" => EX.c.to_s,
+        "//xhtml:div/@about" => "ex:a",
+        "//xhtml:a/@rel" => "ex:b",
+        "//xhtml:a/@href" => EX.c.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value)
@@ -299,10 +299,10 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/@rel" => "ex:b",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/xhtml:li[1]/@about" => "ex:c",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/xhtml:li[2]/@about" => "ex:d",
+        "//xhtml:div/@about" => "ex:a",
+        "//xhtml:ul/@rel" => "ex:b",
+        "//xhtml:ul/xhtml:li[1]/xhtml:a/@href" => EX.c.to_s,
+        "//xhtml:ul/xhtml:li[2]/xhtml:a/@href" => EX.d.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value)
@@ -314,15 +314,15 @@ describe RDF::RDFa::Writer do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.c, EX.d, EX.e]
-        serialize
+        serialize(:haml_options => {:ugly => false})
       end
 
       {
         "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/@rel" => "ex:b",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/xhtml:li/@about" => "ex:c",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/xhtml:li/xhtml:a/@rel" => "ex:d",
-        "/xhtml:html/xhtml:body/xhtml:div/xhtml:ul/xhtml:li/xhtml:a/@href" => EX.e.to_s,
+        "//xhtml:div[@about='ex:a']/xhtml:div[@class='property']/xhtml:div[@rel]/@rel" => "ex:b",
+        "//xhtml:div[@rel]/xhtml:div[@about]/@about" => "ex:c",
+        "//xhtml:div[@rel]/xhtml:div[@about]//xhtml:a/@href" => EX.e.to_s,
+        "//xhtml:div[@rel]/xhtml:div[@about]//xhtml:a/@rel" => "ex:d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value)
@@ -344,7 +344,7 @@ describe RDF::RDFa::Writer do
             graph2 = parse(result, :format => :rdfa)
             graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
           rescue RSpec::Expectations::ExpectationNotMetError => e
-            if %w(0198).include?(t.name) || query =~ /XMLLiteral/m
+            if %w(0198).include?(t.name) || result =~ /XMLLiteral/m
               pending("XMLLiteral canonicalization not implemented yet")
             else
               raise

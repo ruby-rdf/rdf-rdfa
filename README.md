@@ -38,6 +38,7 @@ Install with 'gem install rdf-rdfa'
 ## Dependencies
 * [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.1)
 * [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.3.3)
+* [Haml](https://rubygems.org/gems/haml) (>= 3.0.0)
 
 ## Documentation
 Full documentation available on [RubyForge](http://rdf.rubyforge.org/rdfa)

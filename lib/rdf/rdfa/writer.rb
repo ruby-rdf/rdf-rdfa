@@ -1,4 +1,4 @@
-require 'nokogiri'  # FIXME: Implement using different modules as in RDF::TriX
+require 'haml'
 require 'rdf/rdfa/patches/graph_properties'
 
 module RDF::RDFa
@@ -57,6 +57,9 @@ module RDF::RDFa
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Writer < RDF::Writer
     format RDF::RDFa::Format
+    HAML_OPTIONS = {
+      :ugly => true, # to preserve whitespace without using entities
+    }
 
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
@@ -86,6 +89,11 @@ module RDF::RDFa
     #   Add standard prefixes to _prefixes_, if necessary.
     # @option options [Repository] :profile_repository (nil)
     #   Repository to find and save profile graphs.
+    # @option options [Hash<Symbol => String>] :haml (DEFAULT_HAML)
+    #   HAML templates used for generating code
+    # @option options [Hash] :haml_options (HAML_OPTIONS)
+    #   Options to pass to Haml::Engine.new. Default options set :ugly => true
+    #   to ensure that whitespace in literals with newlines is properly preserved.
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
     def initialize(output = $stdout, options = {}, &block)
@@ -97,6 +105,11 @@ module RDF::RDFa
 
         block.call(self) if block_given?
       end
+    end
+
+    # @return [Hash<Symbol => String>]
+    def haml_template
+      @options[:haml] || DEFAULT_HAML
     end
 
     # @return [RDF::Repository]
@@ -149,51 +162,38 @@ module RDF::RDFa
       @debug = @options[:debug]
       self.reset
 
-      doc = Nokogiri::XML::Document.new
-
       add_debug "\nserialize: graph size: #{@graph.size}"
 
       preprocess
 
       add_debug "\nserialize: graph prefixes: #{prefixes.inspect}"
 
-      doc.root = Nokogiri::XML::Element.new("html", doc)
-      doc.root.default_namespace = "http://www.w3.org/1999/xhtml"
-      doc.root["lang"] = @lang.to_s.downcase if @lang
+      # Profiles
+      profile = @options[:profiles].join(" ") if @options[:profiles]
 
-      # Base
-      head = Nokogiri::XML::Element.new("head", doc)
-      doc.root.add_child(head)
+      # Prefixes
+      prefix = prefixes.keys.map {|pk| "#{pk}: #{prefixes[pk]}"}.sort.join(" ") unless prefixes.empty?
 
-      if @base_uri
-        base = Nokogiri::XML::Element.new("base", doc)
-        base["href"] = @base_uri
-        head.add_child(base)
-      end
-
-      body = Nokogiri::XML::Element.new("body", doc)
-      doc.root.add_child(body)
+      subjects = order_subjects
       
-      # Determine prefixes that need to be generated
-
-      unless (profiles = @options[:profiles] || []).empty?
-        add_debug "serialize: add profiles #{profiles.inspect}"
-        doc.root["profile"] = profiles.join(" ")
+      # If the first subject has a predicate which we recognize has being for a title,
+      # use it as the document title.
+      @graph.properties(subjects.first).each do |pred, value|
+        next unless heading_predicates.include?(pred)
+        @doc_title ||= value.first
       end
 
-      # Add statements for each subject
-      order_subjects.each do |subject|
-        #add_debug "subj: #{subject.inspect}"
-        subject(subject, body)
+      # Generate document
+      doc = hamlify(:doc,
+        :lang     => @lang,
+        :base     => @base_uri,
+        :title    => @doc_title,
+        :profile  => profile,
+        :prefix   => prefix,
+        :subjects => subjects) do |s|
+        subject(s)
       end
-
-      # Profile and Prefixes
-      unless prefixes.empty?
-        add_debug "serialize: add prefixes #{prefixes.inspect}"
-        doc.root["prefix"] = prefixes.keys.map {|pk| "#{pk}: #{prefixes[pk]}"}.sort.join(" ")
-      end
-
-      doc.write_xml_to(@output, :encoding => "UTF-8", :indent => 2)
+      @output.write(doc)
     end
 
     protected
@@ -209,7 +209,7 @@ module RDF::RDFa
         end
         
         prof.terms.each_pair do |k, v|
-          @uri_to_term_or_curie[v] = k
+          @uri_to_term_or_curie[v] = RDF::URI.intern(k)
         end
         
         @vocabulary = prof.vocabulary.to_s
@@ -217,7 +217,7 @@ module RDF::RDFa
       
       # Load defined prefixes
       (@options[:prefixes] || {}).each_pair do |k, v|
-        @uri_to_prefix[RDF::URI.intern(v)] = k
+        @uri_to_prefix[v.to_s] = k
       end
       @options[:prefixes] = {}  # Will define actual used when matched
       
@@ -277,11 +277,12 @@ module RDF::RDFa
       prop_list = []
       
       properties.keys.sort.each do |prop|
-        next if prop_list.include?(prop.to_s)
-        prop_list << prop.to_s
+        prop = prop =~ /^_:(.*)$/ ? RDF::Node.intern($1) : RDF::URI.intern(prop)
+        next if prop_list.include?(prop)
+        prop_list << prop
       end
       
-      add_debug "order_properties: #{prop_list.join(', ')}"
+      add_debug "order_properties: #{prop_list.inspect}"
       prop_list
     end
 
@@ -293,6 +294,10 @@ module RDF::RDFa
       references = ref_count(statement.object) + 1
       @references[statement.object] = references
       @subjects[statement.subject] = true
+      get_curie(statement.subject)
+      get_curie(statement.predicate)
+      get_curie(statement.object)
+      get_curie(statement.object.datatype) if statement.object.literal? && statement.object.has_datatype?
     end
     
     def reset
@@ -318,64 +323,47 @@ module RDF::RDFa
     #
     # @param [RDF::Resource] subject
     # @param [Nokogiri::XML::Element] parent_node
-    # @param [Hash] options ({})
-    # @option options [String] :div ("div") Element name, defaults to "div"
     # @return [Nokogiri::XML::Element, {Namespace}]
-    def subject(subject, parent_node, options = {})
+    def subject(subject)
       return if is_done?(subject)
       
-      options[:div] ||= "div"
-
       subject_done(subject)
-      
-      resource_uri = if subject.is_a?(RDF::Node)
-        # Only need a CURIE if node is referenced elsewhere
-        get_curie(subject) if ref_count(subject) > (@depth == 0 ? 0 : 1)
-      else
-        get_curie(subject)
-      end
       
       properties = @graph.properties(subject)
       prop_list = order_properties(properties)
       
+      curie = get_curie(subject)
+
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
+      typeof = nil if typeof.empty?
       prop_list -= [RDF.type.to_s]
 
-      node = Nokogiri::XML::Element.new(options[:div], parent_node.document)
-      node["about"] = resource_uri if resource_uri
-      node["typeof"] = typeof if typeof.length > 0 || resource_uri.nil?
-      add_debug "subject: #{resource_uri.inspect}, about: #{resource_uri}, typeof: #{typeof}, props: #{properties.inspect}"
+      add_debug "subject: #{curie.inspect}, typeof: #{typeof}, props: #{prop_list.inspect}"
 
-      # Output properties as unordered list
-      prop_nodes = []
-      @depth += 1
-      prop_list.each do |pred|
-        values = properties[pred]
-        add_debug "subject: #{resource_uri.inspect}, pred: #{pred}, values: #{values.inspect}"
-        if heading_predicates.include?(pred)
-          # Add heading-type nodes
-          values.each do |v|
-            h = Nokogiri::XML::Element.new("h#{@depth}", parent_node.document)
-            h["property"] = get_curie(pred)
-            h.content = v.to_s
-            h["lang"] = v.language.to_s.downcase if v.language && v.language.to_s.downcase != @lang.to_s.downcase
-            node.add_child(h)
-            
-            # if depth is 1, also set document title to head
-            if @depth == 1
-              title = Nokogiri::XML::Element.new("title", parent_node.document)
-              title.content = v.to_s
-              head = parent_node.document.at_css("head")
-              head.add_child(title)
-            end
-          end
-        else
-          predicate(pred, values, node, options.merge(:div => "li"))
+      template_key = haml_template[:subject_template].select do |r, t|
+        subject.to_s.match(r)
+      end.values.first
+
+      # Find appropriate template
+      template_key ||= case
+      when subject.node?
+        ref_count(subject) >= (@depth == 0 ? 0 : 1) ? :node_subject : :anon_subject
+      else
+        :default_subject
+      end
+
+      # Render this subject
+      sub = hamlify(template_key,
+        :subject    => subject,
+        :about      => curie,
+        :typeof     => typeof,
+        :predicates => prop_list) do |pred|
+        depth do
+          values = properties[pred.to_s]
+          add_debug "subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"
+          predicate(pred, values)
         end
       end
-      @depth -= 1
-
-      parent_node.add_child(node)
     end
     
     # Write a predicate with one or more values.
@@ -384,100 +372,119 @@ module RDF::RDFa
     #
     # Multi-valued properties are generated with a _ul_ and _li_. Single-valued
     # are generated with a span or anchor
-    def predicate(pred, values, parent_node, options)
+    def predicate(pred, values)
       add_debug "predicate: #{pred.inspect}, values: #{values}"
-      return if values.empty?
       
-      list_type = "ul"  # FIXME, logic to determine if should use ordered list
-      
-      case values.length
+      case (values || []).length
+      when 0
+        nil
       when 1
-        # Display with span or anchor
-        child = case object = values.first
+        case object = values.first
         when RDF::Node, RDF::URI
-          if is_done?(object) || !@subjects.include?(object)
-            # Show as reference to non-subject or previously serialized node
-            show_ref(object, parent_node, :predicate => pred, :div => object.node? ? "span" : "a")
-          else
-            node = Nokogiri::XML::Element.new(list_type, parent_node.document)
-            node["rel"] = get_curie(pred)
-            @depth += 1
-            subject(object, node, options.merge(:div => "li"))
-            @depth -= 1
-            parent_node.add_child(node)
+          hamlify(:single_resource, :property => get_curie(pred), :object => object) do |o|
+            if is_done?(object) || !@subjects.include?(object)
+              show_ref(o, get_curie(pred))
+            else
+              hamlify("%div{:rel => #{get_curie(pred).inspect}}\n  != yield") {depth {subject(o)}}
+            end
           end
-        else  # Literal
-          show_lit(object, parent_node, :predicate => pred, :div => "span")
+        else
+          template_key = heading_predicates.include?(pred) ? :heading_literal : :single_literal
+          show_lit(object, pred, template_key)
         end
       else
-        add_debug("multi-value property")
-        node = Nokogiri::XML::Element.new(list_type, parent_node.document)
-        
-        # Use either or both of @property and @rel depending on if values include literals or uri/node
-        node["property"] = get_curie(pred) if values.any?(&:literal?)
-        node["rel"] = get_curie(pred) if values.any?(&:uri?) || values.any?(&:node?)
-        values.each do |object|
-          add_debug("val: #{object}")
-          if object.literal?
-            show_lit(object, node, :div => "li")
-          elsif !is_done?(object) && !@subjects.include?(object)
-            @depth += 1
-            subject(object, node, options.merge(:div => "li"))
-            @depth -= 1
+        property = get_curie(pred) if values.any?(&:literal?)
+        rel = get_curie(pred) if values.any?(&:uri?) || values.any?(&:node?)
+
+        add_debug("multi-value property: prop=#{property.inspect}, rel=#{rel.inspect}")
+
+        hamlify(:multiple_resource,
+          :property => property,
+          :rel      => rel,
+          :objects  => values) do |o|
+          add_debug("val: #{o}")
+          if o.literal?
+            show_lit(o, pred, :_literal)
+          elsif !is_done?(o) && @subjects.include?(o)
+            hamlify("%li\n  != yield") {depth {subject(o)}}
           else
-            show_ref(object, node, :div => "li")
+            hamlify("%li\n  != yield") {show_ref(o, nil)}
           end
         end
-        parent_node.add_child(node)
       end
     end
     
-    def show_ref(object, parent_node, options)
-      tag = options[:div] || "li"
-      
-      node = Nokogiri::XML::Element.new(tag, parent_node.document)
-      node["rel"] = get_curie(options[:predicate]) if options[:predicate]
-      
-      if tag == "a"
-        node["href"] = object.to_s
-      else
-        node["resource"] = get_curie(object)
-      end
-      parent_node.add_child(node)
+    # Increase depth around a method invocation
+    def depth
+      @depth += 1
+      ret = yield
+      @depth -= 1
+      ret
     end
     
-    def show_lit(object, parent_node, options)
-      tag = options[:div] || "li"
+    def show_ref(object, rel)
+      template_key = haml_template[:object_template].select do |r, t|
+        object.to_s.match(r)
+      end.values.first
       
-      node = Nokogiri::XML::Element.new(tag, parent_node.document)
-      node["property"] = get_curie(options[:predicate]) if options[:predicate]
-      
-      add_debug "show_lit: #{object.inspect}, typed: #{object.typed?.inspect}, XML: #{object.is_a?(RDF::Literal::XML)}"
+      template_key ||= :default_resource
+      curie = get_curie(object)
+
+      hamlify(template_key, :object => object, :curie  => curie, :rel => rel)
+    end
+    
+    def show_lit(object, predicate, template_key)
+      add_debug "show_lit: #{object.inspect}, template: #{template_key.inspect}, typed: #{object.typed?.inspect}, XML: #{object.is_a?(RDF::Literal::XML)}"
+
+      template = haml_template[template_key]
+      template = haml_template[:xml_literal][template_key] if object.datatype == RDF.XMLLiteral
+
+      property = get_curie(predicate)
+      datatype = language = content = nil
+      value = object.to_s
+
       if object.typed?
-        node["datatype"] = get_curie(object.datatype)
+        datatype = get_curie(object.datatype)
         case object
         when RDF::Literal::Date
-          node["content"] = object.to_s
-          node.content = object.object.strftime("%A, %d %B %Y")
+          content = object.to_s
+          value = object.object.strftime("%A, %d %B %Y")
         when RDF::Literal::Time
-          node["content"] = object.to_s
-          node.content = object.object.strftime("%H:%M:%S %Z").sub(/\+00:00/, "UTC")
+          content = object.to_s
+          value = object.object.strftime("%H:%M:%S %Z").sub(/\+00:00/, "UTC")
         when RDF::Literal::DateTime
-          node["content"] = object.to_s
-          node.content = object.object.strftime("%H:%M:%S %Z on %A, %d %B %Y").sub(/\+00:00/, "UTC")
-        when RDF::Literal::XML
-          node.inner_html = object.to_s
-        else
-          node.content = object.to_s
+          content = object.to_s
+          value = object.object.strftime("%H:%M:%S %Z on %A, %d %B %Y").sub(/\+00:00/, "UTC")
         end
       else
-        node.content = object.to_s
-        node["lang"] = object.language.to_s if object.language && object.language.to_s != @options[:language]
+        language = object.language.to_sym if object.language && object.language.to_sym != @options[:lang]
+        STDERR.puts("lit lang: #{language.inspect}, base #{@options[:lang].inspect}") if language
       end
-      
-      parent_node.add_child(node)
+
+      #add_debug "show_lit key: #{template_key}, template: #{template}"
+      hamlify(template,
+        :depth    => (@depth / 2), 
+        :property => property,
+        :datatype => datatype,
+        :lang     => language,
+        :content  => content,
+        :value    => value)
     end
     
+    # Render HAML
+    # @param [Symbol, String] template
+    #   If a symbol, finds a matching template from haml_template, otherwise uses template as is
+    # @param [Hash{Symbol => Object}] locals
+    #   Locals to pass to render
+    # @return [String]
+    def hamlify(template, locals = {})
+      template = haml_template[template] if template.is_a?(Symbol)
+
+      Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(Object.new, locals) do |*args|
+        yield(*args) if block_given?
+      end
+    end
+
     # Mark a subject as done.
     def subject_done(subject)
       @serialized[subject] = true
@@ -502,55 +509,45 @@ module RDF::RDFa
     end
 
     # Return appropriate, term, curie or URI for the given uri
-    # @param [URI,#to_s] uri
+    # @param [RDF::Resource] resource
     # @return [String] value to use to identify URI
-    def get_curie(uri)
-      return uri.to_s if uri.is_a?(RDF::Node)
-      uri_s = uri.to_s
-      uri = RDF::URI.intern(uri)
-      return @uri_to_term_or_curie[uri] if @uri_to_term_or_curie.has_key?(uri)
-      
-      return uri.to_s if uri.is_a?(RDF::Node)
-      
-      # Use @base_uri
-      if @base_uri && uri_s.index(@base_uri.to_s) == 0
-        return @uri_to_term_or_curie[uri] = uri_s.sub(@base_uri.to_s, "")
-      end
-      
-      # Use default vocabulary
-      if @vocabulary && uri_s.index(@vocabulary) == 0
-        return @uri_to_term_or_curie[uri] = uri_s.sub(@vocabulary, "")
-      end
-      
-      # Use a defined prefix
-      @uri_to_prefix.keys.each do |u|
-        if uri_s.index(u.to_s) == 0
-          prefix = @uri_to_prefix[u]
-          prefix(prefix.to_sym, u)  # Define for output
-          return @uri_to_term_or_curie[uri] = uri_s.sub(u.to_s, "#{prefix}:")
-        end
-      end
-      
-      # Use standard profile prefixes
-      rdfcore_prof = RDF::RDFa::Profile.find(RDF::URI("http://www.w3.org/profile/rdfa-1.1"))
-      rdfcore_prof.prefixes.each do |pfx, u|
-        if uri_s.index(u.to_s) == 0
-          prefix(pfx, u)  # Define for output
-          return @uri_to_term_or_curie[uri] = uri_s.sub(u.to_s, "#{pfx}:")
-        end
-      end
+    def get_curie(resource)
+      return resource.to_s unless resource.uri?
 
-      # Use a standard prefix from RDF.rb
-      if @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri_s.index(v.to_uri.to_s) == 0}
+      @rdfcore_prefixes ||= RDF::RDFa::Profile.find(RDF::URI("http://www.w3.org/profile/rdfa-1.1")).prefixes
+      
+      uri = resource.to_s
+
+      curie = case
+      when @uri_to_term_or_curie.has_key?(uri)
+        return @uri_to_term_or_curie[uri]
+      when @base_uri && uri.index(@base_uri.to_s) == 0
+        uri.sub(@base_uri.to_s, "")
+      when @vocabulary && uri.index(@vocabulary) == 0
+        uri.sub(@vocabulary, "")
+      when u = @uri_to_prefix.keys.detect {|u| uri.index(u.to_s) == 0}
+        # Use a defined prefix
+        prefix = @uri_to_prefix[u]
+        prefix(prefix.to_sym, u)  # Define for output
+        uri.sub(u.to_s, "#{prefix}:")
+      when u = @rdfcore_prefixes.values.detect {|u| uri.index(u.to_s) == 0}
+        # Use standard profile prefixes
+        pfx = @rdfcore_prefixes.invert[u]
+        prefix(pfx, u)  # Define for output
+        uri.sub(u.to_s, "#{pfx}:")
+      when @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri.index(v.to_uri.to_s) == 0}
         prefix = vocab.__name__.to_s.split('::').last.downcase
         prefix(prefix.to_sym, vocab.to_uri) # Define for output
-        return @uri_to_term_or_curie[uri] = uri_s.sub(vocab.to_uri.to_s, "#{prefix}:")
+        uri.sub(vocab.to_uri.to_s, "#{prefix}:")
+      else
+        uri
       end
       
-      # Just use the URI
-      @uri_to_term_or_curie[uri] = uri.to_s
+      @uri_to_term_or_curie[uri] = curie
     rescue Addressable::URI::InvalidURIError => e
       raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
     end
   end
 end
+
+require 'rdf/rdfa/writer/haml_templates'

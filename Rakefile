@@ -14,6 +14,7 @@ begin
     gemspec.homepage = "http://github.com/gkellogg/rdf-rdfa"
     gemspec.authors = ["Gregg Kellogg"]
     gemspec.add_dependency('rdf', '>= 0.3.1')
+    gemspec.add_dependency('haml', '>= 3.0.0')
     gemspec.add_dependency('nokogiri', '>= 1.3.3')
     gemspec.add_development_dependency('spira', '>= 0.0.12')
     gemspec.add_development_dependency('rspec', '>= 2.5.0')
