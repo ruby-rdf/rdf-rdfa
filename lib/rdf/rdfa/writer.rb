@@ -480,6 +480,7 @@ module RDF::RDFa
     def hamlify(template, locals = {})
       template = haml_template[template] if template.is_a?(Symbol)
 
+      template = template.align_left
       Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(Object.new, locals) do |*args|
         yield(*args) if block_given?
       end
