@@ -26,7 +26,7 @@ base_uri  = "http://example.com"
 input = nil
 
 opts = GetoptLong.new(
-  ["--debug", GetoptLong::NO_ARGUMENT],
+  ["--dbg", GetoptLong::NO_ARGUMENT],
   ["--verbose", GetoptLong::NO_ARGUMENT],
   ["--quiet", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
@@ -40,7 +40,7 @@ opts.each do |opt, arg|
   when '--verbose' then $verbose = true
   when '--quiet' then $quiet = true
   when '--validate' then $validate = true
-  when '--debug' then ::RDF::RDFa::debug = true
+  when '--dbg' then ::RDF::RDFa::debug = true
   when '--execute' then input = arg
   when '--format' then $output_format = arg
   when '--input-format' then $input_format = arg
