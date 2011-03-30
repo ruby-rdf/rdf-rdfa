@@ -21,7 +21,7 @@ describe RDF::RDFa::Writer do
     context "prefix definitions" do
       subject do
         @graph << [EX.a, RDF::DC.title, "foo"]
-        serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
+        serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"}, :haml_options => {:ugly => false})
       end
 
       specify { subject.should have_xpath("/xhtml:html/@prefix", %r(dc: http://purl.org/dc/terms/))}
@@ -32,7 +32,7 @@ describe RDF::RDFa::Writer do
     context "plain literal" do
       subject do
         @graph << [EX.a, EX.b, "foo"]
-        serialize
+        serialize(:haml_options => {:ugly => false})
       end
 
       {
@@ -49,7 +49,7 @@ describe RDF::RDFa::Writer do
     context "dc:title" do
       subject do
         @graph << [EX.a, RDF::DC.title, "foo"]
-        serialize(:prefixes => {:dc => RDF::DC.to_s})
+        serialize(:prefixes => {:dc => RDF::DC.to_s}, :haml_options => {:ugly => false})
       end
 
       {
@@ -68,7 +68,7 @@ describe RDF::RDFa::Writer do
       context "typed resource" do
         subject do
           @graph << [EX.a, RDF.type, EX.Type]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -85,7 +85,7 @@ describe RDF::RDFa::Writer do
         subject do
           @graph << [EX.a, RDF.type, EX.t1]
           @graph << [EX.a, RDF.type, EX.t2]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -103,7 +103,7 @@ describe RDF::RDFa::Writer do
       context "literal with language and no default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
-          serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
+          serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"}, :haml_options => {:ugly => false})
         end
 
         {
@@ -119,7 +119,7 @@ describe RDF::RDFa::Writer do
       context "literal with language and same default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
-          serialize(:lang => :en)
+          serialize(:lang => :en, :haml_options => {:ugly => false})
         end
 
         {
@@ -135,7 +135,7 @@ describe RDF::RDFa::Writer do
       context "literal with language and different default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
-          serialize(:lang => :de)
+          serialize(:lang => :de, :haml_options => {:ugly => false})
         end
 
         {
@@ -153,7 +153,7 @@ describe RDF::RDFa::Writer do
       describe "xsd:date" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::Date.new("2011-03-18")]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -171,7 +171,7 @@ describe RDF::RDFa::Writer do
       context "xsd:time" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::Time.new("12:34:56")]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -189,7 +189,7 @@ describe RDF::RDFa::Writer do
       context "xsd:dateTime" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::DateTime.new("2011-03-18T12:34:56")]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -207,7 +207,7 @@ describe RDF::RDFa::Writer do
       context "rdf:XMLLiteral" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::XML.new("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time")]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -224,7 +224,7 @@ describe RDF::RDFa::Writer do
       context "xsd:string" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", :datatype => RDF::XSD.string)]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -241,7 +241,7 @@ describe RDF::RDFa::Writer do
       context "unknown" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", :datatype => EX.unknown)]
-          serialize
+          serialize(:haml_options => {:ugly => false})
         end
 
         {
@@ -260,7 +260,7 @@ describe RDF::RDFa::Writer do
       subject do
         @graph << [EX.a, EX.b, "c"]
         @graph << [EX.a, EX.b, "d"]
-        serialize
+        serialize(:haml_options => {:ugly => false})
       end
 
       {
@@ -277,7 +277,7 @@ describe RDF::RDFa::Writer do
     context "resource objects" do
       subject do
         @graph << [EX.a, EX.b, EX.c]
-        serialize
+        serialize(:haml_options => {:ugly => false})
       end
 
       {
@@ -295,7 +295,7 @@ describe RDF::RDFa::Writer do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.a, EX.b, EX.d]
-        serialize
+        serialize(:haml_options => {:ugly => false})
       end
 
       {
@@ -340,7 +340,9 @@ describe RDF::RDFa::Writer do
           begin
             input = t.input("xhtml1", "rdfa1.1")
             @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
+            #RDF::RDFa.debug = true
             result = serialize
+            #RDF::RDFa.debug = false
             graph2 = parse(result, :format => :rdfa)
             graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
           rescue RSpec::Expectations::ExpectationNotMetError => e

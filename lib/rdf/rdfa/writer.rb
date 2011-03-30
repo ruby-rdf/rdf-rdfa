@@ -9,7 +9,7 @@ module RDF::RDFa
   # Writing statements or Triples will create a graph to add them to
   # and then serialize the graph.
   #
-  # The writer will add prefix definitions, and use them for creating @prefix definitions, and minting QNames
+  # The writer will add prefix definitions, and use them for creating @prefix definitions, and minting CURIEs
   #
   # @example Obtaining a RDFa writer class
   #   RDF::Writer.for(:html)         #=> RDF::RDFa::Writer
@@ -57,6 +57,15 @@ module RDF::RDFa
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Writer < RDF::Writer
     format RDF::RDFa::Format
+    
+    # Defines rdf:type of subjects to be emitted at the beginning of the document.
+    # @return [Array<URI>]
+    attr :top_classes
+    
+    # Defines order of predicates to use in heading.
+    # @return [Array<URI>]
+    attr :heading_predicates
+
     HAML_OPTIONS = {
       :ugly => true, # to preserve whitespace without using entities
     }
@@ -89,7 +98,11 @@ module RDF::RDFa
     #   Add standard prefixes to _prefixes_, if necessary.
     # @option options [Repository] :profile_repository (nil)
     #   Repository to find and save profile graphs.
-    # @option options [Hash<Symbol => String>] :haml (DEFAULT_HAML)
+    # @option options [Array<RDF::URI>] :top_classes ([RDF::RDFS.Class])
+    #   Defines rdf:type of subjects to be emitted at the beginning of the document.
+    # @option options [Array<RDF::URI>] :heading_predicates ([RDF::RDFS.label, RDF::DC.title])
+    #   Defines order of predicates to use in heading.
+    # @option options [Hash{Symbol => String}] :haml (DEFAULT_HAML)
     #   HAML templates used for generating code
     # @option options [Hash] :haml_options (HAML_OPTIONS)
     #   Options to pass to Haml::Engine.new. Default options set :ugly => true
@@ -101,6 +114,8 @@ module RDF::RDFa
       super do
         @uri_to_term_or_curie = {}
         @uri_to_prefix = {}
+        @top_classes = options[:top_classes] || [RDF::RDFS.Class]
+        @heading_predicates = options[:heading_predicates] || [RDF::RDFS.label, RDF::DC.title]
         @graph = RDF::Graph.new
 
         block.call(self) if block_given?
@@ -184,20 +199,182 @@ module RDF::RDFa
       end
 
       # Generate document
-      doc = hamlify(:doc,
+      doc = render_document(subjects,
         :lang     => @lang,
         :base     => @base_uri,
         :title    => @doc_title,
         :profile  => profile,
-        :prefix   => prefix,
-        :subjects => subjects) do |s|
+        :prefix   => prefix) do |s|
         subject(s)
       end
       @output.write(doc)
     end
 
     protected
+
+    # Render document using haml_template[:doc].
+    # Yields each subject to be rendered separately (@see render_subject).
+    #
+    # The default Haml template is:
+    #     !!! XML
+    #     !!! 5
+    #     %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :profile => profile, :prefix => prefix}
+    #       - if base || title
+    #         %head
+    #           - if base
+    #             %base{:href => base}
+    #           - if title
+    #             %title= title
+    #       %body
+    #         - subjects.each do |subject|
+    #           != yield(subject)
+    #
+    # @param [Array<RDF::Resource>] subjects
+    #   Ordered list of subjects. Template must yield to each subject, which returns
+    #   the serialization of that subject (@see subject_template)
+    # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
+    # @option options [RDF::URI] base (nil)
+    #   Base URI added to document, used for shortening URIs within the document.
+    # @option options [Symbol, String] language (nil)
+    #   Value of @lang attribute in document, also allows included literals to omit
+    #   an @lang attribute if it is equivalent to that of the document.
+    # @option options [String] title (nil)
+    #   Value of html>head>title element.
+    # @option options [String] profile (nil)
+    #   Value of @profile attribute.
+    # @option options [String] prefix (nil)
+    #   Value of @prefix attribute.
+    # @option options [String] haml (haml_template[:doc])
+    #   Haml template to render.
+    # @yield [subject]
+    #   Yields each subject
+    # @yieldparam [RDF::URI] subject
+    # @yieldreturn [:ignored]
+    # @return String
+    #   The rendered document is returned as a string
+    def render_document(subjects, options = {})
+      template = options[:haml] || :doc
+      hamlify(template, options.merge(:subjects => subjects)) do |subject|
+        yield(subject) if block_given?
+      end
+    end
+    
+    # Render a subject using haml_template[:subject].
+    # Yields each predicate/property to be rendered separately (@see render_property_value and render_property_values).
+    #
+    # The default Haml template for a subject is:
+    #     %div{:about => about, :typeof => typeof}
+    #       - if typeof
+    #         = "#{about || Something} with type #{typeof}"
+    #       - predicates.each do |predicate|
+    #         != yield(predicate)
+    #
+    # @param [Array<RDF::Resource>] subject
+    #   Subject to render
+    # @param [Array<RDF::Resource>] predicates
+    #   Predicates of subject. Each property is yielded for separate rendering.
+    # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
+    # @option options [String] about (nil)
+    #   About description, a CURIE, URI or Node definition.
+    #   May be nil if no @about is rendered (e.g. unreferenced Nodes)
+    # @option options [String] typeof (nil)
+    #   RDF type as a CURIE, URI or Node definition.
+    #   If :about is nil, this defaults to the empty string ("").
+    # @option options [String] haml (haml_template[:subject])
+    #   Haml template to render.
+    # @yield [predicate]
+    #   Yields each predicate
+    # @yieldparam [RDF::URI] predicate
+    # @yieldreturn [:ignored]
+    # @return String
+    #   The rendered document is returned as a string
+    # Return Haml template for document from haml_template[:subject]
+    def render_subject(subject, predicates, options = {})
+      template = options[:haml] || :subject
+      hamlify(template, options.merge(:subject => subject, :predicates => predicates)) do |predicate|
+        yield(predicate) if block_given?
+      end
+    end
+    
+    # Render a single- or multi-valued predicate using haml_template[:property_value] or haml_template[:property_values].
+    # Yields each object for optional rendering. The block should only
+    # render for recursive subject definitions (i.e., where the object
+    # is also a subject and is rendered underneath the first referencing subject).
+    #
+    # The default Haml template for a single-valued property is:
+    #     - object = objects.first
+    #     - if heading_predicates.include?(predicate) && object.literal?
+    #       %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+    #     - else
+    #       %div.property
+    #         %span.label
+    #           = get_predicate_name(predicate)
+    #         - if res = yield(object)
+    #           %div{:rel => get_curie(rel)}
+    #             != res
+    #         - elsif object.node?
+    #           %span{:resource => get_curie(object), :rel => get_curie(predicate)}= get_curie(object)
+    #         - elsif object.uri?
+    #           %a{:href => object.to_s, :rel => get_curie(predicate)}= object.to_s
+    #         - elsif object.datatype == RDF.XMLLiteral
+    #           %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
+    #         - else
+    #           %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+    #
+    # The default Haml template for a multi-valued property is:
+    #     %div.property
+    #       %span.label
+    #         = get_predicate_name(predicate)
+    #       %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
+    #         - objects.each do |object|
+    #           - if res = yield(object)
+    #             %li
+    #               != res
+    #           - if object.node?
+    #             %li{:resource => get_curie(object)}= get_curie(object)
+    #           - elsif object.uri?
+    #             %li
+    #               %a{:href => object.to_s}= object.to_s
+    #           - elsif object.datatype == RDF.XMLLiteral
+    #             %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<
+    #               != get_value(object)
+    #           - else
+    #             %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+    #
+    # @param [Array<RDF::Resource>] predicate
+    #   Predicate to render.
+    # @param [Array<RDF::Resource>] objects
+    #   List of objects to render.
+    #   If the list contains only a single element, the :property_value template will be used.
+    #   Otherwise, the :property_values template is used.
+    # @param [RDF::Resource] property
+    #   Value of @property, which should only be defined for literal objects
+    # @param [RDF::Resource] rel
+    #   Value of @rel, which should only be defined for Node or URI objects.
+    # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
+    # @option options [String] haml (haml_template[:property_value], haml_template[:property_values])
+    #   Haml template to render. Otherwise, uses haml_template[:property_value] or haml_template[:property_values]
+    #   depending on the cardinality of objects.
+    # @yield [object]
+    #   Yields object.
+    # @yieldparam [RDF::Resource] object
+    # @yieldreturn [String, nil]
+    #   The block should only return a string for recursive object definitions.
+    # @return String
+    #   The rendered document is returned as a string
+    def render_property(predicate, objects, property, rel, options = {})
+      template = options[:haml] || (objects.to_a.length == 1 ? :property_value : :property_values)
+      hamlify(template, options.merge(
+        :predicate  => predicate,
+        :property   => property,
+        :rel        => rel,
+        :objects    => objects)) do |object|
+        yield(object) if block_given?
+      end
+    end
+    
     # Perform any preprocessing of statements required
+    # @return [ignored]
     def preprocess
       # Load profiles
       # Add terms and prefixes to local store for converting URIs
@@ -224,15 +401,6 @@ module RDF::RDFa
       # Process each statement to establish CURIEs and Terms
       @graph.each {|statement| preprocess_statement(statement)}
     end
-    
-    # Defines rdf:type of subjects to be emitted at the beginning of the graph. Defaults to rdfs:Class
-    # @return [Array<URI>]
-    def top_classes; [RDF::RDFS.Class]; end
-
-    # Defines order of predicates to use in heading. Defaults to
-    # [rdfs:label, dc:title]
-    # @return [Array<URI>]
-    def heading_predicates; [RDF::RDFS.label, RDF::DC.title]; end
     
     # Order subjects for output. Override this to output subjects in another order.
     #
@@ -261,6 +429,7 @@ module RDF::RDFa
     
     # Take a hash from predicate uris to lists of values.
     # Sort the lists of values.  Return a sorted list of properties.
+    #
     # @param [Hash{String => Array<Resource>}] properties A hash of Property to Resource mappings
     # @return [Array<String>}] Ordered list of properties.
     def order_properties(properties)
@@ -288,7 +457,8 @@ module RDF::RDFa
 
     # Perform any statement preprocessing required. This is used to perform reference counts and determine required
     # prefixes.
-    # @param [Statement] statement
+    # @param [RDF::Statement] statement
+    # @return [ignored]
     def preprocess_statement(statement)
       #add_debug "preprocess: #{statement.inspect}"
       references = ref_count(statement.object) + 1
@@ -300,6 +470,7 @@ module RDF::RDFa
       get_curie(statement.object.datatype) if statement.object.literal? && statement.object.has_datatype?
     end
     
+    # Reset parser to run again
     def reset
       @depth = 0
       prefixes = {}
@@ -309,7 +480,7 @@ module RDF::RDFa
       @top_levels = {}
     end
 
-    private
+    protected
 
     # Display a subject.
     #
@@ -332,32 +503,25 @@ module RDF::RDFa
       properties = @graph.properties(subject)
       prop_list = order_properties(properties)
       
-      curie = get_curie(subject)
+      # Find appropriate template
+      curie ||= case
+      when subject.node?
+        subject.to_s if ref_count(subject) >= (@depth == 0 ? 0 : 1)
+      else
+        get_curie(subject)
+      end
 
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
+      
+      # Nodes without a curie need a blank @typeof to generate a subject
+      typeof ||= "" unless curie
       prop_list -= [RDF.type.to_s]
 
-      add_debug "subject: #{curie.inspect}, typeof: #{typeof}, props: #{prop_list.inspect}"
-
-      template_key = haml_template[:subject_template].select do |r, t|
-        subject.to_s.match(r)
-      end.values.first
-
-      # Find appropriate template
-      template_key ||= case
-      when subject.node?
-        ref_count(subject) >= (@depth == 0 ? 0 : 1) ? :node_subject : :anon_subject
-      else
-        :default_subject
-      end
+      add_debug "subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"
 
       # Render this subject
-      sub = hamlify(template_key,
-        :subject    => subject,
-        :about      => curie,
-        :typeof     => typeof,
-        :predicates => prop_list) do |pred|
+      render_subject(subject, prop_list, :about => curie, :typeof => typeof) do |pred|
         depth do
           values = properties[pred.to_s]
           add_debug "subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"
@@ -369,150 +533,89 @@ module RDF::RDFa
     # Write a predicate with one or more values.
     #
     # Values may be a combination of Literal and Resource (Node or URI).
-    #
-    # Multi-valued properties are generated with a _ul_ and _li_. Single-valued
-    # are generated with a span or anchor
-    def predicate(pred, values)
-      add_debug "predicate: #{pred.inspect}, values: #{values}"
-      
-      case (values || []).length
-      when 0
-        nil
-      when 1
-        case object = values.first
-        when RDF::Node, RDF::URI
-          hamlify(:single_resource, :property => get_curie(pred), :object => object) do |o|
-            if is_done?(object) || !@subjects.include?(object)
-              show_ref(o, get_curie(pred))
-            else
-              hamlify("%div{:rel => #{get_curie(pred).inspect}}\n  != yield") {depth {subject(o)}}
-            end
-          end
-        else
-          template_key = heading_predicates.include?(pred) ? :heading_literal : :single_literal
-          show_lit(object, pred, template_key)
-        end
-      else
-        property = get_curie(pred) if values.any?(&:literal?)
-        rel = get_curie(pred) if values.any?(&:uri?) || values.any?(&:node?)
-
-        add_debug("multi-value property: prop=#{property.inspect}, rel=#{rel.inspect}")
-
-        hamlify(:multiple_resource,
-          :property => property,
-          :rel      => rel,
-          :objects  => values) do |o|
-          add_debug("val: #{o}")
-          if o.literal?
-            show_lit(o, pred, :_literal)
-          elsif !is_done?(o) && @subjects.include?(o)
-            hamlify("%li\n  != yield") {depth {subject(o)}}
-          else
-            hamlify("%li\n  != yield") {show_ref(o, nil)}
-          end
-        end
-      end
-    end
-    
-    # Increase depth around a method invocation
-    def depth
-      @depth += 1
-      ret = yield
-      @depth -= 1
-      ret
-    end
-    
-    def show_ref(object, rel)
-      template_key = haml_template[:object_template].select do |r, t|
-        object.to_s.match(r)
-      end.values.first
-      
-      template_key ||= :default_resource
-      curie = get_curie(object)
-
-      hamlify(template_key, :object => object, :curie  => curie, :rel => rel)
-    end
-    
-    def show_lit(object, predicate, template_key)
-      add_debug "show_lit: #{object.inspect}, template: #{template_key.inspect}, typed: #{object.typed?.inspect}, XML: #{object.is_a?(RDF::Literal::XML)}"
-
-      template = haml_template[template_key]
-      template = haml_template[:xml_literal][template_key] if object.datatype == RDF.XMLLiteral
-
-      property = get_curie(predicate)
-      datatype = language = content = nil
-      value = object.to_s
-
-      if object.typed?
-        datatype = get_curie(object.datatype)
-        case object
-        when RDF::Literal::Date
-          content = object.to_s
-          value = object.object.strftime("%A, %d %B %Y")
-        when RDF::Literal::Time
-          content = object.to_s
-          value = object.object.strftime("%H:%M:%S %Z").sub(/\+00:00/, "UTC")
-        when RDF::Literal::DateTime
-          content = object.to_s
-          value = object.object.strftime("%H:%M:%S %Z on %A, %d %B %Y").sub(/\+00:00/, "UTC")
-        end
-      else
-        language = object.language.to_sym if object.language && object.language.to_sym != @options[:lang]
-        STDERR.puts("lit lang: #{language.inspect}, base #{@options[:lang].inspect}") if language
-      end
-
-      #add_debug "show_lit key: #{template_key}, template: #{template}"
-      hamlify(template,
-        :depth    => (@depth / 2), 
-        :property => property,
-        :datatype => datatype,
-        :lang     => language,
-        :content  => content,
-        :value    => value)
-    end
-    
-    # Render HAML
-    # @param [Symbol, String] template
-    #   If a symbol, finds a matching template from haml_template, otherwise uses template as is
-    # @param [Hash{Symbol => Object}] locals
-    #   Locals to pass to render
+    # @param [RDF::Resource] predicate
+    #   Predicate to serialize
+    # @param [Array<RDF::Resource>] objects
+    #   Objects to serialize
     # @return [String]
-    def hamlify(template, locals = {})
-      template = haml_template[template] if template.is_a?(Symbol)
+    def predicate(predicate, objects)
+      add_debug "predicate: #{predicate.inspect}, objects: #{objects}"
+      
+      return if objects.to_a.empty?
+      
+      add_debug("predicate: #{get_curie(predicate)}")
+      property = predicate if objects.any?(&:literal?)
+      rel      = predicate if objects.any?(&:uri?) || objects.any?(&:node?)
+      render_property(predicate, objects, property, rel) do |o|
+        # Yields each object, for potential recursive definition.
+        # If nil is returned, a leaf is produced
+        depth {subject(o)} if !is_done?(o) && @subjects.include?(o)
+      end
+    end
+    
+    # Haml rendering helper. Return CURIE for the literal datatype, if the literal is a typed literal.
+    #
+    # @param [RDF::Resource] resource
+    # @return [String, nil]
+    def get_dt_curie(literal)
+      raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
+      get_curie(literal.datatype) if literal.literal? && literal.datatype?
+    end
 
-      template = template.align_left
-      Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(Object.new, locals) do |*args|
-        yield(*args) if block_given?
+    # Haml rendering helper. Return language for plain literal, if there is no language, or it is the same as the document, return nil
+    #
+    # @param [RDF::Literal] literal
+    # @return [String, nil]
+    def get_lang(literal)
+      raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
+      literal.language if literal.literal? && literal.language && literal.language != @lang
+    end
+
+    # Haml rendering helper. Data to be added to a @content value
+    #
+    # @param [RDF::Literal] literal
+    # @return [String, nil]
+    def get_content(literal)
+      raise RDF::WriterError, "Getting content for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
+      case literal
+      when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime
+        literal.to_s
       end
     end
 
-    # Mark a subject as done.
-    def subject_done(subject)
-      @serialized[subject] = true
-    end
-    
-    def is_done?(subject)
-      @serialized.include?(subject)
-    end
-
-    # Return the number of times this node has been referenced in the object position
-    def ref_count(node)
-      @references.fetch(node, 0)
-    end
-
-    # Add debug event to debug array, if specified
+    # Haml rendering helper. Display value for object, may be non-canonical if get_content returns a non-nil value
     #
-    # @param [String] message::
-    def add_debug(message)
-      msg = "#{'  ' * @depth}#{message}"
-      STDERR.puts msg if ::RDF::RDFa.debug?
-      @debug << msg if @debug.is_a?(Array)
+    # @param [RDF::Literal] literal
+    # @return [String]
+    def get_value(literal)
+      raise RDF::WriterError, "Getting value for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
+      case literal
+      when RDF::Literal::Date
+        literal.object.strftime("%A, %d %B %Y")
+      when RDF::Literal::Time
+        literal.object.strftime("%H:%M:%S %Z").sub(/\+00:00/, "UTC")
+      when RDF::Literal::DateTime
+        literal.object.strftime("%H:%M:%S %Z on %A, %d %B %Y").sub(/\+00:00/, "UTC")
+      else
+        literal.to_s
+      end
     end
 
-    # Return appropriate, term, curie or URI for the given uri
+    # Haml rendering helper. Return an appropriate label for a resource.
+    #
     # @param [RDF::Resource] resource
+    # @return [String]
+    def get_predicate_name(resource)
+      raise RDF::WriterError, "Getting predicate name for #{resource.inspect}, which must be a resource" unless resource.is_a?(RDF::Resource)
+      get_curie(resource)
+    end
+
+    # Haml rendering helper. Return appropriate, term, CURIE or URI for the given resource.
+    #
+    # @param [RDF::Value] resource
     # @return [String] value to use to identify URI
     def get_curie(resource)
+      raise RDF::WriterError, "Getting CURIE for #{resource.inspect}, which must be an RDF value" unless resource.is_a?(RDF::Value)
       return resource.to_s unless resource.uri?
 
       @rdfcore_prefixes ||= RDF::RDFa::Profile.find(RDF::URI("http://www.w3.org/profile/rdfa-1.1")).prefixes
@@ -547,6 +650,56 @@ module RDF::RDFa
       @uri_to_term_or_curie[uri] = curie
     rescue Addressable::URI::InvalidURIError => e
       raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
+    end
+    private
+    
+    # Increase depth around a method invocation
+    def depth
+      @depth += 1
+      ret = yield
+      @depth -= 1
+      ret
+    end
+    
+    # Render HAML
+    # @param [Symbol, String] template
+    #   If a symbol, finds a matching template from haml_template, otherwise uses template as is
+    # @param [Hash{Symbol => Object}] locals
+    #   Locals to pass to render
+    # @return [String]
+    def hamlify(template, locals = {})
+      template = haml_template[template] if template.is_a?(Symbol)
+
+      template = template.align_left
+      add_debug "hamlify template: #{template}"
+      add_debug "hamlify locals: #{locals.inspect}"
+
+      Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(self, locals) do |*args|
+        yield(*args) if block_given?
+      end
+    end
+
+    # Mark a subject as done.
+    def subject_done(subject)
+      @serialized[subject] = true
+    end
+    
+    def is_done?(subject)
+      @serialized.include?(subject)
+    end
+
+    # Return the number of times this node has been referenced in the object position
+    def ref_count(node)
+      @references.fetch(node, 0)
+    end
+
+    # Add debug event to debug array, if specified
+    #
+    # @param [String] message::
+    def add_debug(message)
+      msg = "#{'  ' * @depth}#{message}"
+      STDERR.puts msg if ::RDF::RDFa.debug?
+      @debug << msg if @debug.is_a?(Array)
     end
   end
 end

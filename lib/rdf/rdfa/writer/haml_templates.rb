@@ -2,20 +2,6 @@
 module RDF::RDFa
   class Writer
     DEFAULT_HAML = {
-      # Detect media types for URI resources and render with appropriate HTML element
-      :subject_template => {
-        %r(\.(mp3|m4a)) => :audio_subject,
-        %r(\.(jpg|png|svg|gif)) => :image_subject,
-        %r(\.(mp4|m4v)) => :video_subject,
-        %r(^_:) => :node_subject,
-      },
-      :object_template => {
-#        %r(\.(mp3|m4a)) => :audio_resource,
-#        %r(\.(jpg|png|svg|gif)) => :image_resource,
-#        %r(\.(mp4|m4v)) => :video_resource,
-        %r(^_:) => :node_resource,
-      },
-
       # Document
       # Locals: language, title, profile, prefix, base, subjects
       # Yield: subjects.each
@@ -34,122 +20,68 @@ module RDF::RDFa
               != yield(subject)
       ),
 
-      # Output for literals treated as title, either singular or multiple
-      # Locals: depth, property, datatype, language, content, value
-      :heading_literal => %q(
-        %h1{:property => property, :content => content, :lang => lang, :datatype => datatype}&= value
+      # Output for non-leaf resources
+      # Note that @about may be omitted for Nodes that are not referenced
+      #
+      # Locals: about, typeof, predicates
+      # Yield: predicates.each
+      :subject => %q(
+        %div{:about => about, :typeof => typeof}
+          - if typeof
+            = "#{about || Something} with type #{typeof}"
+          - predicates.each do |predicate|
+            != yield(predicate)
       ),
 
-      # Output for literals, either singular or multiple
-      # Locals: property, datatype, language, content, value
-      :single_literal => %q(
-        %div.property
-          %span.label
-            = property
-          %span{:property => property, :content => content, :lang => lang, :datatype => datatype}&= value
-      ),
-
-      # Partial for multiple literals
-      # Locals: datatype, language, content, value
-      :_literal => %q(
-        %li{:content => content, :lang => lang, :datatype => datatype}&= value
-      ),
-
-      # Template to use for XMLLiterals, based on translation from selected literal template key
-      # Locals: datatype, language, content, value
-      :xml_literal => {
-        :single_literal => %q(
+      # Output for single-valued properties
+      # Locals: property, objects
+      # Yields: object
+      # If nil is returned, render as a leaf
+      # Otherwise, render result
+      :property_value => %q(
+        - object = objects.first
+        - if heading_predicates.include?(predicate) && object.literal?
+          %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+        - else
           %div.property
             %span.label
-              = property
-            %span{:property => property, :lang => lang, :datatype => datatype}<
-              != value
-        ),
-        :_literal => %q(
-          %li{:content => content, :lang => lang, :datatype => datatype}<
-            != value
-        )
-      },
-
-      # Output for resources, either singular or multiple
-      # Locals: property, object
-      # Yields: object for leaf resource rendering
-      :single_resource => %q(
-        %div.property
-          %span.label
-            = property
-          != yield(object)
+              = get_predicate_name(predicate)
+            - if res = yield(object)
+              %div{:rel => get_curie(rel)}
+                != res
+            - elsif object.node?
+              %span{:resource => get_curie(object), :rel => get_curie(predicate)}= get_curie(object)
+            - elsif object.uri?
+              %a{:href => object.to_s, :rel => get_curie(predicate)}= object.to_s
+            - elsif object.datatype == RDF.XMLLiteral
+              %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
+            - else
+              %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
       ),
 
-      # Output for multple resources, either URI/BNode or Literal
+      # Output for multi-valued properties
       # Locals: property, rel, :objects
       # Yields: object for leaf resource rendering
-      :multiple_resource => 
-        %q(
+      :property_values =>  %q(
         %div.property
           %span.label
-            = (property || rel)
-          %ul{:rel => rel, :property => property}
+            = get_predicate_name(predicate)
+          %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
             - objects.each do |object|
-              != yield(object)
+              - if res = yield(object)
+                %li
+                  != res
+              - if object.node?
+                %li{:resource => get_curie(object)}= get_curie(object)
+              - elsif object.uri?
+                %li
+                  %a{:href => object.to_s}= object.to_s
+              - elsif object.datatype == RDF.XMLLiteral
+                %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<
+                  != get_value(object)
+              - else
+                %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
       ),
-
-      # Output for non-leaf resources
-      # Locals: about, resource, typeof, subject, predicates
-      # Yield: predicates.each
-      :default_subject => %q(
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "#{about} with type #{typeof}"
-          - predicates.each do |predicate|
-            != yield(predicate)
-      ),
-      :audio_subject => %q(
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "Audio with type #{typeof}"
-          %audio{:src => subject.to_s}
-          - predicates.each do |predicate|
-            != yield(predicate)
-      ),
-      :image_subject => %q(
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "Image with type #{typeof}"
-          %img{:src => subject.to_s}
-          - predicates.each do |predicate|
-            != yield(predicate)
-      ),
-      :video_subject => %q(
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "Video with type #{typeof}"
-          %video{:src => subject.to_s}
-          - predicates.each do |predicate|
-            != yield(predicate)
-      ),
-      :anon_subject => %q(
-        %div{:typeof => typeof || ""}
-          - if typeof
-            = "Something with type #{typeof}"
-          - predicates.each do |predicate|
-            != yield(predicate)
-      ),
-      :node_subject => %q(
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "Something named #{about} with type #{typeof}"
-          - predicates.each do |predicate|
-            != yield(predicate)
-      ),
-
-      # Output for leaf resources
-      # locals: object, curie
-      :default_resource => %q(%a{:href => object.to_s, :rel => rel}= object.to_s),
-      :audio_resource => %q(%audio{:src => object.to_s, :resource => curie, :rel => rel}),
-      :image_resource => %q(%img{:src => object.to_s, :resource => curie, :rel => rel}),
-      :video_resource => %q(%video{:src => object.to_s, :resource => curie, :rel => rel}),
-      :node_resource => %q(%span{:resource => curie, :rel => rel}),
     }
   end
 end
