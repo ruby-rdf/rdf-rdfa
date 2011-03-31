@@ -334,22 +334,28 @@ describe RDF::RDFa::Writer do
     describe "w3c xhtml testcases" do
       require 'test_helper'
 
-      Fixtures::TestCase.for_specific("xhtml1", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
-        next if t.name == "0212"  # XMLLiteral equivalence
-        specify "test #{t.name}: #{t.title}" do
-          begin
-            input = t.input("xhtml1", "rdfa1.1")
-            @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
-            #RDF::RDFa.debug = true
-            result = serialize
-            #RDF::RDFa.debug = false
-            graph2 = parse(result, :format => :rdfa)
-            graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
-          rescue RSpec::Expectations::ExpectationNotMetError => e
-            if %w(0198).include?(t.name) || result =~ /XMLLiteral/m
-              pending("XMLLiteral canonicalization not implemented yet")
-            else
-              raise
+      # Generate with each template set
+      {
+        :default  => RDF::RDFa::Writer::DEFAULT_HAML,
+        :min      => RDF::RDFa::Writer::MIN_HAML,
+      }.each do |name, template|
+        context "Using #{name} template" do
+          Fixtures::TestCase.for_specific("xhtml1", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
+            next if t.name == "0212"  # XMLLiteral equivalence
+            specify "test #{t.name}: #{t.title}" do
+              begin
+                input = t.input("xhtml1", "rdfa1.1")
+                @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
+                result = serialize(:haml => template)
+                graph2 = parse(result, :format => :rdfa)
+                graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
+              rescue RSpec::Expectations::ExpectationNotMetError => e
+                if %w(0198).include?(t.name) || result =~ /XMLLiteral/m
+                  pending("XMLLiteral canonicalization not implemented yet")
+                else
+                  raise
+                end
+              end
             end
           end
         end

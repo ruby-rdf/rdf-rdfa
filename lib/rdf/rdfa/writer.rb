@@ -213,7 +213,7 @@ module RDF::RDFa
     protected
 
     # Render document using haml_template[:doc].
-    # Yields each subject to be rendered separately (@see render_subject).
+    # Yields each subject to be rendered separately.
     #
     # The default Haml template is:
     #     !!! XML
