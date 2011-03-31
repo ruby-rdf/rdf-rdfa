@@ -2,19 +2,22 @@ $:.unshift "."
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe RDF::RDFa::Format do
-  it "should be discover 'rdfa'" do
-    formats = [
-      RDF::Format.for(:rdfa),
-      RDF::Format.for("etc/foaf.html"),
-      RDF::Format.for(:file_name      => "etc/foaf.html"),
-      RDF::Format.for(:file_extension => "html"),
-      RDF::Format.for(:file_extension => "xhtml"),
-      RDF::Format.for(:file_extension => "svg"),
-      RDF::Format.for(:content_type   => "text/html"),
-      RDF::Format.for(:content_type   => "application/xhtml+xml"),
-      RDF::Format.for(:content_type   => "image/svg+xml"),
-    ]
-    formats.each { |format| format.should == RDF::RDFa::Format }
+  context "should be discover 'rdfa'" do
+    [
+      [:rdfa,                                        RDF::RDFa::Format],
+      ["etc/foaf.html",                              RDF::RDFa::Format],
+      [{:file_name      => "etc/foaf.html"},         RDF::RDFa::Format],
+      [{:file_extension => "html"},                  RDF::RDFa::Format],
+      [{:file_extension => "xhtml"},                 RDF::RDFa::XHTML],
+      [{:file_extension => "svg"},                   RDF::RDFa::SVG],
+      [{:content_type   => "text/html"},             RDF::RDFa::Format],
+      [{:content_type   => "application/xhtml+xml"}, RDF::RDFa::XHTML],
+      [{:content_type   => "image/svg+xml"},         RDF::RDFa::SVG],
+    ].each do |(arg, format)|
+      it "returns #{format} for #{arg.inspect}" do
+        RDF::Format.for(arg).should == format
+      end
+    end
   end
     
   it "should discover 'html'" do
