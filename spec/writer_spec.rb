@@ -320,9 +320,9 @@ describe RDF::RDFa::Writer do
       {
         "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
         "//xhtml:div[@about='ex:a']/xhtml:div[@class='property']/xhtml:div[@rel]/@rel" => "ex:b",
-        "//xhtml:div[@rel]/xhtml:div[@about]/@about" => "ex:c",
-        "//xhtml:div[@rel]/xhtml:div[@about]//xhtml:a/@href" => EX.e.to_s,
-        "//xhtml:div[@rel]/xhtml:div[@about]//xhtml:a/@rel" => "ex:d",
+        "//xhtml:div[@rel]/@resource" => "ex:c",
+        "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@href" => EX.e.to_s,
+        "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@rel" => "ex:d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value)
@@ -346,7 +346,7 @@ describe RDF::RDFa::Writer do
               begin
                 input = t.input("xhtml1", "rdfa1.1")
                 @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
-                result = serialize(:haml => template)
+                result = serialize(:haml => template, :haml_options => {:ugly => true})
                 graph2 = parse(result, :format => :rdfa)
                 graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
               rescue RSpec::Expectations::ExpectationNotMetError => e

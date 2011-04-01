@@ -24,14 +24,38 @@ module RDF::RDFa
       # Output for non-leaf resources
       # Note that @about may be omitted for Nodes that are not referenced
       #
-      # Locals: about, typeof, predicates
+      # If _rel_ and _resource_ are not nil, the tag will be written relative
+      # to a previous subject. If _element_ is :li, the tag will be written
+      # with <li> instead of <div>.
+      #
+      # Note that @rel and @resource can be used together, or @about and @typeof, but
+      # not both.
+      #
+      # Locals: subject, typeof, predicates, rel, element
       # Yield: predicates.each
       :subject => %q(
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "#{about || Something} with type #{typeof}"
-          - predicates.each do |predicate|
-            != yield(predicate)
+        - if element == :li
+          %li{:about => get_curie(subject), :typeof => typeof}
+            - if typeof
+              %span.type!= typeof
+            - predicates.each do |predicate|
+              != yield(predicate)
+        - elsif rel && typeof
+          %div{:rel => get_curie(rel)}
+            %div{:about => get_curie(subject), :typeof => typeof}
+              %span.type!= typeof
+              - predicates.each do |predicate|
+                != yield(predicate)
+        - elsif rel
+          %div{:rel => get_curie(rel), :resource => get_curie(subject)}
+            - predicates.each do |predicate|
+              != yield(predicate)
+        - else
+          %div{:about => get_curie(subject), :typeof => typeof}
+            - if typeof
+              %span.type!= typeof
+            - predicates.each do |predicate|
+              != yield(predicate)
       ),
 
       # Output for single-valued properties
@@ -48,8 +72,7 @@ module RDF::RDFa
             %span.label
               = get_predicate_name(predicate)
             - if res = yield(object)
-              %div{:rel => get_curie(rel)}
-                != res
+              != res
             - elsif object.node?
               %span{:resource => get_curie(object), :rel => get_curie(predicate)}= get_curie(object)
             - elsif object.uri?
@@ -70,8 +93,7 @@ module RDF::RDFa
           %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
             - objects.each do |object|
               - if res = yield(object)
-                %li
-                  != res
+                != res
               - elsif object.node?
                 %li{:resource => get_curie(object)}= get_curie(object)
               - elsif object.uri?
@@ -109,11 +131,23 @@ module RDF::RDFa
       # Locals: about, typeof, predicates
       # Yield: predicates.each
       :subject => %q(
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "#{about || Something} with type #{typeof}"
-          - predicates.each do |predicate|
-            != yield(predicate)
+        - if element == :li
+          %li{:about => get_curie(subject), :typeof => typeof}
+            - predicates.each do |predicate|
+              != yield(predicate)
+        - elsif rel && typeof
+          %div{:rel => get_curie(rel)}
+            %div{:about => get_curie(subject), :typeof => typeof}
+              - predicates.each do |predicate|
+                != yield(predicate)
+        - elsif rel
+          %div{:rel => get_curie(rel), :resource => get_curie(subject)}
+            - predicates.each do |predicate|
+              != yield(predicate)
+        - else
+          %div{:about => get_curie(subject), :typeof => typeof}
+            - predicates.each do |predicate|
+              != yield(predicate)
       ),
 
       # Output for single-valued properties.

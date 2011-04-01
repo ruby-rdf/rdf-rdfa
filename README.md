@@ -95,13 +95,30 @@ The template hash defines four Haml templates:
 *   _subject_: Subject Template, take a _subject_ and an order list of _predicate_s and yields
     each _predicate_ to be rendered. Described further in {RDF::RDFa::Writer#render_subject}.
     
-        %div{:about => about, :typeof => typeof}
-          - if typeof
-            = "#{about || Something} with type #{typeof}"
-          - predicates.each do |predicate|
-            != yield(predicate)
+        - if element == :li
+          %li{:about => get_curie(subject), :typeof => typeof}
+            - if typeof
+              %span.type!= typeof
+            - predicates.each do |predicate|
+              != yield(predicate)
+        - elsif rel && typeof
+          %div{:rel => get_curie(rel)}
+            %div{:about => get_curie(subject), :typeof => typeof}
+              %span.type!= typeof
+              - predicates.each do |predicate|
+                != yield(predicate)
+        - elsif rel
+          %div{:rel => get_curie(rel), :resource => get_curie(subject)}
+            - predicates.each do |predicate|
+              != yield(predicate)
+        - else
+          %div{:about => get_curie(subject), :typeof => typeof}
+            - if typeof
+              %span.type!= typeof
+            - predicates.each do |predicate|
+              != yield(predicate)
     
-    The template takes locals _about_ and _typeof_ in addition to _predicates_ and _subject_ to
+    The template takes locals _rel_ and _typeof_ in addition to _predicates_ and _subject_ to
     create output similar to the following:
     
         <div about="http://example/">
@@ -121,8 +138,7 @@ The template hash defines four Haml templates:
             %span.label
               = get_predicate_name(predicate)
             - if res = yield(object)
-              %div{:rel => get_curie(rel)}
-                != res
+              != res
             - elsif object.node?
               %span{:resource => get_curie(object), :rel => get_curie(predicate)}= get_curie(object)
             - elsif object.uri?
@@ -163,8 +179,7 @@ The template hash defines four Haml templates:
           %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
             - objects.each do |object|
               - if res = yield(object)
-                %li
-                  != res
+                != res
               - elsif object.node?
                 %li{:resource => get_curie(object)}= get_curie(object)
               - elsif object.uri?
@@ -174,7 +189,7 @@ The template hash defines four Haml templates:
                 %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
               - else
                 %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
-    
+  
     In this case, and unordered list is used for output. Creates output similar to the following:
     
         <div class='property'>

@@ -3,7 +3,9 @@ require 'rdf/rdfa/patches/graph_properties'
 
 module RDF::RDFa
   ##
-  # An RDFa 1.1 serialiser in Ruby
+  # An RDFa 1.1 serialiser in Ruby. The RDFa serializer makes use of Haml templates,
+  # allowing runtime-replacement with alternate templates. Note, however, that templates
+  # should be checked against the W3C test suite to ensure that valid RDFa is emitted.
   #
   # Note that the natural interface is to write a whole graph at a time.
   # Writing statements or Triples will create a graph to add them to
@@ -254,20 +256,48 @@ module RDF::RDFa
     #   The rendered document is returned as a string
     def render_document(subjects, options = {})
       template = options[:haml] || :doc
-      hamlify(template, options.merge(:subjects => subjects)) do |subject|
+      options = {
+        :prefix => nil,
+        :profile => nil,
+        :subjects => subjects,
+        :title => nil,
+      }.merge(options)
+      hamlify(template, options) do |subject|
         yield(subject) if block_given?
       end
     end
     
     # Render a subject using haml_template[:subject].
-    # Yields each predicate/property to be rendered separately (@see render_property_value and render_property_values).
     #
-    # The default Haml template for a subject is:
-    #     %div{:about => about, :typeof => typeof}
-    #       - if typeof
-    #         = "#{about || Something} with type #{typeof}"
-    #       - predicates.each do |predicate|
-    #         != yield(predicate)
+    # The _subject_ template may be called either as a top-level element, or recursively under another element
+    # if the _rel_ local is not nil.
+    #
+    # Yields each predicate/property to be rendered separately (@see render_property_value and
+    # render_property_values).
+    #
+    # The default Haml template is:
+    #     - if element == :li
+    #       %li{:about => get_curie(subject), :typeof => typeof}
+    #         - if typeof
+    #           %span.type!= typeof
+    #         - predicates.each do |predicate|
+    #           != yield(predicate)
+    #     - elsif rel && typeof
+    #       %div{:rel => get_curie(rel)}
+    #         %div{:about => get_curie(subject), :typeof => typeof}
+    #           %span.type!= typeof
+    #           - predicates.each do |predicate|
+    #             != yield(predicate)
+    #     - elsif rel
+    #       %div{:rel => get_curie(rel), :resource => get_curie(subject)}
+    #         - predicates.each do |predicate|
+    #           != yield(predicate)
+    #     - else
+    #       %div{:about => get_curie(subject), :typeof => typeof}
+    #         - if typeof
+    #           %span.type!= typeof
+    #         - predicates.each do |predicate|
+    #           != yield(predicate)
     #
     # @param [Array<RDF::Resource>] subject
     #   Subject to render
@@ -277,9 +307,16 @@ module RDF::RDFa
     # @option options [String] about (nil)
     #   About description, a CURIE, URI or Node definition.
     #   May be nil if no @about is rendered (e.g. unreferenced Nodes)
+    # @option options [String] resource (nil)
+    #   Resource description, a CURIE, URI or Node definition.
+    #   May be nil if no @resource is rendered
+    # @option options [String] rel (nil)
+    #   Optional @rel property description, a CURIE, URI or Node definition.
     # @option options [String] typeof (nil)
     #   RDF type as a CURIE, URI or Node definition.
     #   If :about is nil, this defaults to the empty string ("").
+    # @option options [:li, nil] element (nil)
+    #   Render with <li>, otherwise with template default.
     # @option options [String] haml (haml_template[:subject])
     #   Haml template to render.
     # @yield [predicate]
@@ -291,7 +328,16 @@ module RDF::RDFa
     # Return Haml template for document from haml_template[:subject]
     def render_subject(subject, predicates, options = {})
       template = options[:haml] || :subject
-      hamlify(template, options.merge(:subject => subject, :predicates => predicates)) do |predicate|
+      options = {
+        :about      => (get_curie(subject) unless options[:rel]),
+        :element    => nil,
+        :predicates => predicates,
+        :rel        => nil,
+        :resource   => (get_curie(subject) if options[:rel]),
+        :subject    => subject,
+        :typeof     => nil,
+      }.merge(options)
+      hamlify(template, options) do |predicate|
         yield(predicate) if block_given?
       end
     end
@@ -310,8 +356,7 @@ module RDF::RDFa
     #         %span.label
     #           = get_predicate_name(predicate)
     #         - if res = yield(object)
-    #           %div{:rel => get_curie(rel)}
-    #             != res
+    #           != res
     #         - elsif object.node?
     #           %span{:resource => get_curie(object), :rel => get_curie(predicate)}= get_curie(object)
     #         - elsif object.uri?
@@ -322,24 +367,22 @@ module RDF::RDFa
     #           %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
     #
     # The default Haml template for a multi-valued property is:
-    #     %div.property
-    #       %span.label
-    #         = get_predicate_name(predicate)
-    #       %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
-    #         - objects.each do |object|
-    #           - if res = yield(object)
-    #             %li
-    #               != res
-    #           - if object.node?
-    #             %li{:resource => get_curie(object)}= get_curie(object)
-    #           - elsif object.uri?
-    #             %li
-    #               %a{:href => object.to_s}= object.to_s
-    #           - elsif object.datatype == RDF.XMLLiteral
-    #             %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<
-    #               != get_value(object)
-    #           - else
-    #             %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+    #   %div.property
+    #     %span.label
+    #       = get_predicate_name(predicate)
+    #     %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
+    #       - objects.each do |object|
+    #         - if res = yield(object)
+    #           != res
+    #         - elsif object.node?
+    #           %li{:resource => get_curie(object)}= get_curie(object)
+    #         - elsif object.uri?
+    #           %li
+    #             %a{:href => object.to_s}= object.to_s
+    #         - elsif object.datatype == RDF.XMLLiteral
+    #           %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
+    #         - else
+    #           %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
     #
     # @param [Array<RDF::Resource>] predicate
     #   Predicate to render.
@@ -364,11 +407,13 @@ module RDF::RDFa
     #   The rendered document is returned as a string
     def render_property(predicate, objects, property, rel, options = {})
       template = options[:haml] || (objects.to_a.length == 1 ? :property_value : :property_values)
-      hamlify(template, options.merge(
+      options = {
+        :objects    => objects,
         :predicate  => predicate,
         :property   => property,
         :rel        => rel,
-        :objects    => objects)) do |object|
+      }.merge(options)
+      hamlify(template, options) do |object|
         yield(object) if block_given?
       end
     end
@@ -493,9 +538,13 @@ module RDF::RDFa
     #   </div>
     #
     # @param [RDF::Resource] subject
-    # @param [Nokogiri::XML::Element] parent_node
+    # @param [Hash{Symbol => Object}] options
+    # @option options [:li, nil] :element(:div)
+    #   Serialize using <li> rather than template default element
+    # @option options [RDF::Resource] :rel (nil)
+    #   Optional @rel property
     # @return [Nokogiri::XML::Element, {Namespace}]
-    def subject(subject)
+    def subject(subject, options = {})
       return if is_done?(subject)
       
       subject_done(subject)
@@ -521,7 +570,10 @@ module RDF::RDFa
       add_debug "subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"
 
       # Render this subject
-      render_subject(subject, prop_list, :about => curie, :typeof => typeof) do |pred|
+      # If :rel is specified and :typeof is nil, use @resource instead of @about.
+      # Pass other options from calling context
+      render_opts = {:typeof => typeof}.merge(options)
+      render_subject(subject, prop_list, render_opts) do |pred|
         depth do
           values = properties[pred.to_s]
           add_debug "subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"
@@ -549,7 +601,7 @@ module RDF::RDFa
       render_property(predicate, objects, property, rel) do |o|
         # Yields each object, for potential recursive definition.
         # If nil is returned, a leaf is produced
-        depth {subject(o)} if !is_done?(o) && @subjects.include?(o)
+        depth {subject(o, :rel => rel, :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
       end
     end
     
