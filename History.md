@@ -1,5 +1,7 @@
 ### 0.3.2
-* Added RDFa Writer, to perform generic serialization of RDF content to RDFa.
+* Added RDFa Writer, to perform templated serialization of RDF content to RDFa.
+  * Uses Haml to define default and minimal templates for RDFa serialization.
+  * Allows templates to be specified on invocation, for arbitrary RDFa serialization.
 * Update to pre-LC2 drafts of RDFa
 * Add support for cached profiles, and include cached profiles for XML+RDFa and XHTML+RDFa.
   * Profiles are processed left to right
