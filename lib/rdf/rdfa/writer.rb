@@ -737,7 +737,10 @@ module RDF::RDFa
         yield(*args) if block_given?
       end
     rescue Haml::Error => e
-      raise RDF::WriterError, e.to_s
+      raise RDF::WriterError, "#{e.class}: #{e.message}\n"
+        + "rendering #{template}\n"
+        + "with options #{(@options[:haml_options] || HAML_OPTIONS).inspect}\n"
+        + "and locals #{locals.inspect}"
     end
 
     # Mark a subject as done.
