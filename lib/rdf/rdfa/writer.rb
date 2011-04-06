@@ -609,6 +609,7 @@ module RDF::RDFa
     #
     # @param [RDF::Resource] resource
     # @return [String, nil]
+    # @raise [RDF::WriterError]
     def get_dt_curie(literal)
       raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
       get_curie(literal.datatype) if literal.literal? && literal.datatype?
@@ -618,6 +619,7 @@ module RDF::RDFa
     #
     # @param [RDF::Literal] literal
     # @return [String, nil]
+    # @raise [RDF::WriterError]
     def get_lang(literal)
       raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
       literal.language if literal.literal? && literal.language && literal.language != @lang
@@ -627,6 +629,7 @@ module RDF::RDFa
     #
     # @param [RDF::Literal] literal
     # @return [String, nil]
+    # @raise [RDF::WriterError]
     def get_content(literal)
       raise RDF::WriterError, "Getting content for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
       case literal
@@ -639,6 +642,7 @@ module RDF::RDFa
     #
     # @param [RDF::Literal] literal
     # @return [String]
+    # @raise [RDF::WriterError]
     def get_value(literal)
       raise RDF::WriterError, "Getting value for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
       case literal
@@ -657,6 +661,7 @@ module RDF::RDFa
     #
     # @param [RDF::Resource] resource
     # @return [String]
+    # @raise [RDF::WriterError]
     def get_predicate_name(resource)
       raise RDF::WriterError, "Getting predicate name for #{resource.inspect}, which must be a resource" unless resource.is_a?(RDF::Resource)
       get_curie(resource)
@@ -666,6 +671,7 @@ module RDF::RDFa
     #
     # @param [RDF::Value] resource
     # @return [String] value to use to identify URI
+    # @raise [RDF::WriterError]
     def get_curie(resource)
       raise RDF::WriterError, "Getting CURIE for #{resource.inspect}, which must be an RDF value" unless resource.is_a?(RDF::Value)
       return resource.to_s unless resource.uri?
@@ -719,6 +725,7 @@ module RDF::RDFa
     # @param [Hash{Symbol => Object}] locals
     #   Locals to pass to render
     # @return [String]
+    # @raise [RDF::WriterError]
     def hamlify(template, locals = {})
       template = haml_template[template] if template.is_a?(Symbol)
 
@@ -729,6 +736,8 @@ module RDF::RDFa
       Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(self, locals) do |*args|
         yield(*args) if block_given?
       end
+    rescue Haml::Error => e
+      raise RDF::WriterError, e.to_s
     end
 
     # Mark a subject as done.
