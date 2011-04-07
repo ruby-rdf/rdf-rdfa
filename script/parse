@@ -3,6 +3,7 @@ require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/rdfa'
 require 'rdf/n3' rescue nil
+require 'rdf/rdfxml' rescue nil
 require 'getoptlong'
 require 'open-uri'
 
@@ -11,11 +12,14 @@ def parse(input, base)
   writer_class = RDF::Writer.for($output_format.to_sym)
   raise "Reader not found for #{$input_format}" unless reader_class
   raise "Writer not found for #{$output_format}" unless writer_class
-  puts writer_class.buffer(:standard_prefixes => true, :base_uri => base, :haml_options => {:ugly => false}) { |writer|
-    reader_class.new(input, :base_uri => base, :validate => $validate).each do |statement|
+  prefixes = {}
+  puts writer_class.buffer(:prefixes => prefixes, :base_uri => base, :haml_options => {:ugly => false}) { |writer|
+    reader_class.new(input, :base_uri => base, :validate => $validate, :prefixes => prefixes).each do |statement|
       writer << statement
     end
   }
+  puts "prefixes:"
+  prefixes.each {|k,v| puts "  #{k}: #{v}"}
 end
 
 $verbose = false
