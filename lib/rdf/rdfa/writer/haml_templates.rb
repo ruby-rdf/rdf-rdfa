@@ -66,7 +66,7 @@ module RDF::RDFa
       :property_value => %q(
         - object = objects.first
         - if heading_predicates.include?(predicate) && object.literal?
-          %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+          %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
         - else
           %div.property
             %span.label
@@ -80,7 +80,7 @@ module RDF::RDFa
             - elsif object.datatype == RDF.XMLLiteral
               %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
             - else
-              %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+              %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
       ),
 
       # Output for multi-valued properties
@@ -102,7 +102,7 @@ module RDF::RDFa
               - elsif object.datatype == RDF.XMLLiteral
                 %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
               - else
-                %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+                %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
       ),
     }
 
@@ -164,7 +164,7 @@ module RDF::RDFa
           - elsif object.datatype == RDF.XMLLiteral
             %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
           - else
-            %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= object.to_s
+            %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(object.to_s)
       ),
 
       # Output for multi-valued properties.
@@ -180,7 +180,7 @@ module RDF::RDFa
               - elsif object.datatype == RDF.XMLLiteral
                 %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
               - else
-                %li{:lang => get_lang(object), :datatype => get_dt_curie(object)}&= object.to_s
+                %li{:lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(object.to_s)
       ),
     }
   end
