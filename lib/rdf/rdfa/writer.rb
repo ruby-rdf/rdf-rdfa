@@ -1,4 +1,6 @@
 require 'haml'
+require 'cgi'
+
 require 'rdf/rdfa/patches/graph_properties'
 
 module RDF::RDFa
@@ -69,7 +71,7 @@ module RDF::RDFa
     attr :heading_predicates
 
     HAML_OPTIONS = {
-      :ugly => true, # to preserve whitespace without using entities
+      :ugly => false, # to preserve whitespace without using entities
     }
 
     # @return [Graph] Graph of statements serialized
@@ -107,7 +109,7 @@ module RDF::RDFa
     # @option options [Hash{Symbol => String}] :haml (DEFAULT_HAML)
     #   HAML templates used for generating code
     # @option options [Hash] :haml_options (HAML_OPTIONS)
-    #   Options to pass to Haml::Engine.new. Default options set :ugly => true
+    #   Options to pass to Haml::Engine.new. Default options set :ugly => false
     #   to ensure that whitespace in literals with newlines is properly preserved.
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
@@ -711,6 +713,18 @@ module RDF::RDFa
     end
     private
     
+    ##
+    # Haml rendering helper. Escape entities to avoid whitespace issues.
+    #
+    # # In addtion to "&<>, encode \n and \r to ensure that whitespace is properly preserved
+    #
+    # @param [String] str
+    # @return [String]
+    #   Entity-encoded string
+    def escape_entities(str)
+      CGI.escape_html(str).gsub(/[\n\r]/) {|c| '&#x' + c.unpack('h').first + ';'}
+    end
+
     # Increase depth around a method invocation
     def depth
       @depth += 1
