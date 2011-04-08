@@ -722,7 +722,7 @@ module RDF::RDFa
     # @return [String]
     #   Entity-encoded string
     def escape_entities(str)
-      CGI.escape_html(str).gsub(/[\n\r]/) {|c| '&#x' + c.unpack('h').first + ';'}
+      CGI.escapeHTML(str).gsub(/[\n\r]/) {|c| '&#x' + c.unpack('h').first + ';'}
     end
 
     # Increase depth around a method invocation
