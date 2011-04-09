@@ -692,7 +692,7 @@ module RDF::RDFa
       when u = @uri_to_prefix.keys.detect {|u| uri.index(u.to_s) == 0}
         # Use a defined prefix
         prefix = @uri_to_prefix[u]
-        prefix(prefix.to_sym, u)  # Define for output
+        prefix(prefix, u)  # Define for output
         uri.sub(u.to_s, "#{prefix}:")
       when u = @rdfcore_prefixes.values.detect {|u| uri.index(u.to_s) == 0}
         # Use standard profile prefixes
@@ -701,7 +701,7 @@ module RDF::RDFa
         uri.sub(u.to_s, "#{pfx}:")
       when @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri.index(v.to_uri.to_s) == 0}
         prefix = vocab.__name__.to_s.split('::').last.downcase
-        prefix(prefix.to_sym, vocab.to_uri) # Define for output
+        prefix(prefix, vocab.to_uri) # Define for output
         uri.sub(vocab.to_uri.to_s, "#{prefix}:")
       else
         uri
