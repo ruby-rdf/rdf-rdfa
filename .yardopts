@@ -1,4 +1,4 @@
---title "RDFa parser for RDF.rb."
+--title "RDFa reader/writer for RDF.rb."
 --output-dir doc/yard
 --protected
 --no-private

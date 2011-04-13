@@ -6,19 +6,19 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "rdf-rdfa"
-    gemspec.summary = "RDFa reader for RDF.rb."
+    gemspec.summary = "RDFa reader/writer for RDF.rb."
     gemspec.description = <<-DESCRIPTION
-    RDF::RDFa is an RDFa reader for Ruby using the RDF.rb library suite.
+    RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite.
     DESCRIPTION
     gemspec.email = "gregg@kellogg-assoc.com"
     gemspec.homepage = "http://github.com/gkellogg/rdf-rdfa"
     gemspec.authors = ["Gregg Kellogg"]
-    gemspec.add_dependency('rdf', '>= 0.3.1')
+    gemspec.add_dependency('rdf', '>= 0.3.3')
     gemspec.add_dependency('haml', '>= 3.0.0')
-    gemspec.add_dependency('nokogiri', '>= 1.3.3')
+    gemspec.add_dependency('nokogiri', '>= 1.4.4')
     gemspec.add_development_dependency('spira', '>= 0.0.12')
     gemspec.add_development_dependency('rspec', '>= 2.5.0')
-    gemspec.add_development_dependency('rdf-spec', '>= 0.3.1')
+    gemspec.add_development_dependency('rdf-spec', '>= 0.3.3')
     gemspec.add_development_dependency('rdf-isomorphic', '>= 0.3.4')
     gemspec.add_development_dependency('yard')
     gemspec.extra_rdoc_files     = %w(README.md History.md AUTHORS CONTRIBUTORS)
@@ -42,8 +42,6 @@ RSpec::Core::RakeTask.new("doc:spec") do |spec|
   spec.rspec_opts = ["--format", "html", "-o", "doc/spec.html"]
 end
 
-YARD::Rake::YardocTask.new do |t|
-  t.files   = %w(lib/**/*.rb README.md History.md AUTHORS CONTRIBUTORS UNLICENSE)   # optional
-end
+YARD::Rake::YardocTask.new
 
 task :default => :spec
