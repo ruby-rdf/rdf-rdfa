@@ -66,6 +66,11 @@ module RDF::RDFa
     # @return [Array<URI>]
     attr :top_classes
     
+    # Defines order of predicates to to emit at begninning of a resource description. Defaults to
+    # [rdf:type, rdfs:label, dc:title]
+    # @return [Array<URI>]
+    attr :predicate_order
+    
     # Defines order of predicates to use in heading.
     # @return [Array<URI>]
     attr :heading_predicates
@@ -77,7 +82,7 @@ module RDF::RDFa
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
 
-    # @return [URI] Base URI used for relativizing URIs
+    # @return [RDF::URI] Base URI used for relativizing URIs
     attr_accessor :base_uri
     
     ##
@@ -104,9 +109,11 @@ module RDF::RDFa
     #   Repository to find and save profile graphs.
     # @option options [Array<RDF::URI>] :top_classes ([RDF::RDFS.Class])
     #   Defines rdf:type of subjects to be emitted at the beginning of the document.
+    # @option options [Array<RDF::URI>] :predicate_order ([RDF.type, RDF::RDFS.label, RDF::DC.title])
+    #   Defines order of predicates to to emit at begninning of a resource description..
     # @option options [Array<RDF::URI>] :heading_predicates ([RDF::RDFS.label, RDF::DC.title])
     #   Defines order of predicates to use in heading.
-    # @option options [Hash{Symbol => String}] :haml (DEFAULT_HAML)
+    # @option options [String, Symbol, Hash{Symbol => String}] :haml (DEFAULT_HAML)
     #   HAML templates used for generating code
     # @option options [Hash] :haml_options (HAML_OPTIONS)
     #   Options to pass to Haml::Engine.new. Default options set :ugly => false
@@ -119,6 +126,7 @@ module RDF::RDFa
         @uri_to_term_or_curie = {}
         @uri_to_prefix = {}
         @top_classes = options[:top_classes] || [RDF::RDFS.Class]
+        @predicate_order = options[:predicate_order] || [RDF.type, RDF::RDFS.label, RDF::DC.title]
         @heading_predicates = options[:heading_predicates] || [RDF::RDFS.label, RDF::DC.title]
         @graph = RDF::Graph.new
 
@@ -128,7 +136,11 @@ module RDF::RDFa
 
     # @return [Hash<Symbol => String>]
     def haml_template
-      @options[:haml] || DEFAULT_HAML
+      case @options[:haml]
+      when Symbol, String   then HAML_TEMPLATES.fetch(@options[:haml].to_sym, DEFAULT_HAML)
+      when Hash             then @options[:haml]
+      else                       DEFAULT_HAML
+      end
     end
 
     # @return [RDF::Repository]
@@ -176,7 +188,7 @@ module RDF::RDFa
     #
     # @return [void]
     def write_epilogue
-      @base_uri = @options[:base_uri]
+      @base_uri = RDF::URI(@options[:base_uri]) if @options[:base_uri]
       @lang = @options[:lang]
       @debug = @options[:debug]
       self.reset
@@ -185,28 +197,31 @@ module RDF::RDFa
 
       preprocess
 
-      add_debug "\nserialize: graph prefixes: #{prefixes.inspect}"
-
       # Profiles
       profile = @options[:profiles].join(" ") if @options[:profiles]
 
       # Prefixes
       prefix = prefixes.keys.map {|pk| "#{pk}: #{prefixes[pk]}"}.sort.join(" ") unless prefixes.empty?
+      add_debug "\nserialize: prefixes: #{prefix.inspect}"
 
       subjects = order_subjects
       
-      # If the first subject has a predicate which we recognize has being for a title,
-      # use it as the document title.
-      @graph.properties(subjects.first).each do |pred, value|
-        next unless heading_predicates.include?(pred)
-        @doc_title ||= value.first
+      # Take title from first subject having a heading predicate
+      doc_title = nil
+      titles = {}
+      heading_predicates.each do |pred|
+        @graph.query(:predicate => pred) do |statement|
+          titles[statement.subject] ||= statement.object
+        end
       end
+      title_subject = subjects.detect {|subject| titles[subject]}
+      doc_title = titles[title_subject]
 
       # Generate document
       doc = render_document(subjects,
         :lang     => @lang,
         :base     => @base_uri,
-        :title    => @doc_title,
+        :title    => doc_title,
         :profile  => profile,
         :prefix   => prefix) do |s|
         subject(s)
@@ -451,17 +466,26 @@ module RDF::RDFa
     
     # Order subjects for output. Override this to output subjects in another order.
     #
-    # Uses top_classes
+    # Uses #top_classes and #base_uri.
     # @return [Array<Resource>] Ordered list of subjects
     def order_subjects
       seen = {}
       subjects = []
       
-      top_classes.each do |class_uri|
+      # Start with base_uri
+      if base_uri && @subjects.keys.include?(base_uri)
+        subjects << base_uri
+        seen[base_uri] = true
+      end
+      
+      # Add distinguished classes
+      top_classes.
+      select {|s| !seen.include?(s)}.
+        each do |class_uri|
         graph.query(:predicate => RDF.type, :object => class_uri).map {|st| st.subject}.sort.uniq.each do |subject|
           #add_debug "order_subjects: #{subject.inspect}"
           subjects << subject
-          seen[subject] = @top_levels[subject] = true
+          seen[subject] = true
         end
       end
       
@@ -478,7 +502,7 @@ module RDF::RDFa
     # Sort the lists of values.  Return a sorted list of properties.
     #
     # @param [Hash{String => Array<Resource>}] properties A hash of Property to Resource mappings
-    # @return [Array<String>}] Ordered list of properties.
+    # @return [Array<String>}] Ordered list of properties. Uses predicate_order.
     def order_properties(properties)
       properties.keys.each do |k|
         properties[k] = properties[k].sort do |a, b|
@@ -491,6 +515,11 @@ module RDF::RDFa
       
       # Make sorted list of properties
       prop_list = []
+      
+      predicate_order.each do |prop|
+        next unless properties[prop]
+        prop_list << prop.to_s
+      end
       
       properties.keys.sort.each do |prop|
         prop = prop =~ /^_:(.*)$/ ? RDF::Node.intern($1) : RDF::URI.intern(prop)
@@ -524,7 +553,6 @@ module RDF::RDFa
       @references = {}
       @serialized = {}
       @subjects = {}
-      @top_levels = {}
     end
 
     protected
@@ -684,29 +712,38 @@ module RDF::RDFa
 
       curie = case
       when @uri_to_term_or_curie.has_key?(uri)
+        #add_debug("get_curie(#{uri}): uri_to_term_or_curie")
         return @uri_to_term_or_curie[uri]
       when @base_uri && uri.index(@base_uri.to_s) == 0
+        #add_debug("get_curie(#{uri}): base_uri (#{uri.sub(@base_uri.to_s, "")})")
         uri.sub(@base_uri.to_s, "")
       when @vocabulary && uri.index(@vocabulary) == 0
+        #add_debug("get_curie(#{uri}): vocabulary")
         uri.sub(@vocabulary, "")
       when u = @uri_to_prefix.keys.detect {|u| uri.index(u.to_s) == 0}
+        #add_debug("get_curie(#{uri}): uri_to_prefix")
         # Use a defined prefix
         prefix = @uri_to_prefix[u]
         prefix(prefix, u)  # Define for output
         uri.sub(u.to_s, "#{prefix}:")
       when u = @rdfcore_prefixes.values.detect {|u| uri.index(u.to_s) == 0}
+        #add_debug("get_curie(#{uri}): rdfcore_prefixes")
         # Use standard profile prefixes
         pfx = @rdfcore_prefixes.invert[u]
         prefix(pfx, u)  # Define for output
         uri.sub(u.to_s, "#{pfx}:")
       when @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri.index(v.to_uri.to_s) == 0}
+        #add_debug("get_curie(#{uri}): standard_prefixes")
         prefix = vocab.__name__.to_s.split('::').last.downcase
         prefix(prefix, vocab.to_uri) # Define for output
         uri.sub(vocab.to_uri.to_s, "#{prefix}:")
       else
+        #add_debug("get_curie(#{uri}): none")
         uri
       end
       
+      #add_debug("get_curie(#{resource}) => #{curie}")
+
       @uri_to_term_or_curie[uri] = curie
     rescue Addressable::URI::InvalidURIError => e
       raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
