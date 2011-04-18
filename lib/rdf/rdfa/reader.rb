@@ -220,9 +220,11 @@ module RDF::RDFa
           Nokogiri::XML.parse(input, @base_uri.to_s)
         end
         
-        add_error(nil, "Empty document", RDF::RDFA.DocumentError) if (@doc.nil? || @doc.root.nil?)
+        if (@doc.nil? || @doc.root.nil?)
+          add_error(nil, "Empty document", RDF::RDFA.DocumentError)
+          raise RDF::ReaderError, "Empty Document"
+        end
         add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
-        add_error("Empty document") if (@doc.nil? || @doc.root.nil?) && validate?
 
         @version = options[:version] ? options[:version].to_sym : nil
         
