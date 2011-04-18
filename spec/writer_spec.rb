@@ -21,7 +21,7 @@ describe RDF::RDFa::Writer do
     context "prefix definitions" do
       subject do
         @graph << [EX.a, RDF::DC.title, "foo"]
-        serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"}, :haml_options => {:ugly => false})
+        serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
       end
 
       specify { subject.should have_xpath("/xhtml:html/@prefix", %r(dc: http://purl.org/dc/terms/))}
@@ -49,7 +49,7 @@ describe RDF::RDFa::Writer do
     context "dc:title" do
       subject do
         @graph << [EX.a, RDF::DC.title, "foo"]
-        serialize(:prefixes => {:dc => RDF::DC.to_s}, :haml_options => {:ugly => false})
+        serialize(:prefixes => {:dc => RDF::DC.to_s})
       end
 
       {
@@ -103,7 +103,7 @@ describe RDF::RDFa::Writer do
       context "literal with language and no default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
-          serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"}, :haml_options => {:ugly => false})
+          serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
         end
 
         {
@@ -119,7 +119,7 @@ describe RDF::RDFa::Writer do
       context "literal with language and same default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
-          serialize(:lang => :en, :haml_options => {:ugly => false})
+          serialize(:lang => :en)
         end
 
         {
@@ -135,7 +135,7 @@ describe RDF::RDFa::Writer do
       context "literal with language and different default language" do
         subject do
           @graph << [EX.a, RDF::DC.title, RDF::Literal("foo", :language => :en)]
-          serialize(:lang => :de, :haml_options => {:ugly => false})
+          serialize(:lang => :de)
         end
 
         {
@@ -335,10 +335,7 @@ describe RDF::RDFa::Writer do
       require 'test_helper'
 
       # Generate with each template set
-      {
-        :default  => RDF::RDFa::Writer::DEFAULT_HAML,
-        :min      => RDF::RDFa::Writer::MIN_HAML,
-      }.each do |name, template|
+      RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
         context "Using #{name} template" do
           Fixtures::TestCase.for_specific("xhtml1", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
             next if t.name == "0212"  # XMLLiteral equivalence
@@ -346,7 +343,7 @@ describe RDF::RDFa::Writer do
               begin
                 input = t.input("xhtml1", "rdfa1.1")
                 @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
-                result = serialize(:haml => template, :haml_options => {:ugly => true})
+                result = serialize(:haml => template, :haml_options => {:ugly => false})
                 graph2 = parse(result, :format => :rdfa)
                 graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
               rescue RSpec::Expectations::ExpectationNotMetError => e
