@@ -1,0 +1,86 @@
+@base <http://recipes.payswarm.com/?p=10185> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix cal: <http://www.w3.org/2002/12/cal/ical#> .
+@prefix cc: <http://creativecommons.org/ns#> .
+@prefix com: <http://purl.org/commerce#> .
+@prefix dbp: <http://dbpedia.org/property/> .
+@prefix dbp-owl: <http://dbpedia.org/ontology/> .
+@prefix dbr: <http://dbpedia.org/resource/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix gr: <http://purl.org/goodrelations/v1#> .
+@prefix grddl: <http://www.w3.org/2003/g/data-view#> .
+@prefix og: <http://ogp.me/ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ps: <http://purl.org/payswarm#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfa: <http://www.w3.org/ns/rdfa#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rif: <http://www.w3.org/2007/rif#> .
+@prefix rss: <http://purl.org/rss/1.0/> .
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
+@prefix sig: <http://purl.org/signature#> .
+@prefix sioc: <http://rdfs.org/sioc/ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix v: <http://rdf.data-vocabulary.org/#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix wdr: <http://www.w3.org/2007/05/powder#> .
+@prefix wdrs: <http://www.w3.org/2007/05/powder-s#> .
+@prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xmlns: <http://www.w3.org/2000/xmlns/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<#listing> com:payee <#listing-payee>;
+   com:payeeRule [ com:destinationOwnerType ps:Authority;
+     com:maximumRate "11.45"@en-US;
+     com:rateContext com:Inclusive,
+     com:Tax,
+     com:TaxExempt;
+     com:rateType com:Percentage;
+     a com:PayeeRule];
+   ps:asset <#asset>;
+   ps:assetHash "025b9b9f1eea31a9431f0c181a22df8a8257fc49"@en-US;
+   ps:license <http://purl.org/payswarm/licenses/blogging>;
+   ps:licenseHash "b94ba441c42432e82b6e3a076f4c614f83cac6ef"@en-US;
+   ps:validFrom "2011-04-18T00:00:00+0000"^^xsd:dateTime;
+   ps:validUntil "2011-04-19T00:00:00+0000"^^xsd:dateTime;
+   sig:signature [ dc:created "2011-04-18T00:00:00Z"^^xsd:dateTime;
+     dc:creator <https://payswarm.com/i/devuser/keys/4>;
+     sig:signatureValue "MqF1r37JSev+2uUKdr1ZOWVfNbTx8YdBZUMW4hlgeQyIiYxfbHF+eYhU+NLFrclTjj3i7qnwREIIBP0O0BFk72JIBl3JcCDKpfbA7pqiFuaGvxr9+Ba7o0pYojo0A6Mc/+0UD5rjdJc+qAH9hnMOzKpjyeMxUcR1Z6w0XXKXc8A="@en-US;
+     a sig:JsonldSignature];
+   a gr:Offering,
+   ps:Listing .
+<> xhv:alternate <https://recipes.payswarm.com/?feed=comments-rss2>,
+   <https://recipes.payswarm.com/?feed=rss2>,
+   <https://recipes.payswarm.com/?feed=rss2&p=10185>;
+   xhv:bookmark <https://recipes.payswarm.com/?p=10185>;
+   xhv:index <https://recipes.payswarm.com>;
+   xhv:next <https://recipes.payswarm.com/?p=10186>;
+   xhv:prev <https://recipes.payswarm.com/?p=10184>;
+   xhv:start <https://recipes.payswarm.com/?p=1>;
+   xhv:stylesheet <https://recipes.payswarm.com/wp-content/plugins/payswarm/payswarm.css?ver=3.1>,
+   <https://recipes.payswarm.com/wp-content/themes/twentyten/style.css> .
+<#asset> dc:creator [ foaf:name "chef"@en-US];
+   dc:title "Soft Breadsticks"@en-US;
+   ps:assetProvider <https://dev.payswarm.com:19100/i/devuser>;
+   ps:authority <https://payswarm.dev:19100/client-config>;
+   ps:contentUrl <>;
+   sig:signature [ dc:created "2011-04-18T00:00:00Z"^^xsd:dateTime;
+     dc:creator <https://payswarm.com/i/devuser/keys/4>;
+     sig:signatureValue "GYQHOxTJeyfky4NkxTm/IEcVGKYq7omDXPwdX+CYlJD9ur6RX35jM/RS3SeB7teGlJs1KtAx+l4ZUsAZa4sINYkr9fKh0k0K7TCbXp2X5sJ4ZCE3AvxZfc4IQEMuiiq+C8LHJv6g6tVmdl25UIbfroEBd/Hv+ID995VgapsSmQo="@en-US;
+     a sig:JsonldSignature];
+   a ps:Asset,
+   ps:WebPage .
+<#listing-payee> com:currency "USD"@en-US;
+   com:destination <https://dev.payswarm.com:19100/i/devuser/accounts/primary>;
+   com:payeePosition "0"^^xsd:integer;
+   com:rate "0.04597"@en-US;
+   com:rateType com:FlatAmount;
+   a com:Payee;
+   rdfs:comment "Payment for Soft Breadsticks by chef."@en-US .
