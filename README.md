@@ -249,11 +249,25 @@ Full documentation available on [RubyForge](http://rdf.rubyforge.org/rdfa)
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
 * [RDFa-test-suite](http://rdfa.digitalbazaar.com/test-suite/              "RDFa test suite")
 
-## AUTHOR
+## Author
 * [Gregg Kellogg](http://github.com/gkellogg) - <http://kellogg-assoc.com/>
 
-## CONTRIBUTORS
+## Contributors
 * [Nicholas Humfrey](http://github.com/njh)
+
+## Contributing
+
+* Do your best to adhere to the existing coding conventions and idioms.
+* Don't use hard tabs, and don't leave trailing whitespace on any line.
+* Do document every method you add using [YARD][] annotations. Read the
+  [tutorial][YARD-GS] or just look at the existing code for examples.
+* Don't touch the `.gemspec`, `VERSION` or `AUTHORS` files. If you need to
+  change them, do so on your private branch only.
+* Do feel free to add yourself to the `CREDITS` file and the corresponding
+  list in the the `README`. Alphabetical order applies.
+* Do note that in order for us to merge any non-trivial changes (as a rule
+  of thumb, additions larger than about 15 lines of code), we need an
+  explicit [public domain dedication][PDD] on record from you.
 
 ## License
 
@@ -268,6 +282,9 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 * <http://lists.w3.org/Archives/Public/public-rdf-ruby/>
 
 [RDF.rb]:           http://rdf.rubyforge.org/
+[YARD]:             http://yardoc.org/
+[YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
+[PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
 [RDFa 1.1 Core]:    http://www.w3.org/TR/2010/WD-rdfa-core-20100422/     "RDFa 1.1 Core"
 [XHTML+RDFa 1.1]:   http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/   "XHTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
