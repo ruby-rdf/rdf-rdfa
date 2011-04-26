@@ -76,7 +76,7 @@ opts = GetoptLong.new(
   ["--quiet", GetoptLong::NO_ARGUMENT],
   ["--validate", GetoptLong::NO_ARGUMENT],
   ["--verbose", GetoptLong::NO_ARGUMENT],
-  ["--version", "-v", GetoptLong::OPTIONAL_ARGUMENT],
+  ["--version", "-v", GetoptLong::OPTIONAL_ARGUMENT]
 )
 
 def help(options)
