@@ -1,4 +1,5 @@
 source "http://rubygems.org"
+gem 'addressable',      '2.2.4'
 gem 'rdf',              :git => "https://github.com/gkellogg/rdf.git", :branch => "query-algebra"
 gem 'haml',             '>= 3.0.0'
 gem 'nokogiri',         '>= 1.3.3'
