@@ -1,3 +1,6 @@
+### 0.3.3
+* Major update to writer using Haml templates, rather than Nokogiri node creation.
+
 ### 0.3.2
 * Added RDFa Writer, to perform templated serialization of RDF content to RDFa.
   * Uses Haml to define default and minimal templates for RDFa serialization.
