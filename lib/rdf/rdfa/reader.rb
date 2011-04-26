@@ -195,28 +195,9 @@ module RDF::RDFa
         @processor_graph = options[:processor_graph]
 
         @doc = case input
-        when Nokogiri::HTML::Document
-          @host_language ||= :xhtml1
-        when Nokogiri::XML::Document
+        when Nokogiri::HTML::Document, Nokogiri::XML::Document
           input
         else
-          # Intuit from content type
-          @host_language ||= case input.respond_to?(:content_type) && input.content_type
-          when "text/xml", "application/xml"
-            :xml1
-          when "text/html", "application/xhtml+xml"
-            :xhtml1
-          when "image/svg+xml"
-            :svg
-          end
-          
-          # Intuit from file extension
-          @host_language ||= case input.respond_to?(:path) && File.extname(input.path.to_s)
-          when ".html"  then :html5
-          when ".xhtml" then :xhtml1
-          when ".svg"   then :svg
-          end
- 
           Nokogiri::XML.parse(input, @base_uri.to_s)
         end
         
@@ -247,7 +228,6 @@ module RDF::RDFa
         @host_language ||= case @doc.root.name.downcase.to_sym
         when :html  then :xhtml1
         when :svg   then :svg
-        else             :xml
         end
 
         # Otherwise, treat it as XML
