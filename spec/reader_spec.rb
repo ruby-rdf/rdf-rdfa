@@ -528,12 +528,26 @@ describe "RDF::RDFa::Reader" do
               specify "test #{t.name}: #{t.title}#{",  (negative test)" if t.expectedResults.false?}" do
                 begin
                   t.debug = []
-                  graph = RDF::Graph.load(t.input(host_language, version), :debug => t.debug, :format => :rdfa)
+                  reader = RDF::Reader.open(t.input(host_language, version),
+                    :base_uri => t.input(host_language, version),
+                    :debug => t.debug,
+                    :format => :rdfa)
+                  reader.should be_a RDF::Reader
+
+                  # Make sure auto-detect works
+                  unless host_language =~ /svg/
+                    reader.host_language.should == host_language.to_sym
+                    reader.version.should == version.to_sym
+                  end
+
+                  graph = RDF::Graph.new << reader
                   query = Kernel.open(t.results(host_language, version))
                   graph.should pass_query(query, t)
                 rescue RSpec::Expectations::ExpectationNotMetError => e
                   if %w(0198).include?(t.name) || query =~ /XMLLiteral/m
                     pending("XMLLiteral canonicalization not implemented yet")
+                  elsif %w(html4 html5).include?(host_language) && Kernel.open(t.input(host_language, version)) {|f| f.read =~ /xmlns/}
+                    pending("HTML parsing does not use xmlns")
                   elsif classification != "required"
                     pending("#{classification} test") {  raise }
                   else

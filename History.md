@@ -1,3 +1,7 @@
+### 0.3.3.1
+* Improve format detection.
+* Use HTML parser instead of XML if format is determined to be html4 or html5.
+
 ### 0.3.3
 * Major update to writer using Haml templates, rather than Nokogiri node creation.
 

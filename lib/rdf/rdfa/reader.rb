@@ -12,6 +12,7 @@ module RDF::RDFa
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
     format Format
+    XHTML = "http://www.w3.org/1999/xhtml"
     
     SafeCURIEorCURIEorURI = {
       :"rdfa1.0" => [:term, :safe_curie, :uri, :bnode],
@@ -191,14 +192,20 @@ module RDF::RDFa
         @debug = options[:debug]
         @base_uri = uri(options[:base_uri])
 
-        @host_language = options[:host_language]
+        detect_host_language_version(input, options)
+        
         @processor_graph = options[:processor_graph]
 
         @doc = case input
         when Nokogiri::HTML::Document, Nokogiri::XML::Document
           input
         else
-          Nokogiri::XML.parse(input, @base_uri.to_s)
+          case @host_language
+          when :html4, :html5
+            Nokogiri::HTML.parse(input, @base_uri.to_s)
+          else
+            Nokogiri::XML.parse(input, @base_uri.to_s)
+          end
         end
         
         if (@doc.nil? || @doc.root.nil?)
@@ -206,32 +213,6 @@ module RDF::RDFa
           raise RDF::ReaderError, "Empty Document"
         end
         add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
-
-        @version = options[:version] ? options[:version].to_sym : nil
-        
-        # Check for version of the processor to use:
-        # * Check document type for "XHTML+RDFa 1.0"
-        # * Check @version attribute on the html element for the value "XHTML+RDFa 1.0"
-        @version ||= :"rdfa1.0" if @doc.doctype.to_s =~ /RDFa 1\.0/
-        @version ||= :"rdfa1.0" if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.0/
-        @version ||= :"rdfa1.1" if @doc.root && @doc.root.attribute("version").to_s =~ /RDFa 1\.1/
-        @version ||= :"rdfa1.1"
-
-        # Intuit host_language from doctype
-        @host_language ||= case @doc.doctype.to_s
-        when /html 4/i      then :html4
-        when /xhtml\+rdfa/i then :xhtml1
-        when /html/         then :html5
-        end
-        
-        # Determine host language from element name
-        @host_language ||= case @doc.root.name.downcase.to_sym
-        when :html  then :xhtml1
-        when :svg   then :svg
-        end
-
-        # Otherwise, treat it as XML
-        @host_language ||= :xml1
 
         # Section 4.2 RDFa Host Language Conformance
         #
@@ -264,6 +245,76 @@ module RDF::RDFa
       self.profile_repository = options[:profile_repository] if options[:profile_repository]
     end
 
+    # Determine the host language and/or version from options and the input document
+    def detect_host_language_version(input, options)
+      @host_language = options[:host_language] ? options[:host_language].to_sym : nil
+      @version = options[:version] ? options[:version].to_sym : nil
+      return if @host_language && @version
+      
+      # Snif version based on input
+      case input
+      when Nokogiri::XML::Document, Nokogiri::HTML::Document
+        doc_type_string = input.doc_type.to_s
+        version_attr = input.root && @doc.root.attribute("version").to_s
+        root_element = input.root.name.downcase
+        root_namespace = input.root.namespace.to_s
+        root_attrs = input.root.attributes
+        content_type = case
+        when root_element == "html" && input.is_a?(Nokogiri::HTML::Document)
+          "text/html"
+        when root_element == "html" && input.is_a?(Nokogiri::XML::Document)
+          "application/xhtml+html"
+        end
+      else
+        content_type = input.content_type if input.respond_to?(:content_type)
+
+        # Determine from head of document
+        head = if input.respond_to?(:read)
+          input.rewind
+          string = input.read(1000)
+          input.rewind
+          string
+        else
+          input.to_s[0..1000]
+        end
+        
+        doc_type_string = head.match(%r(<!DOCTYPE[^>]*>)m).to_s
+        root = head.match(%r(<[^!\?>]*>)m).to_s
+        root_element = root.match(%r(^<(\S+)[ >])) ? $1 : ""
+        version_attr = root.match(/version\s+=\s+(\S+)[\s">]/m) ? $1 : ""
+      end
+
+      # Already using XML parser, determine from DOCTYPE and/or root element
+      @version ||= :"rdfa1.0" if doc_type_string =~ /RDFa 1\.0/
+      @version ||= :"rdfa1.0" if version_attr =~ /RDFa 1\.0/
+      @version ||= :"rdfa1.1" if version_attr =~ /RDFa 1\.1/
+      @version ||= :"rdfa1.1"
+
+      @host_language ||= case content_type
+      when "application/xml"  then :xml1
+      when "image/svg+xml"    then :svg
+      when "text/html"
+        case doc_type_string
+        when /html 4/i        then :html4
+        when /xhtml/i         then :xhtml1
+        when /html/i          then :html5
+        end
+      when "application/xhtml+xml"
+        case doc_type_string
+        when /html 4/i        then :html4
+        when /xhtml/i         then :xhtml1
+        when /html/i          then :xhtml5
+        end
+      else
+        case root_element
+        when /svg/i           then :svg
+        when /html/i          then :html4
+        end
+      end
+      
+      @host_language ||= :xml1
+    end
+    
     # @return [RDF::Repository]
     def profile_repository
       Profile.repository

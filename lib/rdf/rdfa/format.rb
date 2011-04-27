@@ -22,7 +22,6 @@ module RDF::RDFa
     content_type     'text/html', :extension => :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
-    XMLNS = 'http://www.w3.org/1999/xhtml'  # FIXME: This or XHV or none at all?
   end
 
   # Aliases for RDFa::Format
