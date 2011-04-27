@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rdf-rdfa}
-  s.version = "0.3.3"
+  s.version = "0.3.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gregg Kellogg"]
-  s.date = %q{2011-04-25}
+  s.date = %q{2011-04-26}
   s.description = %q{    RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite.
 }
   s.email = %q{gregg@kellogg-assoc.com}
@@ -34,6 +34,8 @@ Gem::Specification.new do |s|
     "etc/foaf.html",
     "etc/profile.html",
     "etc/xhv.html",
+    "example-files/bb-test.rb",
+    "example-files/best-buy.html",
     "example-files/data-view.xhtml",
     "example-files/erdf_profile.html",
     "example-files/payswarm.html",
