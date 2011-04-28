@@ -145,7 +145,7 @@ module RDF::RDFa
       end
       
       def inspect
-        v = %w(base parent_subject parent_object language default_vocabulary).map {|a| "#{a}='#{self.send(a).nil? ? '<nil>' : self.send(a)}'"}
+        v = %w(base parent_subject parent_object language default_vocabulary).map {|a| "#{a}='#{self.send(a).inspect}'"}
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
         v << "term_mappings[#{term_mappings.keys.length}]"
@@ -200,11 +200,17 @@ module RDF::RDFa
         when Nokogiri::HTML::Document, Nokogiri::XML::Document
           input
         else
+          # Try to detect charset from input
+          options[:encoding] ||= input.charset if input.respond_to?(:charset)
+          
+          # Otherwise, default is utf-8
+          options[:encoding] ||= 'utf-8'
+
           case @host_language
           when :html4, :html5
-            Nokogiri::HTML.parse(input, @base_uri.to_s)
+            Nokogiri::HTML.parse(input, @base_uri.to_s, options[:encoding])
           else
-            Nokogiri::XML.parse(input, @base_uri.to_s)
+            Nokogiri::XML.parse(input, @base_uri.to_s, options[:encoding])
           end
         end
         
@@ -282,6 +288,20 @@ module RDF::RDFa
         root = head.match(%r(<[^!\?>]*>)m).to_s
         root_element = root.match(%r(^<(\S+)[ >])) ? $1 : ""
         version_attr = root.match(/version\s+=\s+(\S+)[\s">]/m) ? $1 : ""
+        head_element = head.match(%r(<head.*<\/head>)mi)
+        head_doc = Nokogiri::HTML.parse(head_element.to_s)
+        
+        # May determine content-type and/or charset from meta
+        # Easist way is to parse head into a document and iterate
+        # of CSS matches
+        head_doc.css("meta").each do |e|
+          if e.attr("http-equiv").to_s.downcase == 'content-type'
+            content_type, e = e.attr("content").to_s.downcase.split(";")
+            options[:encoding] = $1.downcase if e.to_s =~ /charset=([^\s]*)$/i
+          elsif e.attr("charset")
+            options[:encoding] = e.attr("charset").to_s.downcase
+          end
+        end
       end
 
       # Already using XML parser, determine from DOCTYPE and/or root element
@@ -507,19 +527,33 @@ module RDF::RDFa
       # Regardless of how the mapping is declared, the value to be mapped must be converted to lower case,
       # and the URI is not processed in any way; in particular if it is a relative path it is
       # not resolved against the current base.
+      ns_defs = {}
       element.namespace_definitions.each do |ns|
+        ns_defs[ns.prefix] = ns.href.to_s
+      end
+
+      # HTML parsing doesn't create namespace_definitions
+      if ns_defs.empty?
+        ns_defs = {}
+        element.attributes.each do |k, v|
+          ns_defs[$1] = v.to_s if k =~ /^xmlns(?:\:(.+))?/
+        end
+      end
+
+      ns_defs.each do |prefix, href|
         # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
-        next if ns.prefix == "_"
+        next if prefix == "_"
 
         # Downcase prefix for RDFa 1.1
-        pfx_lc = (@version == :"rdfa1.0" || ns.prefix.nil?) ? ns.prefix : ns.prefix.to_s.downcase
-        if ns.prefix
-          uri_mappings[pfx_lc.to_sym] = ns.href
-          namespaces[pfx_lc] ||= ns.href
-          prefix(pfx_lc, ns.href)
-          add_info(element, "extract_mappings: xmlns:#{ns.prefix} => <#{ns.href}>")
+        pfx_lc = (@version == :"rdfa1.0" || prefix.nil?) ? prefix : prefix.downcase
+        if prefix
+          uri_mappings[pfx_lc.to_sym] = href
+          namespaces[pfx_lc] ||= href
+          prefix(pfx_lc, href)
+          add_info(element, "extract_mappings: #{prefix} => <#{href}>")
         else
-          namespaces[""] ||= ns.href
+          add_info(element, "extract_mappings: nil => <#{href}>")
+          namespaces[""] ||= href
         end
       end
 
@@ -672,6 +706,10 @@ module RDF::RDFa
       #   attribute in no namespace must be ignored for the purposes of determining the element's
       #   language.
       language = case
+      when @doc.is_a?(Nokogiri::HTML::Document) && element.attributes["xml:lang"]
+        element.attributes["xml:lang"].to_s
+      when @doc.is_a?(Nokogiri::HTML::Document) && element.attributes["lang"]
+        element.attributes["lang"].to_s
       when element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s)
         element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s).to_s
       when element.at_xpath("@lang")

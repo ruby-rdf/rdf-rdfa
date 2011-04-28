@@ -546,8 +546,6 @@ describe "RDF::RDFa::Reader" do
                 rescue RSpec::Expectations::ExpectationNotMetError => e
                   if %w(0198).include?(t.name) || query =~ /XMLLiteral/m
                     pending("XMLLiteral canonicalization not implemented yet")
-                  elsif %w(html4 html5).include?(host_language) && Kernel.open(t.input(host_language, version)) {|f| f.read =~ /xmlns/}
-                    pending("HTML parsing does not use xmlns")
                   elsif classification != "required"
                     pending("#{classification} test") {  raise }
                   else
