@@ -535,7 +535,7 @@ describe "RDF::RDFa::Reader" do
                   reader.should be_a RDF::Reader
 
                   # Make sure auto-detect works
-                  unless host_language =~ /svg/
+                  unless host_language =~ /svg/ || t.name == "0216" # due to http-equiv
                     reader.host_language.should == host_language.to_sym
                     reader.version.should == version.to_sym
                   end
