@@ -1,3 +1,10 @@
+### 0.3.3.2
+* In Reader:
+  * Ensure that encoding is set to utf-8 if not specified.
+  * Look for encoding from input and HTML meta tags.
+  * Look for content-type from input and HTML meta tags.
+  * Retrieve @xmlns, @xml:lang and @lang as attributes when doing HTML parsing.
+
 ### 0.3.3.1
 * Improve format detection.
 * Use HTML parser instead of XML if format is determined to be html4 or html5.
