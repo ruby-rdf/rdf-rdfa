@@ -51,7 +51,7 @@ task :update_profiles do
     puts "Build #{uri}"
     vocab = File.expand_path(File.join(File.dirname(__FILE__), "lib", "rdf", "rdfa", "profile", "#{v}.rb"))
     FileUtils.rm(vocab)
-    sh "./script/intern_vocabulary -o #{vocab} #{uri}"
+    `./script/intern_vocabulary -o #{vocab} #{uri}`
   end
 end
 

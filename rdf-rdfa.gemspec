@@ -38,6 +38,7 @@ Gem::Specification.new do |s|
     "example-files/best-buy.html",
     "example-files/data-view.xhtml",
     "example-files/erdf_profile.html",
+    "example-files/gk-foaf.html",
     "example-files/payswarm.html",
     "example-files/payswarm.n3",
     "example.rb",
