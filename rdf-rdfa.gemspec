@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rdf-rdfa}
-  s.version = "0.3.3.2"
+  s.version = "0.3.3.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gregg Kellogg"]
-  s.date = %q{2011-04-29}
+  s.date = %q{2011-06-09}
   s.description = %q{    RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite.
 }
   s.email = %q{gregg@kellogg-assoc.com}
@@ -75,17 +75,8 @@ Gem::Specification.new do |s|
   ]
   s.homepage = %q{http://github.com/gkellogg/rdf-rdfa}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.5.0}
+  s.rubygems_version = %q{1.6.2}
   s.summary = %q{RDFa reader/writer for RDF.rb.}
-  s.test_files = [
-    "spec/literal_spec.rb",
-    "spec/matchers.rb",
-    "spec/profile_spec.rb",
-    "spec/reader_spec.rb",
-    "spec/spec_helper.rb",
-    "spec/test_helper.rb",
-    "spec/writer_spec.rb"
-  ]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3

@@ -1,3 +1,6 @@
+### 0.3.3.3
+* Minor update to rdfa-1-1 profile
+
 ### 0.3.3.2
 * In Reader:
   * Ensure that encoding is set to utf-8 if not specified.

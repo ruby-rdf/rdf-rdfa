@@ -42,6 +42,19 @@ RSpec::Core::RakeTask.new("doc:spec") do |spec|
   spec.rspec_opts = ["--format", "html", "-o", "doc/spec.html"]
 end
 
+desc "Update RDFa Profiles"
+task :update_profiles do
+  {
+    :xhtml => "http://www.w3.org/profile/html-rdfa-1.1",
+    :xml => "http://www.w3.org/profile/rdfa-1.1",
+  }.each do |v, uri|
+    puts "Build #{uri}"
+    vocab = File.expand_path(File.join(File.dirname(__FILE__), "lib", "rdf", "rdfa", "profile", "#{v}.rb"))
+    FileUtils.rm(vocab)
+    sh "./script/intern_vocabulary -o #{vocab} #{uri}"
+  end
+end
+
 YARD::Rake::YardocTask.new
 
 task :default => :spec

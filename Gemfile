@@ -1,12 +1,12 @@
 source "http://rubygems.org"
 gem 'addressable',      '2.2.4'
-gem 'rdf',              :git => "https://github.com/gkellogg/rdf.git", :branch => "query-algebra"
+gem 'rdf',              :git => "https://github.com/gkellogg/rdf.git", :branch => "0.4.x"
 gem 'haml',             '>= 3.0.0'
 gem 'nokogiri',         '>= 1.3.3'
 
 group :development do
   gem 'open-uri-cached',  '>= 0.0.3'
-  gem 'rdf-spec',         :git => "https://github.com/gkellogg/rdf-spec.git", :branch => "query-algebra", :require => 'rdf/spec'
+  gem 'rdf-spec',         :git => "https://github.com/gkellogg/rdf-spec.git", :branch => "0.4.x", :require => 'rdf/spec'
   gem 'rdf-isomorphic',   '>= 0.3.4', :require => 'rdf/isomorphic'
   gem 'rdf-n3',           '>= 0.3.1', :require => 'rdf/n3'
   gem 'rspec',            '>= 2.1.0'
