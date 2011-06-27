@@ -81,7 +81,9 @@ end
 RSpec::Matchers.define :pass_query do |expected, info|
   match do |actual|
     @expected = expected.read
+    @expected = @expected.force_encoding("utf-8") if @expected.respond_to?(:force_encoding)
     query = SPARQL::Grammar.parse(@expected)
+    actual = actual.force_encoding("utf-8") if actual.respond_to?(:force_encoding)
     @results = query.execute(actual)
 
     @results.should == info.expectedResults

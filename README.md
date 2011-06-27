@@ -285,7 +285,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [YARD]:             http://yardoc.org/
 [YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
-[RDFa 1.1 Core]:    http://www.w3.org/TR/2010/WD-rdfa-core-20100422/     "RDFa 1.1 Core"
-[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/   "XHTML+RDFa 1.1"
+[RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/     "RDFa 1.1 Core"
+[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/   "XHTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
 [Haml]:             http://haml-lang.com/

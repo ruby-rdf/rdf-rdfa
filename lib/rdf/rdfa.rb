@@ -18,8 +18,8 @@ module RDF
   # @see http://rdf.rubyforge.org/
   # @see http://www.w3.org/TR/xhtml-rdfa-primer/
   # @see http://www.w3.org/2010/02/rdfa/wiki/Main_Page
-  # @see http://www.w3.org/TR/2010/WD-rdfa-core-20100422/
-  # @see http://www.w3.org/TR/2010/WD-xhtml-rdfa-20100422/
+  # @see http://www.w3.org/TR/2011/WD-rdfa-core-20110331/
+  # @see http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   module RDFa
