@@ -262,7 +262,7 @@ Full documentation available on [RubyForge](http://rdf.rubyforge.org/rdfa)
 
 ## Resources
 * [RDF.rb][RDF.rb]
-* [Distiller](http://distiller.kellogg-assoc)
+* [Distiller](http://rdf.greggkellogg.net/distiller)
 * [Documentation](http://rdf.rubyforge.org/rdfa)
 * [History](file:file.History.html)
 * [RDFa 1.1 Core][RDFa 1.1 Core]
