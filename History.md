@@ -1,3 +1,6 @@
+### 0.3.4
+* Add writer support for template selection based on subject type.
+
 ### 0.3.3.3
 * Minor update to rdfa-1-1 profile
 

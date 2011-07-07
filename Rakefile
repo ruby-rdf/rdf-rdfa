@@ -37,11 +37,6 @@ RSpec::Core::RakeTask.new("spec:rcov") do |spec|
   spec.rcov_opts =  %q[--exclude "spec"]
 end
 
-desc "Generate HTML report specs"
-RSpec::Core::RakeTask.new("doc:spec") do |spec|
-  spec.rspec_opts = ["--format", "html", "-o", "doc/spec.html"]
-end
-
 desc "Update RDFa Profiles"
 task :update_profiles do
   {
@@ -55,6 +50,13 @@ task :update_profiles do
   end
 end
 
-YARD::Rake::YardocTask.new
+namespace :doc do
+  YARD::Rake::YardocTask.new
+
+  desc "Generate HTML report specs"
+  RSpec::Core::RakeTask.new("spec") do |spec|
+    spec.rspec_opts = ["--format", "html", "-o", "doc/spec.html"]
+  end
+end
 
 task :default => :spec

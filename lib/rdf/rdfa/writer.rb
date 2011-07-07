@@ -136,6 +136,7 @@ module RDF::RDFa
 
     # @return [Hash<Symbol => String>]
     def haml_template
+      return @haml_template if @haml_template
       case @options[:haml]
       when Symbol, String   then HAML_TEMPLATES.fetch(@options[:haml].to_sym, DEFAULT_HAML)
       when Hash             then @options[:haml]
@@ -401,6 +402,9 @@ module RDF::RDFa
     #         - else
     #           %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
     #
+    # If a multi-valued property definition is not found within the template,
+    # the writer will use the single-valued property definition multiple times.
+    #
     # @param [Array<RDF::Resource>] predicate
     #   Predicate to render.
     # @param [Array<RDF::Resource>] objects
@@ -423,7 +427,11 @@ module RDF::RDFa
     # @return String
     #   The rendered document is returned as a string
     def render_property(predicate, objects, property, rel, options = {})
-      template = options[:haml] || (objects.to_a.length == 1 ? :property_value : :property_values)
+      template = options[:haml] || (
+        objects.to_a.length > 1 &&
+        haml_template.has_key?(:property_values) ?
+          :property_values :
+          :property_value)
       options = {
         :objects    => objects,
         :predicate  => predicate,
@@ -559,6 +567,9 @@ module RDF::RDFa
 
     # Display a subject.
     #
+    # If the Haml template contains an entry matching the subject's rdf:type URI,
+    # that entry will be used as the template for this subject and it's properties.
+    #
     # @example Displays a subject as a Resource Definition:
     #   <div typeof="rdfs:Resource" about="http://example.com/resource">
     #     <h1 property="dc:title">label</h1>
@@ -590,6 +601,9 @@ module RDF::RDFa
         get_curie(subject)
       end
 
+      # See if there's a template for any of the types associated with this subject
+      tmpl = (properties[RDF.type.to_s] || []).map {|type| haml_template[type]}.compact.first
+      
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
       
@@ -603,11 +617,13 @@ module RDF::RDFa
       # If :rel is specified and :typeof is nil, use @resource instead of @about.
       # Pass other options from calling context
       render_opts = {:typeof => typeof}.merge(options)
-      render_subject(subject, prop_list, render_opts) do |pred|
-        depth do
-          values = properties[pred.to_s]
-          add_debug "subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"
-          predicate(pred, values)
+      with_template(tmpl) do
+        render_subject(subject, prop_list, render_opts) do |pred|
+          depth do
+            values = properties[pred.to_s]
+            add_debug "subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"
+            predicate(pred, values)
+          end
         end
       end
     end
@@ -768,6 +784,17 @@ module RDF::RDFa
       ret = yield
       @depth -= 1
       ret
+    end
+    
+    # Set the template to use within block
+    def with_template(templ)
+      old_template, @haml_template = @haml_template, templ
+
+      res = yield
+      # Restore template
+      @haml_template = old_template
+      
+      res
     end
     
     # Render HAML

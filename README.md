@@ -44,10 +44,11 @@ use the same prefix definitions found during parsing:
     puts graph.dump(:rdfa, :prefixes => prefixes)
     
 ### Template-based Writer
-The RDFa writer uses [Haml][Haml] templates for code generation. This allows fully customizable
-RDFa output in a variety of host languages. The [default template]({RDF::RDFa::Writer::DEFAULT_HAML})
-generates human readable HTML5 output. A [minimal template]({RDF::RDFa::Writer::MIN_HAML})
-generates HTML, which is not intended for human consumption.
+The RDFa writer uses [Haml][Haml] templates for code generation. This allows fully
+customizable RDFa output in a variety of host languages.
+The [default template]({RDF::RDFa::Writer::DEFAULT_HAML}) generates human readable HTML5
+output. A [minimal template]({RDF::RDFa::Writer::MIN_HAML}) generates HTML, which is not
+intended for human consumption.
 
 To specify an alternative Haml template, consider the following:
 
@@ -208,6 +209,25 @@ The template hash defines four Haml templates:
             </li>
           </ul>
         </div>
+    If _property\_values_ does not exist, repeated values will be replecated
+    using _property\_value_.
+* Type-specific templates.
+  To simplify generation of different output types, the
+  template may contain a elements indexed by a URI. When a subject with an rdf:type
+  matching that URI is found, subsequent Haml definitions will be taken from
+  the associated Hash. For example:
+  
+    {
+      :document => "...",
+      :subject => "...",
+      :property\_value => "...",
+      :property\_values => "...",
+      RDF::URI("http://schema.org/Person") => {
+        :subject => "...",
+        :property\_value => "...",
+        :property\_values => "...",
+      }
+    }
 
 ## Dependencies
 * [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.1)
