@@ -602,7 +602,7 @@ module RDF::RDFa
       end
 
       # See if there's a template for any of the types associated with this subject
-      tmpl = (properties[RDF.type.to_s] || []).map {|type| haml_template[type]}.compact.first
+      tmpl = (properties[RDF.type.to_s] || []).map {|type| haml_template[type] || @options[:haml][type]}.compact.first
       
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
@@ -611,6 +611,7 @@ module RDF::RDFa
       typeof ||= "" unless curie
       prop_list -= [RDF.type.to_s]
 
+      add_debug "subject: found template in #{haml_template.keys.inspect}? #{(!tmpl.nil?).inspect}"
       add_debug "subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"
 
       # Render this subject
@@ -620,6 +621,7 @@ module RDF::RDFa
       with_template(tmpl) do
         render_subject(subject, prop_list, render_opts) do |pred|
           depth do
+            pred = RDF::URI(pred) if pred.is_a?(String)
             values = properties[pred.to_s]
             add_debug "subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"
             predicate(pred, values)
