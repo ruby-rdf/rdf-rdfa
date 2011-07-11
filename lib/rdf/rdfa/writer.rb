@@ -602,7 +602,11 @@ module RDF::RDFa
       end
 
       # See if there's a template for any of the types associated with this subject
-      tmpl = (properties[RDF.type.to_s] || []).map {|type| haml_template[type] || @options[:haml][type]}.compact.first
+      tmpl = (properties[RDF.type.to_s] || []).
+        map do |type|
+          haml_template[type] || (@options[:haml] && @options[:haml][type])
+        end.
+        compact.first
       
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?

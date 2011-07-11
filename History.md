@@ -1,5 +1,6 @@
 ### 0.3.4.1
 * Change built-in profiles to use alias\_method\_chain, as they were being removed from the cache.
+* Fixes to Writer template detection with type.
 
 ### 0.3.4
 * Add writer support for template selection based on subject type.
