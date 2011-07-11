@@ -3,6 +3,7 @@ gem 'addressable',      '2.2.4'
 gem 'rdf',              :git => "https://github.com/gkellogg/rdf.git", :branch => "0.4.x"
 gem 'haml',             '>= 3.0.0'
 gem 'nokogiri',         '>= 1.3.3'
+gem 'facets',           '>= 2.9.1'
 
 group :development do
   gem 'open-uri-cached',  '>= 0.0.3'

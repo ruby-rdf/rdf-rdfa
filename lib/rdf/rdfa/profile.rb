@@ -191,8 +191,7 @@ module RDF::RDFa
 
   ##
   # The base class for RDF profile errors.
-  class ProfileError < IOError
-  end # ProfileError
+  class ProfileError < IOError; end
 end
 
 # Load cooked profiles
