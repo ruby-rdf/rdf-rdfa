@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rdf-rdfa}
-  s.version = "0.3.4"
+  s.version = "0.3.4.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gregg Kellogg"]
-  s.date = %q{2011-06-27}
+  s.date = %q{2011-07-11}
   s.description = %q{    RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite.
 }
   s.email = %q{gregg@kellogg-assoc.com}
@@ -76,7 +76,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = %q{http://github.com/gkellogg/rdf-rdfa}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
+  s.rubygems_version = %q{1.5.0}
   s.summary = %q{RDFa reader/writer for RDF.rb.}
 
   if s.respond_to? :specification_version then
@@ -87,6 +87,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<rdf>, [">= 0"])
       s.add_runtime_dependency(%q<haml>, [">= 3.0.0"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.3.3"])
+      s.add_runtime_dependency(%q<facets>, [">= 2.9.1"])
       s.add_development_dependency(%q<open-uri-cached>, [">= 0.0.3"])
       s.add_development_dependency(%q<rdf-spec>, [">= 0"])
       s.add_development_dependency(%q<rdf-isomorphic>, [">= 0.3.4"])
@@ -100,6 +101,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<rdf>, [">= 0.3.3"])
       s.add_runtime_dependency(%q<haml>, [">= 3.0.0"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.4.4"])
+      s.add_runtime_dependency(%q<facets>, [">= 2.9.1"])
       s.add_development_dependency(%q<spira>, [">= 0.0.12"])
       s.add_development_dependency(%q<rspec>, [">= 2.5.0"])
       s.add_development_dependency(%q<rdf-spec>, [">= 0.3.3"])
@@ -110,6 +112,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rdf>, [">= 0"])
       s.add_dependency(%q<haml>, [">= 3.0.0"])
       s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
+      s.add_dependency(%q<facets>, [">= 2.9.1"])
       s.add_dependency(%q<open-uri-cached>, [">= 0.0.3"])
       s.add_dependency(%q<rdf-spec>, [">= 0"])
       s.add_dependency(%q<rdf-isomorphic>, [">= 0.3.4"])
@@ -123,6 +126,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rdf>, [">= 0.3.3"])
       s.add_dependency(%q<haml>, [">= 3.0.0"])
       s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
+      s.add_dependency(%q<facets>, [">= 2.9.1"])
       s.add_dependency(%q<spira>, [">= 0.0.12"])
       s.add_dependency(%q<rspec>, [">= 2.5.0"])
       s.add_dependency(%q<rdf-spec>, [">= 0.3.3"])
@@ -134,6 +138,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rdf>, [">= 0"])
     s.add_dependency(%q<haml>, [">= 3.0.0"])
     s.add_dependency(%q<nokogiri>, [">= 1.3.3"])
+    s.add_dependency(%q<facets>, [">= 2.9.1"])
     s.add_dependency(%q<open-uri-cached>, [">= 0.0.3"])
     s.add_dependency(%q<rdf-spec>, [">= 0"])
     s.add_dependency(%q<rdf-isomorphic>, [">= 0.3.4"])
@@ -147,6 +152,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rdf>, [">= 0.3.3"])
     s.add_dependency(%q<haml>, [">= 3.0.0"])
     s.add_dependency(%q<nokogiri>, [">= 1.4.4"])
+    s.add_dependency(%q<facets>, [">= 2.9.1"])
     s.add_dependency(%q<spira>, [">= 0.0.12"])
     s.add_dependency(%q<rspec>, [">= 2.5.0"])
     s.add_dependency(%q<rdf-spec>, [">= 0.3.3"])
