@@ -503,7 +503,7 @@ module RDF::RDFa
       # Add distinguished classes
       top_classes.
       select {|s| !seen.include?(s)}.
-        each do |class_uri|
+      each do |class_uri|
         graph.query(:predicate => RDF.type, :object => class_uri).map {|st| st.subject}.sort.uniq.each do |subject|
           #add_debug "order_subjects: #{subject.inspect}"
           subjects << subject
@@ -517,6 +517,8 @@ module RDF::RDFa
         map {|r| [r.is_a?(RDF::Node) ? 1 : 0, ref_count(r), r]}.
         sort
       
+      add_debug "order_subjects: #{recursable.inspect}"
+
       subjects += recursable.map{|r| r.last}
     end
     
