@@ -1,3 +1,7 @@
+### 0.3.4.2
+* Fix Writer output for multi-valued properties when there is no :property\_values Haml template.
+* Simplify templates by using pre-rendered CURIEs.
+
 ### 0.3.4.1
 * Change built-in profiles to use alias\_method\_chain, as they were being removed from the cache.
 * Fixes to Writer template detection with type.

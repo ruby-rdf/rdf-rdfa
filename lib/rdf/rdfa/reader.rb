@@ -41,13 +41,19 @@ module RDF::RDFa
       Regexp::EXTENDED)
   
     # Host language
-    # @return [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg]
+    # @attr [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg]
     attr_reader :host_language
     
     # Version
-    # @return [:"rdfa1.0", :"rdfa1.1"]
+    # @attr [:"rdfa1.0", :"rdfa1.1"]
     attr_reader :version
     
+    ##
+    # Returns the base URI determined by this reader.
+    #
+    # @attr [RDF::URI]
+    attr_reader :base_uri
+
     # The Recursive Baggage
     # @private
     class EvaluationContext # :nodoc:

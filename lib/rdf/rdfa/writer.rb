@@ -295,23 +295,23 @@ module RDF::RDFa
     #
     # The default Haml template is:
     #     - if element == :li
-    #       %li{:about => get_curie(subject), :typeof => typeof}
+    #       %li{:about => resource, :typeof => typeof}
     #         - if typeof
     #           %span.type!= typeof
     #         - predicates.each do |predicate|
     #           != yield(predicate)
     #     - elsif rel && typeof
-    #       %div{:rel => get_curie(rel)}
-    #         %div{:about => get_curie(subject), :typeof => typeof}
+    #       %div{:rel => rel}
+    #         %div{:about => about, :typeof => typeof}
     #           %span.type!= typeof
     #           - predicates.each do |predicate|
     #             != yield(predicate)
     #     - elsif rel
-    #       %div{:rel => get_curie(rel), :resource => get_curie(subject)}
+    #       %div{:rel => rel, :resource => resource}
     #         - predicates.each do |predicate|
     #           != yield(predicate)
     #     - else
-    #       %div{:about => get_curie(subject), :typeof => typeof}
+    #       %div{:about => about, :typeof => typeof}
     #         - if typeof
     #           %span.type!= typeof
     #         - predicates.each do |predicate|
@@ -348,6 +348,7 @@ module RDF::RDFa
       template = options[:haml] || :subject
       options = {
         :about      => (get_curie(subject) unless options[:rel]),
+        :base       => @base_uri,
         :element    => nil,
         :predicates => predicates,
         :rel        => nil,
@@ -366,9 +367,8 @@ module RDF::RDFa
     # is also a subject and is rendered underneath the first referencing subject).
     #
     # The default Haml template for a single-valued property is:
-    #     - object = objects.first
     #     - if heading_predicates.include?(predicate) && object.literal?
-    #       %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+    #       %h1{:property => property, :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
     #     - else
     #       %div.property
     #         %span.label
@@ -376,31 +376,31 @@ module RDF::RDFa
     #         - if res = yield(object)
     #           != res
     #         - elsif object.node?
-    #           %span{:resource => get_curie(object), :rel => get_curie(predicate)}= get_curie(object)
+    #           %span{:resource => get_curie(object), :rel => rel}= get_curie(object)
     #         - elsif object.uri?
-    #           %a{:href => object.to_s, :rel => get_curie(predicate)}= object.to_s
+    #           %a{:href => object.to_s, :rel => rel}= object.to_s
     #         - elsif object.datatype == RDF.XMLLiteral
-    #           %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
+    #           %span{:property => property, :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
     #         - else
-    #           %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+    #           %span{:property => property, :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
     #
     # The default Haml template for a multi-valued property is:
-    #   %div.property
-    #     %span.label
-    #       = get_predicate_name(predicate)
-    #     %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
-    #       - objects.each do |object|
-    #         - if res = yield(object)
-    #           != res
-    #         - elsif object.node?
-    #           %li{:resource => get_curie(object)}= get_curie(object)
-    #         - elsif object.uri?
-    #           %li
-    #             %a{:href => object.to_s}= object.to_s
-    #         - elsif object.datatype == RDF.XMLLiteral
-    #           %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
-    #         - else
-    #           %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+    #     %div.property
+    #       %span.label
+    #         = get_predicate_name(predicate)
+    #       %ul{:rel => rel, :property => property}
+    #         - objects.each do |object|
+    #           - if res = yield(object)
+    #             != res
+    #           - elsif object.node?
+    #             %li{:resource => get_curie(object)}= get_curie(object)
+    #           - elsif object.uri?
+    #             %li
+    #               %a{:href => object.to_s}= object.to_s
+    #           - elsif object.datatype == RDF.XMLLiteral
+    #             %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
+    #           - else
+    #             %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
     #
     # If a multi-valued property definition is not found within the template,
     # the writer will use the single-valued property definition multiple times.
@@ -427,19 +427,33 @@ module RDF::RDFa
     # @return String
     #   The rendered document is returned as a string
     def render_property(predicate, objects, property, rel, options = {})
-      template = options[:haml] || (
-        objects.to_a.length > 1 &&
-        haml_template.has_key?(:property_values) ?
-          :property_values :
-          :property_value)
-      options = {
-        :objects    => objects,
-        :predicate  => predicate,
-        :property   => property,
-        :rel        => rel,
-      }.merge(options)
-      hamlify(template, options) do |object|
-        yield(object) if block_given?
+      # If there are multiple objects, and no :properti_values is defined, call recursively with
+      # each object
+      
+      template = options[:haml]
+      template ||= objects.length > 1 ? haml_template[:property_values] : haml_template[:property_value]
+      if objects.length > 1 && template.nil?
+        objects.map do |object|
+          render_property(predicate, [object], property, rel, options)
+        end.join(" ")
+      else
+        raise RDF::WriterError, "Missing property template" if template.nil?
+
+        template = options[:haml] || (
+          objects.to_a.length > 1 &&
+          haml_template.has_key?(:property_values) ?
+            :property_values :
+            :property_value)
+        options = {
+          :objects    => objects,
+          :object     => objects.first,
+          :predicate  => predicate,
+          :property   => (get_curie(property) if property),
+          :rel        => (get_curie(rel) if rel),
+        }.merge(options)
+        hamlify(template, options) do |object|
+          yield(object) if block_given?
+        end
       end
     end
     
@@ -653,7 +667,7 @@ module RDF::RDFa
       render_property(predicate, objects, property, rel) do |o|
         # Yields each object, for potential recursive definition.
         # If nil is returned, a leaf is produced
-        depth {subject(o, :rel => rel, :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
+        depth {subject(o, :rel => get_curie(rel), :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
       end
     end
     
