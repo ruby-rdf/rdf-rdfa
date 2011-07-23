@@ -729,6 +729,8 @@ module RDF::RDFa
       else
         literal.to_s
       end
+    rescue
+      literal.to_s  # When all else fails ...
     end
 
     # Haml rendering helper. Return an appropriate label for a resource.
