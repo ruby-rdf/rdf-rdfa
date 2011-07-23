@@ -618,12 +618,14 @@ module RDF::RDFa
       end
 
       # See if there's a template for any of the types associated with this subject
-      tmpl = (properties[RDF.type.to_s] || []).
-        map do |type|
+      tmpl_type = (properties[RDF.type.to_s] || []).
+        select do |type|
           haml_template[type] || (@options[:haml] && @options[:haml][type])
         end.
         compact.first
       
+      tmpl = haml_template[tmpl_type] || (@options[:haml] && @options[:haml][tmpl_type])
+
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
       
@@ -631,7 +633,7 @@ module RDF::RDFa
       typeof ||= "" unless curie
       prop_list -= [RDF.type.to_s]
 
-      add_debug "subject: found template in #{haml_template.keys.inspect}? #{(!tmpl.nil?).inspect}"
+      add_debug "subject: found template for #{tmpl_type}" if tmpl_type
       add_debug "subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"
 
       # Render this subject
@@ -810,7 +812,14 @@ module RDF::RDFa
     
     # Set the template to use within block
     def with_template(templ)
-      old_template, @haml_template = @haml_template, templ
+      if templ
+        new_template = @options[:haml].
+          reject {|k,v| ![:subject, :property_value, :property_values, :rel].include?(k)}.
+          merge(templ || {})
+        old_template, @haml_template = @haml_template, new_template
+      else
+        old_template = @haml_template
+      end
 
       res = yield
       # Restore template
