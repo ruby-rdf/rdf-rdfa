@@ -617,13 +617,16 @@ module RDF::RDFa
         get_curie(subject)
       end
 
-      # See if there's a template for any of the types associated with this subject
-      tmpl_type = (properties[RDF.type.to_s] || []).
+      # See if there's a template based on the sorted concatenation of all types of this subject
+      # or any type of this subject
+      types = (properties[RDF.type.to_s] || []).dup
+      all_types = types.map(&:to_s).sort.join("")
+      tmpl_type = types.unshift(all_types).
         select do |type|
           haml_template[type] || (@options[:haml] && @options[:haml][type])
         end.
         compact.first
-      
+
       tmpl = haml_template[tmpl_type] || (@options[:haml] && @options[:haml][tmpl_type])
 
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
@@ -633,6 +636,7 @@ module RDF::RDFa
       typeof ||= "" unless curie
       prop_list -= [RDF.type.to_s]
 
+      add_debug "subject: search for types #{types.inspect}"
       add_debug "subject: found template for #{tmpl_type}" if tmpl_type
       add_debug "subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"
 
