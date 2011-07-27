@@ -426,7 +426,7 @@ module RDF::RDFa
     #   The block should only return a string for recursive object definitions.
     # @return String
     #   The rendered document is returned as a string
-    def render_property(predicate, objects, property, rel, options = {})
+    def render_property(predicate, objects, property, rel, options = {}, &block)
       # If there are multiple objects, and no :properti_values is defined, call recursively with
       # each object
       
@@ -434,7 +434,7 @@ module RDF::RDFa
       template ||= objects.length > 1 ? haml_template[:property_values] : haml_template[:property_value]
       if objects.length > 1 && template.nil?
         objects.map do |object|
-          render_property(predicate, [object], property, rel, options)
+          render_property(predicate, [object], property, rel, options, &block)
         end.join(" ")
       else
         raise RDF::WriterError, "Missing property template" if template.nil?
