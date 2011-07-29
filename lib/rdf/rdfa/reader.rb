@@ -266,8 +266,8 @@ module RDF::RDFa
       # Snif version based on input
       case input
       when Nokogiri::XML::Document, Nokogiri::HTML::Document
-        doc_type_string = input.doc_type.to_s
-        version_attr = input.root && @doc.root.attribute("version").to_s
+        doc_type_string = input.doctype.to_s
+        version_attr = input.root && input.root.attribute("version").to_s
         root_element = input.root.name.downcase
         root_namespace = input.root.namespace.to_s
         root_attrs = input.root.attributes
