@@ -97,28 +97,6 @@ describe RDF::RDFa::Writer do
           end
         end
       end
-      
-      context "type template" do
-        subject do
-          @graph << [EX.a, RDF.type, EX.Type]
-          serialize(:haml => RDF::RDFa::Writer::MIN_HAML.merge({
-            EX.Type => {
-              :subject => %q(
-                %span
-                  type-specific subject
-              )
-            }
-          }))
-        end
-
-        {
-          "/xhtml:html/xhtml:body/xhtml:span/text()" => /type-specific subject/,
-        }.each do |path, value|
-          it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
-          end
-        end
-      end
     end
 
     context "languaged tagged literals" do

@@ -3,6 +3,7 @@ module RDF::RDFa
   class Writer
     # The default set of HAML templates used for RDFa code generation
    BASE_HAML = {
+     :identifier => "base", 
       # Document
       # Locals: language, title, profile, prefix, base, subjects
       # Yield: subjects.each
@@ -109,6 +110,7 @@ module RDF::RDFa
     # This version does not perform recursive object generation and does not attempt
     # to create human readable output.
     MIN_HAML = {
+      :identifier => "min", 
       # Document
       # Locals: language, title, profile, prefix, base, subjects
       # Yield: subjects.each
@@ -167,6 +169,7 @@ module RDF::RDFa
     }
 
     DISTILLER_HAML = {
+      :identifier => "distiller", 
       # Document
       # Locals: language, title, profile, prefix, base, subjects
       # Yield: subjects.each

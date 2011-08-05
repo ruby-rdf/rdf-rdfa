@@ -619,12 +619,7 @@ module RDF::RDFa
 
       # See if there's a template based on the sorted concatenation of all types of this subject
       # or any type of this subject
-      types = (properties[RDF.type.to_s] || []).dup
-      all_types = types.map(&:to_s).sort.join("")
-      tmpl = nil
-      tmpl_type = types.unshift(all_types).
-          select {|type| key, tmpl = template_match(type)}.
-          compact.first
+      tmpl = find_template(subject)
 
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
@@ -633,8 +628,7 @@ module RDF::RDFa
       typeof ||= "" unless curie
       prop_list -= [RDF.type.to_s]
 
-      add_debug "subject: search for types #{types.inspect}"
-      add_debug "subject: found template for #{tmpl_type}" if tmpl_type
+      add_debug "subject: found template #{tmpl[:identifier] || tmpl.inspect}" if tmpl
       add_debug "subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"
 
       # Render this subject
@@ -839,10 +833,10 @@ module RDF::RDFa
     # @return [String]
     # @raise [RDF::WriterError]
     def hamlify(template, locals = {})
+      add_debug "hamlify template: #{template}"
       template = haml_template[template] if template.is_a?(Symbol)
 
       template = template.align_left
-      add_debug "hamlify template: #{template}"
       add_debug "hamlify locals: #{locals.inspect}"
 
       Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(self, locals) do |*args|
@@ -856,23 +850,12 @@ module RDF::RDFa
     end
 
     ##
-    # See if there is a template key that matches type.
-    # @param [RDF::URI, String] type
-    # @return [Object, Hash] # return matched key and associated value
-    def template_match(type)
-      return [type, haml_template[type]] if haml_template[type]
-      return [type, @options[:haml][type]] if @options[:haml] && @options[:haml][type]
-
-      # Look for regular expression match
-      key = haml_template.keys.detect {|k| k.is_a?(Regexp) && type.to_s.match(k)}
-      return [key, haml_template[key]] if haml_template[key]
-
-      # Look for in type-level templates
-      if @options[:haml]
-        key = @options[:haml].keys.detect {|k| k.is_a?(Regexp) && type.to_s.match(k)}
-        return [key, @options[:haml][key]] if @options[:haml][key]
-      end
-    end
+    # Find a template appropriate for the subject. 
+    # Override this method to provide templates based on attributes of a given subject
+    #
+    # @param [RDF::URI] subject
+    # @return [Hash] # return matched matched template
+    def find_template(subject); end
 
     # Mark a subject as done.
     def subject_done(subject)
