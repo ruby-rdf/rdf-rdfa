@@ -272,6 +272,22 @@ describe "RDF::RDFa::Reader" do
           RDF::Literal("John Doe")
         ])
       end
+      
+      context "empty @typeof" do
+        before(:all) do
+          @sampledoc = %(
+            <div typeof><span property="dc:title">Title</span></div>
+          )
+        end
+
+        it "does not create node with XML host language" do
+          parse(@sampledoc, :host_language => :xml1).first_subject.should be_uri
+        end
+      
+        it "creates a node with HTML host language" do
+          parse(@sampledoc, :host_language => :html5).first_subject.should be_node
+        end
+      end
     end
 
     describe "html>head>base" do
@@ -521,6 +537,35 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
+  context "problematic examples" do
+    it "parses Jeni's Ice Cream example" do
+      sampledoc = %q(<div vocab="#" typeof="">
+        <p>Flavors in my favorite ice cream:</p>
+        <div rel="flavor">
+          <ul vocab="http://www.w3.org/1999/02/22-rdf-syntax-ns#" typeof="List">
+            <li property="first">Lemon sorbet</li>
+            <li rel="rest">
+              <span typeof="List">
+                <span property="first">Apricot sorbet</span>
+              <span rel="rest" resource="rdf:nil"></span>
+            </span>
+            </li>
+          </ul>
+        </div>
+      </div>)
+      nt = %q(
+      _:a <#flavor> _:b .
+      _:b <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "Lemon sorbet" .
+      _:b <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:c .
+      _:b <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+      _:c <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "Apricot sorbet" .
+      _:c <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+      _:c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+      )
+      parse(sampledoc, :validate => false).should be_equivalent_graph(nt)
+    end
+  end
+
   context :validation do
   end
 
@@ -568,7 +613,7 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
-  def parse(input, options)
+  def parse(input, options = {})
     @debug = options[:debug] || []
     graph = RDF::Graph.new
     RDF::RDFa::Reader.new(input, options.merge(:debug => @debug)).each do |statement|

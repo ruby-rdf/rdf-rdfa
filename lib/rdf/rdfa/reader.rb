@@ -624,7 +624,7 @@ module RDF::RDFa
 
       # Pull out the attributes needed for the skip test.
       property = attrs['property'].to_s.strip if attrs['property']
-      typeof = attrs['typeof'].to_s.strip if attrs['typeof']
+      typeof = attrs['typeof'].to_s.strip if attrs.has_key?('typeof')
       datatype = attrs['datatype'].to_s if attrs['datatype']
       content = attrs['content'].to_s if attrs['content']
       rel = attrs['rel'].to_s.strip if attrs['rel']
@@ -763,15 +763,15 @@ module RDF::RDFa
         # otherwise,
         #   if parent object is present, new subject is set to the value of parent object.
         # Additionally, if @property is not present then the skip element flag is set to 'true';
-        new_subject ||= if element == @doc.root && base
+        new_subject ||= if typeof
+          RDF::Node.new
+        elsif element == @doc.root && base
           uri(base)
         elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
           uri(base)
-        elsif typeof
-          RDF::Node.new
         else
           # if it's null, it's null and nothing changes
           skip = true unless property
