@@ -1,3 +1,11 @@
+### 0.3.5
+* Updates to writer necessary for structure-data.org linter.
+  * Support for type-specific templates and types matching a regular expression.
+  * Allow #find-template to be overridden in subclasses.
+* In reader
+  * Fix initialization bugs when passed an Nokogiri::XML::Document or Nokogiri::HTML::Document.
+  * Fixed bug where @typeof was ignored in the root element.
+
 ### 0.3.4.2
 * Fix Writer output for multi-valued properties when there is no :property\_values Haml template.
 * Simplify templates by using pre-rendered CURIEs.
