@@ -273,19 +273,15 @@ describe "RDF::RDFa::Reader" do
         ])
       end
       
-      context "empty @typeof" do
+      context "empty @typeof on root" do
         before(:all) do
           @sampledoc = %(
             <div typeof><span property="dc:title">Title</span></div>
           )
         end
 
-        it "does not create node with XML host language" do
-          parse(@sampledoc, :host_language => :xml1).first_subject.should be_uri
-        end
-      
-        it "creates a node with HTML host language" do
-          parse(@sampledoc, :host_language => :html5).first_subject.should be_node
+        it "does not create node" do
+          parse(@sampledoc).first_subject.should be_uri
         end
       end
     end
@@ -539,7 +535,7 @@ describe "RDF::RDFa::Reader" do
 
   context "problematic examples" do
     it "parses Jeni's Ice Cream example" do
-      sampledoc = %q(<div vocab="#" typeof="">
+      sampledoc = %q(<root><div vocab="#" typeof="">
         <p>Flavors in my favorite ice cream:</p>
         <div rel="flavor">
           <ul vocab="http://www.w3.org/1999/02/22-rdf-syntax-ns#" typeof="List">
@@ -552,7 +548,7 @@ describe "RDF::RDFa::Reader" do
             </li>
           </ul>
         </div>
-      </div>)
+      </div></root>)
       nt = %q(
       _:a <#flavor> _:b .
       _:b <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "Lemon sorbet" .

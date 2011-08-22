@@ -763,15 +763,15 @@ module RDF::RDFa
         # otherwise,
         #   if parent object is present, new subject is set to the value of parent object.
         # Additionally, if @property is not present then the skip element flag is set to 'true';
-        new_subject ||= if typeof
-          RDF::Node.new
-        elsif element == @doc.root && base
-          uri(base)
-        elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+        new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
           uri(base)
+        elsif element == @doc.root && base
+          uri(base)
+        elsif typeof
+          RDF::Node.new
         else
           # if it's null, it's null and nothing changes
           skip = true unless property
