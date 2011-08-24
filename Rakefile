@@ -1,36 +1,19 @@
 require 'rubygems'
 require 'yard'
+require 'rspec/core/rake_task'
 
-begin
-  gem 'jeweler'
-  require 'jeweler'
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.name = "rdf-rdfa"
-    gemspec.summary = "RDFa reader/writer for RDF.rb."
-    gemspec.description = <<-DESCRIPTION
-    RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite.
-    DESCRIPTION
-    gemspec.email = "gregg@kellogg-assoc.com"
-    gemspec.homepage = "http://github.com/gkellogg/rdf-rdfa"
-    gemspec.authors = ["Gregg Kellogg"]
-    gemspec.add_dependency('rdf', '>= 0.3.3')
-    gemspec.add_dependency('haml', '>= 3.0.0')
-    gemspec.add_dependency('nokogiri', '>= 1.4.4')
-    gemspec.add_dependency('facets','>= 2.9.1')
-    
-    gemspec.add_development_dependency('spira', '>= 0.0.12')
-    gemspec.add_development_dependency('rspec', '>= 2.5.0')
-    gemspec.add_development_dependency('rdf-spec', '>= 0.3.3')
-    gemspec.add_development_dependency('rdf-isomorphic', '>= 0.3.4')
-    gemspec.add_development_dependency('yard')
-    gemspec.extra_rdoc_files     = %w(README.md History.md AUTHORS CONTRIBUTORS)
+namespace :gem do
+  desc "Build the rdf-rdfa-#{File.read('VERSION').chomp}.gem file"
+  task :build do
+    sh "gem build rdf-rdfa.gemspec && mv rdf-rdfa-#{File.read('VERSION').chomp}.gem pkg/"
   end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+
+  desc "Release the rdf-rdfa-#{File.read('VERSION').chomp}.gem file"
+  task :release do
+    sh "gem push pkg/rdf-rdfa-#{File.read('VERSION').chomp}.gem"
+  end
 end
 
-require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 
 desc "Run specs through RCov"
