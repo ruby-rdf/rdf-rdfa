@@ -643,6 +643,9 @@ module RDF::RDFa
           add_debug(element, "[Step 3] traverse, reset default_vocaulary to #{@host_defaults.fetch(:vocabulary, nil).inspect}")
           @host_defaults.fetch(:vocabulary, nil)
         else
+          # Generate a triple indicating that the vocabulary is used
+          add_triple(element, base_uri, RDF::RDFA.hasVocabulary, uri(vocab))
+
           uri(vocab)
         end
         add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")

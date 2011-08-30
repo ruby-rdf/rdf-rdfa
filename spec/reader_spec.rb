@@ -355,10 +355,10 @@ describe "RDF::RDFa::Reader" do
       sampledoc = %q(<root><div vocab="#" typeof="">
         <p>Flavors in my favorite ice cream:</p>
         <div rel="flavor">
-          <ul vocab="http://www.w3.org/1999/02/22-rdf-syntax-ns#" typeof="List">
+          <ul vocab="http://www.w3.org/1999/02/22-rdf-syntax-ns#" typeof="">
             <li property="first">Lemon sorbet</li>
             <li rel="rest">
-              <span typeof="List">
+              <span typeof="">
                 <span property="first">Apricot sorbet</span>
               <span rel="rest" resource="rdf:nil"></span>
             </span>
@@ -366,16 +366,12 @@ describe "RDF::RDFa::Reader" do
           </ul>
         </div>
       </div></root>)
-      nt = %q(
-      _:a <#flavor> _:b .
-      _:b <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "Lemon sorbet" .
-      _:b <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:c .
-      _:b <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
-      _:c <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "Apricot sorbet" .
-      _:c <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-      _:c <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+      ttl = %q(
+      <> <http://www.w3.org/ns/rdfa#hasVocabulary> <#>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+      _:a <#flavor> ("Lemon sorbet" "Apricot sorbet") .
       )
-      parse(sampledoc, :validate => false).should be_equivalent_graph(nt)
+      g_ttl = RDF::Graph.new << RDF::N3::Reader.new(ttl)
+      parse(sampledoc, :validate => false).should be_equivalent_graph(g_ttl)
     end
   end
 
