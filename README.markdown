@@ -20,20 +20,14 @@ Install with 'gem install rdf-rdfa'
 
 ### Reading RDF data in the RDFa format
 
-    RDF::RDFa::Reader.open("etc/foaf.html") do |reader|
-      reader.each_statement do |statement|
-        puts statement.inspect
-      end
-    end
+    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa)
 
 ### Writing RDF data using the XHTML+RDFa format
 
     require 'rdf/rdfa'
     
-    RDF::RDFa::Writer.open("hello.html") do |writer|
-      writer << RDF::Graph.new do |graph|
-        graph << [:hello, RDF::DC.title, "Hello, world!"]
-      end
+    RDF::RDFa::Writer.open("etc/doap.html") do |writer|
+      writer << graph
     end
 
 Note that prefixes may be chained between Reader and Writer, so that the Writer will
@@ -63,7 +57,7 @@ The template hash defines four Haml templates:
 
         !!! XML
         !!! 5
-        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :profile => profile, :prefix => prefix}
+        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :prefix => prefix}
           - if base || title
             %head
               - if base
@@ -74,7 +68,7 @@ The template hash defines four Haml templates:
             - subjects.each do |subject|
               != yield(subject)
 
-    This template takes locals _lang_, _profile_, _prefix_, _base_, _title_ in addition to _subjects_
+    This template takes locals _lang_, _prefix_, _base_, _title_ in addition to _subjects_
     to create output similar to the following:
       
         <!DOCTYPE html>
@@ -88,8 +82,8 @@ The template hash defines four Haml templates:
           </body>
         </html>
       
-    Options passed to the Writer are used to supply _lang_, _profile_ and _base_ locals.
-    _prefix_ is generated based upon prefixes found from default or supplied profiles, as well
+    Options passed to the Writer are used to supply _lang_ and _base_ locals.
+    _prefix_ is generated based upon prefixes found from the default profiles, as well
     as those provided by a previous Reader. _title_ is taken from the first top-level subject
     having an appropriate title property (as defined by the _heading_predicates_ option).
 
@@ -235,7 +229,7 @@ The template hash defines four Haml templates:
 * [Haml](https://rubygems.org/gems/haml) (>= 3.0.0)
 
 ## Documentation
-Full documentation available on [RubyForge](http://rdf.rubyforge.org/rdfa)
+Full documentation available on [Rubydoc.info][RDFa doc]
 
 ### Principle Classes
 * {RDF::RDFa::Format}
@@ -308,4 +302,5 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/     "RDFa 1.1 Core"
 [XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/   "XHTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
+[RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/master/file/README.markdown
 [Haml]:             http://haml-lang.com/

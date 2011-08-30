@@ -23,10 +23,10 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.8.1'
   gem.requirements          = []
 
-  gem.add_runtime_dependency     'rdf',             '>= 0.3.3'
-  gem.add_dependency             'haml',            '>= 3.0.0'
+  gem.add_dependency             'rdf',             '>= 0.3.3'
+  gem.add_runtime_dependency     'haml',            '>= 3.0.0'
   gem.add_runtime_dependency     'nokogiri',        '>= 1.4.4'
-  gem.add_dependency             'facets',          '>= 2.9.1'
+  gem.add_runtime_dependency     'facets',          '>= 2.9.1'
   
   gem.add_development_dependency 'spira',           '>= 0.0.12'
   gem.add_development_dependency 'rspec',           '>= 2.5.0'

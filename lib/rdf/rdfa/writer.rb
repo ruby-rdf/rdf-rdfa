@@ -51,13 +51,6 @@ module RDF::RDFa
   #     end
   #   end
   #
-  # @example Creating @profile definitions in output
-  #   RDF::RDFa::Writer.buffer(:profile => "http://example.com/profile") do |writer|
-  #     graph.each_statement do |statement|
-  #       writer << statement
-  #     end
-  #   end
-  #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Writer < RDF::Writer
     format RDF::RDFa::Format
@@ -96,17 +89,12 @@ module RDF::RDFa
     #   whether to canonicalize literals when serializing
     # @option options [Hash]     :prefixes     (Hash.new)
     #   the prefix mappings to use
-    # @option options [#to_a]     :profiles     (Array.new)
-    #   List of profiles to add to document. This will use terms, prefix definitions and default-vocabularies
-    #   identified within the profiles (taken in reverse order) to determine how to serialize terms
     # @option options [#to_s]    :base_uri     (nil)
     #   the base URI to use when constructing relative URIs, set as html>head>base.href
     # @option options [#to_s]   :lang   (nil)
     #   Output as root @lang attribute, and avoid generation _@lang_ where possible
     # @option options [Boolean]  :standard_prefixes   (false)
     #   Add standard prefixes to _prefixes_, if necessary.
-    # @option options [Repository] :profile_repository (nil)
-    #   Repository to find and save profile graphs.
     # @option options [Array<RDF::URI>] :top_classes ([RDF::RDFS.Class])
     #   Defines rdf:type of subjects to be emitted at the beginning of the document.
     # @option options [Array<RDF::URI>] :predicate_order ([RDF.type, RDF::RDFS.label, RDF::DC.title])
@@ -121,7 +109,6 @@ module RDF::RDFa
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
     def initialize(output = $stdout, options = {}, &block)
-      self.profile_repository = options[:profile_repository] if options[:profile_repository]
       super do
         @uri_to_term_or_curie = {}
         @uri_to_prefix = {}
@@ -144,17 +131,6 @@ module RDF::RDFa
       end
     end
 
-    # @return [RDF::Repository]
-    def profile_repository
-      Profile.repository
-    end
-    
-    # @param [RDF::Repository] repo
-    # @return [RDF::Repository]
-    def profile_repository=(repo)
-      Profile.repository = repo
-    end
-    
     ##
     # Write whole graph
     #
@@ -198,9 +174,6 @@ module RDF::RDFa
 
       preprocess
 
-      # Profiles
-      profile = @options[:profiles].join(" ") if @options[:profiles]
-
       # Prefixes
       prefix = prefixes.keys.map {|pk| "#{pk}: #{prefixes[pk]}"}.sort.join(" ") unless prefixes.empty?
       add_debug "\nserialize: prefixes: #{prefix.inspect}"
@@ -223,7 +196,6 @@ module RDF::RDFa
         :lang     => @lang,
         :base     => @base_uri,
         :title    => doc_title,
-        :profile  => profile,
         :prefix   => prefix) do |s|
         subject(s)
       end
@@ -238,7 +210,7 @@ module RDF::RDFa
     # The default Haml template is:
     #     !!! XML
     #     !!! 5
-    #     %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :profile => profile, :prefix => prefix}
+    #     %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :prefix => prefix}
     #       - if base || title
     #         %head
     #           - if base
@@ -260,8 +232,6 @@ module RDF::RDFa
     #   an @lang attribute if it is equivalent to that of the document.
     # @option options [String] title (nil)
     #   Value of html>head>title element.
-    # @option options [String] profile (nil)
-    #   Value of @profile attribute.
     # @option options [String] prefix (nil)
     #   Value of @prefix attribute.
     # @option options [String] haml (haml_template[:doc])
@@ -276,7 +246,6 @@ module RDF::RDFa
       template = options[:haml] || :doc
       options = {
         :prefix => nil,
-        :profile => nil,
         :subjects => subjects,
         :title => nil,
       }.merge(options)
@@ -460,20 +429,20 @@ module RDF::RDFa
     # Perform any preprocessing of statements required
     # @return [ignored]
     def preprocess
-      # Load profiles
+      # Load default profiles
       # Add terms and prefixes to local store for converting URIs
       # Keep track of vocabulary from left-most profile
-      [@options[:profiles]].flatten.compact.reverse.each do |uri|
+      [XML_RDFA_PROFILE, XHTML_RDFA_PROFILE].each do |uri|
         prof = Profile.find(uri)
         prof.prefixes.each_pair do |k, v|
           @uri_to_prefix[v] = k
         end
         
         prof.terms.each_pair do |k, v|
-          @uri_to_term_or_curie[v] = RDF::URI.intern(k)
+          @uri_to_term_or_curie[v] = k
         end
         
-        @vocabulary = prof.vocabulary.to_s
+        @vocabulary = prof.vocabulary.to_s if prof.vocabulary
       end
       
       # Load defined prefixes
@@ -743,39 +712,31 @@ module RDF::RDFa
       raise RDF::WriterError, "Getting CURIE for #{resource.inspect}, which must be an RDF value" unless resource.is_a?(RDF::Value)
       return resource.to_s unless resource.uri?
 
-      @rdfcore_prefixes ||= RDF::RDFa::Profile.find(RDF::URI("http://www.w3.org/profile/rdfa-1.1")).prefixes
-      
       uri = resource.to_s
 
       curie = case
       when @uri_to_term_or_curie.has_key?(uri)
-        #add_debug("get_curie(#{uri}): uri_to_term_or_curie")
+        add_debug("get_curie(#{uri}): uri_to_term_or_curie #{@uri_to_term_or_curie[uri].inspect}")
         return @uri_to_term_or_curie[uri]
       when @base_uri && uri.index(@base_uri.to_s) == 0
-        #add_debug("get_curie(#{uri}): base_uri (#{uri.sub(@base_uri.to_s, "")})")
+        add_debug("get_curie(#{uri}): base_uri (#{uri.sub(@base_uri.to_s, "")})")
         uri.sub(@base_uri.to_s, "")
       when @vocabulary && uri.index(@vocabulary) == 0
-        #add_debug("get_curie(#{uri}): vocabulary")
+        add_debug("get_curie(#{uri}): vocabulary")
         uri.sub(@vocabulary, "")
       when u = @uri_to_prefix.keys.detect {|u| uri.index(u.to_s) == 0}
-        #add_debug("get_curie(#{uri}): uri_to_prefix")
+        add_debug("get_curie(#{uri}): uri_to_prefix")
         # Use a defined prefix
         prefix = @uri_to_prefix[u]
         prefix(prefix, u)  # Define for output
         uri.sub(u.to_s, "#{prefix}:")
-      when u = @rdfcore_prefixes.values.detect {|u| uri.index(u.to_s) == 0}
-        #add_debug("get_curie(#{uri}): rdfcore_prefixes")
-        # Use standard profile prefixes
-        pfx = @rdfcore_prefixes.invert[u]
-        prefix(pfx, u)  # Define for output
-        uri.sub(u.to_s, "#{pfx}:")
       when @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri.index(v.to_uri.to_s) == 0}
-        #add_debug("get_curie(#{uri}): standard_prefixes")
+        add_debug("get_curie(#{uri}): standard_prefixes")
         prefix = vocab.__name__.to_s.split('::').last.downcase
         prefix(prefix, vocab.to_uri) # Define for output
         uri.sub(vocab.to_uri.to_s, "#{prefix}:")
       else
-        #add_debug("get_curie(#{uri}): none")
+        add_debug("get_curie(#{uri}): none")
         uri
       end
       

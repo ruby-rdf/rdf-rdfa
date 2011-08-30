@@ -1,3 +1,7 @@
+### 0.3.6
+* Sync with changes to RDFa 1.1 spec:
+  * Deprecate explicit use of @profile
+
 ### 0.3.5
 * Updates to writer necessary for structure-data.org linter.
   * Support for type-specific templates and types matching a regular expression.

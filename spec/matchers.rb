@@ -1,7 +1,7 @@
 require 'rspec/matchers'
 require 'sparql/grammar'
 
-RSpec::Matchers.define :have_xpath do |xpath, value|
+RSpec::Matchers.define :have_xpath do |xpath, value, trace|
   match do |actual|
     @doc = Nokogiri::XML.parse(actual)
     @doc.should be_a(Nokogiri::XML::Document)
@@ -24,6 +24,14 @@ RSpec::Matchers.define :have_xpath do |xpath, value|
   failure_message_for_should do |actual|
     msg = "expected that #{xpath.inspect} would be #{value.inspect} in:\n" + actual.to_s
     msg += "was: #{@doc.root.at_xpath(xpath, @namespaces)}"
+    msg +=  "\nDebug:#{trace.join("\n")}" if trace
+    msg
+  end
+  
+  failure_message_for_should_not do |actual|
+    msg = "expected that #{xpath.inspect} would not be #{value.inspect} in:\n" + actual.to_s
+    msg +=  "\nDebug:#{trace.join("\n")}" if trace
+    msg
   end
 end
 

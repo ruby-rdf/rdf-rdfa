@@ -5,12 +5,12 @@ module RDF::RDFa
    BASE_HAML = {
      :identifier => "base", 
       # Document
-      # Locals: language, title, profile, prefix, base, subjects
+      # Locals: language, title, prefix, base, subjects
       # Yield: subjects.each
       :doc => %q(
         !!! XML
         !!! 5
-        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :profile => profile, :prefix => prefix}
+        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :prefix => prefix}
           - if base || title
             %head
               - if base
@@ -112,12 +112,12 @@ module RDF::RDFa
     MIN_HAML = {
       :identifier => "min", 
       # Document
-      # Locals: language, title, profile, prefix, base, subjects
+      # Locals: language, title, prefix, base, subjects
       # Yield: subjects.each
       :doc => %q(
         !!! XML
         !!! 5
-        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :profile => profile, :prefix => prefix}
+        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :prefix => prefix}
           - if base
             %head
               %base{:href => base}
@@ -171,12 +171,12 @@ module RDF::RDFa
     DISTILLER_HAML = {
       :identifier => "distiller", 
       # Document
-      # Locals: language, title, profile, prefix, base, subjects
+      # Locals: language, title, prefix, base, subjects
       # Yield: subjects.each
       :doc => %q(
         !!! XML
         !!! 5
-        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :profile => profile, :prefix => prefix}
+        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :prefix => prefix}
           - if base || title
             %head
               - if base

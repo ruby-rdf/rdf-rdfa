@@ -151,7 +151,9 @@ module RDF::RDFa
       end
       
       def inspect
-        v = %w(base parent_subject parent_object language default_vocabulary).map {|a| "#{a}='#{self.send(a).inspect}'"}
+        v = ['base', 'parent_subject', 'parent_object', 'language', 'default_vocabulary'].map do |a|
+          "#{a}='#{self.send(a).inspect}'"
+        end
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
         v << "term_mappings[#{term_mappings.keys.length}]"
@@ -184,8 +186,6 @@ module RDF::RDFa
     #   Parser version information
     # @option options [Graph]    :processor_graph (nil)
     #   Graph to record information, warnings and errors.
-    # @option options [Repository] :profile_repository (nil)
-    #   Repository to save profile graphs.
     # @option options [Array] :debug
     #   Array to place debug messages
     # @return [reader]
@@ -254,7 +254,6 @@ module RDF::RDFa
 
         block.call(self) if block_given?
       end
-      self.profile_repository = options[:profile_repository] if options[:profile_repository]
     end
 
     # Determine the host language and/or version from options and the input document
@@ -339,17 +338,6 @@ module RDF::RDFa
       end
       
       @host_language ||= :xml1
-    end
-    
-    # @return [RDF::Repository]
-    def profile_repository
-      Profile.repository
-    end
-    
-    # @param [RDF::Repository] repo
-    # @return [RDF::Repository]
-    def profile_repository=(repo)
-      Profile.repository = repo
     end
     
     ##
@@ -451,7 +439,6 @@ module RDF::RDFa
       @callback.call(statement)
     end
 
-  
     # Parsing an RDFa document (this is *not* the recursive method)
     def parse_whole_document(doc, base)
       # find if the document has a base element
@@ -629,7 +616,6 @@ module RDF::RDFa
       content = attrs['content'].to_s if attrs['content']
       rel = attrs['rel'].to_s.strip if attrs['rel']
       rev = attrs['rev'].to_s.strip if attrs['rev']
-      profiles = attrs['profile'].to_s.split(/\s/)  # In-scope profiles in order for passing to XMLLiteral
 
       attrs = {
         :about => about,
@@ -643,49 +629,11 @@ module RDF::RDFa
         :datatype => datatype,
         :rel => rel,
         :rev => rev,
-        :profiles => (profiles.empty? ? nil : profiles),
       }.select{|k,v| v}
       
       add_debug(element, "traverse " + attrs.map{|a| "#{a.first}: #{a.last}"}.join(", ")) unless attrs.empty?
 
-      # Local term mappings [7.5 Steps 2]
-      # Next the current element is parsed for any updates to the local term mappings and local list of URI mappings via @profile.
-      # If @profile is present, its value is processed as defined in RDFa Profiles.
-      unless @version == :"rdfa1.0"
-        begin
-          process_profile(element, profiles) do |which, value|
-            add_debug(element, "[Step 2] traverse, #{which}: #{value.inspect}")
-            case which
-            when :uri_mappings
-              value.each do |k, v|
-                if k.to_s.match(NC_REGEXP)
-                  uri_mappings[k] = v
-                else
-                  add_error(element, "[Step 2] traverse: Prefix #{k.to_s.inspect} does not match NCName production")
-                end
-              end
-            when :term_mappings
-              value.each do |k, v|
-                if k.to_s.match(NC_REGEXP)
-                  term_mappings[k] = v
-                else
-                  add_error(element, "[Step 2] traverse: Term #{k.to_s.inspect} does not match NCName production")
-                end
-              end
-            when :default_vocabulary
-              default_vocabulary = value
-            end
-          end 
-        rescue
-          # Skip this element and all sub-elements
-          # If any referenced RDFa Profile is not available, then the current element and its children must not place any
-          # triples in the default graph .
-          raise if validate?
-          return
-        end
-      end
-
-      # Default vocabulary [7.5 Step 3]
+      # Default vocabulary [7.5 Step 2]
       # Next the current element is examined for any change to the default vocabulary via @vocab.
       # If @vocab is present and contains a value, its value updates the local default vocabulary.
       # If the value is empty, then the local default vocabulary must be reset to the Host Language defined default.
@@ -697,15 +645,15 @@ module RDF::RDFa
         else
           uri(vocab)
         end
-        add_debug(element, "[Step 3] traverse, default_vocaulary: #{default_vocabulary.inspect}")
+        add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")
       end
       
-      # Local term mappings [7.5 Steps 4]
+      # Local term mappings [7.5 Step 3]
       # Next, the current element is then examined for URI mapping s and these are added to the local list of URI mappings.
       # Note that a URI mapping will simply overwrite any current mapping in the list that has the same name
       extract_mappings(element, uri_mappings, namespaces)
     
-      # Language information [7.5 Step 5]
+      # Language information [7.5 Step 4]
       # From HTML5 [3.2.3.3]
       #   If both the lang attribute in no namespace and the lang attribute in the XML namespace are set
       #   on an element, user agents must use the lang attribute in the XML namespace, and the lang
@@ -741,7 +689,7 @@ module RDF::RDFa
       add_debug(element, "traverse, rels: #{rels.join(" ")}, revs: #{revs.join(" ")}") unless (rels + revs).empty?
 
       if !(rel || rev)
-        # Establishing a new subject if no rel/rev [7.5 Step 6]
+        # Establishing a new subject if no rel/rev [7.5 Step 5]
         # May not be valid, but can exist
         new_subject = if about
           process_uri(element, about, evaluation_context, base,
@@ -777,9 +725,9 @@ module RDF::RDFa
           skip = true unless property
           evaluation_context.parent_object
         end
-        add_debug(element, "[Step 6] new_subject: #{new_subject}, skip = #{skip}")
+        add_debug(element, "[Step 5] new_subject: #{new_subject}, skip = #{skip}")
       else
-        # [7.5 Step 7]
+        # [7.5 Step 6]
         # If the current element does contain a @rel or @rev attribute, then the next step is to
         # establish both a value for new subject and a value for current object resource:
         new_subject = process_uri(element, about, evaluation_context, base,
@@ -815,10 +763,10 @@ module RDF::RDFa
                       :restrictions => [:uri])
         end
 
-        add_debug(element, "[Step 7] new_subject: #{new_subject}, current_object_resource = #{current_object_resource.nil? ? 'nil' : current_object_resource}")
+        add_debug(element, "[Step 6] new_subject: #{new_subject}, current_object_resource = #{current_object_resource.nil? ? 'nil' : current_object_resource}")
       end
     
-      # Process @typeof if there is a subject [Step 8]
+      # Process @typeof if there is a subject [Step 7]
       if new_subject and typeof
         # Typeof is TERMorCURIEorAbsURIs
         types = process_uris(element, typeof, evaluation_context, base,
@@ -832,7 +780,7 @@ module RDF::RDFa
         end
       end
     
-      # Generate triples with given object [Step 9]
+      # Generate triples with given object [Step 8]
       if new_subject and current_object_resource
         rels.each do |r|
           add_triple(element, new_subject, r, current_object_resource)
@@ -842,8 +790,8 @@ module RDF::RDFa
           add_triple(element, current_object_resource, r, new_subject)
         end
       elsif rel || rev
-        # Incomplete triples and bnode creation [Step 10]
-        add_debug(element, "[Step 10] incompletes: rels: #{rels}, revs: #{revs}")
+        # Incomplete triples and bnode creation [Step 9]
+        add_debug(element, "[Step 9] incompletes: rels: #{rels}, revs: #{revs}")
         current_object_resource = RDF::Node.new
       
         rels.each do |r|
@@ -855,7 +803,7 @@ module RDF::RDFa
         end
       end
     
-      # Establish current object literal [Step 11]
+      # Establish current object literal [Step 10]
       if property
         properties = process_uris(element, property, evaluation_context, base,
                                   :uri_mappings => uri_mappings,
@@ -884,12 +832,12 @@ module RDF::RDFa
         begin
           current_object_literal = if !datatype.to_s.empty? && datatype.to_s != RDF.XMLLiteral.to_s
             # typed literal
-            add_debug(element, "[Step 11] typed literal (#{datatype})")
+            add_debug(element, "[Step 10] typed literal (#{datatype})")
             RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
           elsif @version == :"rdfa1.1"
             if datatype.to_s == RDF.XMLLiteral.to_s
               # XML Literal
-              add_debug(element, "[Step 11(1.1)] XML Literal: #{element.inner_html}")
+              add_debug(element, "[Step 10(1.1)] XML Literal: #{element.inner_html}")
 
               # In order to maintain maximum portability of this literal, any children of the current node that are
               # elements must have the current in scope XML namespace declarations (if any) declared on the
@@ -909,17 +857,17 @@ module RDF::RDFa
               end
             else
               # plain literal
-              add_debug(element, "[Step 11(1.1)] plain literal")
+              add_debug(element, "[Step 10(1.1)] plain literal")
               RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             end
           else
             if content || (children_node_types == [Nokogiri::XML::Text]) || (element.children.length == 0) || datatype == ""
               # plain literal
-              add_debug(element, "[Step 11 (1.0)] plain literal")
+              add_debug(element, "[Step 10 (1.0)] plain literal")
               RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
               # XML Literal
-              add_debug(element, "[Step 11 (1.0)] XML Literal: #{element.inner_html}")
+              add_debug(element, "[Step 10 (1.0)] XML Literal: #{element.inner_html}")
               recurse = false
               RDF::Literal.new(element.inner_html,
                                :datatype => RDF.XMLLiteral,
@@ -940,8 +888,8 @@ module RDF::RDFa
       end
     
       if not skip and new_subject && !evaluation_context.incomplete_triples.empty?
-        # Complete the incomplete triples from the evaluation context [Step 12]
-        add_debug(element, "[Step 12] complete incomplete triples: new_subject=#{new_subject}, completes=#{evaluation_context.incomplete_triples.inspect}")
+        # Complete the incomplete triples from the evaluation context [Step 11]
+        add_debug(element, "[Step 11] complete incomplete triples: new_subject=#{new_subject}, completes=#{evaluation_context.incomplete_triples.inspect}")
         evaluation_context.incomplete_triples.each do |trip|
           if trip[:direction] == :forward
             add_triple(element, evaluation_context.parent_subject, trip[:predicate], new_subject)
@@ -951,7 +899,7 @@ module RDF::RDFa
         end
       end
 
-      # Create a new evaluation context and proceed recursively [Step 13]
+      # Create a new evaluation context and proceed recursively [Step 12]
       if recurse
         if skip
           if language == evaluation_context.language &&
@@ -960,7 +908,7 @@ module RDF::RDFa
               default_vocabulary == evaluation_context.default_vocabulary &&
               base == evaluation_context.base
             new_ec = evaluation_context
-            add_debug(element, "[Step 13] skip: reused ec")
+            add_debug(element, "[Step 12] skip: reused ec")
           else
             new_ec = evaluation_context.clone
             new_ec.base = base
@@ -969,7 +917,7 @@ module RDF::RDFa
             new_ec.namespaces = namespaces
             new_ec.term_mappings = term_mappings
             new_ec.default_vocabulary = default_vocabulary
-            add_debug(element, "[Step 13] skip: cloned ec")
+            add_debug(element, "[Step 12] skip: cloned ec")
           end
         else
           # create a new evaluation context
@@ -982,7 +930,7 @@ module RDF::RDFa
           new_ec.language = language
           new_ec.term_mappings = term_mappings
           new_ec.default_vocabulary = default_vocabulary
-          add_debug(element, "[Step 13] new ec")
+          add_debug(element, "[Step 12] new ec")
         end
       
         element.children.each do |child|

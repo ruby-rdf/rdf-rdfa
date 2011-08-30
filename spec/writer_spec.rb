@@ -24,9 +24,9 @@ describe RDF::RDFa::Writer do
         serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
       end
 
-      specify { subject.should have_xpath("/xhtml:html/@prefix", %r(dc: http://purl.org/dc/terms/))}
-      specify { subject.should have_xpath("/xhtml:html/@prefix", %r(ex: http://example/))}
-      specify { subject.should_not have_xpath("/xhtml:html/@prefix", %r(bibo:))}
+      specify { subject.should have_xpath("/xhtml:html/@prefix", %r(dc: http://purl.org/dc/terms/), @debug)}
+      specify { subject.should have_xpath("/xhtml:html/@prefix", %r(ex: http://example/), @debug)}
+      specify { subject.should have_xpath("/xhtml:html/@prefix", %r(ex:), @debug)}
     end
 
     context "plain literal" do
@@ -41,7 +41,7 @@ describe RDF::RDFa::Writer do
         "//xhtml:div[@class='property']/xhtml:span[@property]/text()" => "foo",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value)
+          subject.should have_xpath(path, value, @debug)
         end
       end
     end
@@ -59,7 +59,7 @@ describe RDF::RDFa::Writer do
         "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/text()" => "foo",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value)
+          subject.should have_xpath(path, value, @debug)
         end
       end
     end
@@ -76,7 +76,7 @@ describe RDF::RDFa::Writer do
           "/xhtml:html/xhtml:body/xhtml:div/@typeof" => "ex:Type",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -93,7 +93,7 @@ describe RDF::RDFa::Writer do
           "/xhtml:html/xhtml:body/xhtml:div/@typeof" => "ex:t1 ex:t2",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -111,7 +111,7 @@ describe RDF::RDFa::Writer do
           "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@lang" => "en",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -127,7 +127,7 @@ describe RDF::RDFa::Writer do
           "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@lang" => false,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -143,7 +143,7 @@ describe RDF::RDFa::Writer do
           "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@lang" => "en",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -163,7 +163,7 @@ describe RDF::RDFa::Writer do
           "//xhtml:span[@property]/text()" => "Friday, 18 March 2011",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -181,7 +181,7 @@ describe RDF::RDFa::Writer do
           "//xhtml:span[@property]/text()" => /12:34:56/,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -199,7 +199,7 @@ describe RDF::RDFa::Writer do
           "//xhtml:span[@property]/text()" => /12:34:56 \w+ on Friday, 18 March 2011/,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -216,7 +216,7 @@ describe RDF::RDFa::Writer do
           "//xhtml:span[@property]" => %r(<span [^>]+>E = mc<sup>2</sup>: The Most Urgent Problem of Our Time<\/span>),
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -233,7 +233,7 @@ describe RDF::RDFa::Writer do
           "//xhtml:span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -250,7 +250,7 @@ describe RDF::RDFa::Writer do
           "//xhtml:span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value)
+            subject.should have_xpath(path, value, @debug)
           end
         end
       end
@@ -269,7 +269,7 @@ describe RDF::RDFa::Writer do
         "//xhtml:ul/xhtml:li[2]/text()" => "d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value)
+          subject.should have_xpath(path, value, @debug)
         end
       end
     end
@@ -286,7 +286,7 @@ describe RDF::RDFa::Writer do
         "//xhtml:a/@href" => EX.c.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value)
+          subject.should have_xpath(path, value, @debug)
         end
       end
     end
@@ -305,7 +305,7 @@ describe RDF::RDFa::Writer do
         "//xhtml:ul/xhtml:li[2]/xhtml:a/@href" => EX.d.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value)
+          subject.should have_xpath(path, value, @debug)
         end
       end
     end
@@ -325,7 +325,7 @@ describe RDF::RDFa::Writer do
         "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@rel" => "ex:d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value)
+          subject.should have_xpath(path, value, @debug)
         end
       end
     end
