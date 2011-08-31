@@ -37,7 +37,7 @@ end
 
 def normalize(graph)
   case graph
-  when RDF::Graph then graph
+  when RDF::Queryable then graph
   when IO, StringIO
     RDF::Graph.new.load(graph, :base_uri => @info.about)
   else
@@ -49,7 +49,7 @@ def normalize(graph)
   end
 end
 
-Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument)
+Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument, :expectedResults)
 
 RSpec::Matchers.define :be_equivalent_graph do |expected, info|
   match do |actual|
@@ -88,29 +88,45 @@ end
 
 RSpec::Matchers.define :pass_query do |expected, info|
   match do |actual|
-    @expected = expected.read
+    if info.respond_to?(:information)
+      @info = info
+    elsif info.is_a?(Hash)
+      trace = info[:trace]
+      trace = trace.join("\n") if trace.is_a?(Array)
+      @info = Info.new(info[:identifier] || "", info[:information] || "", trace, info[:compare])
+      @info[:expectedResults] = info[:expectedResults] || RDF::Literal::Boolean.new(true)
+    elsif info.is_a?(Array)
+      @info = Info.new()
+      @info[:trace] = info.join("\n")
+      @info[:expectedResults] = RDF::Literal::Boolean.new(true)
+    else
+      @info = Info.new()
+      @info[:expectedResults] = RDF::Literal::Boolean.new(true)
+    end
+
+    @expected = expected.respond_to?(:read) ? expected.read : expected
     @expected = @expected.force_encoding("utf-8") if @expected.respond_to?(:force_encoding)
     query = SPARQL::Grammar.parse(@expected)
     actual = actual.force_encoding("utf-8") if actual.respond_to?(:force_encoding)
     @results = query.execute(actual)
 
-    @results.should == info.expectedResults
+    @results.should == @info.expectedResults
   end
   
   failure_message_for_should do |actual|
-    information = info.respond_to?(:information) ? info.information : ""
-    "#{information + "\n" unless information.empty?}" +
+    "#{@info.inspect + "\n"}" +
+    "#{@info.title + "\n" if @info.title}" +
     if @results.nil?
       "Query failed to return results"
     elsif !@results.is_a?(RDF::Literal::Boolean)
       "Query returned non-boolean results"
-    elsif info.expectedResults
-      "Query returned false"
+    elsif @info.expectedResults != @results
+      "Query returned false (expected #{@info.expectedResults})"
     else
-      "Query returned true (expected false)"
+      "Query returned true (expected #{@info.expectedResults})"
     end +
     "\n#{@expected}" +
     "\nResults:\n#{@actual.dump(:ntriples)}" +
-    "\nDebug:\n#{info.trace}"
+    "\nDebug:\n#{@info.trace}"
   end  
 end

@@ -1,6 +1,8 @@
 ### 0.3.6
 * Sync with changes to RDFa 1.1 spec:
   * Deprecate explicit use of @profile
+  * Add rdfa:hasVocabulary when encountering @vocab
+  * Implemented Reader#expand to perform vocabulary expansion using RDFS rules 5, 7, 9 and 11.
 
 ### 0.3.5
 * Updates to writer necessary for structure-data.org linter.

@@ -6,11 +6,13 @@ require 'rubygems'
 require 'rspec'
 require 'bigdecimal'  # XXX Remove Me
 require 'rdf/rdfa'
+require 'rdf/rdfxml'
 require 'rdf/spec'
 require 'rdf/spec/matchers'
 require 'rdf/isomorphic'
 require 'open-uri/cached'
 require 'matchers'
+require 'rdf/turtle'
 
 # Create and maintain a cache of downloaded URIs
 URI_CACHE = File.expand_path(File.join(File.dirname(__FILE__), "uri-cache"))
@@ -40,7 +42,7 @@ def detect_format(stream)
   end
   case string
   when /<html/i   then RDF::RDFa::Reader
-  when /@prefix/i then RDF::N3::Reader
+  when /@prefix/i then RDF::Turtle::Reader
   else                 RDF::NTriples::Reader
   end
 end

@@ -348,6 +348,48 @@ describe "RDF::RDFa::Reader" do
         end
       end
     end
+
+    context "@vocab" do
+      before (:all) do
+        @sampledoc = %q(
+        <html>
+          <head>
+            <base href="http://example.org/"/>
+          </head>
+          <body>
+            <div about ="#me" vocab="http://xmlns.com/foaf/0.1/" typeof="Person" >
+              <p property="name">Gregg Kellogg</p>
+            </div>
+          </body>
+        </html>
+        )
+      end
+      
+      it "uses vocabulary when creating property IRI" do
+        query = %q(
+          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+          ASK WHERE { <http://example.org/#me> a foaf:Person }
+        )
+        parse(@sampledoc).should pass_query(query, @debug)
+      end
+
+      it "uses vocabulary when creating type IRI" do
+        query = %q(
+          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+          ASK WHERE { <http://example.org/#me> foaf:name "Gregg Kellogg" }
+        )
+        parse(@sampledoc).should pass_query(query, @debug)
+      end
+
+      it "adds rdfa:hasProperty triple" do
+        query = %q(
+          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+          PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
+          ASK WHERE { <http://example.org/> rdfa:hasVocabulary foaf: }
+        )
+        parse(@sampledoc).should pass_query(query, @debug)
+      end
+    end
   end
 
   context "problematic examples" do
@@ -370,7 +412,7 @@ describe "RDF::RDFa::Reader" do
       <> <http://www.w3.org/ns/rdfa#hasVocabulary> <#>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
       _:a <#flavor> ("Lemon sorbet" "Apricot sorbet") .
       )
-      g_ttl = RDF::Graph.new << RDF::N3::Reader.new(ttl)
+      g_ttl = RDF::Graph.new << RDF::Turtle::Reader.new(ttl)
       parse(sampledoc, :validate => false).should be_equivalent_graph(g_ttl)
     end
   end

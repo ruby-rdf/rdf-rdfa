@@ -31,7 +31,8 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'spira',           '>= 0.0.12'
   gem.add_development_dependency 'rspec',           '>= 2.5.0'
   gem.add_development_dependency 'rdf-spec',        '>= 0.3.2'
-  gem.add_development_dependency 'rdf-n3',          '>= 0.3.3'
+  gem.add_development_dependency 'rdf-turtle'
+  gem.add_development_dependency 'rdf-rdfxml',      '>= 0.3.4'
   gem.add_development_dependency 'rdf-isomorphic',  '>= 0.3.4'
   gem.add_development_dependency 'yard' ,           '>= 0.6.0'
   gem.post_install_message  = nil

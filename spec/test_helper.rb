@@ -55,6 +55,8 @@ module Fixtures
     def name
       subject.to_s.split("/").last
     end
+    
+    def information; title; end
 
     def input(host_language, version)
       base = self.inputDocument.to_s.sub('test-cases/', "test-cases/#{host_language}/#{version}/")
@@ -82,6 +84,7 @@ module Fixtures
         version
         inputDocument
         resultDocument
+        expectedResults
       ).map {|a| v = self.send(a); "#{a}='#{v}'" if v}.compact.join(", ") +
       "]"
     end

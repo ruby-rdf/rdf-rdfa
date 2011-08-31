@@ -12,6 +12,8 @@ module RDF::RDFa
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
     format Format
+    include Expansion
+
     XHTML = "http://www.w3.org/1999/xhtml"
     
     SafeCURIEorCURIEorURI = {
@@ -644,7 +646,7 @@ module RDF::RDFa
           @host_defaults.fetch(:vocabulary, nil)
         else
           # Generate a triple indicating that the vocabulary is used
-          add_triple(element, base_uri, RDF::RDFA.hasVocabulary, uri(vocab))
+          add_triple(element, base, RDF::RDFA.hasVocabulary, uri(vocab))
 
           uri(vocab)
         end
