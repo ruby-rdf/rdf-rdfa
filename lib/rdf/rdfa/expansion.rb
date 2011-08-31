@@ -41,7 +41,7 @@ module RDF::RDFa
           repo.load(vocab, :context => vocab)
         rescue RDF::FormatError => e
           # XXX: update spec to indicate the error if the vocabulary fails to laod
-          add_error("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.VocabularyReferenceError)
+          add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresovedVocabulary)
         end
       end
       

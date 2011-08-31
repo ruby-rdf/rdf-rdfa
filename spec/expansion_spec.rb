@@ -1,6 +1,5 @@
 $:.unshift "."
 require File.join(File.dirname(__FILE__), 'spec_helper')
-require 'rdf/rdfxml'
 
 # Class for abstract testing of module
 class ModuleTester
