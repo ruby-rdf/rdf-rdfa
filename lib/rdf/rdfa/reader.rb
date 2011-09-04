@@ -202,6 +202,8 @@ module RDF::RDFa
     #   whether to validate the parsed statements and values
     # @option options [Boolean]  :canonicalize (false)
     #   whether to canonicalize parsed literals
+    # @option options [Boolean]  :expand (false)
+    #   whether to perform RDFS expansion on the resulting graph
     # @option options [Boolean]  :intern       (true)
     #   whether to intern all parsed URIs
     # @option options [Hash]     :prefixes     (Hash.new)
@@ -371,19 +373,27 @@ module RDF::RDFa
     ##
     # Iterates the given block for each RDF statement in the input.
     #
+    # Reads to graph and performs expansion if required.
+    #
     # @yield  [statement]
     # @yieldparam [RDF::Statement] statement
     # @return [void]
     def each_statement(&block)
-      @callback = block
+      if @options[:expand]
+        @options[:expand] = false
+        expand.each_statement(&block)
+        @options[:expand] = true
+      else
+        @callback = block
 
-      # Add prefix definitions from host defaults
-      @host_defaults[:uri_mappings].each_pair do |prefix, value|
-        prefix(prefix, value)
+        # Add prefix definitions from host defaults
+        @host_defaults[:uri_mappings].each_pair do |prefix, value|
+          prefix(prefix, value)
+        end
+
+        # parse
+        parse_whole_document(@doc, @base_uri)
       end
-
-      # parse
-      parse_whole_document(@doc, @base_uri)
     end
 
     ##

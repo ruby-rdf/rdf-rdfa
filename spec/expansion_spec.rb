@@ -7,6 +7,7 @@ class ModuleTester
   include RDF::Enumerable
 
   attr_reader :about, :information, :repo, :inputDocument, :outputDocument
+  attr :format, true
 
   def initialize(name)
     @about = @information = name
@@ -274,7 +275,6 @@ describe RDF::RDFa::Expansion do
   
   def parse(input, options = {})
     @debug = options[:debug] || []
-    graph = RDF::Graph.new
-    RDF::RDFa::Reader.new(input, options.merge(:debug => @debug)).expand
+    RDF::Graph.new << RDF::RDFa::Reader.new(input, options.merge(:debug => @debug, :expand => true))
   end
 end
