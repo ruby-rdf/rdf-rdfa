@@ -59,6 +59,7 @@ module RDF::RDFa
     # The Recursive Baggage
     # @private
     class EvaluationContext # :nodoc:
+      ##
       # The base.
       #
       # This will usually be the URL of the document being processed,
@@ -66,15 +67,19 @@ module RDF::RDFa
       # such as the (X)HTML base element. The important thing is that it establishes
       # a URL against which relative paths can be resolved.
       #
-      # @return [URI]
+      # @attr [RDF::URI]
       attr :base, true
+
+      ##
       # The parent subject.
       #
       # The initial value will be the same as the initial value of base,
       # but it will usually change during the course of processing.
       #
-      # @return [URI]
+      # @attr [RDF::URI]
       attr :parent_subject, true
+      
+      ##
       # The parent object.
       #
       # In some situations the object of a statement becomes the subject of any nested statements,
@@ -84,17 +89,23 @@ module RDF::RDFa
       # This means that the bnode must be set in the containing statement and passed down,
       # and this property is used to convey this value.
       #
-      # @return URI
+      # @attr [RDF::URI]
       attr :parent_object, true
+      
+      ##
       # A list of current, in-scope URI mappings.
       #
-      # @return [Hash{Symbol => String}]
+      # @attr [Hash{Symbol => String}]
       attr :uri_mappings, true
+      
+      ##
       # A list of current, in-scope Namespaces. This is the subset of uri_mappings
       # which are defined using xmlns.
       #
-      # @return [Hash{String => Namespace}]
+      # @attr [Hash{String => Namespace}]
       attr :namespaces, true
+      
+      ##
       # A list of incomplete triples.
       #
       # A triple can be incomplete when no object resource
@@ -102,33 +113,46 @@ module RDF::RDFa
       # The triples can be completed when a resource becomes available,
       # which will be when the next subject is specified (part of the process called chaining).
       #
-      # @return [Array<Array<URI, Resource>>]
+      # @attr [Array<Array<RDF::URI, RDF::Resource>>]
       attr :incomplete_triples, true
+      
+      ##
       # The language. Note that there is no default language.
       #
-      # @return [Symbol]
+      # @attr [Symbol]
       attr :language, true
+      
+      ##
       # The term mappings, a list of terms and their associated URIs.
       #
       # This specification does not define an initial list.
       # Host Languages may define an initial list.
       # If a Host Language provides an initial list, it should do so via an RDFa Profile document.
       #
-      # @return [Hash{Symbol => URI}]
+      # @attr [Hash{Symbol => RDF::URI}]
       attr :term_mappings, true
+      
+      ##
       # The default vocabulary
       #
       # A value to use as the prefix URI when a term is used.
       # This specification does not define an initial setting for the default vocabulary.
       # Host Languages may define an initial setting.
       #
-      # @return [URI]
+      # @attr [RDF::URI]
       attr :default_vocabulary, true
+
+      ##
+      # collections
+      #
+      # A hash associating collections with properties.
+      # @attr [Hash{RDF::URI => Array<RDF::Resource>}]
+      attr :collection_mappings, true
 
       # @param [RDF::URI] base
       # @param [Hash] host_defaults
-      # @option host_defaults [Hash{String => URI}] :term_mappings Hash of NCName => URI
-      # @option host_defaults [Hash{String => URI}] :vocabulary Hash of prefix => URI
+      # @option host_defaults [Hash{String => RDF::URI}] :term_mappings Hash of NCName => URI
+      # @option host_defaults [Hash{String => RDF::URI}] :vocabulary Hash of prefix => URI
       def initialize(base, host_defaults)
         # Initialize the evaluation context, [5.1]
         @base = base
@@ -150,6 +174,7 @@ module RDF::RDFa
         @uri_mappings = from.uri_mappings.clone
         @incomplete_triples = from.incomplete_triples.clone
         @namespaces = from.namespaces.clone
+        @collection_mappings = from.collection_mappings # Don't clone
       end
       
       def inspect
@@ -159,6 +184,7 @@ module RDF::RDFa
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
         v << "term_mappings[#{term_mappings.keys.length}]"
+        v << "collections[#{collection_mappings.keys.length}]" if collection_mappings
         v.join(", ")
       end
     end
@@ -186,7 +212,7 @@ module RDF::RDFa
     #   Host Language
     # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
     #   Parser version information
-    # @option options [Graph]    :processor_graph (nil)
+    # @option options [RDF::Writable]    :processor_graph (nil)
     #   Graph to record information, warnings and errors.
     # @option options [Array] :debug
     #   Array to place debug messages
@@ -392,7 +418,7 @@ module RDF::RDFa
     
     # Add debug event to debug array, if specified
     #
-    # @param [XML Node, any] node:: XML Node or string for showing context
+    # @param [Nokogiri::XML::Node, #to_s] node:: XML Node or string for showing context
     # @param [String] message::
     def add_debug(node, message)
       add_processor_message(node, message, RDF::RDFA.Info)
@@ -429,12 +455,12 @@ module RDF::RDFa
 
     # add a statement, object can be literal or URI or bnode
     #
-    # @param [Nokogiri::XML::Node, any] node:: XML Node or string for showing context
-    # @param [URI, BNode] subject:: the subject of the statement
-    # @param [URI] predicate:: the predicate of the statement
-    # @param [URI, BNode, Literal] object:: the object of the statement
-    # @return [Statement]:: Added statement
-    # @raise [ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
+    # @param [Nokogiri::XML::Node, #to_s] node:: XML Node or string for showing context
+    # @param [RDF::URI, RDF::BNode] subject:: the subject of the statement
+    # @param [RDF::URI] predicate:: the predicate of the statement
+    # @param [URI, RDF::BNode, RDF::Literal] object:: the object of the statement
+    # @return [RDF::Statement]:: Added statement
+    # @raise [RDF::ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
       add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
@@ -596,9 +622,8 @@ module RDF::RDFa
       language = evaluation_context.language
       term_mappings = evaluation_context.term_mappings.clone
       default_vocabulary = evaluation_context.default_vocabulary
+      collection_mappings = evaluation_context.collection_mappings
 
-      current_object_literal = nil  # XXX Not explicit
-    
       # shortcut
       attrs = element.attributes
 
@@ -619,6 +644,13 @@ module RDF::RDFa
       rel = attrs['rel'].to_s.strip if attrs['rel']
       rev = attrs['rev'].to_s.strip if attrs['rev']
 
+      # Collections:
+      # @member
+      #   an attribute (value ignored) used to indicate that the object associated with a
+      #   @rel or @property attribute on the same element is to be added to the collection
+      #   for that property. Causes a collection to be created if it does not already exist.
+      member = attrs['member'].to_s.strip if attrs.has_key?('member')
+
       attrs = {
         :about => about,
         :src => src,
@@ -631,6 +663,7 @@ module RDF::RDFa
         :datatype => datatype,
         :rel => rel,
         :rev => rev,
+        :member => member,
       }.select{|k,v| v}
       
       add_debug(element, "traverse " + attrs.map{|a| "#{a.first}: #{a.last}"}.join(", ")) unless attrs.empty?
@@ -784,11 +817,33 @@ module RDF::RDFa
           add_triple(element, new_subject, RDF["type"], one_type)
         end
       end
-    
+
+      # Collections: If new subject is set and is not the same as parent subject,
+      # replace the collection mappings taken from
+      # the evaluation context with a new empty mappings.
+      if (new_subject && new_subject != evaluation_context.parent_subject) || collection_mappings.nil?
+        collection_mappings = {}
+        add_debug(element, "collections: create new collection mappings(#{collection_mappings.object_id}) ns: #{new_subject}, ps: #{evaluation_context.parent_subject}")
+      end
+
       # Generate triples with given object [Step 8]
+      #
+      # Collections: if the current element has a @member attribute, add the property to the
+      # collection associated with that property, creating a new collection if necessary.
       if new_subject and current_object_resource
         rels.each do |r|
-          add_triple(element, new_subject, r, current_object_resource)
+          if member
+            # If the current collection mappings does not contain a collection associated with this IRI,
+            # instantiate a new collection
+            unless collection_mappings[r]
+              collection_mappings[r] = RDF::List.new
+              add_debug(element, "collections(#{r}): create #{collection_mappings[r]}")
+            end
+            add_debug(element, "member: add #{current_object_resource} to #{r} collection")
+            collection_mappings[r] << current_object_resource
+          else
+            add_triple(element, new_subject, r, current_object_resource)
+          end
         end
       
         revs.each do |r|
@@ -799,8 +854,22 @@ module RDF::RDFa
         add_debug(element, "[Step 9] incompletes: rels: #{rels}, revs: #{revs}")
         current_object_resource = RDF::Node.new
       
+        # predicate: full IRI
+        # direction: forward/reverse
+        # collection: Save into collection, don't generate triple
+
         rels.each do |r|
-          incomplete_triples << {:predicate => r, :direction => :forward}
+          if member
+            # If the current collection mappings does not contain a collection associated with this IRI,
+            # instantiate a new collection
+            unless collection_mappings[r]
+              collection_mappings[r] = RDF::List.new
+              add_debug(element, "collections(#{r}): create #{collection_mappings[r]}")
+            end
+            incomplete_triples << {:collection => collection_mappings[r]}
+          else
+            incomplete_triples << {:predicate => r, :direction => :forward}
+          end
         end
       
         revs.each do |r|
@@ -809,6 +878,9 @@ module RDF::RDFa
       end
     
       # Establish current object literal [Step 10]
+      #
+      # Collections: if the current element has a @member attribute, add the property to the
+      # collection associated with that property, creating a new collection if necessary.
       if property
         properties = process_uris(element, property, evaluation_context, base,
                                   :uri_mappings => uri_mappings,
@@ -888,15 +960,30 @@ module RDF::RDFa
 
         # add each property
         properties.each do |p|
-          add_triple(element, new_subject, p, current_object_literal) if new_subject
+          # Collections: If element has an @member attribute, add the value to a collection
+          if member
+            # If the current collection mappings does not contain a collection associated with this IRI,
+            # instantiate a new collection
+            unless collection_mappings[p]
+              collection_mappings[p] = RDF::List.new
+              add_debug(element, "collections(#{p}): create #{collection_mappings[p]}")
+            end
+            add_debug(element, "member: add #{current_object_literal} to #{p} collection")
+            collection_mappings[p] << current_object_literal
+          elsif new_subject
+            add_triple(element, new_subject, p, current_object_literal) 
+          end
         end
       end
     
       if not skip and new_subject && !evaluation_context.incomplete_triples.empty?
         # Complete the incomplete triples from the evaluation context [Step 11]
-        add_debug(element, "[Step 11] complete incomplete triples: new_subject=#{new_subject}, completes=#{evaluation_context.incomplete_triples.inspect}")
+        add_debug(element, "[Step 11] complete incomplete triples: new_subject=#{new_subject.inspect}, completes=#{evaluation_context.incomplete_triples.inspect}")
         evaluation_context.incomplete_triples.each do |trip|
-          if trip[:direction] == :forward
+          if trip[:collection]
+            add_debug(element, "member: add #{current_object_resource} to #{trip[:collection]} collection")
+            trip[:collection] << new_subject
+          elsif trip[:direction] == :forward
             add_triple(element, evaluation_context.parent_subject, trip[:predicate], new_subject)
           elsif trip[:direction] == :reverse
             add_triple(element, new_subject, trip[:predicate], evaluation_context.parent_subject)
@@ -911,7 +998,8 @@ module RDF::RDFa
               uri_mappings == evaluation_context.uri_mappings &&
               term_mappings == evaluation_context.term_mappings &&
               default_vocabulary == evaluation_context.default_vocabulary &&
-              base == evaluation_context.base
+              base == evaluation_context.base &&
+              collection_mappings == evaluation_context.collection_mappings
             new_ec = evaluation_context
             add_debug(element, "[Step 12] skip: reused ec")
           else
@@ -922,6 +1010,7 @@ module RDF::RDFa
             new_ec.namespaces = namespaces
             new_ec.term_mappings = term_mappings
             new_ec.default_vocabulary = default_vocabulary
+            new_ec.collection_mappings = collection_mappings
             add_debug(element, "[Step 12] skip: cloned ec")
           end
         else
@@ -935,12 +1024,36 @@ module RDF::RDFa
           new_ec.language = language
           new_ec.term_mappings = term_mappings
           new_ec.default_vocabulary = default_vocabulary
+          new_ec.collection_mappings = collection_mappings
           add_debug(element, "[Step 12] new ec")
         end
       
         element.children.each do |child|
           # recurse only if it's an element
           traverse(child, new_ec) if child.class == Nokogiri::XML::Element
+        end
+        
+        # Collections: after traversing through child elements, for each collection associated with
+        # a property
+        collection_mappings.each do |p, c|
+          # if that collection is different from the evaluation context
+          ec_col = evaluation_context.collection_mappings[p] if evaluation_context.collection_mappings
+          add_debug(element, "collections: time to create #{c}? #{(ec_col != c).inspect}")
+          if ec_col != c
+            add_debug(element, "collection(#{p}) create #{c}")
+            # Generate an rdf:List with the elements of that collection.
+            c.each_statement do |st|
+              add_triple(element, st.subject, st.predicate, st.object) unless st.object == RDF.List
+            end
+
+            # Generate a triple relating new_subject, property and the collection BNode,
+            # or rdf:nil if the collection is empty.
+            if c.empty?
+              add_triple(element, new_subject, p, RDF.nil)
+            else
+              add_triple(element, new_subject, p, c.subject)
+            end
+          end
         end
       end
     end
@@ -1010,11 +1123,6 @@ module RDF::RDFa
     end
     
     # [7.4.3] General Use of Terms in Attributes
-    #
-    # @param [String] term:: term
-    # @param [Hash] options:: Parser options, one of
-    # <em>options[:term_mappings]</em>:: Term mappings
-    # <em>options[:vocab]</em>:: Default vocabulary
     def process_term(element, value, options)
       if options[:term_mappings].is_a?(Hash)
         # If the term is in the local term mappings, use the associated URI (case sensitive).

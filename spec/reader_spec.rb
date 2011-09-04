@@ -390,6 +390,165 @@ describe "RDF::RDFa::Reader" do
         parse(@sampledoc).should pass_query(query, @debug)
       end
     end
+
+    context "collections" do
+      {
+        "empty list" => [
+          %q(
+            <div about ="">
+              <p rel="rdf:value" resource="rdf:nil"/>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value () .
+          )
+        ],
+        "literal" => [
+          %q(
+            <div about ="">
+              <p property="rdf:value" member="">Foo</p>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo") .
+          )
+        ],
+        "IRI" => [
+          %q(
+            <div about ="">
+              <a rel="rdf:value" member="" href="foo">Foo</a>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value (<foo>) .
+          )
+        ],
+        "implicit list with hetrogenious membership" => [
+          %q(
+            <div about ="">
+              <p property="rdf:value" member="">Foo</p>
+              <a rel="rdf:value" member="" href="foo">Foo</p>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo" <foo>) .
+          )
+        ],
+        "implicit list at different levels" => [
+          %q(
+            <div about ="">
+              <p property="rdf:value" member="">Foo</p>
+              <strong><p property="rdf:value" member="">Bar</p></strong>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo" "Bar") .
+          )
+        ],
+        "property with list and literal" => [
+          %q(
+            <div about ="">
+              <p property="rdf:value" member="">Foo</p>
+              <strong><p property="rdf:value" member="">Bar</p></strong>
+              <p property="rdf:value">Baz</p>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo" "Bar"), "Baz" .
+          )
+        ],
+        "multiple rel items" => [
+          %q(
+            <div about ="">
+              <ol rel="rdf:value" member="">
+                <li><a href="foo">Foo</a></li>
+                <li><a href="bar">Bar</a></li>
+              </ol
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value (<foo> <bar>) .
+          )
+        ],
+        "multiple collections" => [
+          %q(
+            <div>
+              <div about ="foo">
+                <p property="rdf:value" member="">Foo</p>
+              </div>
+              <div about="foo">
+                <p property="rdf:value" member="">Bar</p>
+              </div>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <foo> rdf:value ("Foo"), ("Bar") .
+          )
+        ],
+        "confusion between multiple implicit collections (resource)" => [
+          %q(
+            <div about ="">
+              <p property="rdf:value" member="">Foo</p>
+              <span rel="rdf:member" resource="res">
+                <p property="rdf:value" member="">Bar</p>
+              </span>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo"); rdf:member <res> .
+            <res> rdf:value ("Bar") .
+          )
+        ],
+        "confusion between multiple implicit collections (about)" => [
+          %q(
+            <div about ="">
+              <p property="rdf:value" member="">Foo</p>
+              <span rel="rdf:member">
+                <p about="res" property="rdf:value" member="">Bar</p>
+              </span>
+            </div>
+          ),
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo"); rdf:member <res> .
+            <res> rdf:value ("Bar") .
+          )
+        ],
+      }.each do |test, (input, result)|
+        it test do
+          parse(input).should be_equivalent_graph(result, :trace => @debug, :format => :ttl)
+        end
+      end
+    end
   end
 
   context "problematic examples" do

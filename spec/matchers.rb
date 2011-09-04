@@ -49,7 +49,7 @@ def normalize(graph)
   end
 end
 
-Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument, :expectedResults)
+Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument, :expectedResults, :format)
 
 RSpec::Matchers.define :be_equivalent_graph do |expected, info|
   match do |actual|
@@ -59,10 +59,13 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
       identifier = info[:identifier] || expected.is_a?(RDF::Graph) ? expected.context : info[:about]
       trace = info[:trace]
       trace = trace.join("\n") if trace.is_a?(Array)
-      Info.new(identifier, info[:information] || "", trace, info[:compare])
+      i = Info.new(identifier, info[:information] || "", trace, info[:compare])
+      i.format = info[:format]
+      i
     else
       Info.new(expected.is_a?(RDF::Graph) ? expected.context : info, info.to_s)
     end
+    @info.format ||= :ntriples
     @expected = normalize(expected)
     @actual = normalize(actual)
     @actual.isomorphic_with?(@expected)
@@ -80,8 +83,8 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     "\n#{info + "\n" unless info.empty?}" +
     (@info.inputDocument ? "Input file: #{@info.inputDocument}\n" : "") +
     (@info.outputDocument ? "Output file: #{@info.outputDocument}\n" : "") +
-    "Unsorted Expected:\n#{@expected.dump(:ntriples)}" +
-    "Unsorted Results:\n#{@actual.dump(:ntriples)}" +
+    "Unsorted Expected:\n#{@expected.dump(@info.format, :standard_prefixes => true)}" +
+    "Unsorted Results:\n#{@actual.dump(@info.format, :standard_prefixes => true)}" +
     (@info.trace ? "\nDebug:\n#{@info.trace}" : "")
   end  
 end
