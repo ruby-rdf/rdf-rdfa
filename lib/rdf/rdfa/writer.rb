@@ -1,8 +1,6 @@
 require 'haml'
 require 'cgi'
 
-require 'rdf/rdfa/patches/graph_properties'
-
 module RDF::RDFa
   ##
   # An RDFa 1.1 serialiser in Ruby. The RDFa serializer makes use of Haml templates,
@@ -497,30 +495,20 @@ module RDF::RDFa
     # @param [Hash{String => Array<Resource>}] properties A hash of Property to Resource mappings
     # @return [Array<String>}] Ordered list of properties. Uses predicate_order.
     def order_properties(properties)
-      properties.keys.each do |k|
-        properties[k] = properties[k].sort do |a, b|
-          a_li = a.is_a?(RDF::URI) && get_curie(a) && get_curie(a).to_s =~ /:_\d+$/ ? a.to_i : a.to_s
-          b_li = b.is_a?(RDF::URI) && get_curie(b) && get_curie(b).to_s =~ /:_\d+$/ ? b.to_i : b.to_s
-          
-          a_li <=> b_li
-        end
-      end
-      
       # Make sorted list of properties
       prop_list = []
       
       predicate_order.each do |prop|
-        next unless properties[prop]
+        next unless properties[prop.to_s]
         prop_list << prop.to_s
       end
       
       properties.keys.sort.each do |prop|
-        prop = prop =~ /^_:(.*)$/ ? RDF::Node.intern($1) : RDF::URI.intern(prop)
-        next if prop_list.include?(prop)
-        prop_list << prop
+        next if prop_list.include?(prop.to_s)
+        prop_list << prop.to_s
       end
       
-      add_debug {"order_properties: #{prop_list.inspect}"}
+      add_debug {"order_properties: #{prop_list.join(', ')}"}
       prop_list
     end
 
@@ -575,7 +563,11 @@ module RDF::RDFa
       
       subject_done(subject)
       
-      properties = @graph.properties(subject)
+      properties = {}
+      @graph.query(:subject => subject) do |st|
+        properties[st.predicate.to_s] ||= []
+        properties[st.predicate.to_s] << st.object
+      end
       prop_list = order_properties(properties)
       
       # Find appropriate template

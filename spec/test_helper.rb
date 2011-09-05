@@ -92,9 +92,9 @@ module Fixtures
 
   local_manifest = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'manifest.ttl')
   repo = if File.exist?(local_manifest)
-    RDF::Repository.load(local_manifest, :base_uri => SUITE.join("manifest.ttl"), :format => :n3)
+    RDF::Repository.load(local_manifest, :base_uri => SUITE.join("manifest.ttl"), :format => :ttl)
   else
-    RDF::Repository.load(SUITE.join("manifest.ttl"), :format => :n3)
+    RDF::Repository.load(SUITE.join("manifest.ttl"), :format => :ttl)
   end
   Spira.add_repository! :default, repo
 end
