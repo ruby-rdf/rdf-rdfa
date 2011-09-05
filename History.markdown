@@ -3,7 +3,12 @@
   * Deprecate explicit use of @profile
   * Add rdfa:hasVocabulary when encountering @vocab
   * Implemented Reader#expand to perform vocabulary expansion using RDFS rules 5, 7, 9 and 11.
-
+  * Support for RDF collections (rdf:List) using @member attribute.
+  *Implemented :expand option to reader, which allows normal use of reader interface without requiring the use of the #expand method.
+  * Add caches for popular vocabularies to speed load time.
+  Add :vocabulary_profile as Reader option to allow for use of persistent vocabulary caches.
+  * Performance improvements by evaluating debug statements in block only when debug enabled.
+  
 ### 0.3.5
 * Updates to writer necessary for structure-data.org linter.
   * Support for type-specific templates and types matching a regular expression.
