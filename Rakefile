@@ -27,6 +27,7 @@ task :update_vocabularies do
   {
     :cc     => "http://creativecommons.org/ns#",
     :dc     => "http://purl.org/dc/terms/",
+    :doap   => "http://usefulinc.com/ns/doap#",
     :foaf => ['http://xmlns.com/foaf/0.1/', 'http://xmlns.com/foaf/0.1/index.rdf'],
     :gr     => "http://purl.org/goodrelations/v1#",
     :schema => ['http://schema.org/', 'http://schema.rdfs.org/all.ttl'],

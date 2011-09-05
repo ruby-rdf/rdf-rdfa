@@ -377,4 +377,4 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
 [RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/master/file/README.markdown
 [Haml]:             http://haml-lang.com/
-[Turtle]:       http://www.w3.org/TR/2011/WD-turtle-20110809/
+[Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/

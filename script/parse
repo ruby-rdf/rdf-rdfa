@@ -2,7 +2,7 @@
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/rdfa'
-require 'rdf/n3' rescue nil
+require 'rdf/turtle' rescue nil
 require 'rdf/rdfxml' rescue nil
 require 'getoptlong'
 require 'open-uri'
@@ -15,7 +15,7 @@ def run(input, options)
   num = 0
 
   if options[:output_format] == :ntriples || options[:quiet]
-    reader_class.new(input, :base_uri => options[:base_uri], :strict => true).each do |statement|
+    reader_class.new(input, options).each do |statement|
       num += 1
       if options[:quiet]
         #print "."
@@ -24,7 +24,7 @@ def run(input, options)
       end
     end
   elsif options[:output_format] == :inspect
-    reader_class.new(input, :base_uri => options[:base_uri], :strict => true).each do |statement|
+    reader_class.new(input, options).each do |statement|
       num += 1
       options[:output].puts statement.inspect
     end
@@ -57,6 +57,7 @@ input = nil
 opts = GetoptLong.new(
   ["--dbg", GetoptLong::NO_ARGUMENT],
   ["--execute", "-e", GetoptLong::REQUIRED_ARGUMENT],
+  ["--expand", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
   ["--input-format", GetoptLong::REQUIRED_ARGUMENT],
   ["--output", "-o", GetoptLong::REQUIRED_ARGUMENT],
@@ -70,6 +71,7 @@ opts.each do |opt, arg|
   case opt
   when '--dbg'          then ::RDF::RDFa::debug = true
   when '--execute'      then input = arg
+  when '--expand'       then options[:expand] = true
   when '--format'       then options[:output_format] = arg.to_sym
   when '--input-format' then options[:input_format] = arg.to_sym
   when '--quiet'        then options[:quiet] = true

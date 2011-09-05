@@ -363,7 +363,7 @@ describe RDF::RDFa::Writer do
     end
   end
 
-  require 'rdf/n3'
+  require 'rdf/turtle'
   def parse(input, options = {})
     reader_class = RDF::Reader.for(options[:format]) if options[:format]
     reader_class ||= options.fetch(:reader, RDF::Reader.for(detect_format(input)))
