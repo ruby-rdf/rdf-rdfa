@@ -37,7 +37,7 @@ module RDF::RDFa
       repo << self  # Add default graph
       
       count = repo.count
-      add_debug("expand", "Loaded #{repo.size} triples into default graph")
+      add_debug("expand") {"Loaded #{repo.size} triples into default graph"}
       
       # Vocabularies managed in vocab_repo, and copied to repo for processing.
       # This allows for persistent storage of vocabularies
@@ -60,7 +60,6 @@ module RDF::RDFa
       
       @@vocab_repo.each do |statement|
         if vocabs.include?(statement.context)
-          add_debug("expand", "Add vocab triple: #{statement.inspect}")
           repo << statement
         end
       end
@@ -191,7 +190,7 @@ module RDF::RDFa
 
         RULES.each do |rule|
           rule.execute(repo) do |statement|
-            add_debug("entailment(#{rule.name})", statement.inspect)
+            add_debug("entailment(#{rule.name})") {statement.inspect}
             repo << statement
           end
         end

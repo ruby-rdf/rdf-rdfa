@@ -24,7 +24,8 @@ class ModuleTester
 
   def each_statement(&block); @repo.each_statement(&block); end
 
-  def add_debug(node, message)
+  def add_debug(node, message = "")
+    message = message + yield if block_given?
     @trace ||= []
     @trace << "#{node}: #{message}"
     #STDERR.puts "#{node}: #{message}"

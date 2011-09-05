@@ -170,13 +170,13 @@ module RDF::RDFa
       @debug = @options[:debug]
       self.reset
 
-      add_debug "\nserialize: graph size: #{@graph.size}"
+      add_debug {"\nserialize: graph size: #{@graph.size}"}
 
       preprocess
 
       # Prefixes
       prefix = prefixes.keys.map {|pk| "#{pk}: #{prefixes[pk]}"}.sort.join(" ") unless prefixes.empty?
-      add_debug "\nserialize: prefixes: #{prefix.inspect}"
+      add_debug {"\nserialize: prefixes: #{prefix.inspect}"}
 
       subjects = order_subjects
       
@@ -474,7 +474,7 @@ module RDF::RDFa
       select {|s| !seen.include?(s)}.
       each do |class_uri|
         graph.query(:predicate => RDF.type, :object => class_uri).map {|st| st.subject}.sort.uniq.each do |subject|
-          #add_debug "order_subjects: #{subject.inspect}"
+          #add_debug {"order_subjects: #{subject.inspect}"}
           subjects << subject
           seen[subject] = true
         end
@@ -486,7 +486,7 @@ module RDF::RDFa
         map {|r| [r.is_a?(RDF::Node) ? 1 : 0, ref_count(r), r]}.
         sort
       
-      add_debug "order_subjects: #{recursable.inspect}"
+      add_debug {"order_subjects: #{recursable.inspect}"}
 
       subjects += recursable.map{|r| r.last}
     end
@@ -520,7 +520,7 @@ module RDF::RDFa
         prop_list << prop
       end
       
-      add_debug "order_properties: #{prop_list.inspect}"
+      add_debug {"order_properties: #{prop_list.inspect}"}
       prop_list
     end
 
@@ -529,7 +529,7 @@ module RDF::RDFa
     # @param [RDF::Statement] statement
     # @return [ignored]
     def preprocess_statement(statement)
-      #add_debug "preprocess: #{statement.inspect}"
+      #add_debug {"preprocess: #{statement.inspect}"}
       references = ref_count(statement.object) + 1
       @references[statement.object] = references
       @subjects[statement.subject] = true
@@ -597,8 +597,8 @@ module RDF::RDFa
       typeof ||= "" unless curie
       prop_list -= [RDF.type.to_s]
 
-      add_debug "subject: found template #{tmpl[:identifier] || tmpl.inspect}" if tmpl
-      add_debug "subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"
+      add_debug {"subject: found template #{tmpl[:identifier] || tmpl.inspect}"} if tmpl
+      add_debug {"subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"}
 
       # Render this subject
       # If :rel is specified and :typeof is nil, use @resource instead of @about.
@@ -609,7 +609,7 @@ module RDF::RDFa
           depth do
             pred = RDF::URI(pred) if pred.is_a?(String)
             values = properties[pred.to_s]
-            add_debug "subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"
+            add_debug {"subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"}
             predicate(pred, values)
           end
         end
@@ -625,11 +625,11 @@ module RDF::RDFa
     #   Objects to serialize
     # @return [String]
     def predicate(predicate, objects)
-      add_debug "predicate: #{predicate.inspect}, objects: #{objects}"
+      add_debug {"predicate: #{predicate.inspect}, objects: #{objects}"}
       
       return if objects.to_a.empty?
       
-      add_debug("predicate: #{get_curie(predicate)}")
+      add_debug {"predicate: #{get_curie(predicate)}"}
       property = predicate if objects.any?(&:literal?)
       rel      = predicate if objects.any?(&:uri?) || objects.any?(&:node?)
       render_property(predicate, objects, property, rel) do |o|
@@ -716,31 +716,31 @@ module RDF::RDFa
 
       curie = case
       when @uri_to_term_or_curie.has_key?(uri)
-        add_debug("get_curie(#{uri}): uri_to_term_or_curie #{@uri_to_term_or_curie[uri].inspect}")
+        add_debug {"get_curie(#{uri}): uri_to_term_or_curie #{@uri_to_term_or_curie[uri].inspect}"}
         return @uri_to_term_or_curie[uri]
       when @base_uri && uri.index(@base_uri.to_s) == 0
-        add_debug("get_curie(#{uri}): base_uri (#{uri.sub(@base_uri.to_s, "")})")
+        add_debug {"get_curie(#{uri}): base_uri (#{uri.sub(@base_uri.to_s, "")})"}
         uri.sub(@base_uri.to_s, "")
       when @vocabulary && uri.index(@vocabulary) == 0
-        add_debug("get_curie(#{uri}): vocabulary")
+        add_debug {"get_curie(#{uri}): vocabulary"}
         uri.sub(@vocabulary, "")
       when u = @uri_to_prefix.keys.detect {|u| uri.index(u.to_s) == 0}
-        add_debug("get_curie(#{uri}): uri_to_prefix")
+        add_debug {"get_curie(#{uri}): uri_to_prefix"}
         # Use a defined prefix
         prefix = @uri_to_prefix[u]
         prefix(prefix, u)  # Define for output
         uri.sub(u.to_s, "#{prefix}:")
       when @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri.index(v.to_uri.to_s) == 0}
-        add_debug("get_curie(#{uri}): standard_prefixes")
+        add_debug {"get_curie(#{uri}): standard_prefixes"}
         prefix = vocab.__name__.to_s.split('::').last.downcase
         prefix(prefix, vocab.to_uri) # Define for output
         uri.sub(vocab.to_uri.to_s, "#{prefix}:")
       else
-        add_debug("get_curie(#{uri}): none")
+        add_debug {"get_curie(#{uri}): none"}
         uri
       end
       
-      #add_debug("get_curie(#{resource}) => #{curie}")
+      #add_debug {"get_curie(#{resource}) => #{curie}"}
 
       @uri_to_term_or_curie[uri] = curie
     rescue Addressable::URI::InvalidURIError => e
@@ -794,11 +794,11 @@ module RDF::RDFa
     # @return [String]
     # @raise [RDF::WriterError]
     def hamlify(template, locals = {})
-      add_debug "hamlify template: #{template}"
+      add_debug {"hamlify template: #{template}"}
       template = haml_template[template] if template.is_a?(Symbol)
 
       template = template.align_left
-      add_debug "hamlify locals: #{locals.inspect}"
+      add_debug {"hamlify locals: #{locals.inspect}"}
 
       Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(self, locals) do |*args|
         yield(*args) if block_given?
@@ -835,7 +835,10 @@ module RDF::RDFa
     # Add debug event to debug array, if specified
     #
     # @param [String] message::
-    def add_debug(message)
+    # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
+    def add_debug(message = "")
+      return unless ::RDF::RDFa.debug? || @debug
+      message = message + yield if block_given?
       msg = "#{'  ' * @depth}#{message}"
       STDERR.puts msg if ::RDF::RDFa.debug?
       @debug << msg if @debug.is_a?(Array)

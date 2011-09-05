@@ -432,7 +432,10 @@ module RDF::RDFa
     #
     # @param [Nokogiri::XML::Node, #to_s] node:: XML Node or string for showing context
     # @param [String] message::
-    def add_debug(node, message)
+    # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
+    def add_debug(node, message = "")
+      return unless ::RDF::RDFa.debug? || @debug
+      message = message + yield if block_given?
       add_processor_message(node, message, RDF::RDFA.Info)
     end
 
@@ -495,7 +498,7 @@ module RDF::RDFa
         # Strip any fragment from base
         base = base.to_s.split("#").first
         base = uri(base)
-        add_debug("", "parse_whole_doc: base='#{base}'")
+        add_debug("") {"parse_whole_doc: base='#{base}'"}
       end
 
       # initialize the evaluation context with the appropriate base
@@ -504,7 +507,7 @@ module RDF::RDFa
       if @version != :"rdfa1.0"
         # Process default vocabularies
         process_profile(doc.root, @host_defaults[:profiles]) do |which, value|
-          add_debug(doc.root, "parse_whole_document, #{which}: #{value.inspect}")
+          add_debug(doc.root) { "parse_whole_document, #{which}: #{value.inspect}"}
           case which
           when :uri_mappings        then evaluation_context.uri_mappings.merge!(value)
           when :term_mappings       then evaluation_context.term_mappings.merge!(value)
@@ -621,7 +624,7 @@ module RDF::RDFa
         return nil
       end
       
-      add_debug(element, "traverse, ec: #{evaluation_context.inspect}")
+      add_debug(element) { "ec: #{evaluation_context.inspect}" }
 
       # local variables [7.5 Step 1]
       recurse = true
@@ -663,22 +666,24 @@ module RDF::RDFa
       #   for that property. Causes a collection to be created if it does not already exist.
       member = attrs['member'].to_s.strip if attrs.has_key?('member')
 
-      attrs = {
-        :about => about,
-        :src => src,
-        :resource => resource,
-        :href => href,
-        :vocab => vocab,
-        :base => xml_base,
-        :property => property,
-        :typeof => typeof,
-        :datatype => datatype,
-        :rel => rel,
-        :rev => rev,
-        :member => member,
-      }.select{|k,v| v}
-      
-      add_debug(element, "traverse " + attrs.map{|a| "#{a.first}: #{a.last}"}.join(", ")) unless attrs.empty?
+      add_debug(element) do
+        attrs = {
+          :about => about,
+          :src => src,
+          :resource => resource,
+          :href => href,
+          :vocab => vocab,
+          :base => xml_base,
+          :property => property,
+          :typeof => typeof,
+          :datatype => datatype,
+          :rel => rel,
+          :rev => rev,
+          :member => member,
+        }.select {|k,v| v}
+
+        "attrs " + attrs.map {|a| "#{a.first}: #{a.last}"}.join(", ")
+      end unless attrs.empty?
 
       # Default vocabulary [7.5 Step 2]
       # Next the current element is examined for any change to the default vocabulary via @vocab.
@@ -687,7 +692,9 @@ module RDF::RDFa
       unless vocab.nil?
         default_vocabulary = if vocab.to_s.empty?
           # Set default_vocabulary to host language default
-          add_debug(element, "[Step 3] traverse, reset default_vocaulary to #{@host_defaults.fetch(:vocabulary, nil).inspect}")
+          add_debug(element) {
+            "[Step 3] reset default_vocaulary to #{@host_defaults.fetch(:vocabulary, nil).inspect}"
+          }
           @host_defaults.fetch(:vocabulary, nil)
         else
           # Generate a triple indicating that the vocabulary is used
@@ -695,7 +702,9 @@ module RDF::RDFa
 
           uri(vocab)
         end
-        add_debug(element, "[Step 2] traverse, default_vocaulary: #{default_vocabulary.inspect}")
+        add_debug(element) {
+          "[Step 2] default_vocaulary: #{default_vocabulary.inspect}"
+        }
       end
       
       # Local term mappings [7.5 Step 3]
@@ -722,7 +731,7 @@ module RDF::RDFa
         language
       end
       language = nil if language.to_s.empty?
-      add_debug(element, "HTML5 [3.2.3.3] traverse, lang: #{language || 'nil'}") if language
+      add_debug(element, "HTML5 [3.2.3.3] lang: #{language || 'nil'}") if language
     
       # rels and revs
       rels = process_uris(element, rel, evaluation_context, base,
@@ -736,7 +745,9 @@ module RDF::RDFa
                           :vocab => default_vocabulary,
                           :restrictions => TERMorCURIEorAbsURI[@version])
     
-      add_debug(element, "traverse, rels: #{rels.join(" ")}, revs: #{revs.join(" ")}") unless (rels + revs).empty?
+      add_debug(element) do
+        "rels: #{rels.join(" ")}, revs: #{revs.join(" ")}"
+      end unless (rels + revs).empty?
 
       if !(rel || rev)
         # Establishing a new subject if no rel/rev [7.5 Step 5]
@@ -835,7 +846,11 @@ module RDF::RDFa
       # the evaluation context with a new empty mappings.
       if (new_subject && new_subject != evaluation_context.parent_subject) || collection_mappings.nil?
         collection_mappings = {}
-        add_debug(element, "collections: create new collection mappings(#{collection_mappings.object_id}) ns: #{new_subject}, ps: #{evaluation_context.parent_subject}")
+        add_debug(element) do
+          "collections: create new collection mappings(#{collection_mappings.object_id}) " +
+            "ns: #{new_subject}, " +
+            "ps: #{evaluation_context.parent_subject}"
+        end
       end
 
       # Generate triples with given object [Step 8]
@@ -849,7 +864,7 @@ module RDF::RDFa
             # instantiate a new collection
             unless collection_mappings[r]
               collection_mappings[r] = RDF::List.new
-              add_debug(element, "collections(#{r}): create #{collection_mappings[r]}")
+              add_debug(element) {"collections(#{r}): create #{collection_mappings[r]}"}
             end
             add_debug(element, "member: add #{current_object_resource} to #{r} collection")
             collection_mappings[r] << current_object_resource
@@ -863,7 +878,7 @@ module RDF::RDFa
         end
       elsif rel || rev
         # Incomplete triples and bnode creation [Step 9]
-        add_debug(element, "[Step 9] incompletes: rels: #{rels}, revs: #{revs}")
+        add_debug(element) {"[Step 9] incompletes: rels: #{rels}, revs: #{revs}"}
         current_object_resource = RDF::Node.new
       
         # predicate: full IRI
@@ -876,7 +891,7 @@ module RDF::RDFa
             # instantiate a new collection
             unless collection_mappings[r]
               collection_mappings[r] = RDF::List.new
-              add_debug(element, "collections(#{r}): create #{collection_mappings[r]}")
+              add_debug(element) {"collections(#{r}): create #{collection_mappings[r]}"}
             end
             incomplete_triples << {:collection => collection_mappings[r]}
           else
@@ -926,7 +941,7 @@ module RDF::RDFa
           elsif @version == :"rdfa1.1"
             if datatype.to_s == RDF.XMLLiteral.to_s
               # XML Literal
-              add_debug(element, "[Step 10(1.1)] XML Literal: #{element.inner_html}")
+              add_debug(element) {"[Step 10(1.1)] XML Literal: #{element.inner_html}"}
 
               # In order to maintain maximum portability of this literal, any children of the current node that are
               # elements must have the current in scope XML namespace declarations (if any) declared on the
@@ -956,7 +971,7 @@ module RDF::RDFa
               RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
               # XML Literal
-              add_debug(element, "[Step 10 (1.0)] XML Literal: #{element.inner_html}")
+              add_debug(element) {"[Step 10 (1.0)] XML Literal: #{element.inner_html}"}
               recurse = false
               RDF::Literal.new(element.inner_html,
                                :datatype => RDF.XMLLiteral,
@@ -978,9 +993,9 @@ module RDF::RDFa
             # instantiate a new collection
             unless collection_mappings[p]
               collection_mappings[p] = RDF::List.new
-              add_debug(element, "collections(#{p}): create #{collection_mappings[p]}")
+              add_debug(element) {"collections(#{p}): create #{collection_mappings[p]}"}
             end
-            add_debug(element, "member: add #{current_object_literal} to #{p} collection")
+            add_debug(element)  {"member: add #{current_object_literal} to #{p} collection"}
             collection_mappings[p] << current_object_literal
           elsif new_subject
             add_triple(element, new_subject, p, current_object_literal) 
@@ -990,10 +1005,15 @@ module RDF::RDFa
     
       if not skip and new_subject && !evaluation_context.incomplete_triples.empty?
         # Complete the incomplete triples from the evaluation context [Step 11]
-        add_debug(element, "[Step 11] complete incomplete triples: new_subject=#{new_subject.inspect}, completes=#{evaluation_context.incomplete_triples.inspect}")
+        add_debug(element) do
+          "[Step 11] complete incomplete triples: " +
+          "new_subject=#{new_subject.inspect}, " +
+          "completes=#{evaluation_context.incomplete_triples.inspect}"
+        end
+
         evaluation_context.incomplete_triples.each do |trip|
           if trip[:collection]
-            add_debug(element, "member: add #{current_object_resource} to #{trip[:collection]} collection")
+            add_debug(element) {"member: add #{current_object_resource} to #{trip[:collection]} collection"}
             trip[:collection] << new_subject
           elsif trip[:direction] == :forward
             add_triple(element, evaluation_context.parent_subject, trip[:predicate], new_subject)
@@ -1050,9 +1070,9 @@ module RDF::RDFa
         collection_mappings.each do |p, c|
           # if that collection is different from the evaluation context
           ec_col = evaluation_context.collection_mappings[p] if evaluation_context.collection_mappings
-          add_debug(element, "collections: time to create #{c}? #{(ec_col != c).inspect}")
+          add_debug(element) {"collections: time to create #{c}? #{(ec_col != c).inspect}"}
           if ec_col != c
-            add_debug(element, "collection(#{p}) create #{c}")
+            add_debug(element) {"collection(#{p}) create #{c}"}
             # Generate an rdf:List with the elements of that collection.
             c.each_statement do |st|
               add_triple(element, st.subject, st.predicate, st.object) unless st.object == RDF.List
@@ -1073,14 +1093,14 @@ module RDF::RDFa
     # space-separated TERMorCURIEorAbsURI or SafeCURIEorCURIEorURI
     def process_uris(element, value, evaluation_context, base, options)
       return [] if value.to_s.empty?
-      add_debug(element, "process_uris: #{value}")
+      add_debug(element) {"process_uris: #{value}"}
       value.to_s.split(/\s+/).map {|v| process_uri(element, v, evaluation_context, base, options)}.compact
     end
 
     def process_uri(element, value, evaluation_context, base, options = {})
       return if value.nil?
       restrictions = options[:restrictions]
-      add_debug(element, "process_uri: #{value}, restrictions = #{restrictions.inspect}")
+      add_debug(element) {"process_uri: #{value}, restrictions = #{restrictions.inspect}"}
       options = {:uri_mappings => {}}.merge(options)
       if !options[:term_mappings] && options[:uri_mappings] && value.to_s.match(/^\[(.*)\]$/) && restrictions.include?(:safe_curie)
         # SafeCURIEorCURIEorURI
@@ -1088,14 +1108,14 @@ module RDF::RDFa
         # evaluated as a CURIE according to the CURIE Syntax definition. If it is not a valid CURIE, the
         # value must be ignored.
         uri = curie_to_resource_or_bnode(element, $1, options[:uri_mappings], evaluation_context.parent_subject, restrictions)
-        add_debug(element, "process_uri: #{value} => safeCURIE => <#{uri}>")
+        add_debug(element) {"process_uri: #{value} => safeCURIE => <#{uri}>"}
         uri
       elsif options[:term_mappings] && NC_REGEXP.match(value.to_s) && restrictions.include?(:term)
         # TERMorCURIEorAbsURI
         # If the value is an NCName, then it is evaluated as a term according to General Use of Terms in
         # Attributes. Note that this step may mean that the value is to be ignored.
         uri = process_term(element, value.to_s, options)
-        add_debug(element, "process_uri: #{value} => term => <#{uri}>")
+        add_debug(element) {"process_uri: #{value} => term => <#{uri}>"}
         uri
       else
         # SafeCURIEorCURIEorURI or TERMorCURIEorAbsURI
@@ -1103,7 +1123,7 @@ module RDF::RDFa
         # If it is a valid CURIE, the resulting URI is used; otherwise, the value will be processed as a URI.
         uri = curie_to_resource_or_bnode(element, value, options[:uri_mappings], evaluation_context.parent_subject, restrictions)
         if uri
-          add_debug(element, "process_uri: #{value} => CURIE => <#{uri}>")
+          add_debug(element) {"process_uri: #{value} => CURIE => <#{uri}>"}
         elsif @version == :"rdfa1.0" && value.to_s.match(/^xml/i)
           # Special case to not allow anything starting with XML to be treated as a URI
         elsif restrictions.include?(:absuri) || restrictions.include?(:uri)
@@ -1128,7 +1148,7 @@ module RDF::RDFa
               add_warning(element, "Relative URI #{value}")
             end
           end
-          add_debug(element, "process_uri: #{value} => URI => <#{uri}>")
+          add_debug(element) {"process_uri: #{value} => URI => <#{uri}>"}
         end
         uri
       end
@@ -1175,12 +1195,14 @@ module RDF::RDFa
       else
         # Prefixes always downcased
         prefix = prefix.to_s.downcase unless @version == :"rdfa1.0"
-        add_debug(element, "curie_to_resource_or_bnode check for #{prefix.to_s.to_sym.inspect} in #{uri_mappings.inspect}")
+        add_debug(element) do
+          "curie_to_resource_or_bnode check for #{prefix.to_s.to_sym.inspect} in #{uri_mappings.inspect}"
+        end
         ns = uri_mappings[prefix.to_s.to_sym]
         if ns
           uri(ns + reference.to_s)
         else
-          add_debug(element, "curie_to_resource_or_bnode No namespace mapping for #{prefix}")
+          add_debug(element) {"curie_to_resource_or_bnode No namespace mapping for #{prefix}"}
           nil
         end
       end
