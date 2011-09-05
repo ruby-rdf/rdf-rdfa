@@ -6,7 +6,7 @@ class ModuleTester
   include RDF::RDFa::Expansion
   include RDF::Enumerable
 
-  attr_reader :about, :information, :repo, :inputDocument, :outputDocument
+  attr_reader :about, :information, :repo, :inputDocument, :outputDocument, :options
   attr :format, true
 
   def initialize(name)
@@ -33,6 +33,8 @@ class ModuleTester
   def trace; @trace.join("\n"); end
   
   def load(elements)
+    @options = {}
+    @@vocab_repo = RDF::Repository.new
     result = nil
     elements.each do |context, ttl|
       case context
@@ -45,12 +47,16 @@ class ModuleTester
       else
         parse(ttl).each do |st|
           st.context = RDF::URI(context.to_s)
-          @repo << st
+          @@vocab_repo << st
         end
       end
     end
     
     result
+  end
+  
+  def add_vocabs_to_repo(repo)
+    repo.insert(@@vocab_repo)
   end
   
   def parse(ttl)
@@ -67,6 +73,11 @@ class ModuleTester
 end
 
 describe RDF::RDFa::Expansion do
+  
+  before(:each) do
+    RDF::RDFa::Reader.class_variable_set(:@@vocab_repo, nil)
+  end
+
   describe :rdfs_entailment do
     {
       "empty"   => {
@@ -119,6 +130,7 @@ describe RDF::RDFa::Expansion do
       it test do
         mt = ModuleTester.new(test)
         result = mt.load(elements)
+        mt.add_vocabs_to_repo(mt.repo)
         mt.send(:rdfs_entailment, mt.repo)
         mt.graph.should be_equivalent_graph(result, mt)
       end
@@ -136,7 +148,7 @@ describe RDF::RDFa::Expansion do
           <document> rdfa:hasVocabulary ex: .
           <#me> ex:name "Gregg Kellogg" .
         ),
-        :rules => %q(
+        "http://example.org/vocab#" => %q(
           ex:name rdfs:subPropertyOf foaf:name .
           foaf:name rdfs:subPropertyOf rdfs:label .
         ),
@@ -152,7 +164,7 @@ describe RDF::RDFa::Expansion do
           <document> rdfa:hasVocabulary ex: .
           <#me> ex:name "Gregg Kellogg" .
         ),
-        :rules => %q(
+        "http://example.org/vocab#" => %q(
           ex:name rdfs:subPropertyOf foaf:name .
         ),
         :result => %q(
@@ -166,7 +178,7 @@ describe RDF::RDFa::Expansion do
           <document> rdfa:hasVocabulary ex: .
           <#me> a ex:Person .
         ),
-        :rules => %q(
+        "http://example.org/vocab#" => %q(
           ex:Person rdfs:subClassOf foaf:Person .
         ),
         :result => %q(
@@ -179,7 +191,7 @@ describe RDF::RDFa::Expansion do
           <document> rdfa:hasVocabulary ex: .
           <#me> a ex:Person .
         ),
-        :rules => %q(
+        "http://example.org/vocab#" => %q(
           ex:Person rdfs:subClassOf foaf:Person .
           foaf:Person rdfs:subClassOf foaf:Agent .
         ),
@@ -195,7 +207,6 @@ describe RDF::RDFa::Expansion do
         vocab = RDF::URI("http://example.org/vocab#")
         graph = RDF::Graph.new
         RDF::Graph.should_receive(:new).and_return(graph)
-        RDF::Repository.should_receive(:new).at_least(1).times.and_return(mt.repo)
         graph = mt.expand
         graph.should be_equivalent_graph(result, mt)
       end
@@ -205,7 +216,7 @@ describe RDF::RDFa::Expansion do
   context "with empty graph" do
     it "returns an empty graph" do
       rdfa = %q(<http></http>)
-      parse(rdfa).should be_empty
+      parse(rdfa).should be_equivalent_graph("", :trace => @debug)
     end
   end
   

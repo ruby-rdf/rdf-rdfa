@@ -4,6 +4,10 @@ module RDF::RDFa
   # which implementes RDF::Readable.
   module Expansion
     ##
+    # Pre-processed vocabularies used to simplify loading of common vocabularies
+    COOKED_VOCAB_STATEMENTS = []
+
+    ##
     # Perform vocabulary expansion on the resulting default graph.
     #
     #   Vocabulary expansion relies on a sub-set of RDFS [RDF-SCHEMA] entailment to add triples to the default graph
@@ -33,15 +37,31 @@ module RDF::RDFa
       repo << self  # Add default graph
       
       count = repo.count
-      
       add_debug("expand", "Loaded #{repo.size} triples into default graph")
-      repo.query(:predicate => RDF::RDFA.hasVocabulary).to_a.map(&:object).each do |vocab|
+      
+      # Vocabularies managed in vocab_repo, and copied to repo for processing.
+      # This allows for persistent storage of vocabularies
+      @@vocab_repo ||= @options[:vocab_repository] || begin
+        RDF::Repository.new.insert(*COOKED_VOCAB_STATEMENTS)
+      end
+      
+      vocabs = repo.query(:predicate => RDF::RDFA.hasVocabulary).to_a.map(&:object)
+      vocabs.each do |vocab|
         begin
-          add_debug("expand", "Load #{vocab}")
-          repo.load(vocab, :context => vocab)
+          unless @@vocab_repo.has_context?(vocab)
+            add_debug("expand", "Load #{vocab}")
+            @@vocab_repo.load(vocab, :context => vocab)
+          end
         rescue RDF::FormatError => e
           # XXX: update spec to indicate the error if the vocabulary fails to laod
           add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresovedVocabulary)
+        end
+      end
+      
+      @@vocab_repo.each do |statement|
+        if vocabs.include?(statement.context)
+          add_debug("expand", "Add vocab triple: #{statement.inspect}")
+          repo << statement
         end
       end
       
@@ -182,3 +202,6 @@ module RDF::RDFa
     end
   end
 end
+
+# Load cooked profiles
+Dir.glob(File.join(File.expand_path(File.dirname(__FILE__)), 'expansion', '*')).each {|f| load f}

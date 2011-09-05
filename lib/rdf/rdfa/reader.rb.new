@@ -147,7 +147,7 @@ module RDF::RDFa
       #
       # A hash associating collections with properties.
       # @attr [Hash{RDF::URI => Array<RDF::Resource>}]
-      attr :collection_mappings, true
+      attr :collection_context, true
 
       # @param [RDF::URI] base
       # @param [Hash] host_defaults
@@ -174,7 +174,7 @@ module RDF::RDFa
         @uri_mappings = from.uri_mappings.clone
         @incomplete_triples = from.incomplete_triples.clone
         @namespaces = from.namespaces.clone
-        @collection_mappings = from.collection_mappings # Don't clone
+        @collection_context = from.collection_context # Don't clone
       end
       
       def inspect
@@ -184,7 +184,7 @@ module RDF::RDFa
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
         v << "term_mappings[#{term_mappings.keys.length}]"
-        v << "collections[#{collection_mappings.keys.length}]" if collection_mappings
+        v << "collections(#{collection_context.object_id})[#{collection_context.keys.length}]" if collection_context
         v.join(", ")
       end
     end
@@ -202,8 +202,6 @@ module RDF::RDFa
     #   whether to validate the parsed statements and values
     # @option options [Boolean]  :canonicalize (false)
     #   whether to canonicalize parsed literals
-    # @option options [Boolean]  :expand (false)
-    #   whether to perform RDFS expansion on the resulting graph
     # @option options [Boolean]  :intern       (true)
     #   whether to intern all parsed URIs
     # @option options [Hash]     :prefixes     (Hash.new)
@@ -216,8 +214,6 @@ module RDF::RDFa
     #   Parser version information
     # @option options [RDF::Writable]    :processor_graph (nil)
     #   Graph to record information, warnings and errors.
-    # @option options [Repository] :vocab_repository (nil)
-    #   Repository to save loaded vocabularies.
     # @option options [Array] :debug
     #   Array to place debug messages
     # @return [reader]
@@ -375,27 +371,19 @@ module RDF::RDFa
     ##
     # Iterates the given block for each RDF statement in the input.
     #
-    # Reads to graph and performs expansion if required.
-    #
     # @yield  [statement]
     # @yieldparam [RDF::Statement] statement
     # @return [void]
     def each_statement(&block)
-      if @options[:expand]
-        @options[:expand] = false
-        expand.each_statement(&block)
-        @options[:expand] = true
-      else
-        @callback = block
+      @callback = block
 
-        # Add prefix definitions from host defaults
-        @host_defaults[:uri_mappings].each_pair do |prefix, value|
-          prefix(prefix, value)
-        end
-
-        # parse
-        parse_whole_document(@doc, @base_uri)
+      # Add prefix definitions from host defaults
+      @host_defaults[:uri_mappings].each_pair do |prefix, value|
+        prefix(prefix, value)
       end
+
+      # parse
+      parse_whole_document(@doc, @base_uri)
     end
 
     ##
@@ -634,7 +622,7 @@ module RDF::RDFa
       language = evaluation_context.language
       term_mappings = evaluation_context.term_mappings.clone
       default_vocabulary = evaluation_context.default_vocabulary
-      collection_mappings = evaluation_context.collection_mappings
+      collection_context = evaluation_context.collection_context
 
       # shortcut
       attrs = element.attributes
@@ -657,11 +645,24 @@ module RDF::RDFa
       rev = attrs['rev'].to_s.strip if attrs['rev']
 
       # Collections:
+      # @collection
+      #   a white space separated list of TERMorCURIEorAbsIRIs, used to
+      #   indicate decendent elements with the same @property/@rel value and an
+      #   @member attribute are to be contained within a collection. This attribute
+      #   MAY be used to ensure that only decendent elements are contained within a
+      #   corresponding collection.
+      #
+      #   Creates a new collection context.
+      #
+      #   Decendent elements with @member or @context MUST have @property and/or @rel values which are
+      #   specified within this @context
+      #
       # @member
       #   an attribute (value ignored) used to indicate that the object associated with a
       #   @rel or @property attribute on the same element is to be added to the collection
       #   for that property. Causes a collection to be created if it does not already exist.
       member = attrs['member'].to_s.strip if attrs.has_key?('member')
+      collection = attrs['collection'].to_s.strip if attrs.has_key?('collection')
 
       attrs = {
         :about => about,
@@ -676,6 +677,7 @@ module RDF::RDFa
         :rel => rel,
         :rev => rev,
         :member => member,
+        :collection => collection,
       }.select{|k,v| v}
       
       add_debug(element, "traverse " + attrs.map{|a| "#{a.first}: #{a.last}"}.join(", ")) unless attrs.empty?
@@ -830,12 +832,42 @@ module RDF::RDFa
         end
       end
 
-      # Collections: If new subject is set and is not the same as parent subject,
-      # replace the collection mappings taken from
-      # the evaluation context with a new empty mappings.
-      if (new_subject && new_subject != evaluation_context.parent_subject) || collection_mappings.nil?
-        collection_mappings = {}
-        add_debug(element, "collections: create new collection mappings(#{collection_mappings.object_id}) ns: #{new_subject}, ps: #{evaluation_context.parent_subject}")
+      # Collections: If new subject set and is not the same as parent subject,
+      # replace the set of collections taken from
+      # the evaluation context with a new set of collections
+      if (new_subject && new_subject != evaluation_context.parent_subject) || collection_context.nil?
+        collection_context = {}
+        add_debug(element, "collections: create new collection context(#{collection_context.object_id})")
+      end
+
+      # Collections: if the current element has an @collection attribute, create a new collection
+      # associated with the property which is the IRI derived from the value of the @collection attribute.
+      if collection
+        collections = process_uris(element, collection, evaluation_context, base,
+                            :uri_mappings => uri_mappings,
+                            :term_mappings => term_mappings,
+                            :vocab => default_vocabulary,
+                            :restrictions => TERMorCURIEorAbsURI[@version])
+        
+        new_context = {}
+        add_debug(element, "collections: create new collection context(#{collection_context.object_id})")
+      
+        # For each IRI identified within @collection
+        collections.each do |prop|
+          # If the current collection context does not contain a collection associated with this IRI,
+          # instantiate a new collection
+          unless collection_context[prop]
+            collection_context[prop] = RDF::List.new
+            add_debug(element, "collections(#{prop}): create #{collection_context[prop]} in #{collection_context.object_id}")
+          end
+          
+          # Create a new collection associated with this IRI and add it to the new collection context
+          new_context[prop] = RDF::List.new
+          add_debug(element, "collections(#{prop}): create #{new_context[prop]} in #{new_context.object_id}")
+        end
+
+        # Update the current collection context to a new empty collection context
+        collection_context = new_context
       end
 
       # Generate triples with given object [Step 8]
@@ -845,14 +877,14 @@ module RDF::RDFa
       if new_subject and current_object_resource
         rels.each do |r|
           if member
-            # If the current collection mappings does not contain a collection associated with this IRI,
+            # If the current collection context does not contain a collection associated with this IRI,
             # instantiate a new collection
-            unless collection_mappings[r]
-              collection_mappings[r] = RDF::List.new
-              add_debug(element, "collections(#{r}): create #{collection_mappings[r]}")
+            unless collection_context[r]
+              collection_context[r] = RDF::List.new
+              add_debug(element, "collections(#{r}): create #{collection_context[r]}")
             end
             add_debug(element, "member: add #{current_object_resource} to #{r} collection")
-            collection_mappings[r] << current_object_resource
+            collection_context[r] << current_object_resource
           else
             add_triple(element, new_subject, r, current_object_resource)
           end
@@ -866,22 +898,8 @@ module RDF::RDFa
         add_debug(element, "[Step 9] incompletes: rels: #{rels}, revs: #{revs}")
         current_object_resource = RDF::Node.new
       
-        # predicate: full IRI
-        # direction: forward/reverse
-        # collection: Save into collection, don't generate triple
-
         rels.each do |r|
-          if member
-            # If the current collection mappings does not contain a collection associated with this IRI,
-            # instantiate a new collection
-            unless collection_mappings[r]
-              collection_mappings[r] = RDF::List.new
-              add_debug(element, "collections(#{r}): create #{collection_mappings[r]}")
-            end
-            incomplete_triples << {:collection => collection_mappings[r]}
-          else
-            incomplete_triples << {:predicate => r, :direction => :forward}
-          end
+          incomplete_triples << {:predicate => r, :direction => :forward}
         end
       
         revs.each do |r|
@@ -974,14 +992,14 @@ module RDF::RDFa
         properties.each do |p|
           # Collections: If element has an @member attribute, add the value to a collection
           if member
-            # If the current collection mappings does not contain a collection associated with this IRI,
+            # If the current collection context does not contain a collection associated with this IRI,
             # instantiate a new collection
-            unless collection_mappings[p]
-              collection_mappings[p] = RDF::List.new
-              add_debug(element, "collections(#{p}): create #{collection_mappings[p]}")
+            unless collection_context[p]
+              collection_context[p] = RDF::List.new
+              add_debug(element, "collections(#{p}): create #{collection_context[p]}")
             end
             add_debug(element, "member: add #{current_object_literal} to #{p} collection")
-            collection_mappings[p] << current_object_literal
+            collection_context[p] << current_object_literal
           elsif new_subject
             add_triple(element, new_subject, p, current_object_literal) 
           end
@@ -990,12 +1008,9 @@ module RDF::RDFa
     
       if not skip and new_subject && !evaluation_context.incomplete_triples.empty?
         # Complete the incomplete triples from the evaluation context [Step 11]
-        add_debug(element, "[Step 11] complete incomplete triples: new_subject=#{new_subject.inspect}, completes=#{evaluation_context.incomplete_triples.inspect}")
+        add_debug(element, "[Step 11] complete incomplete triples: new_subject=#{new_subject}, completes=#{evaluation_context.incomplete_triples.inspect}")
         evaluation_context.incomplete_triples.each do |trip|
-          if trip[:collection]
-            add_debug(element, "member: add #{current_object_resource} to #{trip[:collection]} collection")
-            trip[:collection] << new_subject
-          elsif trip[:direction] == :forward
+          if trip[:direction] == :forward
             add_triple(element, evaluation_context.parent_subject, trip[:predicate], new_subject)
           elsif trip[:direction] == :reverse
             add_triple(element, new_subject, trip[:predicate], evaluation_context.parent_subject)
@@ -1011,7 +1026,7 @@ module RDF::RDFa
               term_mappings == evaluation_context.term_mappings &&
               default_vocabulary == evaluation_context.default_vocabulary &&
               base == evaluation_context.base &&
-              collection_mappings == evaluation_context.collection_mappings
+              collection_context == evaluation_context.collection_context
             new_ec = evaluation_context
             add_debug(element, "[Step 12] skip: reused ec")
           else
@@ -1022,7 +1037,7 @@ module RDF::RDFa
             new_ec.namespaces = namespaces
             new_ec.term_mappings = term_mappings
             new_ec.default_vocabulary = default_vocabulary
-            new_ec.collection_mappings = collection_mappings
+            new_ec.collection_context = collection_context
             add_debug(element, "[Step 12] skip: cloned ec")
           end
         else
@@ -1036,7 +1051,7 @@ module RDF::RDFa
           new_ec.language = language
           new_ec.term_mappings = term_mappings
           new_ec.default_vocabulary = default_vocabulary
-          new_ec.collection_mappings = collection_mappings
+          new_ec.collection_context = collection_context
           add_debug(element, "[Step 12] new ec")
         end
       
@@ -1047,9 +1062,9 @@ module RDF::RDFa
         
         # Collections: after traversing through child elements, for each collection associated with
         # a property
-        collection_mappings.each do |p, c|
+        collection_context.each do |p, c|
           # if that collection is different from the evaluation context
-          ec_col = evaluation_context.collection_mappings[p] if evaluation_context.collection_mappings
+          ec_col = evaluation_context.collection_context[p] if evaluation_context.collection_context
           add_debug(element, "collections: time to create #{c}? #{(ec_col != c).inspect}")
           if ec_col != c
             add_debug(element, "collection(#{p}) create #{c}")
@@ -1058,12 +1073,26 @@ module RDF::RDFa
               add_triple(element, st.subject, st.predicate, st.object) unless st.object == RDF.List
             end
 
-            # Generate a triple relating new_subject, property and the collection BNode,
-            # or rdf:nil if the collection is empty.
-            if c.empty?
-              add_triple(element, new_subject, p, RDF.nil)
+            if ec_col && ec_col.last == c.subject # If it's there, it must be in the last position
+              # If the collection is contained as a value in the collection associated with the property
+              # within the evaluation context
+              if c.empty?
+                add_debug(element, "collection(#{p}) replace #{c.subject} in #{ec_col} with rdf:nil")
+                # If the collection is empty, replace the bnode for the current collection within that
+                # collection with rdf:nil.
+                ec_col.delete!(c)
+                ec_col << RDF.nil
+              else
+                add_debug(element, "collection(#{p}) #{c.subject} in #{ec_col}")
+              end
             else
-              add_triple(element, new_subject, p, c.subject)
+              # Otherwise, the collection is a top-level collection for the property. Generate a triple
+              # relating new_subject, property and the collection BNode, or rdf:nil if the collection is empty.
+              if c.empty?
+                add_triple(element, new_subject, p, RDF.nil)
+              else
+                add_triple(element, new_subject, p, c.subject)
+              end
             end
           end
         end
