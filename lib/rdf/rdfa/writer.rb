@@ -73,9 +73,6 @@ module RDF::RDFa
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
 
-    # @return [RDF::URI] Base URI used for relativizing URIs
-    attr_accessor :base_uri
-    
     ##
     # Initializes the RDFa writer instance.
     #
@@ -163,7 +160,6 @@ module RDF::RDFa
     #
     # @return [void]
     def write_epilogue
-      @base_uri = RDF::URI(@options[:base_uri]) if @options[:base_uri]
       @lang = @options[:lang]
       @debug = @options[:debug]
       self.reset
@@ -192,7 +188,7 @@ module RDF::RDFa
       # Generate document
       doc = render_document(subjects,
         :lang     => @lang,
-        :base     => @base_uri,
+        :base     => base_uri,
         :title    => doc_title,
         :prefix   => prefix) do |s|
         subject(s)
@@ -315,7 +311,7 @@ module RDF::RDFa
       template = options[:haml] || :subject
       options = {
         :about      => (get_curie(subject) unless options[:rel]),
-        :base       => @base_uri,
+        :base       => base_uri,
         :element    => nil,
         :predicates => predicates,
         :rel        => nil,
@@ -710,9 +706,9 @@ module RDF::RDFa
       when @uri_to_term_or_curie.has_key?(uri)
         add_debug {"get_curie(#{uri}): uri_to_term_or_curie #{@uri_to_term_or_curie[uri].inspect}"}
         return @uri_to_term_or_curie[uri]
-      when @base_uri && uri.index(@base_uri.to_s) == 0
-        add_debug {"get_curie(#{uri}): base_uri (#{uri.sub(@base_uri.to_s, "")})"}
-        uri.sub(@base_uri.to_s, "")
+      when base_uri && uri.index(base_uri.to_s) == 0
+        add_debug {"get_curie(#{uri}): base_uri (#{uri.sub(base_uri.to_s, "")})"}
+        uri.sub(base_uri.to_s, "")
       when @vocabulary && uri.index(@vocabulary) == 0
         add_debug {"get_curie(#{uri}): vocabulary"}
         uri.sub(@vocabulary, "")
