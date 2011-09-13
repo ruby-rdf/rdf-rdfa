@@ -1,7 +1,6 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift File.dirname(__FILE__)
 
-require "bundler/setup"
 require 'rubygems'
 require 'rspec'
 require 'bigdecimal'  # XXX Remove Me
@@ -10,6 +9,7 @@ require 'rdf/rdfxml'
 require 'rdf/spec'
 require 'rdf/spec/matchers'
 require 'rdf/isomorphic'
+require 'yaml'
 require 'open-uri/cached'
 require 'matchers'
 require 'rdf/turtle'
