@@ -22,6 +22,22 @@ module RDF::RDFa
     content_type     'text/html', :extension => :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
+
+
+    ##
+    # Sample detection to see if it matches Microdata (not RDF/XML or RDFa)
+    #
+    # Use a text sample to detect the format of an input file. Sub-classes implement
+    # a matcher sufficient to detect probably format matches, including disambiguating
+    # between other similar formats.
+    #
+    # @param [String] sample Beginning several bytes (~ 1K) of input.
+    # @result [Boolean]
+    def self.detect(sample)
+      (sample.match(/<[^>]*(about|resource|prefix|typeof|property|vocab)\s*="[^>]*>/m) ||
+       sample.match(/<[^>]*DOCTYPE\s+html[^>]*>.*xmlns:/im)
+      ) && !sample.match(/<(\w+:)?(RDF)/)
+    end
   end
 
   # Aliases for RDFa::Format
@@ -34,7 +50,6 @@ module RDF::RDFa
   #   RDF::Format.for(:html).writer  # RDF::RDFa::Writer
   class HTML < RDF::Format
     content_encoding 'utf-8'
-    content_type     'text/html', :extension => :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
