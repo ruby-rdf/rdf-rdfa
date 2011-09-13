@@ -8,8 +8,37 @@ class EX < RDF::Vocabulary("http://example/"); end
 describe RDF::RDFa::Writer do
   before(:each) do
     @graph = RDF::Graph.new
+    @writer = RDF::RDFa::Writer.new(StringIO.new)
   end
   
+  it_should_behave_like RDF_Writer
+
+  describe ".for" do
+    formats = [
+      :rdfa,
+      'etc/doap.html',
+      {:file_name      => 'etc/doap.html'},
+      {:file_extension => 'html'},
+      {:content_type   => 'text/html'},
+
+      :xhtml,
+      'etc/doap.xhtml',
+      {:file_name      => 'etc/doap.xhtml'},
+      {:file_extension => 'xhtml'},
+      {:content_type   => 'application/xhtml+xml'},
+
+      :svg,
+      'etc/doap.svg',
+      {:file_name      => 'etc/doap.svg'},
+      {:file_extension => 'svg'},
+      {:content_type   => 'image/svg+xml'},
+    ].each do |arg|
+      it "discovers with #{arg.inspect}" do
+        RDF::Writer.for(arg).should == RDF::RDFa::Writer
+      end
+    end
+  end
+
   context "generic" do
     before(:each) do
       @writer = RDF::RDFa::Writer.new(StringIO.new)

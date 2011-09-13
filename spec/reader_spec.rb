@@ -1,52 +1,36 @@
 $:.unshift "."
-require File.join(File.dirname(__FILE__), 'spec_helper')
-
-describe RDF::RDFa::Format do
-  context "should discover 'rdfa'" do
-    [
-      [:rdfa,                                        RDF::RDFa::Format],
-      ["etc/foaf.html",                              RDF::RDFa::Format],
-      [{:file_name      => "etc/foaf.html"},         RDF::RDFa::Format],
-      [{:file_extension => "html"},                  RDF::RDFa::Format],
-      [{:file_extension => "xhtml"},                 RDF::RDFa::XHTML],
-      [{:file_extension => "svg"},                   RDF::RDFa::SVG],
-      [{:content_type   => "text/html"},             RDF::RDFa::Format],
-      [{:content_type   => "application/xhtml+xml"}, RDF::RDFa::XHTML],
-      [{:content_type   => "image/svg+xml"},         RDF::RDFa::SVG],
-    ].each do |(arg, format)|
-      it "returns #{format} for #{arg.inspect}" do
-        RDF::Format.for(arg).should == format
-      end
-    end
-  end
-    
-  it "should discover 'html'" do
-    RDF::Format.for(:html).reader.should == RDF::RDFa::Reader
-    RDF::Format.for(:html).writer.should == RDF::RDFa::Writer
-  end
-
-  it "should discover 'xhtml'" do
-    RDF::Format.for(:xhtml).reader.should == RDF::RDFa::Reader
-    RDF::Format.for(:xhtml).writer.should == RDF::RDFa::Writer
-  end
-
-  it "should discover 'svg'" do
-    RDF::Format.for(:svg).reader.should == RDF::RDFa::Reader
-    RDF::Format.for(:svg).writer.should == RDF::RDFa::Writer
-  end
-end
+require 'spec_helper'
+require 'rdf/spec/reader'
 
 describe "RDF::RDFa::Reader" do
-  context "discovery" do
-    {
-      "html" => RDF::Reader.for(:rdfa),
-      "etc/foaf.html" => RDF::Reader.for("etc/foaf.html"),
-      "foaf.html" => RDF::Reader.for(:file_name      => "foaf.html"),
-      ".html" => RDF::Reader.for(:file_extension => "html"),
-      "application/xhtml+xml" => RDF::Reader.for(:content_type   => "application/xhtml+xml"),
-    }.each_pair do |label, format|
-      it "should discover '#{label}'" do
-        format.should == RDF::RDFa::Reader
+  before :each do
+    @reader = RDF::RDFa::Reader.new(StringIO.new("<html></html>"))
+  end
+
+  it_should_behave_like RDF_Reader
+
+  describe ".for" do
+    formats = [
+      :rdfa,
+      'etc/doap.html',
+      {:file_name      => 'etc/doap.html'},
+      {:file_extension => 'html'},
+      {:content_type   => 'text/html'},
+
+      :xhtml,
+      'etc/doap.xhtml',
+      {:file_name      => 'etc/doap.xhtml'},
+      {:file_extension => 'xhtml'},
+      {:content_type   => 'application/xhtml+xml'},
+
+      :svg,
+      'etc/doap.svg',
+      {:file_name      => 'etc/doap.svg'},
+      {:file_extension => 'svg'},
+      {:content_type   => 'image/svg+xml'},
+    ].each do |arg|
+      it "discovers with #{arg.inspect}" do
+        RDF::Reader.for(arg).should == RDF::RDFa::Reader
       end
     end
   end
@@ -577,50 +561,6 @@ describe "RDF::RDFa::Reader" do
   end
 
   context :validation do
-  end
-
-  # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
-  describe "w3c test cases" do
-    require 'test_helper'
-    
-    Fixtures::TestCase::HOST_LANGUAGE_VERSION_SETS.each do |(host_language, version)|
-      describe "for #{host_language} #{version}" do
-        %w(required optional buggy).each do |classification|
-          describe "that are #{classification}" do
-            Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
-              specify "test #{t.name}: #{t.title}#{",  (negative test)" if t.expectedResults.false?}" do
-                begin
-                  t.debug = []
-                  reader = RDF::Reader.open(t.input(host_language, version),
-                    :base_uri => t.input(host_language, version),
-                    :debug => t.debug,
-                    :format => :rdfa)
-                  reader.should be_a RDF::Reader
-
-                  # Make sure auto-detect works
-                  unless host_language =~ /svg/ || t.name == "0216" # due to http-equiv
-                    reader.host_language.should == host_language.to_sym
-                    reader.version.should == version.to_sym
-                  end
-
-                  graph = RDF::Graph.new << reader
-                  query = Kernel.open(t.results(host_language, version))
-                  graph.should pass_query(query, t)
-                rescue RSpec::Expectations::ExpectationNotMetError => e
-                  if %w(0198).include?(t.name) || query =~ /XMLLiteral/m
-                    pending("XMLLiteral canonicalization not implemented yet")
-                  elsif classification != "required"
-                    pending("#{classification} test") {  raise }
-                  else
-                    raise
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-    end
   end
 
   def parse(input, options = {})
