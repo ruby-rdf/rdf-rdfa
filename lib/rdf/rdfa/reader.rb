@@ -653,11 +653,11 @@ module RDF::RDFa
       rev = attrs['rev'].to_s.strip if attrs['rev']
 
       # Collections:
-      # @member
+      # @onlist
       #   an attribute (value ignored) used to indicate that the object associated with a
       #   @rel or @property attribute on the same element is to be added to the collection
       #   for that property. Causes a collection to be created if it does not already exist.
-      member = attrs['member'].to_s.strip if attrs.has_key?('member')
+      onlist = attrs['onlist'].to_s.strip if attrs.has_key?('onlist')
 
       add_debug(element) do
         attrs = {
@@ -672,7 +672,7 @@ module RDF::RDFa
           :datatype => datatype,
           :rel => rel,
           :rev => rev,
-          :member => member,
+          :onlist => onlist,
         }.select {|k,v| v}
 
         "attrs " + attrs.map {|a| "#{a.first}: #{a.last}"}.join(", ")
@@ -848,18 +848,18 @@ module RDF::RDFa
 
       # Generate triples with given object [Step 8]
       #
-      # Collections: if the current element has a @member attribute, add the property to the
+      # Collections: if the current element has a @onlist attribute, add the property to the
       # collection associated with that property, creating a new collection if necessary.
       if new_subject and current_object_resource
         rels.each do |r|
-          if member
+          if onlist
             # If the current collection mappings does not contain a collection associated with this IRI,
             # instantiate a new collection
             unless collection_mappings[r]
               collection_mappings[r] = RDF::List.new
               add_debug(element) {"collections(#{r}): create #{collection_mappings[r]}"}
             end
-            add_debug(element, "member: add #{current_object_resource} to #{r} collection")
+            add_debug(element, "onlist: add #{current_object_resource} to #{r} collection")
             collection_mappings[r] << current_object_resource
           else
             add_triple(element, new_subject, r, current_object_resource)
@@ -879,7 +879,7 @@ module RDF::RDFa
         # collection: Save into collection, don't generate triple
 
         rels.each do |r|
-          if member
+          if onlist
             # If the current collection mappings does not contain a collection associated with this IRI,
             # instantiate a new collection
             unless collection_mappings[r]
@@ -899,7 +899,7 @@ module RDF::RDFa
     
       # Establish current object literal [Step 10]
       #
-      # Collections: if the current element has a @member attribute, add the property to the
+      # Collections: if the current element has a @onlist attribute, add the property to the
       # collection associated with that property, creating a new collection if necessary.
       if property
         properties = process_uris(element, property, evaluation_context, base,
@@ -980,15 +980,15 @@ module RDF::RDFa
 
         # add each property
         properties.each do |p|
-          # Collections: If element has an @member attribute, add the value to a collection
-          if member
+          # Collections: If element has an @onlist attribute, add the value to a collection
+          if onlist
             # If the current collection mappings does not contain a collection associated with this IRI,
             # instantiate a new collection
             unless collection_mappings[p]
               collection_mappings[p] = RDF::List.new
               add_debug(element) {"collections(#{p}): create #{collection_mappings[p]}"}
             end
-            add_debug(element)  {"member: add #{current_object_literal} to #{p} collection"}
+            add_debug(element)  {"onlist: add #{current_object_literal} to #{p} collection"}
             collection_mappings[p] << current_object_literal
           elsif new_subject
             add_triple(element, new_subject, p, current_object_literal) 
@@ -1006,7 +1006,7 @@ module RDF::RDFa
 
         evaluation_context.incomplete_triples.each do |trip|
           if trip[:collection]
-            add_debug(element) {"member: add #{current_object_resource} to #{trip[:collection]} collection"}
+            add_debug(element) {"onlist: add #{current_object_resource} to #{trip[:collection]} collection"}
             trip[:collection] << new_subject
           elsif trip[:direction] == :forward
             add_triple(element, evaluation_context.parent_subject, trip[:predicate], new_subject)
