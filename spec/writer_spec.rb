@@ -1,5 +1,5 @@
 $:.unshift "."
-require File.join(File.dirname(__FILE__), 'spec_helper')
+require 'spec_helper'
 require 'rdf/spec/writer'
 require 'rspec/matchers'
 
@@ -332,7 +332,7 @@ describe RDF::RDFa::Writer do
 
     # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
     describe "w3c xhtml testcases" do
-      require 'test_helper'
+      require 'suite_helper'
 
       # Generate with each template set
       RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|

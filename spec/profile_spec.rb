@@ -1,5 +1,5 @@
 $:.unshift "."
-require File.join(File.dirname(__FILE__), 'spec_helper')
+require 'spec_helper'
 
 describe RDF::RDFa::Profile do
   describe ".new" do
