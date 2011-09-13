@@ -50,12 +50,6 @@ module RDF::RDFa
     # @attr [:"rdfa1.0", :"rdfa1.1"]
     attr_reader :version
     
-    ##
-    # Returns the base URI determined by this reader.
-    #
-    # @attr [RDF::URI]
-    attr_reader :base_uri
-
     # The Recursive Baggage
     # @private
     class EvaluationContext # :nodoc:
@@ -228,7 +222,6 @@ module RDF::RDFa
     def initialize(input = $stdin, options = {}, &block)
       super do
         @debug = options[:debug]
-        @base_uri = uri(options[:base_uri])
 
         detect_host_language_version(input, options)
         
@@ -246,17 +239,17 @@ module RDF::RDFa
 
           case @host_language
           when :html4, :html5
-            Nokogiri::HTML.parse(input, @base_uri.to_s, options[:encoding])
+            Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
           else
-            Nokogiri::XML.parse(input, @base_uri.to_s, options[:encoding])
+            Nokogiri::XML.parse(input, base_uri.to_s, options[:encoding])
           end
         end
         
-        if (@doc.nil? || @doc.root.nil?)
+        if ((@doc.nil? || @doc.root.nil?) && validate?)
           add_error(nil, "Empty document", RDF::RDFA.DocumentError)
           raise RDF::ReaderError, "Empty Document"
         end
-        add_warning(nil, "Synax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
+        add_warning(nil, "Syntax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
 
         # Section 4.2 RDFa Host Language Conformance
         #
@@ -316,7 +309,7 @@ module RDF::RDFa
           input.rewind
           string = input.read(1000)
           input.rewind
-          string
+          string.to_s
         else
           input.to_s[0..1000]
         end
@@ -394,7 +387,7 @@ module RDF::RDFa
         end
 
         # parse
-        parse_whole_document(@doc, @base_uri)
+        parse_whole_document(@doc, base_uri)
       end
     end
 
@@ -422,7 +415,7 @@ module RDF::RDFa
     
     # Figure out the document path, if it is a Nokogiri::XML::Element or Attribute
     def node_path(node)
-      "<#{@base_uri}>" + case node
+      "<#{base_uri}>" + case node
       when Nokogiri::XML::Node then node.display_path
       else node.to_s
       end
@@ -460,7 +453,7 @@ module RDF::RDFa
         @processor_graph << RDF::Statement.new(n, RDF["type"], process_class)
         @processor_graph << RDF::Statement.new(n, RDF::DC.description, message)
         @processor_graph << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
-        @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, @base_uri)
+        @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, base_uri)
         nc = RDF::Node.new
         @processor_graph << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
         @processor_graph << RDF::Statement.new(nc, RDF::PTR.expression, node.path) if node.respond_to?(:path)
@@ -528,7 +521,7 @@ module RDF::RDFa
         map {|uri| uri(uri).normalize}.
         each do |uri|
         # Don't try to open ourselves!
-        if @base_uri == uri
+        if base_uri == uri
           add_debug(element, "process_profile: skip recursive profile <#{uri}>")
           next
         end
