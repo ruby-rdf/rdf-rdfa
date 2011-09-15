@@ -22,8 +22,8 @@ describe RDF::RDFa::Format do
       end
     end
 
-
     {
+      :rdfa   => '<div about="foo"></div>',
     }.each do |sym, str|
       it "detects #{sym}" do
         @format_class.for {str}.should == @format_class
@@ -88,18 +88,18 @@ describe RDF::RDFa::Format do
     end
 
     {
-      :n3             => "@prefix foo: <bar> .\nfoo:bar = {<a> <b> <c>} .",
-      :nquads => "<a> <b> <c> <d> . ",
-      :rdfxml => '<rdf:RDF about="foo"></rdf:RDF>',
-      :jsonld => '{"@context" => "foo"}',
-      :ntriples         => "<a> <b> <c> .",
-      :microdata => '<div itemref="bar"></div>',
-      :multi_line       => '<a>\n  <b>\n  "literal"\n .',
-      :turtle           => "@prefix foo: <bar> .\n foo:a foo:b <c> .",
-      :STRING_LITERAL1  => %(<a> <b> 'literal' .),
-      :STRING_LITERAL2  => %(<a> <b> "literal" .),
-      :STRING_LITERAL_LONG1  => %(<a> <b> '''\nliteral\n''' .),
-      :STRING_LITERAL_LONG2  => %(<a> <b> """\nliteral\n""" .),
+      :n3                   => "@prefix foo: <bar> .\nfoo:bar = {<a> <b> <c>} .",
+      :nquads               => "<a> <b> <c> <d> . ",
+      :rdfxml               => '<rdf:RDF about="foo"></rdf:RDF>',
+      :jsonld               => '{"@context" => "foo"}',
+      :ntriples             => "<a> <b> <c> .",
+      :microdata            => '<div itemref="bar"></div>',
+      :multi_line           => '<a>\n  <b>\n  "literal"\n .',
+      :turtle               => "@prefix foo: <bar> .\n foo:a foo:b <c> .",
+      :STRING_LITERAL1      => %(<a> <b> 'literal' .),
+      :STRING_LITERAL2      => %(<a> <b> "literal" .),
+      :STRING_LITERAL_LONG1 => %(<a> <b> '''\nliteral\n''' .),
+      :STRING_LITERAL_LONG2 => %(<a> <b> """\nliteral\n""" .),
     }.each do |sym, str|
       it "does not detect #{sym}" do
         @format_class.detect(str).should be_false

@@ -394,7 +394,7 @@ describe "RDF::RDFa::Reader" do
         "literal" => [
           %q(
             <div about ="">
-              <p property="rdf:value" onlist="">Foo</p>
+              <p property="rdf:value" inlist="">Foo</p>
             </div>
           ),
           %q(
@@ -407,7 +407,7 @@ describe "RDF::RDFa::Reader" do
         "IRI" => [
           %q(
             <div about ="">
-              <a rel="rdf:value" onlist="" href="foo">Foo</a>
+              <a rel="rdf:value" inlist="" href="foo">Foo</a>
             </div>
           ),
           %q(
@@ -420,8 +420,8 @@ describe "RDF::RDFa::Reader" do
         "implicit list with hetrogenious memberip" => [
           %q(
             <div about ="">
-              <p property="rdf:value" onlist="">Foo</p>
-              <a rel="rdf:value" onlist="" href="foo">Foo</p>
+              <p property="rdf:value" inlist="">Foo</p>
+              <a rel="rdf:value" inlist="" href="foo">Foo</p>
             </div>
           ),
           %q(
@@ -434,8 +434,8 @@ describe "RDF::RDFa::Reader" do
         "implicit list at different levels" => [
           %q(
             <div about ="">
-              <p property="rdf:value" onlist="">Foo</p>
-              <strong><p property="rdf:value" onlist="">Bar</p></strong>
+              <p property="rdf:value" inlist="">Foo</p>
+              <strong><p property="rdf:value" inlist="">Bar</p></strong>
             </div>
           ),
           %q(
@@ -448,8 +448,8 @@ describe "RDF::RDFa::Reader" do
         "property with list and literal" => [
           %q(
             <div about ="">
-              <p property="rdf:value" onlist="">Foo</p>
-              <strong><p property="rdf:value" onlist="">Bar</p></strong>
+              <p property="rdf:value" inlist="">Foo</p>
+              <strong><p property="rdf:value" inlist="">Bar</p></strong>
               <p property="rdf:value">Baz</p>
             </div>
           ),
@@ -463,7 +463,7 @@ describe "RDF::RDFa::Reader" do
         "multiple rel items" => [
           %q(
             <div about ="">
-              <ol rel="rdf:value" onlist="">
+              <ol rel="rdf:value" inlist="">
                 <li><a href="foo">Foo</a></li>
                 <li><a href="bar">Bar</a></li>
               </ol
@@ -480,10 +480,10 @@ describe "RDF::RDFa::Reader" do
           %q(
             <div>
               <div about ="foo">
-                <p property="rdf:value" onlist="">Foo</p>
+                <p property="rdf:value" inlist="">Foo</p>
               </div>
               <div about="foo">
-                <p property="rdf:value" onlist="">Bar</p>
+                <p property="rdf:value" inlist="">Bar</p>
               </div>
             </div>
           ),
@@ -497,9 +497,9 @@ describe "RDF::RDFa::Reader" do
         "confusion between multiple implicit collections (resource)" => [
           %q(
             <div about ="">
-              <p property="rdf:value" onlist="">Foo</p>
-              <span rel="rdf:onlist" resource="res">
-                <p property="rdf:value" onlist="">Bar</p>
+              <p property="rdf:value" inlist="">Foo</p>
+              <span rel="rdf:inlist" resource="res">
+                <p property="rdf:value" inlist="">Bar</p>
               </span>
             </div>
           ),
@@ -507,16 +507,16 @@ describe "RDF::RDFa::Reader" do
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-            <> rdf:value ("Foo"); rdf:onlist <res> .
+            <> rdf:value ("Foo"); rdf:inlist <res> .
             <res> rdf:value ("Bar") .
           )
         ],
         "confusion between multiple implicit collections (about)" => [
           %q(
             <div about ="">
-              <p property="rdf:value" onlist="">Foo</p>
-              <span rel="rdf:onlist">
-                <p about="res" property="rdf:value" onlist="">Bar</p>
+              <p property="rdf:value" inlist="">Foo</p>
+              <span rel="rdf:inlist">
+                <p about="res" property="rdf:value" inlist="">Bar</p>
               </span>
             </div>
           ),
@@ -524,7 +524,7 @@ describe "RDF::RDFa::Reader" do
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-            <> rdf:value ("Foo"); rdf:onlist <res> .
+            <> rdf:value ("Foo"); rdf:inlist <res> .
             <res> rdf:value ("Bar") .
           )
         ],

@@ -1,6 +1,6 @@
 ### 0.3.7
 * RDF.rb 0.3.4 compatibility.
-* Changed @member to @onlist.
+* Changed @member to @inlist.
 * Added format detection.
 
 ### 0.3.6

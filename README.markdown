@@ -45,13 +45,13 @@ One significant RDF feature missing from RDFa was support for ordered collection
       )
     ]
 
-defines a playlist with an ordered set of tracks. RDFa adds the @onlist attribute, which is used to identify values (object or literal) that are to be placed in a list. The same playlist might be defined in RDFa as follows:
+defines a playlist with an ordered set of tracks. RDFa adds the @inlist attribute, which is used to identify values (object or literal) that are to be placed in a list. The same playlist might be defined in RDFa as follows:
 
     <div vocab="http://schema.org/" typeof="MusicPlaylist">
       <span property="name">Classic Rock Playlist</span>
       <meta property="numTracks" content="5"/>
 
-      <div rel="tracks" onlist="">
+      <div rel="tracks" inlist="">
         <div typeof="MusicRecording">
           1.<span property="name">Sweet Home Alabama</span> -
           <span property="byArtist">Lynard Skynard</span>

@@ -23,9 +23,8 @@ module RDF::RDFa
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
 
-
     ##
-    # Sample detection to see if it matches Microdata (not RDF/XML or RDFa)
+    # Sample detection to see if it matches RDFa (not RDF/XML or Microdata)
     #
     # Use a text sample to detect the format of an input file. Sub-classes implement
     # a matcher sufficient to detect probably format matches, including disambiguating

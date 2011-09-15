@@ -653,11 +653,11 @@ module RDF::RDFa
       rev = attrs['rev'].to_s.strip if attrs['rev']
 
       # Lists:
-      # @onlist
+      # @inlist
       #   an attribute (value ignored) used to indicate that the object associated with a
       #   @rel or @property attribute on the same element is to be added to the list
       #   for that property. Causes a list to be created if it does not already exist.
-      onlist = attrs['onlist'].to_s.strip if attrs.has_key?('onlist')
+      inlist = attrs['inlist'].to_s.strip if attrs.has_key?('inlist')
 
       add_debug(element) do
         attrs = {
@@ -672,7 +672,7 @@ module RDF::RDFa
           :datatype => datatype,
           :rel => rel,
           :rev => rev,
-          :onlist => onlist,
+          :inlist => inlist,
         }.select {|k,v| v}
 
         "attrs " + attrs.map {|a| "#{a.first}: #{a.last}"}.join(", ")
@@ -849,11 +849,11 @@ module RDF::RDFa
 
       # Generate triples with given object [Step 9]
       #
-      # If the current element has a @onlist attribute, add the property to the
+      # If the current element has a @inlist attribute, add the property to the
       # list associated with that property, creating a new list if necessary.
       if new_subject and current_object_resource
         rels.each do |r|
-          if onlist
+          if inlist
             # If the current list mapping does not contain a list associated with this IRI,
             # instantiate a new list
             unless list_mapping[r]
@@ -880,7 +880,7 @@ module RDF::RDFa
         # lists: Save into list, don't generate triple
 
         rels.each do |r|
-          if onlist
+          if inlist
             # If the current list mapping does not contain a list associated with this IRI,
             # instantiate a new list
             unless list_mapping[r]
@@ -900,7 +900,7 @@ module RDF::RDFa
     
       # Establish current object literal [Step 11]
       #
-      # If the current element has a @onlist attribute, add the property to the
+      # If the current element has a @inlist attribute, add the property to the
       # list associated with that property, creating a new list if necessary.
       if property
         properties = process_uris(element, property, evaluation_context, base,
@@ -981,8 +981,8 @@ module RDF::RDFa
 
         # add each property
         properties.each do |p|
-          # Lists: If element has an @onlist attribute, add the value to a list
-          if onlist
+          # Lists: If element has an @inlist attribute, add the value to a list
+          if inlist
             # If the current list mapping does not contain a list associated with this IRI,
             # instantiate a new list
             unless list_mapping[p]
