@@ -137,11 +137,11 @@ module RDF::RDFa
       attr :default_vocabulary, true
 
       ##
-      # collections
+      # lists
       #
-      # A hash associating collections with properties.
+      # A hash associating lists with properties.
       # @attr [Hash{RDF::URI => Array<RDF::Resource>}]
-      attr :collection_mappings, true
+      attr :list_mapping, true
 
       # @param [RDF::URI] base
       # @param [Hash] host_defaults
@@ -168,7 +168,7 @@ module RDF::RDFa
         @uri_mappings = from.uri_mappings.clone
         @incomplete_triples = from.incomplete_triples.clone
         @namespaces = from.namespaces.clone
-        @collection_mappings = from.collection_mappings # Don't clone
+        @list_mapping = from.list_mapping # Don't clone
       end
       
       def inspect
@@ -178,7 +178,7 @@ module RDF::RDFa
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
         v << "term_mappings[#{term_mappings.keys.length}]"
-        v << "collections[#{collection_mappings.keys.length}]" if collection_mappings
+        v << "lists[#{list_mapping.keys.length}]" if list_mapping
         v.join(", ")
       end
     end
@@ -387,7 +387,7 @@ module RDF::RDFa
         end
 
         # parse
-        parse_whole_document(@doc, base_uri)
+        parse_whole_document(@doc, RDF::URI(base_uri))
       end
     end
 
@@ -630,7 +630,7 @@ module RDF::RDFa
       language = evaluation_context.language
       term_mappings = evaluation_context.term_mappings.clone
       default_vocabulary = evaluation_context.default_vocabulary
-      collection_mappings = evaluation_context.collection_mappings
+      list_mapping = evaluation_context.list_mapping
 
       # shortcut
       attrs = element.attributes
@@ -652,11 +652,11 @@ module RDF::RDFa
       rel = attrs['rel'].to_s.strip if attrs['rel']
       rev = attrs['rev'].to_s.strip if attrs['rev']
 
-      # Collections:
+      # Lists:
       # @onlist
       #   an attribute (value ignored) used to indicate that the object associated with a
-      #   @rel or @property attribute on the same element is to be added to the collection
-      #   for that property. Causes a collection to be created if it does not already exist.
+      #   @rel or @property attribute on the same element is to be added to the list
+      #   for that property. Causes a list to be created if it does not already exist.
       onlist = attrs['onlist'].to_s.strip if attrs.has_key?('onlist')
 
       add_debug(element) do
@@ -779,7 +779,7 @@ module RDF::RDFa
           skip = true unless property
           evaluation_context.parent_object
         end
-        add_debug(element, "[Step 5] new_subject: #{new_subject}, skip = #{skip}")
+        add_debug(element, "[Step 5] new_subject: #{new_subject.to_ntriples rescue 'nil'}, skip = #{skip}")
       else
         # [7.5 Step 6]
         # If the current element does contain a @rel or @rev attribute, then the next step is to
@@ -834,33 +834,34 @@ module RDF::RDFa
         end
       end
 
-      # Collections: If new subject is set and is not the same as parent subject,
-      # replace the collection mappings taken from
-      # the evaluation context with a new empty mappings.
-      if (new_subject && new_subject != evaluation_context.parent_subject) || collection_mappings.nil?
-        collection_mappings = {}
+      # Create new List mapping [step 8]
+      #
+      # If in any of the previous steps a new subject was set to a non-null value different from the parent object;
+      # The list mapping taken from the evaluation context is set to a new, empty mapping.
+      if (new_subject && (new_subject != evaluation_context.parent_subject || list_mapping.nil?))
+        list_mapping = {}
         add_debug(element) do
-          "collections: create new collection mappings(#{collection_mappings.object_id}) " +
-            "ns: #{new_subject}, " +
-            "ps: #{evaluation_context.parent_subject}"
+          "[Step 8]: create new list mapping(#{list_mapping.object_id}) " +
+            "ns: #{new_subject.to_ntriples}, " +
+            "ps: #{evaluation_context.parent_subject.to_ntriples rescue 'nil'}"
         end
       end
 
-      # Generate triples with given object [Step 8]
+      # Generate triples with given object [Step 9]
       #
-      # Collections: if the current element has a @onlist attribute, add the property to the
-      # collection associated with that property, creating a new collection if necessary.
+      # If the current element has a @onlist attribute, add the property to the
+      # list associated with that property, creating a new list if necessary.
       if new_subject and current_object_resource
         rels.each do |r|
           if onlist
-            # If the current collection mappings does not contain a collection associated with this IRI,
-            # instantiate a new collection
-            unless collection_mappings[r]
-              collection_mappings[r] = RDF::List.new
-              add_debug(element) {"collections(#{r}): create #{collection_mappings[r]}"}
+            # If the current list mapping does not contain a list associated with this IRI,
+            # instantiate a new list
+            unless list_mapping[r]
+              list_mapping[r] = RDF::List.new
+              add_debug(element) {"list(#{r}): create #{list_mapping[r].inspect}"}
             end
-            add_debug(element, "onlist: add #{current_object_resource} to #{r} collection")
-            collection_mappings[r] << current_object_resource
+            add_debug(element, "[Step 9] add #{current_object_resource.to_ntriples} to #{r} #{list_mapping[r].inspect}")
+            list_mapping[r] << current_object_resource
           else
             add_triple(element, new_subject, r, current_object_resource)
           end
@@ -870,23 +871,23 @@ module RDF::RDFa
           add_triple(element, current_object_resource, r, new_subject)
         end
       elsif rel || rev
-        # Incomplete triples and bnode creation [Step 9]
-        add_debug(element) {"[Step 9] incompletes: rels: #{rels}, revs: #{revs}"}
+        # Incomplete triples and bnode creation [Step 10]
+        add_debug(element) {"[Step 10] incompletes: rels: #{rels}, revs: #{revs}"}
         current_object_resource = RDF::Node.new
       
         # predicate: full IRI
         # direction: forward/reverse
-        # collection: Save into collection, don't generate triple
+        # lists: Save into list, don't generate triple
 
         rels.each do |r|
           if onlist
-            # If the current collection mappings does not contain a collection associated with this IRI,
-            # instantiate a new collection
-            unless collection_mappings[r]
-              collection_mappings[r] = RDF::List.new
-              add_debug(element) {"collections(#{r}): create #{collection_mappings[r]}"}
+            # If the current list mapping does not contain a list associated with this IRI,
+            # instantiate a new list
+            unless list_mapping[r]
+              list_mapping[r] = RDF::List.new
+              add_debug(element) {"[Step 10] list(#{r}): create #{list_mapping[r].inspect}"}
             end
-            incomplete_triples << {:collection => collection_mappings[r]}
+            incomplete_triples << {:list => list_mapping[r], :direction => :none}
           else
             incomplete_triples << {:predicate => r, :direction => :forward}
           end
@@ -897,10 +898,10 @@ module RDF::RDFa
         end
       end
     
-      # Establish current object literal [Step 10]
+      # Establish current object literal [Step 11]
       #
-      # Collections: if the current element has a @onlist attribute, add the property to the
-      # collection associated with that property, creating a new collection if necessary.
+      # If the current element has a @onlist attribute, add the property to the
+      # list associated with that property, creating a new list if necessary.
       if property
         properties = process_uris(element, property, evaluation_context, base,
                                   :uri_mappings => uri_mappings,
@@ -912,7 +913,7 @@ module RDF::RDFa
           if p.is_a?(RDF::URI)
             false
           else
-            add_debug(element, "predicate #{p.inspect} must be a URI")
+            add_debug(element, "[Step 11] predicate #{p.to_ntriples} must be a URI")
             true
           end
         end
@@ -929,12 +930,12 @@ module RDF::RDFa
         begin
           current_object_literal = if !datatype.to_s.empty? && datatype.to_s != RDF.XMLLiteral.to_s
             # typed literal
-            add_debug(element, "[Step 10] typed literal (#{datatype})")
+            add_debug(element, "[Step 11] typed literal (#{datatype})")
             RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
           elsif @version == :"rdfa1.1"
             if datatype.to_s == RDF.XMLLiteral.to_s
               # XML Literal
-              add_debug(element) {"[Step 10(1.1)] XML Literal: #{element.inner_html}"}
+              add_debug(element) {"[Step 11(1.1)] XML Literal: #{element.inner_html}"}
 
               # In order to maintain maximum portability of this literal, any children of the current node that are
               # elements must have the current in scope XML namespace declarations (if any) declared on the
@@ -954,17 +955,17 @@ module RDF::RDFa
               end
             else
               # plain literal
-              add_debug(element, "[Step 10(1.1)] plain literal")
+              add_debug(element, "[Step 11(1.1)] plain literal")
               RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             end
           else
             if content || (children_node_types == [Nokogiri::XML::Text]) || (element.children.length == 0) || datatype == ""
               # plain literal
-              add_debug(element, "[Step 10 (1.0)] plain literal")
+              add_debug(element, "[Step 11 (1.0)] plain literal")
               RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
               # XML Literal
-              add_debug(element) {"[Step 10 (1.0)] XML Literal: #{element.inner_html}"}
+              add_debug(element) {"[Step 11 (1.0)] XML Literal: #{element.inner_html}"}
               recurse = false
               RDF::Literal.new(element.inner_html,
                                :datatype => RDF.XMLLiteral,
@@ -980,16 +981,16 @@ module RDF::RDFa
 
         # add each property
         properties.each do |p|
-          # Collections: If element has an @onlist attribute, add the value to a collection
+          # Lists: If element has an @onlist attribute, add the value to a list
           if onlist
-            # If the current collection mappings does not contain a collection associated with this IRI,
-            # instantiate a new collection
-            unless collection_mappings[p]
-              collection_mappings[p] = RDF::List.new
-              add_debug(element) {"collections(#{p}): create #{collection_mappings[p]}"}
+            # If the current list mapping does not contain a list associated with this IRI,
+            # instantiate a new list
+            unless list_mapping[p]
+              list_mapping[p] = RDF::List.new
+              add_debug(element) {"[Step 11] lists(#{p}): create #{list_mapping[p].inspect}"}
             end
-            add_debug(element)  {"onlist: add #{current_object_literal} to #{p} collection"}
-            collection_mappings[p] << current_object_literal
+            add_debug(element)  {"[Step 11] add #{current_object_literal.to_ntriples} to #{p.to_ntriples} #{list_mapping[p].inspect}"}
+            list_mapping[p] << current_object_literal
           elsif new_subject
             add_triple(element, new_subject, p, current_object_literal) 
           end
@@ -997,26 +998,27 @@ module RDF::RDFa
       end
     
       if not skip and new_subject && !evaluation_context.incomplete_triples.empty?
-        # Complete the incomplete triples from the evaluation context [Step 11]
+        # Complete the incomplete triples from the evaluation context [Step 12]
         add_debug(element) do
-          "[Step 11] complete incomplete triples: " +
-          "new_subject=#{new_subject.inspect}, " +
+          "[Step 12] complete incomplete triples: " +
+          "new_subject=#{new_subject.to_ntriples}, " +
           "completes=#{evaluation_context.incomplete_triples.inspect}"
         end
 
         evaluation_context.incomplete_triples.each do |trip|
-          if trip[:collection]
-            add_debug(element) {"onlist: add #{current_object_resource} to #{trip[:collection]} collection"}
-            trip[:collection] << new_subject
-          elsif trip[:direction] == :forward
+          case trip[:direction]
+          when :none
+            add_debug(element) {"[Step 12] add #{new_subject.to_ntriples} to #{trip[:list].inspect}"}
+            trip[:list] << new_subject
+          when :forward
             add_triple(element, evaluation_context.parent_subject, trip[:predicate], new_subject)
-          elsif trip[:direction] == :reverse
+          when :reverse
             add_triple(element, new_subject, trip[:predicate], evaluation_context.parent_subject)
           end
         end
       end
 
-      # Create a new evaluation context and proceed recursively [Step 12]
+      # Create a new evaluation context and proceed recursively [Step 13]
       if recurse
         if skip
           if language == evaluation_context.language &&
@@ -1024,9 +1026,9 @@ module RDF::RDFa
               term_mappings == evaluation_context.term_mappings &&
               default_vocabulary == evaluation_context.default_vocabulary &&
               base == evaluation_context.base &&
-              collection_mappings == evaluation_context.collection_mappings
+              list_mapping == evaluation_context.list_mapping
             new_ec = evaluation_context
-            add_debug(element, "[Step 12] skip: reused ec")
+            add_debug(element, "[Step 13] skip: reused ec")
           else
             new_ec = evaluation_context.clone
             new_ec.base = base
@@ -1035,8 +1037,8 @@ module RDF::RDFa
             new_ec.namespaces = namespaces
             new_ec.term_mappings = term_mappings
             new_ec.default_vocabulary = default_vocabulary
-            new_ec.collection_mappings = collection_mappings
-            add_debug(element, "[Step 12] skip: cloned ec")
+            new_ec.list_mapping = list_mapping
+            add_debug(element, "[Step 13] skip: cloned ec")
           end
         else
           # create a new evaluation context
@@ -1049,8 +1051,8 @@ module RDF::RDFa
           new_ec.language = language
           new_ec.term_mappings = term_mappings
           new_ec.default_vocabulary = default_vocabulary
-          new_ec.collection_mappings = collection_mappings
-          add_debug(element, "[Step 12] new ec")
+          new_ec.list_mapping = list_mapping
+          add_debug(element, "[Step 13] new ec")
         end
       
         element.children.each do |child|
@@ -1058,25 +1060,25 @@ module RDF::RDFa
           traverse(child, new_ec) if child.class == Nokogiri::XML::Element
         end
         
-        # Collections: after traversing through child elements, for each collection associated with
+        # Step 14: after traversing through child elements, for each list associated with
         # a property
-        collection_mappings.each do |p, c|
-          # if that collection is different from the evaluation context
-          ec_col = evaluation_context.collection_mappings[p] if evaluation_context.collection_mappings
-          add_debug(element) {"collections: time to create #{c}? #{(ec_col != c).inspect}"}
-          if ec_col != c
-            add_debug(element) {"collection(#{p}) create #{c}"}
-            # Generate an rdf:List with the elements of that collection.
-            c.each_statement do |st|
+        (list_mapping || {}).each do |p, l|
+          # if that list is different from the evaluation context
+          ec_list = evaluation_context.list_mapping[p] if evaluation_context.list_mapping
+          add_debug(element) {"[Step 14] time to create #{l.inspect}? #{(ec_list != l).inspect}"}
+          if ec_list != l
+            add_debug(element) {"[Step 14] list(#{p}) create #{l.inspect}"}
+            # Generate an rdf:List with the elements of that list.
+            l.each_statement do |st|
               add_triple(element, st.subject, st.predicate, st.object) unless st.object == RDF.List
             end
 
-            # Generate a triple relating new_subject, property and the collection BNode,
-            # or rdf:nil if the collection is empty.
-            if c.empty?
+            # Generate a triple relating new_subject, property and the list BNode,
+            # or rdf:nil if the list is empty.
+            if l.empty?
               add_triple(element, new_subject, p, RDF.nil)
             else
-              add_triple(element, new_subject, p, c.subject)
+              add_triple(element, new_subject, p, l.subject)
             end
           end
         end

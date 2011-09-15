@@ -262,10 +262,11 @@ describe "RDF::RDFa::Reader" do
           @sampledoc = %(
             <div typeof><span property="dc:title">Title</span></div>
           )
+          @expected = RDF::Graph.new << RDF::Statement.new(RDF::URI(""), RDF::DC.title, "Title")
         end
 
         it "does not create node" do
-          parse(@sampledoc).first_subject.should be_uri
+          parse(@sampledoc).should be_equivalent_graph(@expected, :trace => @debug, :format => :ttl)
         end
       end
     end
@@ -321,7 +322,7 @@ describe "RDF::RDFa::Reader" do
 
             context "with #{value}" do
               it "creates triple with invalid literal" do
-                parse(@rdfa, :validate => false).should be_equivalent_graph(@expected)
+                parse(@rdfa, :validate => false).should be_equivalent_graph(@expected, :trace => @debug)
               end
             
               it "does not create triple when validating" do
@@ -375,7 +376,7 @@ describe "RDF::RDFa::Reader" do
       end
     end
 
-    context "collections" do
+    context "lists" do
       {
         "empty list" => [
           %q(
@@ -567,7 +568,7 @@ describe "RDF::RDFa::Reader" do
     @debug = options[:debug] || []
     graph = RDF::Graph.new
     RDF::RDFa::Reader.new(input, options.merge(:debug => @debug)).each do |statement|
-      graph << statement
+      graph << statement rescue fail "SPEC: #{$!}"
     end
     graph
   end
