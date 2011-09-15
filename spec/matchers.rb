@@ -1,5 +1,4 @@
 require 'rspec/matchers'
-require 'sparql/grammar'
 
 RSpec::Matchers.define :have_xpath do |xpath, value, trace|
   match do |actual|
@@ -109,7 +108,9 @@ RSpec::Matchers.define :pass_query do |expected, info|
 
     @expected = expected.respond_to?(:read) ? expected.read : expected
     @expected = @expected.force_encoding("utf-8") if @expected.respond_to?(:force_encoding)
-    query = SPARQL::Grammar.parse(@expected)
+
+    require 'sparql'
+    query = SPARQL.parse(@expected)
     actual = actual.force_encoding("utf-8") if actual.respond_to?(:force_encoding)
     @results = query.execute(actual)
 
