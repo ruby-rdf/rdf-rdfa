@@ -1,3 +1,8 @@
+### 0.3.7
+* RDF.rb 0.3.4 compatibility.
+* Changed @member to @onlist.
+* Added format detection.
+
 ### 0.3.6
 * Sync with changes to RDFa 1.1 spec:
   * Deprecate explicit use of @profile

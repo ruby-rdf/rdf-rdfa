@@ -45,13 +45,13 @@ One significant RDF feature missing from RDFa was support for ordered collection
       )
     ]
 
-defines a playlist with an ordered set of tracks. RDFa adds the @member attribute, which is used to identify values (object or literal) that are to be placed in a list. The same playlist might be defined in RDFa as follows:
+defines a playlist with an ordered set of tracks. RDFa adds the @onlist attribute, which is used to identify values (object or literal) that are to be placed in a list. The same playlist might be defined in RDFa as follows:
 
     <div vocab="http://schema.org/" typeof="MusicPlaylist">
       <span property="name">Classic Rock Playlist</span>
       <meta property="numTracks" content="5"/>
 
-      <div rel="tracks" member="">
+      <div rel="tracks" onlist="">
         <div typeof="MusicRecording">
           1.<span property="name">Sweet Home Alabama</span> -
           <span property="byArtist">Lynard Skynard</span>
@@ -330,7 +330,7 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 ## Resources
 * [RDF.rb][RDF.rb]
 * [Distiller](http://rdf.greggkellogg.net/distiller)
-* [Documentation](http://rdf.rubyforge.org/rdfa)
+* [Documentation][RDFa doc]
 * [History](file:file.History.html)
 * [RDFa 1.1 Core][RDFa 1.1 Core]
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
@@ -375,6 +375,6 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/     "RDFa 1.1 Core"
 [XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/   "XHTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
-[RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/master/file/README.markdown
+[RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
 [Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/
