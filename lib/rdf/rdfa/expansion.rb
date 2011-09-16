@@ -41,9 +41,8 @@ module RDF::RDFa
       
       # Vocabularies managed in vocab_repo, and copied to repo for processing.
       # This allows for persistent storage of vocabularies
-      @@vocab_repo ||= @options[:vocab_repository] || begin
-        RDF::Repository.new.insert(*COOKED_VOCAB_STATEMENTS)
-      end
+      @@vocab_repo = @options[:vocab_repository] if @options.has_key?(:vocab_repository)
+      @@vocab_repo ||= RDF::Repository.new.insert(*COOKED_VOCAB_STATEMENTS)
       
       vocabs = repo.query(:predicate => RDF::RDFA.hasVocabulary).to_a.map(&:object)
       vocabs.each do |vocab|

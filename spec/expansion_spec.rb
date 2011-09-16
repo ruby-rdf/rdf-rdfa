@@ -34,8 +34,8 @@ class ModuleTester
   def trace; @trace.join("\n"); end
   
   def load(elements)
-    @options = {}
     @@vocab_repo = RDF::Repository.new
+    @options = {:vocab_repository => @@vocab_repo}
     result = nil
     elements.each do |context, ttl|
       case context
@@ -76,7 +76,7 @@ end
 describe RDF::RDFa::Expansion do
   
   before(:each) do
-    RDF::RDFa::Reader.class_variable_set(:@@vocab_repo, nil)
+    RDF::RDFa::Reader.send(:class_variable_set, :@@vocab_repo, nil)
   end
 
   describe :rdfs_entailment do
