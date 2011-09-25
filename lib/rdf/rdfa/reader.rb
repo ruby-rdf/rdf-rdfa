@@ -1,4 +1,5 @@
 require 'nokogiri'  # FIXME: Implement using different modules as in RDF::TriX
+require 'rdf/ntriples'
 
 module RDF::RDFa
   ##
@@ -731,12 +732,12 @@ module RDF::RDFa
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
-                          :restrictions => TERMorCURIEorAbsURI[@version])
+                          :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
       revs = process_uris(element, rev, evaluation_context, base,
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
-                          :restrictions => TERMorCURIEorAbsURI[@version])
+                          :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
     
       add_debug(element) do
         "rels: #{rels.join(" ")}, revs: #{revs.join(" ")}"
@@ -748,15 +749,15 @@ module RDF::RDFa
         new_subject = if about
           process_uri(element, about, evaluation_context, base,
                       :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorURI[@version])
-        elsif src
-          process_uri(element, src, evaluation_context, base, :restrictions => [:uri])
+                      :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
         elsif resource
           process_uri(element, resource, evaluation_context, base,
                       :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorURI[@version])
+                      :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
         elsif href
           process_uri(element, href, evaluation_context, base, :restrictions => [:uri])
+        elsif src
+          process_uri(element, src, evaluation_context, base, :restrictions => [:uri])
         end
 
         # If no URI is provided by a resource attribute, then the first match from the following rules
@@ -786,10 +787,10 @@ module RDF::RDFa
         # establish both a value for new subject and a value for current object resource:
         new_subject = process_uri(element, about, evaluation_context, base,
                                   :uri_mappings => uri_mappings,
-                                  :restrictions => SafeCURIEorCURIEorURI[@version]) ||
-                      process_uri(element, src, evaluation_context, base,
+                                  :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+        new_subject ||= process_uri(element, src, evaluation_context, base,
                                   :uri_mappings => uri_mappings,
-                                  :restrictions => [:uri])
+                                  :restrictions => [:uri]) if @version == :"rdfa1.0"
       
         # If no URI is provided then the first match from the following rules will apply
         new_subject ||= if element == @doc.root && base
@@ -811,9 +812,12 @@ module RDF::RDFa
         current_object_resource = if resource
           process_uri(element, resource, evaluation_context, base,
                       :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorURI[@version])
+                      :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
         elsif href
           process_uri(element, href, evaluation_context, base,
+                      :restrictions => [:uri])
+        elsif src && @version != :"rdfa1.0"
+          process_uri(element, src, evaluation_context, base,
                       :restrictions => [:uri])
         end
 
@@ -827,7 +831,7 @@ module RDF::RDFa
                             :uri_mappings => uri_mappings,
                             :term_mappings => term_mappings,
                             :vocab => default_vocabulary,
-                            :restrictions => TERMorCURIEorAbsURI[@version])
+                            :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
         add_debug(element, "typeof: #{typeof}")
         types.each do |one_type|
           add_triple(element, new_subject, RDF["type"], one_type)
@@ -907,7 +911,7 @@ module RDF::RDFa
                                   :uri_mappings => uri_mappings,
                                   :term_mappings => term_mappings,
                                   :vocab => default_vocabulary,
-                                  :restrictions => TERMorCURIEorAbsURIprop[@version])
+                                  :restrictions => TERMorCURIEorAbsURIprop.fetch(@version, []))
 
         properties.reject! do |p|
           if p.is_a?(RDF::URI)
@@ -926,7 +930,7 @@ module RDF::RDFa
                               :uri_mappings => uri_mappings,
                               :term_mappings => term_mappings,
                               :vocab => default_vocabulary,
-                              :restrictions => TERMorCURIEorAbsURI[@version]) unless datatype.to_s.empty?
+                              :restrictions => TERMorCURIEorAbsURI.fetch(@version, [])) unless datatype.to_s.empty?
         begin
           current_object_literal = if !datatype.to_s.empty? && datatype.to_s != RDF.XMLLiteral.to_s
             # typed literal

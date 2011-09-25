@@ -217,7 +217,70 @@ describe "RDF::RDFa::Reader" do
       end
     end
 
-    describe "typeof" do
+    describe "@about" do
+      it "creates a statement with subject from @about" do
+        html = %(
+          <span about="foo" property="dc:title">Title</span>
+        )
+        expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF::DC.title, "Title")
+        parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+      end
+    end
+
+    describe "@resource" do
+      it "creates a statement with object from @resource" do
+        html = %(
+          <div about="foo"><span resource="bar" rel="rdf:value"/></div>
+        )
+        expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar"))
+        parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+      end
+
+      it "uses @resource as subject of child elements" do
+        html = %(
+          <div resource="foo"><span property="dc:title">Title</span></div>
+        )
+        expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF::DC.title, "Title")
+        parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+      end
+    end
+
+    describe "@href" do
+      it "creates a statement with object from @href" do
+        html = %(
+          <div about="foo"><a href="bar" rel="rdf:value"></a></div>
+        )
+        expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar"))
+        parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+      end
+    end
+
+    describe "@src" do
+      subject {
+        %(
+          <div about="foo" xmlns:dc="http://purl.org/dc/terms/">
+            <img src="bar" rel="rdf:value" property="dc:title" content="Title"/>
+          </div>
+        )
+      }
+      context "RDFa 1.0" do
+        it "creates a statement with subject from @src" do
+          expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("bar"), RDF::DC.title, "Title")
+          parse(subject, :version => "rdfa1.0").should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+        end
+      end
+      
+      context "RDFa 1.1" do
+        it "creates a statement with object from @src" do
+          expected = RDF::Graph.new <<
+            RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar")) <<
+            RDF::Statement.new(RDF::URI("foo"), RDF::DC.title, "Title")
+          parse(subject).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+        end
+      end
+    end
+
+    describe "@typeof" do
       before :each do
         sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
@@ -380,8 +443,8 @@ describe "RDF::RDFa::Reader" do
       {
         "empty list" => [
           %q(
-            <div about ="">
-              <p rel="rdf:value" resource="rdf:nil"/>
+            <div about="">
+              <p rel="rdf:value" inlist=""/>
             </div>
           ),
           %q(
@@ -393,7 +456,7 @@ describe "RDF::RDFa::Reader" do
         ],
         "literal" => [
           %q(
-            <div about ="">
+            <div about="">
               <p property="rdf:value" inlist="">Foo</p>
             </div>
           ),
@@ -406,7 +469,7 @@ describe "RDF::RDFa::Reader" do
         ],
         "IRI" => [
           %q(
-            <div about ="">
+            <div about="">
               <a rel="rdf:value" inlist="" href="foo">Foo</a>
             </div>
           ),
@@ -417,9 +480,9 @@ describe "RDF::RDFa::Reader" do
             <> rdf:value (<foo>) .
           )
         ],
-        "implicit list with hetrogenious memberip" => [
+        "implicit list with hetrogenious membership" => [
           %q(
-            <div about ="">
+            <div about="">
               <p property="rdf:value" inlist="">Foo</p>
               <a rel="rdf:value" inlist="" href="foo">Foo</p>
             </div>
@@ -433,7 +496,7 @@ describe "RDF::RDFa::Reader" do
         ],
         "implicit list at different levels" => [
           %q(
-            <div about ="">
+            <div about="">
               <p property="rdf:value" inlist="">Foo</p>
               <strong><p property="rdf:value" inlist="">Bar</p></strong>
             </div>
@@ -447,7 +510,7 @@ describe "RDF::RDFa::Reader" do
         ],
         "property with list and literal" => [
           %q(
-            <div about ="">
+            <div about="">
               <p property="rdf:value" inlist="">Foo</p>
               <strong><p property="rdf:value" inlist="">Bar</p></strong>
               <p property="rdf:value">Baz</p>
@@ -462,7 +525,7 @@ describe "RDF::RDFa::Reader" do
         ],
         "multiple rel items" => [
           %q(
-            <div about ="">
+            <div about="">
               <ol rel="rdf:value" inlist="">
                 <li><a href="foo">Foo</a></li>
                 <li><a href="bar">Bar</a></li>
@@ -479,7 +542,7 @@ describe "RDF::RDFa::Reader" do
         "multiple collections" => [
           %q(
             <div>
-              <div about ="foo">
+              <div about="foo">
                 <p property="rdf:value" inlist="">Foo</p>
               </div>
               <div about="foo">
@@ -496,7 +559,7 @@ describe "RDF::RDFa::Reader" do
         ],
         "confusion between multiple implicit collections (resource)" => [
           %q(
-            <div about ="">
+            <div about="">
               <p property="rdf:value" inlist="">Foo</p>
               <span rel="rdf:inlist" resource="res">
                 <p property="rdf:value" inlist="">Bar</p>
@@ -513,7 +576,7 @@ describe "RDF::RDFa::Reader" do
         ],
         "confusion between multiple implicit collections (about)" => [
           %q(
-            <div about ="">
+            <div about="">
               <p property="rdf:value" inlist="">Foo</p>
               <span rel="rdf:inlist">
                 <p about="res" property="rdf:value" inlist="">Bar</p>
