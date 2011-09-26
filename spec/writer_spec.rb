@@ -176,6 +176,23 @@ describe RDF::RDFa::Writer do
           end
         end
       end
+      
+      context "property and rel serialize to different elements" do
+        subject do
+          @graph << [EX.a, RDF.value, "foo"]
+          @graph << [EX.a, RDF.value, EX.b]
+          serialize
+        end
+
+        {
+          "/xhtml:html/xhtml:body/xhtml:div/xhtml:div/xhtml:ul/xhtml:li[@property='rdf:value']/text()" => "foo",
+          "/xhtml:html/xhtml:body/xhtml:div/xhtml:div/xhtml:ul/xhtml:li/xhtml:a[@rel='rdf:value']/@href" => EX.b.to_s,
+        }.each do |path, value|
+          it "returns #{value.inspect} for xpath #{path}" do
+            subject.should have_xpath(path, value, @debug)
+          end
+        end
+      end
     end
 
     context "typed literals" do
@@ -293,9 +310,8 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "//xhtml:ul/@property" => "ex:b",
-        "//xhtml:ul/xhtml:li[1]/text()" => "c",
-        "//xhtml:ul/xhtml:li[2]/text()" => "d",
+        "//xhtml:ul/xhtml:li[1][@property='ex:b']/text()" => "c",
+        "//xhtml:ul/xhtml:li[2][@property='ex:b']/text()" => "d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value, @debug)
@@ -329,9 +345,8 @@ describe RDF::RDFa::Writer do
 
       {
         "//xhtml:div/@about" => "ex:a",
-        "//xhtml:ul/@rel" => "ex:b",
-        "//xhtml:ul/xhtml:li[1]/xhtml:a/@href" => EX.c.to_s,
-        "//xhtml:ul/xhtml:li[2]/xhtml:a/@href" => EX.d.to_s,
+        "//xhtml:ul/xhtml:li[1]/xhtml:a[@rel='ex:b']/@href" => EX.c.to_s,
+        "//xhtml:ul/xhtml:li[2]/xhtml:a[@rel='ex:b']/@href" => EX.d.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value, @debug)

@@ -36,9 +36,9 @@ module RDF::RDFa
       # Yield: predicates.each
       :subject => %q(
         - if element == :li
-          %li{:about => resource, :typeof => typeof}
+          %li{:rel => rel, :resource => resource}
             - if typeof
-              %span.type!= typeof
+              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
             - predicates.each do |predicate|
               != yield(predicate)
         - elsif rel && typeof
@@ -90,19 +90,19 @@ module RDF::RDFa
         %div.property
           %span.label
             = get_predicate_name(predicate)
-          %ul{:rel => rel, :property => property}
+          %ul
             - objects.each do |object|
               - if res = yield(object)
                 != res
               - elsif object.node?
-                %li{:resource => get_curie(object)}= get_curie(object)
+                %li{:rel => rel, :resource => get_curie(object)}= get_curie(object)
               - elsif object.uri?
                 %li
-                  %a{:href => object.to_s}= object.to_s
+                  %a{:rel => rel, :href => object.to_s}= object.to_s
               - elsif object.datatype == RDF.XMLLiteral
-                %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
+                %li{:property => property, :lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
               - else
-                %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
+                %li{:property => property, :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
       ),
     }
 
@@ -133,6 +133,11 @@ module RDF::RDFa
       # Yield: predicates.each
       :subject => %q(
         - if element == :li
+          %li{:rel => rel, :resource => resource}
+            - if typeof
+              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
+            - predicates.each do |predicate|
+              != yield(predicate)
           %li{:about => resource, :typeof => typeof}
             - predicates.each do |predicate|
               != yield(predicate)
@@ -209,9 +214,9 @@ module RDF::RDFa
       # Yield: predicates.each
       :subject => %q(
         - if element == :li
-          %li{:about => resource, :typeof => typeof}
+          %li{:rel => rel, :resource => resource}
             - if typeof
-              %span.type!= typeof
+              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
             %table.properties
               - predicates.each do |predicate|
                 != yield(predicate)
@@ -268,20 +273,20 @@ module RDF::RDFa
         %tr.property
           %td.label
             = get_predicate_name(predicate)
-          %td{:rel => rel, :property => property}
+          %td
             %ul
               - objects.each do |object|
                 - if res = yield(object)
                   != res
                 - elsif object.node?
-                  %li{:resource => get_curie(object)}= get_curie(object)
+                  %li{:rel => rel, :resource => get_curie(object)}= get_curie(object)
                 - elsif object.uri?
                   %li
-                    %a{:href => object.to_s}= object.to_s
+                    %a{:rel => rel, :href => object.to_s}= object.to_s
                 - elsif object.datatype == RDF.XMLLiteral
-                  %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
+                  %li{:property => property, :lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
                 - else
-                  %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
+                  %li{:property => property, :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
       ),
     }
     HAML_TEMPLATES = {:base => BASE_HAML, :min => MIN_HAML, :distiller => DISTILLER_HAML}
