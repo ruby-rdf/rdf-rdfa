@@ -354,6 +354,107 @@ describe RDF::RDFa::Writer do
       end
     end
     
+    context "lists" do
+      {
+        "empty list" => [
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value () .
+          ),
+          {
+            "//xhtml:div/xhtml:span[@inlist]/@rel" => 'rdf:value',
+            "//xhtml:div/xhtml:span[@inlist]/text()" => false,
+          }
+        ],
+        "literal" => [
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo") .
+          ),
+          {
+            "//xhtml:div/xhtml:span[@inlist]/@property" => 'rdf:value',
+            "//xhtml:div/xhtml:span[@inlist]/text()" => 'Foo',
+          }
+        ],
+        "IRI" => [
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value (<foo>) .
+          ),
+          {
+            "//xhtml:div/xhtml:a[@inlist]/@rel" => 'rdf:value',
+            "//xhtml:div/xhtml:a[@inlist]/@href" => 'foo',
+          }
+        ],
+        "implicit list with hetrogenious membership" => [
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo" <foo>) .
+          ),
+          {
+            "//xhtml:ul/xhtml:li[1][@inlist]/@property" => 'rdf:value',
+            "//xhtml:ul/xhtml:li[1][@inlist]/text()" => 'Foo',
+            "//xhtml:ul/xhtml:li[2]/xhtml:a[@inlist]/@rel" => 'rdf:value',
+            "//xhtml:ul/xhtml:li[2]/xhtml:a[@inlist]/@href" => 'foo',
+          }
+        ],
+        "property with list and literal" => [
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value ("Foo" "Bar"), "Baz" .
+          ),
+          {
+            "//xhtml:div[@class='property']/xhtml:span[@property='rdf:value']/text()" => "Baz",
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[1][@inlist][@property='rdf:value']/text()" => 'Foo',
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[2][@inlist][@property='rdf:value']/text()" => 'Bar',
+          }
+        ],
+        "multiple rel items" => [
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <> rdf:value (<foo> <bar>) .
+          ),
+          {
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[1]/xhtml:a[@inlist][@rel='rdf:value']/@href" => 'foo',
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[2]/xhtml:a[@inlist][@rel='rdf:value']/@href" => 'bar',
+          }
+        ],
+        "multiple collections" => [
+          %q(
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            
+            <foo> rdf:value ("Foo"), ("Bar") .
+          ),
+          {
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[1][@inlist][@property='rdf:value']/text()" => 'Foo',
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[2][@inlist][@property='rdf:value']/text()" => 'Bar',
+          }
+        ],
+      }.each do |test, (input, result)|
+        it test do
+          pending("Serializing multiple lists") if test == "multiple collections"
+          @graph = parse(input, :format => :ttl)
+          html = serialize(:haml_options => {:ugly => false})
+          result.each do |path, value|
+            html.should have_xpath(path, value, @debug)
+          end
+        end
+      end
+    end
+
     context "included resource definitions" do
       subject do
         @graph << [EX.a, EX.b, EX.c]
@@ -396,6 +497,8 @@ describe RDF::RDFa::Writer do
               rescue RSpec::Expectations::ExpectationNotMetError => e
                 if %w(0198).include?(t.name) || result =~ /XMLLiteral/m
                   pending("XMLLiteral canonicalization not implemented yet")
+                elsif %w(0225).include?(t.name)
+                  pending("Serializing multiple lists")
                 else
                   raise
                 end

@@ -73,6 +73,9 @@ module RDF::RDFa
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
 
+    # @return [RDF::URI] Base URI used for relativizing URIs
+    attr_accessor :base_uri
+    
     ##
     # Initializes the RDFa writer instance.
     #
@@ -160,6 +163,7 @@ module RDF::RDFa
     #
     # @return [void]
     def write_epilogue
+      @base_uri = RDF::URI(@options[:base_uri]) if @options[:base_uri]
       @lang = @options[:lang]
       @debug = @options[:debug]
       self.reset
@@ -315,6 +319,7 @@ module RDF::RDFa
         :element    => nil,
         :predicates => predicates,
         :rel        => nil,
+        :inlist     => nil,
         :resource   => (get_curie(subject) if options[:rel]),
         :subject    => subject,
         :typeof     => nil,
@@ -331,39 +336,42 @@ module RDF::RDFa
     #
     # The default Haml template for a single-valued property is:
     #     - if heading_predicates.include?(predicate) && object.literal?
-    #       %h1{:property => property, :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
+    #       %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
     #     - else
     #       %div.property
     #         %span.label
     #           = get_predicate_name(predicate)
     #         - if res = yield(object)
     #           != res
+    #         - elsif get_curie(object) == 'rdf:nil'
+    #           %span{:rel => get_curie(predicate), :inlist => ''}
     #         - elsif object.node?
-    #           %span{:resource => get_curie(object), :rel => rel}= get_curie(object)
+    #           %span{:resource => get_curie(object), :rel => get_curie(predicate), :inlist => inlist}= get_curie(object)
     #         - elsif object.uri?
-    #           %a{:href => object.to_s, :rel => rel}= object.to_s
+    #           %a{:href => object.to_s, :rel => get_curie(predicate), :inlist => inlist}= object.to_s
     #         - elsif object.datatype == RDF.XMLLiteral
-    #           %span{:property => property, :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
+    #           %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
     #         - else
-    #           %span{:property => property, :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
+    #           %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
+    #
     #
     # The default Haml template for a multi-valued property is:
     #     %div.property
     #       %span.label
     #         = get_predicate_name(predicate)
-    #       %ul{:rel => rel, :property => property}
+    #       %ul
     #         - objects.each do |object|
     #           - if res = yield(object)
     #             != res
     #           - elsif object.node?
-    #             %li{:resource => get_curie(object)}= get_curie(object)
+    #             %li{:rel => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
     #           - elsif object.uri?
     #             %li
-    #               %a{:href => object.to_s}= object.to_s
+    #               %a{:rel => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
     #           - elsif object.datatype == RDF.XMLLiteral
-    #             %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
+    #             %li{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_curie(object.datatype), :inlist => inlist}<!= get_value(object)
     #           - else
-    #             %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}= escape_entities(get_value(object))
+    #             %li{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
     #
     # If a multi-valued property definition is not found within the template,
     # the writer will use the single-valued property definition multiple times.
@@ -374,10 +382,6 @@ module RDF::RDFa
     #   List of objects to render.
     #   If the list contains only a single element, the :property_value template will be used.
     #   Otherwise, the :property_values template is used.
-    # @param [RDF::Resource] property
-    #   Value of @property, which should only be defined for literal objects
-    # @param [RDF::Resource] rel
-    #   Value of @rel, which should only be defined for Node or URI objects.
     # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
     # @option options [String] haml (haml_template[:property_value], haml_template[:property_values])
     #   Haml template to render. Otherwise, uses haml_template[:property_value] or haml_template[:property_values]
@@ -389,15 +393,34 @@ module RDF::RDFa
     #   The block should only return a string for recursive object definitions.
     # @return String
     #   The rendered document is returned as a string
-    def render_property(predicate, objects, property, rel, options = {}, &block)
-      # If there are multiple objects, and no :properti_values is defined, call recursively with
+    def render_property(predicate, objects, options = {}, &block)
+      add_debug {"render_property(#{predicate}): #{objects.inspect}"}
+      # If there are multiple objects, and no :property_values is defined, call recursively with
       # each object
       
       template = options[:haml]
       template ||= objects.length > 1 ? haml_template[:property_values] : haml_template[:property_value]
+
+      # Separate out the objects which are lists and render separately
+      list_objects = objects.select {|o| o != RDF.nil && RDF::List.new(o, @graph).valid?}
+      unless list_objects.empty?
+        # Render non-list objects
+        add_debug {"properties with lists: non-lists: #{objects - list_objects} lists: #{list_objects}"}
+        nl = render_property(predicate, objects - list_objects, options, &block) unless objects == list_objects
+        return nl.to_s + list_objects.map do |object|
+          # Render each list as multiple properties and set :inlist to true
+          list = RDF::List.new(object, @graph)
+          list.each_statement {|st| subject_done(st.subject)}
+          
+          add_debug {"list: #{list.inspect} #{list.to_a}"}
+          render_property(predicate, list.to_a, options.merge(:inlist => ""), &block)
+        end.join(" ")
+      end
+
       if objects.length > 1 && template.nil?
+        # Uf there is no property_values template, render each property using property_value template
         objects.map do |object|
-          render_property(predicate, [object], property, rel, options, &block)
+          render_property(predicate, [object], options, &block)
         end.join(" ")
       else
         raise RDF::WriterError, "Missing property template" if template.nil?
@@ -411,8 +434,9 @@ module RDF::RDFa
           :objects    => objects,
           :object     => objects.first,
           :predicate  => predicate,
-          :property   => (get_curie(property) if property),
-          :rel        => (get_curie(rel) if rel),
+          :property   => get_curie(predicate),
+          :rel        => get_curie(predicate),
+          :inlist     => nil,
         }.merge(options)
         hamlify(template, options) do |object|
           yield(object) if block_given?
@@ -618,12 +642,10 @@ module RDF::RDFa
       return if objects.to_a.empty?
       
       add_debug {"predicate: #{get_curie(predicate)}"}
-      property = predicate if objects.any?(&:literal?)
-      rel      = predicate if objects.any?(&:uri?) || objects.any?(&:node?)
-      render_property(predicate, objects, property, rel) do |o|
+      render_property(predicate, objects) do |o|
         # Yields each object, for potential recursive definition.
         # If nil is returned, a leaf is produced
-        depth {subject(o, :rel => get_curie(rel), :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
+        depth {subject(o, :rel => get_curie(predicate), :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
       end
     end
     

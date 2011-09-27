@@ -160,27 +160,27 @@ The template hash defines four Haml templates:
     as those provided by a previous Reader. _title_ is taken from the first top-level subject
     having an appropriate title property (as defined by the _heading_predicates_ option).
 
-*   _subject_: Subject Template, take a _subject_ and an order list of _predicate_s and yields
+*   _subject_: Subject Template, take a _subject_ and an ordered list of _predicate_s and yields
     each _predicate_ to be rendered. Described further in {RDF::RDFa::Writer#render_subject}.
     
         - if element == :li
-          %li{:about => get_curie(subject), :typeof => typeof}
+          %li{:rel => rel, :resource => resource, :inlist => inlist}
             - if typeof
-              %span.type!= typeof
+              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
             - predicates.each do |predicate|
               != yield(predicate)
         - elsif rel && typeof
-          %div{:rel => get_curie(rel)}
-            %div{:about => get_curie(subject), :typeof => typeof}
+          %div{:rel => rel}
+            %div{:about => resource, :typeof => typeof}
               %span.type!= typeof
               - predicates.each do |predicate|
                 != yield(predicate)
         - elsif rel
-          %div{:rel => get_curie(rel), :resource => get_curie(subject)}
+          %div{:rel => rel, :resource => resource}
             - predicates.each do |predicate|
               != yield(predicate)
         - else
-          %div{:about => get_curie(subject), :typeof => typeof}
+          %div{:about => about, :typeof => typeof}
             - if typeof
               %span.type!= typeof
             - predicates.each do |predicate|
@@ -198,27 +198,27 @@ The template hash defines four Haml templates:
 *   _property\_value_: Property Value Template, used for predicates having a single value; takes
     a _predicate_, and a single-valued Array of _objects_. Described further in {RDF::RDFa::Writer#render\_property}.
     
-        - object = objects.first
         - if heading_predicates.include?(predicate) && object.literal?
-          %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+          %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
         - else
           %div.property
             %span.label
               = get_predicate_name(predicate)
             - if res = yield(object)
               != res
+            - elsif get_curie(object) == 'rdf:nil'
+              %span{:rel => get_curie(predicate), :inlist => ''}
             - elsif object.node?
-              %span{:resource => get_curie(object), :rel => get_curie(predicate)}= get_curie(object)
+              %span{:resource => get_curie(object), :rel => get_curie(predicate), :inlist => inlist}= get_curie(object)
             - elsif object.uri?
-              %a{:href => object.to_s, :rel => get_curie(predicate)}= object.to_s
+              %a{:href => object.to_s, :rel => get_curie(predicate), :inlist => inlist}= object.to_s
             - elsif object.datatype == RDF.XMLLiteral
-              %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object)}<!= get_value(object)
+              %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
             - else
-              %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+              %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
    
-    In addition to _predicate_ and _objects_, the template takes locals _property_ and/or _rel_, which are
-    copies of _predicate_ and indicate use in the @property or @rel attributes. Either or both may be
-    specified, as the conditions dictate.
+    In addition to _predicate_ and _objects_, the template takes _inlist_ to indicate that the
+    property is part of an rdf:List.
 
     Also, if the predicate is identified as a _heading predicate_ (via _:heading\_predicates_ option),
     it will generate a heading element, and may use the value as the document title.
@@ -244,19 +244,19 @@ The template hash defines four Haml templates:
         %div.property
           %span.label
             = get_predicate_name(predicate)
-          %ul{:rel => (get_curie(rel) if rel), :property => (get_curie(property) if property)}
+          %ul
             - objects.each do |object|
               - if res = yield(object)
                 != res
               - elsif object.node?
-                %li{:resource => get_curie(object)}= get_curie(object)
+                %li{:rel => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
               - elsif object.uri?
                 %li
-                  %a{:href => object.to_s}= object.to_s
+                  %a{:rel => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
               - elsif object.datatype == RDF.XMLLiteral
-                %li{:lang => get_lang(object), :datatype => get_curie(object.datatype)}<!= get_value(object)
+                %li{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_curie(object.datatype), :inlist => inlist}<!= get_value(object)
               - else
-                %li{:content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object)}&= get_value(object)
+                %li{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
   
     In this case, and unordered list is used for output. Creates output similar to the following:
     

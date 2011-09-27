@@ -2,8 +2,9 @@
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/rdfa'
+require 'linkeddata' rescue nil
 require 'rdf/turtle' rescue nil
-require 'rdf/rdfxml' rescue nil
+require 'json/ld' rescue nil
 require 'getoptlong'
 require 'open-uri'
 
@@ -32,6 +33,7 @@ def run(input, options)
     r = reader_class.new(input, options)
     g = RDF::Graph.new << r
     num = g.count
+    STDERR.puts "graph: #{g.dump(:ttl)}"
     options[:output].puts g.dump(options[:output_format], options.merge(:prefixes => r.prefixes))
   end
   STDERR.puts
