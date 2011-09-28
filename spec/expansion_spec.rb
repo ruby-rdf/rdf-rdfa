@@ -229,7 +229,7 @@ describe RDF::RDFa::Expansion do
             <p>Project description for <span property="doap:name">RDF::RDFa</span>.</p>
             <dl>
               <dt>Creator</dt><dd>
-                <a href="http://greggkellogg.net/foaf.rdf#me"
+                <a href="http://greggkellogg.net/foaf#me"
                    rel="dc:creator">
                    Gregg Kellogg
                 </a>
@@ -244,7 +244,7 @@ describe RDF::RDFa::Expansion do
 
         <> a doap:Project;
           doap:name "RDF::RDFa";
-          dc:creator <http://greggkellogg.net/foaf.rdf#me> .
+          dc:creator <http://greggkellogg.net/foaf#me> .
       )
       parse(rdfa).should be_equivalent_graph(ttl, :trace => @debug)
     end
@@ -258,7 +258,7 @@ describe RDF::RDFa::Expansion do
             <p>Project description for <span property="name">RDF::RDFa</span>.</p>
             <dl>
               <dt>Creator</dt><dd>
-                <a href="http://greggkellogg.net/foaf.rdf#me"
+                <a href="http://greggkellogg.net/foaf#me"
                    rel="dc:creator">
                    Gregg Kellogg
                 </a>
@@ -279,7 +279,7 @@ describe RDF::RDFa::Expansion do
           rdfa:hasVocabulary <http://usefulinc.com/ns/doap#>;
           doap:name "RDF::RDFa";
           rdfs:label "RDF::RDFa";
-          dc:creator <http://greggkellogg.net/foaf.rdf#me> .
+          dc:creator <http://greggkellogg.net/foaf#me> .
       )
       parse(rdfa).should be_equivalent_graph(ttl, :trace => @debug)
     end
