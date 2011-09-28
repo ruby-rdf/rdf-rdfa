@@ -19,17 +19,18 @@ module RDF::RDFa
     # Subsequently, perform RDFS expansion using rules rdfs5, rdfs7, rdfs9, and rdfs11 placing
     # resulting triples into the default graph. Iterate on this step until no more triples are added.
     #
+    # @example
     #    rdfs5
-    #    {uuu rdfs:subPropertyOf vvv . vvv rdfs:subPropertyOf xxx} => { uuu rdfs:subPropertyOf xxx}
+    #    {uuu rdfs:subPropertyOf vvv . vvv rdfs:subPropertyOf xxx} => {uuu rdfs:subPropertyOf xxx}
     #
     #    rdfs7
-    #    {aaa rdfs:subPropertyOf bbb . uuu aaa yyy} => { uuu bbb yyy}
+    #    {aaa rdfs:subPropertyOf bbb . uuu aaa yyy} => {uuu bbb yyy}
     #
     #    rdfs9
-    #    {uuu rdfs:subClassOf xxx . vvv rdf:type uuu} => { vvv rdf:type xxx}
+    #    {uuu rdfs:subClassOf xxx . vvv rdf:type uuu} => {vvv rdf:type xxx}
     #
     #    rdfs11
-    #    {uuu rdfs:subClassOf vvv . vvv rdfs:subClassOf xxx} => { uuu rdfs:subClassOf xxx}
+    #    {uuu rdfs:subClassOf vvv . vvv rdfs:subClassOf xxx} => {uuu rdfs:subClassOf xxx}
     #
     # @return [RDF::Graph]
     def expand

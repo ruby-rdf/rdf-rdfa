@@ -31,7 +31,7 @@ module RDF::RDFa
     # between other similar formats.
     #
     # @param [String] sample Beginning several bytes (~ 1K) of input.
-    # @result [Boolean]
+    # @return [Boolean]
     def self.detect(sample)
       (sample.match(/<[^>]*(about|resource|prefix|typeof|property|vocab)\s*="[^>]*>/m) ||
        sample.match(/<[^>]*DOCTYPE\s+html[^>]*>.*xmlns:/im)
