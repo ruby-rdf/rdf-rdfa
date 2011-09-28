@@ -2,6 +2,9 @@
 * RDF.rb 0.3.4 compatibility.
 * Changed @member to @inlist.
 * Added format detection.
+* Serialize lists.
+* Change @src to be like @resource for RDFa 1.1 (still like @about for RDFa 1.0).
+* Fix writer template issues with muti-valued properties
 
 ### 0.3.6
 * Sync with changes to RDFa 1.1 spec:
