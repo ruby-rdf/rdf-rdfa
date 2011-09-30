@@ -5,6 +5,14 @@ module RDF::RDFa
   ##
   # An RDFa parser in Ruby
   #
+  # This class supports [Nokogiri][] for HTML
+  # processing, and will automatically select the most performant
+  # implementation (Nokogiri or LibXML) that is available. If need be, you
+  # can explicitly override the used implementation by passing in a
+  # `:library` option to `Reader.new` or `Reader.open`.
+  #
+  # [Nokogiri]: http://nokogiri.org/
+  #
   # Based on processing rules described here:
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
   # @see http://www.w3.org/TR/2011/WD-rdfa-core-20110331/ RDFa Core 1.1
@@ -174,7 +182,7 @@ module RDF::RDFa
       
       def inspect
         v = ['base', 'parent_subject', 'parent_object', 'language', 'default_vocabulary'].map do |a|
-          "#{a}='#{self.send(a).inspect}'"
+          "#{a}=#{self.send(a).inspect}"
         end
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
@@ -184,27 +192,21 @@ module RDF::RDFa
       end
     end
 
+    # Returns the XML implementation module for this reader instance.
+    #
+    # @attr_reader [Module]
+    attr_reader :implementation
+
     ##
     # Initializes the RDFa reader instance.
     #
-    # @param  [Nokogiri::HTML::Document, Nokogiri::XML::Document, IO, File, String] input
+    # @param  [IO, File, String] input
     #   the input stream to read
     # @param  [Hash{Symbol => Object}] options
-    #   any additional options
-    # @option options [Encoding] :encoding     (Encoding::UTF_8)
-    #   the encoding of the input stream (Ruby 1.9+)
-    # @option options [Boolean]  :validate     (false)
-    #   whether to validate the parsed statements and values
-    # @option options [Boolean]  :canonicalize (false)
-    #   whether to canonicalize parsed literals
+    #   any additional options (see `RDF::Reader#initialize`)
+    # @option options [Symbol] :library (:nokogiri)
     # @option options [Boolean]  :expand (false)
     #   whether to perform RDFS expansion on the resulting graph
-    # @option options [Boolean]  :intern       (true)
-    #   whether to intern all parsed URIs
-    # @option options [Hash]     :prefixes     (Hash.new)
-    #   the prefix mappings to use (not supported by all readers)
-    # @option options [#to_s]    :base_uri     (nil)
-    #   the base URI to use when resolving relative URIs
     # @option options [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:xhtml1)
     #   Host Language
     # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
@@ -224,29 +226,34 @@ module RDF::RDFa
       super do
         @debug = options[:debug]
 
-        detect_host_language_version(input, options)
-        
         @processor_graph = options[:processor_graph]
 
-        @doc = case input
-        when Nokogiri::HTML::Document, Nokogiri::XML::Document
-          input
-        else
-          # Try to detect charset from input
-          options[:encoding] ||= input.charset if input.respond_to?(:charset)
-          
-          # Otherwise, default is utf-8
-          options[:encoding] ||= 'utf-8'
-
-          case @host_language
-          when :html4, :html5
-            Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
+        @library = case options[:library]
+          when nil
+            # Use Nokogiri when available, and REXML or Hpricot otherwise:
+            begin
+              require 'nokogiri'
+              :nokogiri
+            rescue LoadError => e
+              :rexml
+            end
+          when :nokogiri, :rexml
+            options[:library]
           else
-            Nokogiri::XML.parse(input, base_uri.to_s, options[:encoding])
-          end
+            raise ArgumentError.new("expected :rexml or :nokogiri, but got #{options[:library].inspect}")
         end
-        
-        if ((@doc.nil? || @doc.root.nil?) && validate?)
+
+        require "rdf/rdfa/reader/#{@library}"
+        @implementation = case @library
+          when :nokogiri then Nokogiri
+          #when :rexml    then REXML
+        end
+        self.extend(@implementation)
+
+        detect_host_language_version(input, options)
+        initialize_xml(input, options)
+
+        if (root.nil? && validate?)
           add_error(nil, "Empty document", RDF::RDFA.DocumentError)
           raise RDF::ReaderError, "Empty Document"
         end
@@ -282,90 +289,6 @@ module RDF::RDFa
       end
     end
 
-    # Determine the host language and/or version from options and the input document
-    def detect_host_language_version(input, options)
-      @host_language = options[:host_language] ? options[:host_language].to_sym : nil
-      @version = options[:version] ? options[:version].to_sym : nil
-      return if @host_language && @version
-      
-      # Snif version based on input
-      case input
-      when Nokogiri::XML::Document, Nokogiri::HTML::Document
-        doc_type_string = input.doctype.to_s
-        version_attr = input.root && input.root.attribute("version").to_s
-        root_element = input.root.name.downcase
-        root_namespace = input.root.namespace.to_s
-        root_attrs = input.root.attributes
-        content_type = case
-        when root_element == "html" && input.is_a?(Nokogiri::HTML::Document)
-          "text/html"
-        when root_element == "html" && input.is_a?(Nokogiri::XML::Document)
-          "application/xhtml+html"
-        end
-      else
-        content_type = input.content_type if input.respond_to?(:content_type)
-
-        # Determine from head of document
-        head = if input.respond_to?(:read)
-          input.rewind
-          string = input.read(1000)
-          input.rewind
-          string.to_s
-        else
-          input.to_s[0..1000]
-        end
-        
-        doc_type_string = head.match(%r(<!DOCTYPE[^>]*>)m).to_s
-        root = head.match(%r(<[^!\?>]*>)m).to_s
-        root_element = root.match(%r(^<(\S+)[ >])) ? $1 : ""
-        version_attr = root.match(/version\s+=\s+(\S+)[\s">]/m) ? $1 : ""
-        head_element = head.match(%r(<head.*<\/head>)mi)
-        head_doc = Nokogiri::HTML.parse(head_element.to_s)
-        
-        # May determine content-type and/or charset from meta
-        # Easist way is to parse head into a document and iterate
-        # of CSS matches
-        head_doc.css("meta").each do |e|
-          if e.attr("http-equiv").to_s.downcase == 'content-type'
-            content_type, e = e.attr("content").to_s.downcase.split(";")
-            options[:encoding] = $1.downcase if e.to_s =~ /charset=([^\s]*)$/i
-          elsif e.attr("charset")
-            options[:encoding] = e.attr("charset").to_s.downcase
-          end
-        end
-      end
-
-      # Already using XML parser, determine from DOCTYPE and/or root element
-      @version ||= :"rdfa1.0" if doc_type_string =~ /RDFa 1\.0/
-      @version ||= :"rdfa1.0" if version_attr =~ /RDFa 1\.0/
-      @version ||= :"rdfa1.1" if version_attr =~ /RDFa 1\.1/
-      @version ||= :"rdfa1.1"
-
-      @host_language ||= case content_type
-      when "application/xml"  then :xml1
-      when "image/svg+xml"    then :svg
-      when "text/html"
-        case doc_type_string
-        when /html 4/i        then :html4
-        when /xhtml/i         then :xhtml1
-        when /html/i          then :html5
-        end
-      when "application/xhtml+xml"
-        case doc_type_string
-        when /html 4/i        then :html4
-        when /xhtml/i         then :xhtml1
-        when /html/i          then :xhtml5
-        end
-      else
-        case root_element
-        when /svg/i           then :svg
-        when /html/i          then :html4
-        end
-      end
-      
-      @host_language ||= :xml1
-    end
-    
     ##
     # Iterates the given block for each RDF statement in the input.
     #
@@ -414,17 +337,14 @@ module RDF::RDFa
       @bnode_cache[value.to_s] ||= RDF::Node.new(value)
     end
     
-    # Figure out the document path, if it is a Nokogiri::XML::Element or Attribute
+    # Figure out the document path, if it is an Element or Attribute
     def node_path(node)
-      "<#{base_uri}>" + case node
-      when Nokogiri::XML::Node then node.display_path
-      else node.to_s
-      end
+      "<#{base_uri}>#{node.respond_to?(:display_path) ? node.display_path : node}"
     end
     
     # Add debug event to debug array, if specified
     #
-    # @param [Nokogiri::XML::Node, #to_s] node:: XML Node or string for showing context
+    # @param [#display_path, #to_s] node:: XML Node or string for showing context
     # @param [String] message::
     # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
     def add_debug(node, message = "")
@@ -464,7 +384,7 @@ module RDF::RDFa
 
     # add a statement, object can be literal or URI or bnode
     #
-    # @param [Nokogiri::XML::Node, #to_s] node:: XML Node or string for showing context
+    # @param [#display_path, #to_s] node:: XML Node or string for showing context
     # @param [RDF::URI, RDF::BNode] subject:: the subject of the statement
     # @param [RDF::URI] predicate:: the predicate of the statement
     # @param [URI, RDF::BNode, RDF::Literal] object:: the object of the statement
@@ -478,16 +398,7 @@ module RDF::RDFa
 
     # Parsing an RDFa document (this is *not* the recursive method)
     def parse_whole_document(doc, base)
-      # find if the document has a base element
-      case @host_language
-      when :xhtml1, :xhtml5, :html4, :html5
-        base_el = doc.at_css("html>head>base")
-        base = base_el.attribute("href").to_s.split("#").first if base_el
-      else
-        xml_base = doc.root.attribute_with_ns("base", RDF::XML.to_s)
-        base = xml_base if xml_base
-      end
-      
+      base = doc_base(base)
       if (base)
         # Strip any fragment from base
         base = base.to_s.split("#").first
@@ -500,8 +411,8 @@ module RDF::RDFa
       
       if @version != :"rdfa1.0"
         # Process default vocabularies
-        process_profile(doc.root, @host_defaults[:profiles]) do |which, value|
-          add_debug(doc.root) { "parse_whole_document, #{which}: #{value.inspect}"}
+        process_profile(root, @host_defaults[:profiles]) do |which, value|
+          add_debug(root) { "parse_whole_document, #{which}: #{value.inspect}"}
           case which
           when :uri_mappings        then evaluation_context.uri_mappings.merge!(value)
           when :term_mappings       then evaluation_context.term_mappings.merge!(value)
@@ -510,7 +421,7 @@ module RDF::RDFa
         end
       end
       
-      traverse(doc.root, evaluation_context)
+      traverse(root, evaluation_context)
       add_debug("", "parse_whole_doc: traversal complete'")
     end
   
@@ -558,8 +469,9 @@ module RDF::RDFa
       # and the URI is not processed in any way; in particular if it is a relative path it is
       # not resolved against the current base.
       ns_defs = {}
-      element.namespace_definitions.each do |ns|
-        ns_defs[ns.prefix] = ns.href.to_s
+      element.namespaces.each do |prefix, suffix|
+        add_debug("extract_mappings") { "ns: #{prefix}: #{suffix}"}
+        ns_defs[prefix] = suffix
       end
 
       # HTML parsing doesn't create namespace_definitions
@@ -641,7 +553,7 @@ module RDF::RDFa
       resource = attrs['resource']
       href = attrs['href']
       vocab = attrs['vocab']
-      xml_base = element.attribute_with_ns("base", RDF::XML.to_s)
+      xml_base = element.base
       base = xml_base.to_s if xml_base && ![:xhtml1, :xhtml5, :html4, :html5].include?(@host_language)
       base ||= evaluation_context.base
 
@@ -707,25 +619,9 @@ module RDF::RDFa
       extract_mappings(element, uri_mappings, namespaces)
     
       # Language information [7.5 Step 4]
-      # From HTML5 [3.2.3.3]
-      #   If both the lang attribute in no namespace and the lang attribute in the XML namespace are set
-      #   on an element, user agents must use the lang attribute in the XML namespace, and the lang
-      #   attribute in no namespace must be ignored for the purposes of determining the element's
-      #   language.
-      language = case
-      when @doc.is_a?(Nokogiri::HTML::Document) && element.attributes["xml:lang"]
-        element.attributes["xml:lang"].to_s
-      when @doc.is_a?(Nokogiri::HTML::Document) && element.attributes["lang"]
-        element.attributes["lang"].to_s
-      when element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s)
-        element.at_xpath("@xml:lang", "xml" => RDF::XML["uri"].to_s).to_s
-      when element.at_xpath("@lang")
-        element.at_xpath("@lang").to_s
-      else
-        language
-      end
+      language = element.language || language
       language = nil if language.to_s.empty?
-      add_debug(element, "HTML5 [3.2.3.3] lang: #{language || 'nil'}") if language
+      add_debug(element) {"HTML5 [3.2.3.3] lang: #{language.inspect}"} if language
     
       # rels and revs
       rels = process_uris(element, rel, evaluation_context, base,
@@ -771,7 +667,7 @@ module RDF::RDFa
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
           uri(base)
-        elsif element == @doc.root && base
+        elsif element == root && base
           uri(base)
         elsif typeof
           RDF::Node.new
@@ -793,7 +689,7 @@ module RDF::RDFa
                                   :restrictions => [:uri]) if @version == :"rdfa1.0"
       
         # If no URI is provided then the first match from the following rules will apply
-        new_subject ||= if element == @doc.root && base
+        new_subject ||= if element == root && base
           uri(base)
         elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
@@ -922,9 +818,6 @@ module RDF::RDFa
           end
         end
 
-        # get the literal datatype
-        children_node_types = element.children.collect{|c| c.class}.uniq
-      
         # the following 3 IF clauses should be mutually exclusive. Written as is to prevent extensive indentation.
         datatype = process_uri(element, datatype, evaluation_context, base,
                               :uri_mappings => uri_mappings,
@@ -963,11 +856,11 @@ module RDF::RDFa
               RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             end
           else
-            if content || (children_node_types == [Nokogiri::XML::Text]) || (element.children.length == 0) || datatype == ""
+            if content || element.text_content? || (element.children.length == 0) || datatype == ""
               # plain literal
               add_debug(element, "[Step 11 (1.0)] plain literal")
               RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
-            elsif children_node_types != [Nokogiri::XML::Text] and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
+            elsif !element.text_content? and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
               # XML Literal
               add_debug(element) {"[Step 11 (1.0)] XML Literal: #{element.inner_html}"}
               recurse = false
@@ -1061,7 +954,7 @@ module RDF::RDFa
       
         element.children.each do |child|
           # recurse only if it's an element
-          traverse(child, new_ec) if child.class == Nokogiri::XML::Element
+          traverse(child, new_ec) if child.element?
         end
         
         # Step 14: after traversing through child elements, for each list associated with
