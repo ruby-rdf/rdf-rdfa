@@ -15,6 +15,8 @@ module RDF::RDFa
 
       # Proxy class to implement uniform element accessors
       class NodeProxy
+        attr_reader :node
+
         def initialize(node)
           @node = node
         end
@@ -51,10 +53,15 @@ module RDF::RDFa
         end
 
         def display_path
-          @display_path ||= case @node
-          when ::Nokogiri::XML::Document then ""
-          when ::Nokogiri::XML::Element then @node.parent ? "#{@node.parent.display_path}/#{name}" : @node.name
-          when ::Nokogiri::XML::Attr then @node.parent ? "#{@node.parent.display_path}@#{name}" : "@#{node.name}"
+          @display_path ||= begin
+            path = []
+            path << @node.parent.display_path if @node.parent.respond_to?(:display_path)
+            path << @node.display_path if @node.respond_to?(:display_path)
+            case @node
+            when ::Nokogiri::XML::Element then path.join("/")
+            when ::Nokogiri::XML::Attr    then path.join("@")
+            else path.join("?")
+            end
           end
         end
 
@@ -92,15 +99,42 @@ module RDF::RDFa
         ##
         # Children of this node
         #
-        # @return [NodeProxy]
+        # @return [NodeSetProxy]
         def children
-          @node.children.map {|c| NodeProxy.new(c)}
+          NodeSetProxy.new(@node.children)
         end
 
         ##
         # Proxy for everything else to @node
         def method_missing(method, *args)
           @node.send(method, *args)
+        end
+      end
+
+      ##
+      # NodeSet proxy
+      class NodeSetProxy
+        attr_reader :node_set
+
+        def initialize(node_set)
+          @node_set = node_set
+        end
+
+        ##
+        # Return a proxy for each child
+        #
+        # @yield(child)
+        # @yieldparam(NodeProxy)
+        def each
+          @node_set.each do |c|
+            yield NodeProxy.new(c)
+          end
+        end
+
+        ##
+        # Proxy for everything else to @node_set
+        def method_missing(method, *args)
+          @node_set.send(method, *args)
         end
       end
 
@@ -123,7 +157,11 @@ module RDF::RDFa
 
           case @host_language
           when :html4, :html5
-            ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
+            if RUBY_PLATFORM == "java"
+              ::Nokogiri::XML.parse(input, base_uri.to_s, options[:encoding])
+            else
+              ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
+            end
           else
             ::Nokogiri::XML.parse(input, base_uri.to_s, options[:encoding])
           end
@@ -244,8 +282,124 @@ module RDF::RDFa
   end
 end
 
-class ::Nokogiri::XML::Document
-  def doctype
-    self.children.first rescue false
+module ::Nokogiri::XML
+  ##
+  # XML Exclusive Canonicalization (c14n) for Nokogiri.
+  #
+  # Classes mixin this module to implement canonicalization methods.
+  #
+  # This implementation acts in two parts, first to canonicalize the Node
+  # or NoteSet in the context of its containing document, and second to
+  # serialize to a lexical representation.
+  #
+  # @see # @see   http://www.w3.org/TR/xml-exc-c14n/
+  class Node
+    ##
+    # Canonicalize the Node. Return a new instance of this node
+    # which is canonicalized and marked as such
+    #
+    # @param [Hash{Symbol => Object}] options
+    # @option options [Hash{String => String}] :namespaces
+    #   Namespaces to apply to node.
+    # @option options [#to_s] :language
+    #   Language to set on node, unless an xml:lang is already set.
+    def c14nxl(options = {})
+      node = self.clone
+      node.instance_variable_set(:@c14nxl, true)
+      node
+    end
+
+    ##
+    # Serialize a canonicalized Node or NodeSet to XML
+    #
+    # Override standard #to_s implementation to output in c14n representation
+    # if the Node or NodeSet is marked as having been canonicalized
+    def to_s_with_c14nxl
+      if @c15nxl
+        to_xml(:save_with => ::Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS)
+      else
+        to_s_without_c14nxl
+      end
+    end
+
+    alias_method :to_s_without_c14nxl, :to_s
+    alias_method :to_s, :to_s_with_c14nxl
   end
+
+  class Element
+    ##
+    # Canonicalize the Element. Return a new instance of this node
+    # which is canonicalized and marked as such.
+    #
+    # Apply namespaces either passed as an option, or that are in scope.
+    #
+    # @param [Hash{Symbol => Object}] options
+    #   From {Nokogiri::XML::Node#c14nxl}
+    def c14nxl(options = {})
+      element = self.dup
+      
+      # Add in-scope namespace definitions
+      options[:namespaces].each do |prefix, href|
+        if prefix.to_s.empty?
+          element.default_namespace = href unless element.namespace
+        else
+          element.add_namespace(prefix, href) unless element.namespaces[prefix]
+        end
+      end
+      
+      # Add language
+      element["xml:lang"] = options[:language].to_s if
+        options[:language] &&
+        element.attribute_with_ns("lang", RDF::XML.to_s).to_s.empty? &&
+        element.attribute("lang").to_s.empty?
+      
+      element
+    end
+  end
+  
+  class NodeSet
+    ##
+    # Canonicalize the NodeSet. Return a new NodeSet marked
+    # as being canonical with all child nodes canonicalized.
+    #
+    # @param [Hash{Symbol => Object}] options
+    #   Passed to {Nokogiri::XML::Node#c14nxl}
+    def c14nxl(options = {})
+      # Create a new NodeSet
+      set = self.class.new(Nokogiri::XML::Document.new)
+      set.instance_variable_set(:@c14nxl, true)
+      
+      # Unless passed a set of namespaces, figure them out from namespace_scopes
+      #options[:namespaces] ||= first.parent.namespace_scopes.compact.inject({}) do |memo, ns|
+      #  memo[ns.prefix] = ns.href.to_s
+      #  memo
+      #end
+
+      self.each {|c| set << c.c14nxl(options)}
+      set
+    end
+
+    ##
+    # Serialize a canonicalized Node or NodeSet to XML
+    #
+    # Override standard #to_s implementation to output in c14n representation
+    # if the Node or NodeSet is marked as having been canonicalized
+    def to_s_with_c14nxl
+      if @c15nxl
+        to_xml(:save_with => ::Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS)
+      else
+        to_s_without_c14nxl
+      end
+    end
+
+    alias_method :to_s_without_c14nxl, :to_s
+    alias_method :to_s, :to_s_with_c14nxl
+  end
+
+  class Document
+    def doctype
+      self.children.first rescue false
+    end
+  end
+  
 end

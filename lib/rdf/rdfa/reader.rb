@@ -841,10 +841,8 @@ module RDF::RDFa
               # generating the serialized element definition. For avoidance of doubt, any re-declarations on the
               # child node must take precedence over declarations that were active on the current node.
               begin
-                RDF::Literal.new(element.inner_html,
+                RDF::Literal.new(element.children.c14nxl(:language => language, :namespaces => {nil => XHTML}.merge(namespaces)),
                                 :datatype => RDF.XMLLiteral,
-                                :language => language,
-                                :namespaces => namespaces,
                                 :validate => validate?,
                                 :canonicalize => canonicalize?)
               rescue ArgumentError => e
@@ -864,12 +862,10 @@ module RDF::RDFa
               # XML Literal
               add_debug(element) {"[Step 11 (1.0)] XML Literal: #{element.inner_html}"}
               recurse = false
-              RDF::Literal.new(element.inner_html,
-                               :datatype => RDF.XMLLiteral,
-                               :language => language,
-                               :namespaces => namespaces,
-                               :validate => validate?,
-                               :canonicalize => canonicalize?)
+              RDF::Literal.new(element.children.c14nxl(:language => language, :namespaces => {nil => XHTML}.merge(namespaces)),
+                              :datatype => RDF.XMLLiteral,
+                              :validate => validate?,
+                              :canonicalize => canonicalize?)
             end
           end
         rescue ArgumentError => e

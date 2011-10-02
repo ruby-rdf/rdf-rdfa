@@ -31,9 +31,7 @@ describe "RDF::RDFa::Reader" do
                   query = Kernel.open(t.results(host_language, version))
                   graph.should pass_query(query, t)
                 rescue RSpec::Expectations::ExpectationNotMetError => e
-                  if %w(0198).include?(t.name) || query =~ /XMLLiteral/m
-                    pending("XMLLiteral canonicalization not implemented yet")
-                  elsif classification != "required"
+                  if classification != "required"
                     pending("#{classification} test") {  raise }
                   else
                     raise

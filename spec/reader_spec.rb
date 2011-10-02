@@ -154,15 +154,11 @@ describe "RDF::RDFa::Reader" do
       end
 
       it "should have an XML Literal for the dc:title of the document" do
-        begin
-          @graph.should have_triple([
-            RDF::URI('http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml'),
-            RDF::DC11.title,
-            RDF::Literal(%(E = mc<sup xmlns="http://www.w3.org/1999/xhtml" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">2</sup>: The Most Urgent Problem of Our Time), :datatype => RDF.XMLLiteral)
-          ])
-        rescue RSpec::Expectations::ExpectationNotMetError => e
-          pending("XMLLiteral canonicalization not implemented yet")
-        end
+        @graph.should have_triple([
+          RDF::URI('http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml'),
+          RDF::DC11.title,
+          RDF::Literal(%(E = mc<sup xmlns="http://www.w3.org/1999/xhtml" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">2</sup>: The Most Urgent Problem of Our Time), :datatype => RDF.XMLLiteral)
+        ])
       end
     end
 
