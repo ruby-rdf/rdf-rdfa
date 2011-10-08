@@ -12,6 +12,7 @@ describe "RDF::RDFa::Reader" do
         %w(required optional buggy).each do |classification|
           describe "that are #{classification}" do
             Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
+              #next unless t.name =~ /0231/
               specify "test #{t.name}: #{t.title}#{",  (negative test)" if t.expectedResults.false?}" do
                 begin
                   t.debug = []

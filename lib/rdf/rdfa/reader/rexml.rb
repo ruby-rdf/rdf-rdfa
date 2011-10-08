@@ -1,16 +1,16 @@
 module RDF::RDFa
   class Reader < RDF::Reader
     ##
-    # Nokogiri implementation of the RDFa reader.
+    # REXML implementation of the RDFa reader.
     #
-    # @see http://nokogiri.org/
-    module Nokogiri
+    # @see http://www.germane-software.com/software/rexml/
+    module REXML
       ##
       # Returns the name of the underlying XML library.
       #
       # @return [Symbol]
       def self.library
-        :nokogiri
+        :rexml
       end
 
       # Proxy class to implement uniform element accessors
@@ -35,12 +35,8 @@ module RDF::RDFa
         # @return [String]
         def language
           language = case
-          when @node.document.is_a?(::Nokogiri::HTML::Document) && @node.attributes["xml:lang"]
-            @node.attributes["xml:lang"].to_s
-          when @node.document.is_a?(::Nokogiri::HTML::Document) && @node.attributes["lang"]
-            @node.attributes["lang"].to_s
-          when @node.attribute_with_ns("lang", RDF::XML.to_s)
-            @node.attribute_with_ns("lang", RDF::XML.to_s)
+          when @node.attribute("lang", RDF::XML.to_s)
+            @node.attribute("lang", RDF::XML.to_s)
           when @node.attribute("lang")
             @node.attribute("lang").to_s
           end
@@ -51,7 +47,7 @@ module RDF::RDFa
         #
         # @return [String]
         def base
-          @node.attribute_with_ns("base", RDF::XML.to_s)
+          @node.attribute("base", RDF::XML.to_s)
         end
 
         def display_path
@@ -60,8 +56,8 @@ module RDF::RDFa
             path << parent.display_path if parent
             path << @node.name
             case @node
-            when ::Nokogiri::XML::Element then path.join("/")
-            when ::Nokogiri::XML::Attr    then path.join("@")
+            when ::REXML::Element   then path.join("/")
+            when ::REXML::Attribute then path.join("@")
             else path.join("?")
             end
           end
@@ -72,7 +68,7 @@ module RDF::RDFa
         #
         # @return [Array<:text, :element, :attribute>]
         def text_content?
-          @node.children.all? {|c| c.text?}
+          @node.children.all? {|c| c.is_a?(::REXML::Text)}
         end
 
         ##
@@ -80,7 +76,7 @@ module RDF::RDFa
         #
         # @return [Hash{String => String}]
         def namespaces
-          @node.namespace_definitions.inject({}) {|memo, ns| memo[ns.prefix] = ns.href.to_s; memo }
+          @node.namespaces
         end
         
         ##
@@ -89,6 +85,32 @@ module RDF::RDFa
         # @return [NodeSetProxy]
         def children
           NodeSetProxy.new(@node.children, self)
+        end
+        
+        ##
+        # Inner text of an element
+        #
+        # @see http://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
+        # @return [String]
+        def inner_text
+           ::REXML::XPath.match(@node,'.//text()').join
+        end
+
+        ##
+        # Inner text of an element
+        #
+        # @see http://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
+        # @return [String]
+        def inner_html
+           @node.children.map(&:to_s).join
+        end
+
+        ##
+        # Node type accessors
+        #
+        # @return [Boolean]
+        def element?
+          @node.is_a?(::REXML::Element)
         end
 
         ##
@@ -133,9 +155,9 @@ module RDF::RDFa
       # @param  [Hash{Symbol => Object}] options
       # @return [void]
       def initialize_xml(input, options = {})
-        require 'nokogiri' unless defined?(::Nokogiri)
+        require 'rexml/document' unless defined?(::REXML)
         @doc = case input
-        when ::Nokogiri::HTML::Document, ::Nokogiri::XML::Document
+        when ::REXML::Document
           input
         else
           # Try to detect charset from input
@@ -144,12 +166,11 @@ module RDF::RDFa
           # Otherwise, default is utf-8
           options[:encoding] ||= 'utf-8'
 
-          case @host_language
-          when :html4, :html5
-            ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
-          else
-            ::Nokogiri::XML.parse(input, base_uri.to_s, options[:encoding])
-          end
+          # Set xml:base for the document element, if defined
+          @base_uri = base_uri ? base_uri.to_s : nil
+
+          # Only parse as XML, no HTML mode
+          doc = ::REXML::Document.new(input.respond_to?(:read) ? input.read : input.to_s)
         end
       end
 
@@ -161,18 +182,13 @@ module RDF::RDFa
 
         # Snif version based on input
         case input
-        when ::Nokogiri::XML::Document, ::Nokogiri::HTML::Document
-          doc_type_string = input.children.detect {|c| c.is_a?(::Nokogiri::XML::DTD)}
+        when ::REXML::Document
+          doc_type_string = input.doctype.to_s
           version_attr = input.root && input.root.attribute("version").to_s
           root_element = input.root.name.downcase
           root_namespace = input.root.namespace.to_s
           root_attrs = input.root.attributes
-          content_type = case
-          when root_element == "html" && input.is_a?(Nokogiri::HTML::Document)
-            "text/html"
-          when root_element == "html" && input.is_a?(Nokogiri::XML::Document)
-            "application/xhtml+html"
-          end
+          content_type = "application/xhtml+html" # FIXME: what about other possible XML types?
         else
           content_type = input.content_type if input.respond_to?(:content_type)
 
@@ -191,16 +207,16 @@ module RDF::RDFa
           root_element = root.match(%r(^<(\S+)[ >])) ? $1 : ""
           version_attr = root.match(/version\s+=\s+(\S+)[\s">]/m) ? $1 : ""
           head_element = head.match(%r(<head.*<\/head>)mi)
-          head_doc = ::Nokogiri::HTML.parse(head_element.to_s)
+          head_doc = ::REXML::Document.new(head_element.to_s)
 
           # May determine content-type and/or charset from meta
           # Easist way is to parse head into a document and iterate
           # of CSS matches
-          head_doc.css("meta").each do |e|
-            if e.attr("http-equiv").to_s.downcase == 'content-type'
-              content_type, e = e.attr("content").to_s.downcase.split(";")
+          ::REXML::XPath.each(head_doc, "//meta") do |e|
+            if e.attribute("http-equiv").to_s.downcase == 'content-type'
+              content_type, e = e.attribute("content").to_s.downcase.split(";")
               options[:encoding] = $1.downcase if e.to_s =~ /charset=([^\s]*)$/i
-            elsif e.attr("charset")
+            elsif e.attribute("charset")
               options[:encoding] = e.attr("charset").to_s.downcase
             end
           end
@@ -248,7 +264,7 @@ module RDF::RDFa
       ##
       # Document errors
       def doc_errors
-        @doc.errors
+        []
       end
       
       ##
@@ -260,14 +276,14 @@ module RDF::RDFa
         # find if the document has a base element
         case @host_language
         when :xhtml1, :xhtml5, :html4, :html5
-          base_el = @doc.at_css("html>head>base") 
+          base_el = ::REXML::XPath.first(@doc, "/html/head/base") 
           base = base_el.attribute("href").to_s.split("#").first if base_el
         else
-          xml_base = root.attribute_with_ns("base", RDF::XML.to_s)
+          xml_base = root.attribute("base", RDF::XML.to_s)
           base = xml_base if xml_base
         end
         
-        base
+        base || @base_uri
       end
     end
   end

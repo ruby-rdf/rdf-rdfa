@@ -2,7 +2,7 @@ $:.unshift "."
 require 'spec_helper'
 
 # Class for abstract testing of module
-class ModuleTester
+class ExpansionTester
   include RDF::RDFa::Expansion
   include RDF::Enumerable
 
@@ -129,7 +129,7 @@ describe RDF::RDFa::Expansion do
       },
     }.each do |test, elements|
       it test do
-        mt = ModuleTester.new(test)
+        mt = ExpansionTester.new(test)
         result = mt.load(elements)
         mt.add_vocabs_to_repo(mt.repo)
         mt.send(:rdfs_entailment, mt.repo)
@@ -203,7 +203,7 @@ describe RDF::RDFa::Expansion do
       },
     }.each do |test, elements|
       it test do
-        mt = ModuleTester.new(test)
+        mt = ExpansionTester.new(test)
         result = mt.load(elements)
         vocab = RDF::URI("http://example.org/vocab#")
         graph = RDF::Graph.new

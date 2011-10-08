@@ -26,7 +26,8 @@ def run_tc(tc, options)
       :base_uri => input_uri,
       :validate => options[:validate],
       :processor_graph => pg,
-      :version => options[:version])
+      :version => options[:version],
+      :library => options[:library])
 
     graph = RDF::Graph.new << reader
   rescue Exception => e
@@ -62,6 +63,7 @@ options = {
   :quite           => false,
   :validate        => false,
   :format          => :ntriples,
+  :library         => nil,
   :processor_graph => nil,
   :host_language   => "xhtml1",
   :version         => "rdfa1.1"
@@ -71,7 +73,8 @@ opts = GetoptLong.new(
   ["--help", "-?", GetoptLong::NO_ARGUMENT],
   ["--dbg", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
-  ["--host-language", "-h", GetoptLong::OPTIONAL_ARGUMENT],
+  ["--host-language", "-h", GetoptLong::REQUIRED_ARGUMENT],
+  ["--library", GetoptLong::REQUIRED_ARGUMENT],
   ["--processor-graph", GetoptLong::NO_ARGUMENT],
   ["--quiet", GetoptLong::NO_ARGUMENT],
   ["--validate", GetoptLong::NO_ARGUMENT],
@@ -86,6 +89,7 @@ def help(options)
   puts "      --debug:              Display detailed debug output"
   puts "      --format:             Format for output, defaults to #{options[:format].inspect}"
   puts "      --host-language:      Run for specified host language, defaults to #{options[:host_language]}"
+  puts "      --library:            XML parsing library, defaults to :nokogiri if available, otherwise :rexml"
   puts "      --processor-graph:    Output processor graph"
   puts "      --quiet:              Minimal output"
   puts "      --validate:           Validate input"
@@ -102,6 +106,7 @@ opts.each do |opt, arg|
   when '--quiet'            then options[:quiet] = true
   when '--dbg'              then ::RDF::RDFa::debug = true
   when '--format'           then options[:format] = arg.to_sym
+  when '--library'          then options[:library] = arg.to_sym
   when '--processor-graph'  then options[:processor_graph] = true
   when '--host-language'    then options[:host_language] = arg
   when '--version'          then options[:version] = arg
@@ -111,5 +116,6 @@ end
 
 Fixtures::TestCase.for_specific(options[:host_language], options[:version]) do |tc|
   next unless ARGV.empty? || ARGV.any? {|n| tc.name.match(/#{n}/)}
+  next if tc.classification.to_s =~ /deprecated/
   run_tc(tc, options)
 end

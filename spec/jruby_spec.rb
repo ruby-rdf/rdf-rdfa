@@ -1,6 +1,6 @@
 # coding: utf-8
 $:.unshift "."
-require File.join(File.dirname(__FILE__), 'spec_helper')
+require 'spec_helper'
 require 'rdf/spec/reader'
 
 # Some specific issues that fail with jRuby to be resolved

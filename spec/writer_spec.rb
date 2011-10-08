@@ -483,7 +483,6 @@ describe RDF::RDFa::Writer do
       RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
         context "Using #{name} template" do
           Fixtures::TestCase.for_specific("xhtml1", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
-            next if t.name == "0212"  # XMLLiteral equivalence
             specify "test #{t.name}: #{t.title}" do
               begin
                 input = t.input("xhtml1", "rdfa1.1")
@@ -493,10 +492,11 @@ describe RDF::RDFa::Writer do
                 # Need to put this in to avoid problems with added markup
                 statements = graph2.query(:object => RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
                 statements.each {|st| graph2.delete(st)}
+                #puts graph2.dump(:ttl)
                 graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
               rescue RSpec::Expectations::ExpectationNotMetError => e
-                if %w(0198).include?(t.name) || result =~ /XMLLiteral/m
-                  pending("XMLLiteral canonicalization not implemented yet")
+                if %w(0198).include?(t.name) || t.title =~ /XMLLiteral/
+                  pending("XMLLiteral aren't serialized canonically")
                 elsif %w(0225).include?(t.name)
                   pending("Serializing multiple lists")
                 else

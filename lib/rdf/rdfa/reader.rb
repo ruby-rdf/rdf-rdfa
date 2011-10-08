@@ -1,5 +1,6 @@
 require 'nokogiri'  # FIXME: Implement using different modules as in RDF::TriX
 require 'rdf/ntriples'
+require 'rdf/xsd'
 
 module RDF::RDFa
   ##
@@ -232,6 +233,7 @@ module RDF::RDFa
           when nil
             # Use Nokogiri when available, and REXML or Hpricot otherwise:
             begin
+              raise LoadError, "Don't use java-native Nokogiri" if RUBY_PLATFORM == 'java'
               require 'nokogiri'
               :nokogiri
             rescue LoadError => e
@@ -246,18 +248,18 @@ module RDF::RDFa
         require "rdf/rdfa/reader/#{@library}"
         @implementation = case @library
           when :nokogiri then Nokogiri
-          #when :rexml    then REXML
+          when :rexml    then REXML
         end
         self.extend(@implementation)
 
         detect_host_language_version(input, options)
-        initialize_xml(input, options)
+        initialize_xml(input, options) rescue raise RDF::ReaderError.new($!.message)
 
         if (root.nil? && validate?)
           add_error(nil, "Empty document", RDF::RDFA.DocumentError)
           raise RDF::ReaderError, "Empty Document"
         end
-        add_warning(nil, "Syntax errors:\n#{@doc.errors}", RDF::RDFA.DocumentError) if !@doc.errors.empty? && validate?
+        add_warning(nil, "Syntax errors:\n#{doc_errors}", RDF::RDFA.DocumentError) if !doc_errors.empty? && validate?
 
         # Section 4.2 RDFa Host Language Conformance
         #
@@ -283,7 +285,7 @@ module RDF::RDFa
           @host_defaults[:profiles] = [XML_RDFA_PROFILE, XHTML_RDFA_PROFILE]
         end
 
-        add_info(@doc, "version = #{@version},  host_language = #{@host_language}")
+        add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{@library}")
 
         block.call(self) if block_given?
       end
@@ -432,33 +434,33 @@ module RDF::RDFa
       profiles.
         map {|uri| uri(uri).normalize}.
         each do |uri|
-        # Don't try to open ourselves!
-        if base_uri == uri
-          add_debug(element, "process_profile: skip recursive profile <#{uri}>")
-          next
-        end
+          # Don't try to open ourselves!
+          if base_uri == uri
+            add_debug(element, "process_profile: skip recursive profile <#{uri}>")
+            next
+          end
 
-        old_debug = RDF::RDFa.debug?
-        begin
-          add_info(element, "process_profile: load <#{uri}>")
-          RDF::RDFa.debug = false
-          profile = Profile.find(uri)
-        rescue Exception => e
-          RDF::RDFa.debug = old_debug
-          add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
-          raise # In case we're not in strict mode, we need to be sure processing stops
-        ensure
-          RDF::RDFa.debug = old_debug
-        end
+          old_debug = RDF::RDFa.debug?
+          begin
+            add_info(element, "process_profile: load <#{uri}>")
+            RDF::RDFa.debug = false
+            profile = Profile.find(uri)
+          rescue Exception => e
+            RDF::RDFa.debug = old_debug
+            add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
+            raise # In case we're not in strict mode, we need to be sure processing stops
+          ensure
+            RDF::RDFa.debug = old_debug
+          end
 
-        # Add URI Mappings to prefixes
-        profile.prefixes.each_pair do |prefix, value|
-          prefix(prefix, value)
+          # Add URI Mappings to prefixes
+          profile.prefixes.each_pair do |prefix, value|
+            prefix(prefix, value)
+          end
+          yield :uri_mappings, profile.prefixes unless profile.prefixes.empty?
+          yield :term_mappings, profile.terms unless profile.terms.empty?
+          yield :default_vocabulary, profile.vocabulary if profile.vocabulary
         end
-        yield :uri_mappings, profile.prefixes unless profile.prefixes.empty?
-        yield :term_mappings, profile.terms unless profile.terms.empty?
-        yield :default_vocabulary, profile.vocabulary if profile.vocabulary
-      end
     end
 
     # Extract the XMLNS mappings from an element

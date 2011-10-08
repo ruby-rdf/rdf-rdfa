@@ -6,7 +6,7 @@ require 'rubygems'
 require 'rspec'
 require 'bigdecimal'  # XXX Remove Me
 require 'rdf/rdfa'
-require 'rdf/rdfxml'
+#require 'rdf/rdfxml'
 require 'rdf/spec'
 require 'rdf/spec/matchers'
 require 'rdf/isomorphic'
@@ -24,7 +24,8 @@ OpenURI::Cache.class_eval { @cache_path = URI_CACHE }
   c.filter_run :focus => true
   c.run_all_when_everything_filtered = true
   c.exclusion_filter = {
-    :ruby => lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version.to_s}/) },
+    :ruby     => lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version.to_s}/) },
+    :library  => lambda { |library| (RUBY_PLATFORM == 'java' && library == :nokogiri) },
   }
   c.include(RDF::Spec::Matchers)
 end
