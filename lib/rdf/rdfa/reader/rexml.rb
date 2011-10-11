@@ -1,3 +1,5 @@
+require 'htmlentities'
+
 module RDF::RDFa
   class Reader < RDF::Reader
     ##
@@ -93,7 +95,10 @@ module RDF::RDFa
         # @see http://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
         # @return [String]
         def inner_text
-           ::REXML::XPath.match(@node,'.//text()').join
+          coder = HTMLEntities.new
+          ::REXML::XPath.match(@node,'.//text()').map { |e|
+            coder.decode(e)
+          }.join
         end
 
         ##
@@ -102,7 +107,7 @@ module RDF::RDFa
         # @see http://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
         # @return [String]
         def inner_html
-           @node.children.map(&:to_s).join
+          @node.children.map(&:to_s).join
         end
 
         ##

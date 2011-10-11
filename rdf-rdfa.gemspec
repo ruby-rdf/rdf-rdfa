@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'haml',            '>= 3.0.0'
   gem.add_runtime_dependency     'facets',          '>= 2.9.1'
   gem.add_runtime_dependency     'rdf-xsd',         '>= 0.3.5'
+  gem.add_runtime_dependency     'htmlentities',    '>= 4.3.0'
   
   gem.add_development_dependency 'open-uri-cached', '>= 0.0.4', :path => 'open-uri/cached'
   gem.add_development_dependency 'spira',           '>= 0.0.12'
