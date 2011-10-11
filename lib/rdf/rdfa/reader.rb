@@ -475,8 +475,8 @@ module RDF::RDFa
       if ns_defs.empty?
         ns_defs = {}
         element.attributes.each do |attr, href|
-          prefix = $1 if attr =~ /^xmlns(?:\:(.+))?/
-          next unless prefix
+          next unless attr =~ /^xmlns(?:\:(.+))?/
+          prefix = $1
           add_debug("extract_mappings") { "ns(attr): #{prefix}: #{href}"}
           ns_defs[prefix] = href.to_s
         end

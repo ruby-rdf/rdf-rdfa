@@ -78,7 +78,12 @@ module RDF::RDFa
         #
         # @return [Hash{String => String}]
         def namespaces
-          @node.namespaces
+          ns_decls = {}
+          @node.attributes.each do |name, attr|
+            next unless name =~ /^xmlns(?:\:(.+))?/
+            ns_decls[$1] = attr
+          end
+          ns_decls
         end
         
         ##
