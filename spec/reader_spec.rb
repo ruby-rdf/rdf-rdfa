@@ -109,34 +109,29 @@ describe "RDF::RDFa::Reader" do
       end
 
       context :features do
-        it "XML Literal" do
-          html = %(<?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-            <html xmlns="http://www.w3.org/1999/xhtml"
-                  xmlns:dc="http://purl.org/dc/elements/1.1/"
-                  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <head>
-                <title>Test 0011</title>
-              </head>
-              <body>
-                <div about="">
-                  Author: <span property="dc:creator">Albert Einstein</span>
-                  <h2 property="dc:title" datatype="rdf:XMLLiteral">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
-              </div>
-              </body>
-            </html>
+        describe "XML Literal" do
+          it "xmlns=" do
+            html = %(<?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+              <html xmlns="http://www.w3.org/1999/xhtml">
+                <head><base href=""/></head>
+                <body>
+                  <div about="http://example.com/">
+                    <h2 property="dc:title" datatype="rdf:XMLLiteral">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
+                </div>
+                </body>
+              </html>
+              )
+            expected = %q(
+              @base <http://example.com/> .
+              @prefix dc: <http://purl.org/dc/terms/> .
+              @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+              <> dc:title "E = mc<sup xmlns=\"http://www.w3.org/1999/xhtml\">2</sup>: The Most Urgent Problem of Our Time"^^rdf:XMLLiteral .
             )
-          expected = %q(
-            @base <http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml> .
-            @prefix dc: <http://purl.org/dc/elements/1.1/> .
-            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-            <> dc:creator "Albert Einstein";
-               dc:title "E = mc<sup xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">2</sup>: The Most Urgent Problem of Our Time"^^rdf:XMLLiteral .
-          )
-
-          graph = parse(html, :base_uri => "http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0011.xhtml", :validate => true)
-          graph.should be_equivalent_graph(expected, :trace => @debug)
+            parse(html).should be_equivalent_graph(expected, :trace => @debug)
+          end
         end
 
         it "bnodes" do

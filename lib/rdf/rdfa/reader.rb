@@ -1,4 +1,4 @@
-require 'nokogiri'  # FIXME: Implement using different modules as in RDF::TriX
+require 'nokogiri' rescue :rexml
 require 'rdf/ntriples'
 require 'rdf/xsd'
 
@@ -232,13 +232,7 @@ module RDF::RDFa
         @library = case options[:library]
           when nil
             # Use Nokogiri when available, and REXML or Hpricot otherwise:
-            begin
-              raise LoadError, "Don't use java-native Nokogiri" if RUBY_PLATFORM == 'java'
-              require 'nokogiri'
-              :nokogiri
-            rescue LoadError => e
-              :rexml
-            end
+            (defined?(::Nokogiri) && RUBY_PLATFORM != 'java') ? :nokogiri : :rexml
           when :nokogiri, :rexml
             options[:library]
           else
@@ -471,16 +465,20 @@ module RDF::RDFa
       # and the URI is not processed in any way; in particular if it is a relative path it is
       # not resolved against the current base.
       ns_defs = {}
-      element.namespaces.each do |prefix, suffix|
-        add_debug("extract_mappings") { "ns: #{prefix}: #{suffix}"}
-        ns_defs[prefix] = suffix
+      element.namespaces.each do |prefix, href|
+        prefix = nil if prefix == "xmlns"
+        add_debug("extract_mappings") { "ns: #{prefix}: #{href}"}
+        ns_defs[prefix] = href
       end
 
       # HTML parsing doesn't create namespace_definitions
       if ns_defs.empty?
         ns_defs = {}
-        element.attributes.each do |k, v|
-          ns_defs[$1] = v.to_s if k =~ /^xmlns(?:\:(.+))?/
+        element.attributes.each do |attr, href|
+          prefix = $1 if attr =~ /^xmlns(?:\:(.+))?/
+          next unless prefix
+          add_debug("extract_mappings") { "ns(attr): #{prefix}: #{href}"}
+          ns_defs[prefix] = href.to_s
         end
       end
 
@@ -843,10 +841,15 @@ module RDF::RDFa
               # generating the serialized element definition. For avoidance of doubt, any re-declarations on the
               # child node must take precedence over declarations that were active on the current node.
               begin
-                RDF::Literal.new(element.children.c14nxl(:language => language, :namespaces => {nil => XHTML}.merge(namespaces)),
-                                :datatype => RDF.XMLLiteral,
-                                :validate => validate?,
-                                :canonicalize => canonicalize?)
+                c14nxl = element.children.c14nxl(
+                  :library => @library,
+                  :language => language,
+                  :namespaces => {nil => XHTML}.merge(namespaces))
+                RDF::Literal.new(c14nxl,
+                  :library => @library,
+                  :datatype => RDF.XMLLiteral,
+                  :validate => validate?,
+                  :canonicalize => canonicalize?)
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
@@ -864,10 +867,15 @@ module RDF::RDFa
               # XML Literal
               add_debug(element) {"[Step 11 (1.0)] XML Literal: #{element.inner_html}"}
               recurse = false
-              RDF::Literal.new(element.children.c14nxl(:language => language, :namespaces => {nil => XHTML}.merge(namespaces)),
-                              :datatype => RDF.XMLLiteral,
-                              :validate => validate?,
-                              :canonicalize => canonicalize?)
+              c14nxl = element.children.c14nxl(
+                :library => @library,
+                :language => language,
+                :namespaces => {nil => XHTML}.merge(namespaces))
+              RDF::Literal.new(c14nxl,
+                :library => @library,
+                :datatype => RDF.XMLLiteral,
+                :validate => validate?,
+                :canonicalize => canonicalize?)
             end
           end
         rescue ArgumentError => e
