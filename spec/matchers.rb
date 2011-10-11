@@ -1,9 +1,10 @@
 require 'rspec/matchers'
 
 RSpec::Matchers.define :have_xpath do |xpath, value, trace|
+  xpath = xpath.gsub("xhtml:", "") if RUBY_PLATFORM == "java"
   match do |actual|
-    @doc = Nokogiri::XML.parse(actual)
-    @doc.should be_a(Nokogiri::XML::Document)
+    @doc = Nokogiri::HTML.parse(actual)
+    @doc.should be_a(Nokogiri::HTML::Document)
     @doc.root.should be_a(Nokogiri::XML::Element)
     @namespaces = @doc.namespaces.merge("xhtml" => "http://www.w3.org/1999/xhtml", "xml" => "http://www.w3.org/XML/1998/namespace")
     case value
