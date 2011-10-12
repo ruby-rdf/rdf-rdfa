@@ -287,6 +287,8 @@ describe RDF::RDFa::Expansion do
   
   def parse(input, options = {})
     @debug = options[:debug] || []
-    RDF::Graph.new << RDF::RDFa::Reader.new(input, options.merge(:debug => @debug, :expand => true))
+    RDF::Graph.new << RDF::RDFa::Reader.new(input, options.merge(
+      :debug => @debug, :expand => true, :vocab_repository => nil
+    ))
   end
 end
