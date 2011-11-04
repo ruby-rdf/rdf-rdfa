@@ -49,7 +49,7 @@ def normalize(graph)
   end
 end
 
-Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument, :expectedResults, :format)
+Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument, :expectedResults, :format, :title)
 
 RSpec::Matchers.define :be_equivalent_graph do |expected, info|
   match do |actual|
