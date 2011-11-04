@@ -314,6 +314,8 @@ Full documentation available on [Rubydoc.info][RDFa doc]
   * {RDF::RDFa::SVG}
     Asserts :svg format, image/svg+xml mime-type and .svg file extension.
 * {RDF::RDFa::Reader}
+  * {RDF::RDFa::Reader::Nokogiri}
+  * {RDF::RDFa::Reader::REXML}
 * {RDF::RDFa::Profile}
 * {RDF::RDFa::Writer}
 

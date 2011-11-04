@@ -3,7 +3,7 @@ require 'htmlentities'
 module RDF::RDFa
   class Reader < RDF::Reader
     ##
-    # REXML implementation of the RDFa reader.
+    # REXML implementation of an XML parser.
     #
     # @see http://www.germane-software.com/software/rexml/
     module REXML

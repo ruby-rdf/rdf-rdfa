@@ -1,7 +1,7 @@
 module RDF::RDFa
   class Reader < RDF::Reader
     ##
-    # Nokogiri implementation of the RDFa reader.
+    # Nokogiri implementation of an XML parser.
     #
     # @see http://nokogiri.org/
     module Nokogiri
