@@ -205,7 +205,8 @@ module RDF::RDFa
     #   the input stream to read
     # @param  [Hash{Symbol => Object}] options
     #   any additional options (see `RDF::Reader#initialize`)
-    # @option options [Symbol] :library (:nokogiri)
+    # @option options [Symbol] :library
+    #   One of :nokogiri or :rexml. If nil/unspecified uses :nokogiri if available, :rexml otherwise.
     # @option options [Boolean]  :expand (false)
     #   whether to perform RDFS expansion on the resulting graph
     # @option options [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:xhtml1)
@@ -231,7 +232,7 @@ module RDF::RDFa
 
         @library = case options[:library]
           when nil
-            # Use Nokogiri when available, and REXML or Hpricot otherwise:
+            # Use Nokogiri when available, and REXML otherwise:
             (defined?(::Nokogiri) && RUBY_PLATFORM != 'java') ? :nokogiri : :rexml
           when :nokogiri, :rexml
             options[:library]
@@ -430,7 +431,7 @@ module RDF::RDFa
         each do |uri|
           # Don't try to open ourselves!
           if base_uri == uri
-            add_debug(element, "process_profile: skip recursive profile <#{uri}>")
+            add_debug(element) {"process_profile: skip recursive profile <#{uri}>"}
             next
           end
 
@@ -545,58 +546,39 @@ module RDF::RDFa
       default_vocabulary = evaluation_context.default_vocabulary
       list_mapping = evaluation_context.list_mapping
 
-      # shortcut
-      attrs = element.attributes
-
-      about = attrs['about']
-      src = attrs['src']
-      resource = attrs['resource']
-      href = attrs['href']
-      vocab = attrs['vocab']
       xml_base = element.base
       base = xml_base.to_s if xml_base && ![:xhtml1, :xhtml5, :html4, :html5].include?(@host_language)
       base ||= evaluation_context.base
 
       # Pull out the attributes needed for the skip test.
-      property = attrs['property'].to_s.strip if attrs['property']
-      typeof = attrs['typeof'].to_s.strip if attrs.has_key?('typeof')
-      datatype = attrs['datatype'].to_s if attrs['datatype']
-      content = attrs['content'].to_s if attrs['content']
-      rel = attrs['rel'].to_s.strip if attrs['rel']
-      rev = attrs['rev'].to_s.strip if attrs['rev']
+      attrs = {}
+      %w(
+        about
+        content
+        data
+        datatype
+        datetime
+        href
+        inlist
+        property
+        rel
+        resource
+        rev
+        src
+        typeof
+        vocab
+      ).each do |a|
+        attrs[a.to_sym] = element.attributes[a].to_s.strip if element.attributes[a]
+      end
 
-      # Lists:
-      # @inlist
-      #   an attribute (value ignored) used to indicate that the object associated with a
-      #   @rel or @property attribute on the same element is to be added to the list
-      #   for that property. Causes a list to be created if it does not already exist.
-      inlist = attrs['inlist'].to_s.strip if attrs.has_key?('inlist')
-
-      add_debug(element) do
-        attrs = {
-          :about => about,
-          :src => src,
-          :resource => resource,
-          :href => href,
-          :vocab => vocab,
-          :base => xml_base,
-          :property => property,
-          :typeof => typeof,
-          :datatype => datatype,
-          :rel => rel,
-          :rev => rev,
-          :inlist => inlist,
-        }.select {|k,v| v}
-
-        "attrs " + attrs.map {|a| "#{a.first}: #{a.last}"}.join(", ")
-      end unless attrs.empty?
+      add_debug(element) {"attrs " + attrs.inspect} unless attrs.empty?
 
       # Default vocabulary [7.5 Step 2]
       # Next the current element is examined for any change to the default vocabulary via @vocab.
       # If @vocab is present and contains a value, its value updates the local default vocabulary.
       # If the value is empty, then the local default vocabulary must be reset to the Host Language defined default.
-      unless vocab.nil?
-        default_vocabulary = if vocab.to_s.empty?
+      if attrs[:vocab]
+        default_vocabulary = if attrs[:vocab].empty?
           # Set default_vocabulary to host language default
           add_debug(element) {
             "[Step 3] reset default_vocaulary to #{@host_defaults.fetch(:vocabulary, nil).inspect}"
@@ -604,9 +586,9 @@ module RDF::RDFa
           @host_defaults.fetch(:vocabulary, nil)
         else
           # Generate a triple indicating that the vocabulary is used
-          add_triple(element, base, RDF::RDFA.hasVocabulary, uri(vocab))
+          add_triple(element, base, RDF::RDFA.hasVocabulary, uri(attrs[:vocab]))
 
-          uri(vocab)
+          uri(attrs[:vocab])
         end
         add_debug(element) {
           "[Step 2] default_vocaulary: #{default_vocabulary.inspect}"
@@ -624,12 +606,12 @@ module RDF::RDFa
       add_debug(element) {"HTML5 [3.2.3.3] lang: #{language.inspect}"} if language
     
       # rels and revs
-      rels = process_uris(element, rel, evaluation_context, base,
+      rels = process_uris(element, attrs[:rel], evaluation_context, base,
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
                           :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
-      revs = process_uris(element, rev, evaluation_context, base,
+      revs = process_uris(element, attrs[:rev], evaluation_context, base,
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
@@ -639,52 +621,110 @@ module RDF::RDFa
         "rels: #{rels.join(" ")}, revs: #{revs.join(" ")}"
       end unless (rels + revs).empty?
 
-      if !(rel || rev)
+      if !(attrs[:rel] || attrs[:rev])
         # Establishing a new subject if no rel/rev [7.5 Step 5]
-        # May not be valid, but can exist
-        new_subject = if about
-          process_uri(element, about, evaluation_context, base,
-                      :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
-        elsif resource
-          process_uri(element, resource, evaluation_context, base,
-                      :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
-        elsif href
-          process_uri(element, href, evaluation_context, base, :restrictions => [:uri])
-        elsif src
-          process_uri(element, src, evaluation_context, base, :restrictions => [:uri])
+        
+        if @version == :"rdfa1.0"
+          new_subject = if attrs[:about]
+            process_uri(element, attrs[:about], evaluation_context, base,
+                        :uri_mappings => uri_mappings,
+                        :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+          elsif attrs[:resource]
+            process_uri(element, attrs[:resource], evaluation_context, base,
+                        :uri_mappings => uri_mappings,
+                        :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+          elsif attrs[:href] || attrs[:src]
+            process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
+          end
+
+          # If no URI is provided by a resource attribute, then the first match from the following rules
+          # will apply:
+          new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+            # From XHTML+RDFa:
+            # if no URI is provided, then first check to see if the element is the head or body element.
+            # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
+            uri(base)
+          elsif element == root && base
+            # if the element is the root element of the document, then act as if there is an empty @about present,
+            # and process it according to the rule for @about, above;
+            uri(base)
+          elsif attrs[:typeof]
+            RDF::Node.new
+          else
+            # otherwise, if parent object is present, new subject is set to the value of parent object.
+            skip = true unless attrs[:property]
+            evaluation_context.parent_object
+          end
+        else  # rdfa1.1
+          # If the current element contains the @property attribute, but does not contain the @content or the @datatype attribute
+          if attrs[:property] && !(attrs[:content] || attrs[:datatype])
+            new_subject = process_uri(element, attrs[:about], evaluation_context, base,
+                        :uri_mappings => uri_mappings,
+                        :restrictions => SafeCURIEorCURIEorURI.fetch(@version, [])) if attrs[:about]
+
+            # If no URI is provided by a resource attribute, then the first match from the following rules
+            # will apply:
+            new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+              # From XHTML+RDFa 1.1:
+              # if no URI is provided, then first check to see if the element is the head or body element.
+              # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
+              uri(base)
+            elsif element == root && base
+              # if the element is the root element of the document, then act as if there is an empty @about present,
+              # and process it according to the rule for @about, above;
+              uri(base)
+            else
+              # otherwise, if parent object is present, new subject is set to the value of parent object.
+              evaluation_context.parent_object
+            end
+          else
+            # Establishing a new subject if no rel/rev [7.5 Step 5]
+            # May not be valid, but can exist
+            new_subject = if attrs[:about]
+              process_uri(element, attrs[:about], evaluation_context, base,
+                          :uri_mappings => uri_mappings,
+                          :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+            elsif attrs[:resource]
+              process_uri(element, attrs[:resource], evaluation_context, base,
+                          :uri_mappings => uri_mappings,
+                          :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+            elsif attrs[:href] || attrs[:src]
+              process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
+            end
+
+            # If no URI is provided by a resource attribute, then the first match from the following rules
+            # will apply:
+            new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+              # From XHTML+RDFa 1.1:
+              # if no URI is provided, then first check to see if the element is the head or body element.
+              # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
+              uri(base)
+            elsif element == root && base
+              # if the element is the root element of the document, then act as if there is an empty @about present,
+              # and process it according to the rule for @about, above;
+              uri(base)
+            elsif attrs[:typeof]
+              RDF::Node.new
+            else
+              # otherwise, if parent object is present, new subject is set to the value of parent object.
+              skip = true unless attrs[:property]
+              evaluation_context.parent_object
+            end
+          end
         end
 
-        # If no URI is provided by a resource attribute, then the first match from the following rules
-        # will apply:
-        #   if @typeof is present, then new subject is set to be a newly created bnode.
-        # otherwise,
-        #   if parent object is present, new subject is set to the value of parent object.
-        # Additionally, if @property is not present then the skip element flag is set to 'true';
-        new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
-          # From XHTML+RDFa 1.1:
-          # if no URI is provided, then first check to see if the element is the head or body element.
-          # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-          uri(base)
-        elsif element == root && base
-          uri(base)
-        elsif typeof
-          RDF::Node.new
-        else
-          # if it's null, it's null and nothing changes
-          skip = true unless property
-          evaluation_context.parent_object
-        end
-        add_debug(element, "[Step 5] new_subject: #{new_subject.to_ntriples rescue 'nil'}, skip = #{skip}")
+        add_debug(element) {
+          "[Step 5] new_subject: #{new_subject.to_ntriples rescue 'nil'}, " +
+          "skip = #{skip}"
+        }
       else
         # [7.5 Step 6]
         # If the current element does contain a @rel or @rev attribute, then the next step is to
         # establish both a value for new subject and a value for current object resource:
-        new_subject = process_uri(element, about, evaluation_context, base,
+        new_subject = process_uri(element, attrs[:about], evaluation_context, base,
                                   :uri_mappings => uri_mappings,
                                   :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
-        new_subject ||= process_uri(element, src, evaluation_context, base,
+        new_subject ||= process_uri(element, attrs[:src], evaluation_context, base,
                                   :uri_mappings => uri_mappings,
                                   :restrictions => [:uri]) if @version == :"rdfa1.0"
       
@@ -696,7 +736,7 @@ module RDF::RDFa
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
           uri(base)
-        elsif element.attributes['typeof']
+        elsif attrs[:typeof]
           RDF::Node.new
         else
           # if it's null, it's null and nothing changes
@@ -705,32 +745,36 @@ module RDF::RDFa
         end
       
         # Then the current object resource is set to the URI obtained from the first match from the following rules:
-        current_object_resource = if resource
-          process_uri(element, resource, evaluation_context, base,
+        current_object_resource = if attrs[:resource]
+          process_uri(element, attrs[:resource], evaluation_context, base,
                       :uri_mappings => uri_mappings,
                       :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
-        elsif href
-          process_uri(element, href, evaluation_context, base,
+        elsif attrs[:href]
+          process_uri(element, attrs[:href], evaluation_context, base,
                       :restrictions => [:uri])
-        elsif src && @version != :"rdfa1.0"
-          process_uri(element, src, evaluation_context, base,
+        elsif attrs[:src] && @version != :"rdfa1.0"
+          process_uri(element, attrs[:src], evaluation_context, base,
                       :restrictions => [:uri])
         end
 
-        add_debug(element, "[Step 6] new_subject: #{new_subject}, current_object_resource = #{current_object_resource.nil? ? 'nil' : current_object_resource}")
+        add_debug(element) {
+          "[Step 6] new_subject: #{new_subject}, " +
+          "current_object_resource = #{current_object_resource.nil? ? 'nil' : current_object_resource} " +
+          ""
+        }
       end
     
       # Process @typeof if there is a subject [Step 7]
-      if new_subject and typeof
+      if new_subject and attrs[:typeof]
         # Typeof is TERMorCURIEorAbsURIs
-        types = process_uris(element, typeof, evaluation_context, base,
+        types = process_uris(element, attrs[:typeof], evaluation_context, base,
                             :uri_mappings => uri_mappings,
                             :term_mappings => term_mappings,
                             :vocab => default_vocabulary,
                             :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
-        add_debug(element, "typeof: #{typeof}")
+        add_debug(element, "[Step 7] typeof: #{attrs[:typeof]}")
         types.each do |one_type|
-          add_triple(element, new_subject, RDF["type"], one_type)
+          add_triple(element, new_subject, RDF.type, one_type)
         end
       end
 
@@ -751,16 +795,17 @@ module RDF::RDFa
       #
       # If the current element has a @inlist attribute, add the property to the
       # list associated with that property, creating a new list if necessary.
-      if new_subject and current_object_resource
+      if new_subject && current_object_resource && (attrs[:rel] || attrs[:rev])
+        add_debug(element) {"[Step 9] rels: #{rels.inspect} revs: #{revs.inspect}"}
         rels.each do |r|
-          if inlist
+          if attrs[:inlist]
             # If the current list mapping does not contain a list associated with this IRI,
             # instantiate a new list
             unless list_mapping[r]
               list_mapping[r] = RDF::List.new
               add_debug(element) {"list(#{r}): create #{list_mapping[r].inspect}"}
             end
-            add_debug(element, "[Step 9] add #{current_object_resource.to_ntriples} to #{r} #{list_mapping[r].inspect}")
+            add_debug(element) {"[Step 9] add #{current_object_resource.to_ntriples} to #{r} #{list_mapping[r].inspect}"}
             list_mapping[r] << current_object_resource
           else
             add_triple(element, new_subject, r, current_object_resource)
@@ -770,7 +815,7 @@ module RDF::RDFa
         revs.each do |r|
           add_triple(element, current_object_resource, r, new_subject)
         end
-      elsif rel || rev
+      elsif attrs[:rel] || attrs[:rev]
         # Incomplete triples and bnode creation [Step 10]
         add_debug(element) {"[Step 10] incompletes: rels: #{rels}, revs: #{revs}"}
         current_object_resource = RDF::Node.new
@@ -780,7 +825,7 @@ module RDF::RDFa
         # lists: Save into list, don't generate triple
 
         rels.each do |r|
-          if inlist
+          if attrs[:inlist]
             # If the current list mapping does not contain a list associated with this IRI,
             # instantiate a new list
             unless list_mapping[r]
@@ -802,8 +847,8 @@ module RDF::RDFa
       #
       # If the current element has a @inlist attribute, add the property to the
       # list associated with that property, creating a new list if necessary.
-      if property
-        properties = process_uris(element, property, evaluation_context, base,
+      if attrs[:property]
+        properties = process_uris(element, attrs[:property], evaluation_context, base,
                                   :uri_mappings => uri_mappings,
                                   :term_mappings => term_mappings,
                                   :vocab => default_vocabulary,
@@ -813,24 +858,23 @@ module RDF::RDFa
           if p.is_a?(RDF::URI)
             false
           else
-            add_debug(element, "[Step 11] predicate #{p.to_ntriples} must be a URI")
+            add_warning(element, "[Step 11] predicate #{p.to_ntriples} must be a URI")
             true
           end
         end
 
-        # the following 3 IF clauses should be mutually exclusive. Written as is to prevent extensive indentation.
-        datatype = process_uri(element, datatype, evaluation_context, base,
+        datatype = process_uri(element, attrs[:datatype], evaluation_context, base,
                               :uri_mappings => uri_mappings,
                               :term_mappings => term_mappings,
                               :vocab => default_vocabulary,
-                              :restrictions => TERMorCURIEorAbsURI.fetch(@version, [])) unless datatype.to_s.empty?
+                              :restrictions => TERMorCURIEorAbsURI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
         begin
-          current_object_literal = if !datatype.to_s.empty? && datatype.to_s != RDF.XMLLiteral.to_s
+          current_object_literal = if datatype && datatype != RDF.XMLLiteral
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
-            RDF::Literal.new(content || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
           elsif @version == :"rdfa1.1"
-            if datatype.to_s == RDF.XMLLiteral.to_s
+            if datatype == RDF.XMLLiteral
               # XML Literal
               add_debug(element) {"[Step 11(1.1)] XML Literal: #{element.inner_html}"}
 
@@ -853,16 +897,42 @@ module RDF::RDFa
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
+            elsif attrs[:datetime]
+              # Lexically scan value and assign appropriate type, otherwise, leave untyped
+              v = element.attribute('datetime').to_s
+              datatype = %w(Date Time DateTime Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
+                v.match(dt::GRAMMAR)
+              end || RDF::Literal
+              add_debug(element) {"[Step 11(1.1)] datetime literal: #{v.class}"}
+              datatype.new(v)
+            elsif attrs[:content]
+              # plain literal
+              add_debug(element, "[Step 11(1.1)] plain literal (content)")
+              RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            elsif attrs[:value]
+              # plain literal
+              add_debug(element, "[Step 11(1.1)] plain literal (value)")
+              RDF::Literal.new(attrs[:value], :validate => validate?, :canonicalize => canonicalize?)
+            elsif (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) && !(attrs[:rel] || attrs[:rev]) && @version != :"rdfa1.0"
+              if attrs[:resource]
+                add_debug(element, "[Step 11(1.1)] IRI literal (resource)")
+                process_uri(element, attrs[:resource], evaluation_context, base,
+                            :uri_mappings => uri_mappings,
+                            :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+              else
+                add_debug(element, "[Step 11(1.1)] IRI literal (href/src/data)")
+                process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
+              end
             else
               # plain literal
-              add_debug(element, "[Step 11(1.1)] plain literal")
-              RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+              add_debug(element, "[Step 11(1.1)] plain literal (inner text)")
+              RDF::Literal.new(element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             end
           else
-            if content || element.text_content? || (element.children.length == 0) || datatype == ""
+            if element.text_content? || (element.children.length == 0) || attrs[:datatype] == ""
               # plain literal
               add_debug(element, "[Step 11 (1.0)] plain literal")
-              RDF::Literal.new(content || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+              RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             elsif !element.text_content? and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
               # XML Literal
               add_debug(element) {"[Step 11 (1.0)] XML Literal: #{element.inner_html}"}
@@ -885,7 +955,7 @@ module RDF::RDFa
         # add each property
         properties.each do |p|
           # Lists: If element has an @inlist attribute, add the value to a list
-          if inlist
+          if attrs[:inlist]
             # If the current list mapping does not contain a list associated with this IRI,
             # instantiate a new list
             unless list_mapping[p]
@@ -900,7 +970,7 @@ module RDF::RDFa
         end
       end
     
-      if not skip and new_subject && !evaluation_context.incomplete_triples.empty?
+      if !skip and new_subject && !evaluation_context.incomplete_triples.empty?
         # Complete the incomplete triples from the evaluation context [Step 12]
         add_debug(element) do
           "[Step 12] complete incomplete triples: " +

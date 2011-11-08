@@ -169,7 +169,24 @@ describe "RDF::RDFa::Reader" do
             html = %(
               <span about="foo" property="dc:title">Title</span>
             )
-            expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF::DC.title, "Title")
+            expected = %q(
+              @prefix dc: <http://purl.org/dc/terms/> .
+
+              <foo> dc:title "Title" .
+            )
+            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+          end
+          
+          it "creates a typed subject with @typeof" do
+            html = %(
+              <span about="foo" property="dc:title" typeof="rdfs:Resource">Title</span>
+            )
+            expected = %q(
+              @prefix dc: <http://purl.org/dc/terms/> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              <foo> a rdfs:Resource; dc:title "Title" .
+            )
             parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
         end
@@ -179,7 +196,10 @@ describe "RDF::RDFa::Reader" do
             html = %(
               <div about="foo"><span resource="bar" rel="rdf:value"/></div>
             )
-            expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar"))
+            expected = %q(
+              @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+              <foo> rdf:value <bar> .
+            )
             parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
 
@@ -362,7 +382,7 @@ describe "RDF::RDFa::Reader" do
           end
         end
 
-        context "lists" do
+        context "@inlist" do
           {
             "empty list" => [
               %q(
@@ -520,34 +540,231 @@ describe "RDF::RDFa::Reader" do
             end
           end
         end
+
+        context "@property" do
+          {
+            "with text content" => [
+              %q(
+                <div about="">
+                  <p property="rdf:value">Foo</p>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "Foo" .
+              )
+            ],
+            "with @content" => [
+              %q(
+                <div about="">
+                  <title property="rdf:value" content="Foo">Bar</title>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "Foo" .
+              )
+            ],
+            "with @href" => [
+              %q(
+                <div about="">
+                  <a property="rdf:value" href="#foo">Bar</a>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value <#foo> .
+              )
+            ],
+            "with @src" => [
+              %q(
+                <div about="">
+                  <image property="rdf:value" src="#foo"/>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value <#foo> .
+              )
+            ],
+            "with @data" => [
+              %q(
+                <div about="">
+                  <object property="rdf:value" data="#foo"/>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value <#foo> .
+              )
+            ],
+            "with @datetime=xsd:date" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="2011-06-28Z">28 June 2011</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "2011-06-28Z"^^<http://www.w3.org/2001/XMLSchema#date> .
+              )
+            ],
+            "with @datetime=xsd:time" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="00:00:00Z">midnight</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
+              )
+            ],
+            "with @datetime=xsd:dateTime" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="2011-06-28T00:00:00Z">28 June 2011 at midnight</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "2011-06-28T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+              )
+            ],
+            "with @datetime=xsd:duration" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="P2011Y06M28DT00H00M00S">2011 years 6 months 28 days</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "P2011Y06M28DT00H00M00S"^^<http://www.w3.org/2001/XMLSchema#duration> .
+              )
+            ],
+            "with @datetime=plain" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="foo">Foo</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "foo" .
+              )
+            ],
+            "with @resource" => [
+              %q(
+                <div about="">
+                  <p property="rdf:value" resource="#foo">Bar</p>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value <#foo> .
+              )
+            ],
+            "with @about" => [
+              %q(
+                <div about="">
+                  <div property="rdf:value" about="#foo"> <p property="rdf:value">Bar</p> </div>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <#foo> rdf:value " Bar ", "Bar" .
+              )
+            ],
+            "@href and @property no-chaining" => [
+              %q(
+                <div about="">
+                  <a property="rdf:value" href="#foo">
+                    <span property="rdf:value">Bar</span>
+                  </a>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value <#foo>, "Bar" .
+              )
+            ],
+            "@property with @href in a list" => [
+              %q(
+                <div about="http://www.example.org">
+                  <a inlist="" property="rdf:value" href="http://www.example.org#foo"></a>
+                  <a inlist="" property="rdf:value" href="http://www.example.org#bar"></a>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                <http://www.example.org> rdf:value ( <http://www.example.org#foo> <http://www.example.org#bar> ).
+              )
+            ],
+            "@property and @rel with @href in a list" => [
+              %q(
+                <div about="http://www.example.org">
+                  <a inlist="" property="rdf:value" href="http://www.example.org#foo"></a>
+                  <a inlist="" rel="rdf:value" href="http://www.example.org#bar"></a>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                <http://www.example.org> rdf:value ( <http://www.example.org#foo> <http://www.example.org#bar> ).
+              )
+            ],
+          }.each do |test, (input, expected)|
+            it test do
+              parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            end
+          end
+        end
       end
 
       context "problematic examples" do
-        it "parses Jeni's Ice Cream example" do
-          html = %q(<root><div vocab="#" typeof="">
-            <p>Flavors in my favorite ice cream:</p>
-            <div rel="flavor">
-              <ul vocab="http://www.w3.org/1999/02/22-rdf-syntax-ns#" typeof="">
-                <li property="first">Lemon sorbet</li>
-                <li rel="rest">
-                  <span typeof="">
-                    <span property="first">Apricot sorbet</span>
-                  <span rel="rest" resource="rdf:nil"></span>
-                </span>
-                </li>
-              </ul>
-            </div>
-          </div></root>)
-          ttl = %q(
-          <> <http://www.w3.org/ns/rdfa#hasVocabulary> <#>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          _:a <#flavor> ("Lemon sorbet" "Apricot sorbet") .
-          )
-          g_ttl = RDF::Graph.new << RDF::Turtle::Reader.new(ttl)
-          parse(html, :validate => false).should be_equivalent_graph(g_ttl, :trace => @debug, :format => :ttl)
+        {
+          "Jen's Ice Cream example" => [
+            %q(<root><div vocab="#" typeof="">
+              <p>Flavors in my favorite ice cream:</p>
+              <div rel="flavor">
+                <ul vocab="http://www.w3.org/1999/02/22-rdf-syntax-ns#" typeof="">
+                  <li property="first">Lemon sorbet</li>
+                  <li rel="rest">
+                    <span typeof="">
+                      <span property="first">Apricot sorbet</span>
+                    <span rel="rest" resource="rdf:nil"></span>
+                  </span>
+                  </li>
+                </ul>
+              </div>
+            </div></root>),
+            %q(
+            <> <http://www.w3.org/ns/rdfa#hasVocabulary> <#>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            _:a <#flavor> ("Lemon sorbet" "Apricot sorbet") .
+            )
+          ],
+        }.each do |title, (html, ttl)|
+          it "parses #{title}" do
+            g_ttl = RDF::Graph.new << RDF::Turtle::Reader.new(ttl)
+            parse(html, :validate => false).should be_equivalent_graph(g_ttl, :trace => @debug, :format => :ttl)
+          end
         end
       end
 
       context :validation do
+        it "needs some examples", :pending => true
       end
     end
   end
