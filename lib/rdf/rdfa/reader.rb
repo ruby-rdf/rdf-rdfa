@@ -537,6 +537,7 @@ module RDF::RDFa
       recurse = true
       skip = false
       new_subject = nil
+      typed_resource = nil
       current_object_resource = nil
       uri_mappings = evaluation_context.uri_mappings.clone
       namespaces = evaluation_context.namespaces.clone
@@ -640,7 +641,7 @@ module RDF::RDFa
           # If no URI is provided by a resource attribute, then the first match from the following rules
           # will apply:
           new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
-            # From XHTML+RDFa:
+            # From XHTML+RDFa 1.1:
             # if no URI is provided, then first check to see if the element is the head or body element.
             # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
             uri(base)
@@ -655,12 +656,18 @@ module RDF::RDFa
             skip = true unless attrs[:property]
             evaluation_context.parent_object
           end
-        else  # rdfa1.1
+
+          # if the @typeof attribute is present, set typed resource to new subject
+          typed_resource = new_subject if attrs[:typeof]
+        else
           # If the current element contains the @property attribute, but does not contain the @content or the @datatype attribute
           if attrs[:property] && !(attrs[:content] || attrs[:datatype])
             new_subject = process_uri(element, attrs[:about], evaluation_context, base,
                         :uri_mappings => uri_mappings,
                         :restrictions => SafeCURIEorCURIEorURI.fetch(@version, [])) if attrs[:about]
+
+            # if the @typeof attribute is present, set typed resource to new subject
+            typed_resource = new_subject if attrs[:typeof]
 
             # If no URI is provided by a resource attribute, then the first match from the following rules
             # will apply:
@@ -677,9 +684,25 @@ module RDF::RDFa
               # otherwise, if parent object is present, new subject is set to the value of parent object.
               evaluation_context.parent_object
             end
+
+            if attrs[:typeof]
+              typed_resource ||= if attrs[:resource]
+                process_uri(element, attrs[:resource], evaluation_context, base,
+                            :uri_mappings => uri_mappings,
+                            :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+              elsif attrs[:href] || attrs[:src]
+                process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
+              else
+                # if none of these are present, the value of typed resource is set to a newly defined bnode.
+                RDF::Node.new
+              end
+              
+              # The value of the current object resource is set to the value of typed resource.
+              current_object_resource = typed_resource
+            end
           else
-            # Establishing a new subject if no rel/rev [7.5 Step 5]
-            # May not be valid, but can exist
+            # otherwise (ie, the @property element is not present)
+
             new_subject = if attrs[:about]
               process_uri(element, attrs[:about], evaluation_context, base,
                           :uri_mappings => uri_mappings,
@@ -707,14 +730,19 @@ module RDF::RDFa
               RDF::Node.new
             else
               # otherwise, if parent object is present, new subject is set to the value of parent object.
+              # Additionally, if @property is not present then the skip element flag is set to 'true'.
               skip = true unless attrs[:property]
               evaluation_context.parent_object
             end
+
+            # if @typeof is present, set the typed resource to the value of new subject</code>
+            typed_resource ||= new_subject if attrs[:typeof]
           end
         end
 
         add_debug(element) {
           "[Step 5] new_subject: #{new_subject.to_ntriples rescue 'nil'}, " +
+          "typed_resource: #{typed_resource.to_ntriples rescue 'nil'}, " +
           "skip = #{skip}"
         }
       else
@@ -728,6 +756,9 @@ module RDF::RDFa
                                   :uri_mappings => uri_mappings,
                                   :restrictions => [:uri]) if @version == :"rdfa1.0"
       
+        # if the @typeof attribute is present, set typed resource to new subject
+        typed_resource = new_subject if attrs[:typeof]
+
         # If no URI is provided then the first match from the following rules will apply
         new_subject ||= if element == root && base
           uri(base)
@@ -736,7 +767,7 @@ module RDF::RDFa
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
           uri(base)
-        elsif attrs[:typeof]
+        elsif attrs[:typeof] && @version == :"rdfa1.0"
           RDF::Node.new
         else
           # if it's null, it's null and nothing changes
@@ -755,17 +786,23 @@ module RDF::RDFa
         elsif attrs[:src] && @version != :"rdfa1.0"
           process_uri(element, attrs[:src], evaluation_context, base,
                       :restrictions => [:uri])
+        elsif attrs[:typeof] && !attrs[:about] && @version != :"rdfa1.0"
+          # otherwise, if @typeof is present and @about is not, use a newly created bnode
+          RDF::Node.new
         end
+
+        # and also set the value typed resource to this bnode
+        typed_resource = current_object_resource if attrs[:typeof] && !attrs[:about] && @version != :"rdfa1.0"
 
         add_debug(element) {
           "[Step 6] new_subject: #{new_subject}, " +
           "current_object_resource = #{current_object_resource.nil? ? 'nil' : current_object_resource} " +
-          ""
+          "typed_resource: #{typed_resource.to_ntriples rescue 'nil'}, "
         }
       end
     
       # Process @typeof if there is a subject [Step 7]
-      if new_subject and attrs[:typeof]
+      if typed_resource
         # Typeof is TERMorCURIEorAbsURIs
         types = process_uris(element, attrs[:typeof], evaluation_context, base,
                             :uri_mappings => uri_mappings,
@@ -774,7 +811,7 @@ module RDF::RDFa
                             :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
         add_debug(element, "[Step 7] typeof: #{attrs[:typeof]}")
         types.each do |one_type|
-          add_triple(element, new_subject, RDF.type, one_type)
+          add_triple(element, typed_resource, RDF["type"], one_type)
         end
       end
 
@@ -869,7 +906,7 @@ module RDF::RDFa
                               :vocab => default_vocabulary,
                               :restrictions => TERMorCURIEorAbsURI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
         begin
-          current_object_literal = if datatype && datatype != RDF.XMLLiteral
+          current_property_value = if datatype && datatype != RDF.XMLLiteral
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
             RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
@@ -923,6 +960,9 @@ module RDF::RDFa
                 add_debug(element, "[Step 11(1.1)] IRI literal (href/src/data)")
                 process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
               end
+            elsif typed_resource && !attrs[:about] && @version != :"rdfa1.0"
+              add_debug(element, "[Step 11(1.1)] @datatype")
+              typed_resource
             else
               # plain literal
               add_debug(element, "[Step 11(1.1)] plain literal (inner text)")
@@ -962,10 +1002,10 @@ module RDF::RDFa
               list_mapping[p] = RDF::List.new
               add_debug(element) {"[Step 11] lists(#{p}): create #{list_mapping[p].inspect}"}
             end
-            add_debug(element)  {"[Step 11] add #{current_object_literal.to_ntriples} to #{p.to_ntriples} #{list_mapping[p].inspect}"}
-            list_mapping[p] << current_object_literal
+            add_debug(element)  {"[Step 11] add #{current_property_value.to_ntriples} to #{p.to_ntriples} #{list_mapping[p].inspect}"}
+            list_mapping[p] << current_property_value
           elsif new_subject
-            add_triple(element, new_subject, p, current_object_literal) 
+            add_triple(element, new_subject, p, current_property_value) 
           end
         end
       end

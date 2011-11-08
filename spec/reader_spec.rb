@@ -80,7 +80,7 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
-  [:nokogiri, :rexml].each do |library|
+  [:nokogiri].each do |library|
     context library.to_s, :library => library do
       next if library == :nokogiri && RUBY_PLATFORM == 'java'
       before(:all) {@library = library}
@@ -199,6 +199,19 @@ describe "RDF::RDFa::Reader" do
             expected = %q(
               @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
               <foo> rdf:value <bar> .
+            )
+            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+          end
+
+          it "creates a type on object with @typeof" do
+            html = %(
+              <div about="foo"><link resource="bar" rel="rdf:value" typeof="rdfs:Resource"/></div>
+            )
+            expected = %q(
+              @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+              <foo> rdf:value <bar> .
+              <bar> a rdfs:Resource .
             )
             parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
@@ -675,6 +688,18 @@ describe "RDF::RDFa::Reader" do
                 <> rdf:value <#foo> .
               )
             ],
+            "with @typeof" => [
+              %q(
+                <div about="">
+                  <div property="rdf:value" typeof="">Bar</div>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value [] .
+              )
+            ],
             "with @about" => [
               %q(
                 <div about="">
@@ -699,6 +724,24 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
                 <> rdf:value <#foo>, "Bar" .
+              )
+            ],
+            "@href, @typeof and @property chaining" => [
+              %q(
+                <div typeof="foaf:Person" about="http://greggkellogg.net/foaf#me">
+                  <p property="foaf:name">Gregg Kellogg</p>
+                  <p property="foaf:knows" typeof="foaf:Person" href="http://manu.sporny.org/#this">
+                    <span property="foaf:name">Manu Sporny</span>
+                  </p>
+                </div>
+              ),
+              %q(
+                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                <http://greggkellogg.net/foaf#me> a foaf:Person;
+                  foaf:name "Gregg Kellogg";
+                  foaf:knows <http://manu.sporny.org/#this> .
+                <http://manu.sporny.org/#this> a foaf:Person;
+                  foaf:name "Manu Sporny" .
               )
             ],
             "@property with @href in a list" => [
@@ -753,6 +796,53 @@ describe "RDF::RDFa::Reader" do
             %q(
             <> <http://www.w3.org/ns/rdfa#hasVocabulary> <#>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             _:a <#flavor> ("Lemon sorbet" "Apricot sorbet") .
+            )
+          ],
+          "schema.org Event with @property" => [
+            %q(
+              <div>
+                <div vocab="http://schema.org/" typeof="Event">
+                  <a property="url" href="nba-miami-philidelphia-game3.html">
+                    <span property="description">
+                      NBA Eastern Conference First Round Playoff Tickets:
+                      Miami Heat at Philadelphia 76ers - Game 3 (Home Game 1)
+                    </span>
+                  </a>
+                </div>
+              </div>
+            ),
+            %q(
+              @prefix schema: <http://schema.org/> .
+              <> <http://www.w3.org/ns/rdfa#hasVocabulary> <http://schema.org/> .
+              [ a schema:Event;
+                schema:url <nba-miami-philidelphia-game3.html>;
+                schema:description """
+                      NBA Eastern Conference First Round Playoff Tickets:
+                      Miami Heat at Philadelphia 76ers - Game 3 (Home Game 1)
+                    """ ] .
+            )
+          ],
+          "schema.org Event with @property and @typeof chain" => [
+            %q(
+              <div>
+                <div vocab="http://schema.org/" typeof="Event">
+                  <div property="offers" typeof="AggregateOffer">
+                    Priced from: <span property="lowPrice">$35</span>
+                    <span property="offerCount">1,938</span> tickets left
+                  </div>
+                </div>
+              </div>
+            ),
+            %q(
+              @prefix schema: <http://schema.org/> .
+              <> <http://www.w3.org/ns/rdfa#hasVocabulary> <http://schema.org/> .
+              [ a schema:Event;
+                schema:offers [
+                  a schema:AggregateOffer;
+                  schema:lowPrice "$35";
+                  schema:offerCount "1,938"
+                ]
+              ] .
             )
           ],
         }.each do |title, (html, ttl)|
