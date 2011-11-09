@@ -81,6 +81,66 @@ defines a playlist with an ordered set of tracks. RDFa adds the @inlist attribut
 
 This basically does the same thing, but places each track in an rdf:List in the defined order.
 
+#### Property relations
+The @property attribute has been updated to allow for creating URI references as well as object literals.
+1. If an element contains @property but no @rel, @datatype or @content and it contains a resource attribute (such as @href, @src, or @resource)
+  1.Generate an IRI object. Furthermore, sub-elements do not chain, i.e., the subject in effect when the @property
+    is processed is also in effect for sub-elements.
+  2. Otherwise, generate a literal as before.
+
+For example:
+
+    <a vocab="http://schema.org" property="url" href="http://example.com">
+      <span property="title">NBA Eastern Conference ...</span>
+    </a>
+
+results in
+
+    <> schema:url <http://example.com>;
+       schema:title "NBA Eastern Conference".
+
+#### Magnetic @typeof
+The @typeof attribute has changed; previously, it always created a new subject, either using a resource from @about, @resource and so forth. This has long been a source of errors for people using RDFa. The new rules cause @typeof to bind to a subject if used with @about, otherwise, to an object, if either used alone, or in combination with some other resource attribute (such as @href, @src or @resource).
+
+For example:
+
+  <div typeof="foaf:Person" about="http://greggkellogg.net/foaf#me">
+    <p property="name">Gregg Kellogg</span>
+    <a rel="knows" typeof="foaf:Person" href="http://manu.sporny.org/#this">
+      <span property="name">Manu Sporny</span>
+    </a>
+  </div>
+
+results in
+
+    <http://greggkellogg.net/foaf#me> a foaf:Person;
+      foaf:name "Gregg Kellogg";
+      foaf:knows <http://manu.sporny.org/#this> .
+    <http://manu.sporny.org/#this> a foaf:Person;
+      foaf:name "Manu Sporny" .
+
+Note that if the explicit @href is not present, i.e.,
+
+    <div typeof="foaf:Person" about="http://greggkellogg.net/foaf#me">
+      <p property="name">Gregg Kellogg</span>
+      <a href="knows" typeof="foaf:Person">
+        <span property="name">Manu Sporny</span>
+      </a>
+    </div>
+
+this results in
+
+    <http://greggkellogg.net/foaf#me> a foaf:Person;
+      foaf:name "Gregg Kellogg";
+      foaf:knows [ 
+            a foaf:Person;
+            foaf:name "Manu Sporny" 
+      ].
+
+
+#### Property chaining
+If used without @rel, but with @typeof and a resource attribute, @property will cause chaining to another object just like @rel. The effect of this and other changes is to allow pretty much all RDFa to be marked up using just @property; @rel/@rev is no longer required. Although, @rel and @rev have useful features that @property does not, so it's worth keeping them in your toolkit.
+
 ## Usage
 
 ### Reading RDF data in the RDFa format
