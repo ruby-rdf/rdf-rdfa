@@ -20,6 +20,10 @@ Install with 'gem install rdf-rdfa'
 RDFa is an evolving standard, undergoing some substantial recent changes partly due to perceived competition
 with Microdata. As a result, the RDF Webapps working group is currently looking at changes in the processing model for RDFa. These changes are now being tracked in {RDF::RDFa::Reader}:
 
+#### RDFa 1.1 Lite
+This version fully supports the limited syntax of [RDFa Lite 1.1][]. This includes the ability to use
+@property exclusively.
+
 #### Remove RDFa Profiles
 RDFa Profiles were a mechanism added to allow groups of terms and prefixes to be defined in an external resource and loaded to affect the processing of an RDFa document. This introduced a problem for some implementations needing to perform a cross-origin GET in order to retrieve the profiles. The working group elected to drop support for user-defined RDFa Profiles (the default profiles defined by RDFa Core and host languages still apply) and replace it with an inference regime using vocabularies. Parsing of @profile has been removed from this version.
 
@@ -83,10 +87,10 @@ This basically does the same thing, but places each track in an rdf:List in the 
 
 #### Property relations
 The @property attribute has been updated to allow for creating URI references as well as object literals.
+
 1. If an element contains @property but no @rel, @datatype or @content and it contains a resource attribute (such as @href, @src, or @resource)
-  1.Generate an IRI object. Furthermore, sub-elements do not chain, i.e., the subject in effect when the @property
-    is processed is also in effect for sub-elements.
-  2. Otherwise, generate a literal as before.
+    1. Generate an IRI object. Furthermore, sub-elements do not chain, i.e., the subject in effect when the @property is processed is also in effect for sub-elements.
+    2. Otherwise, generate a literal as before.
 
 For example:
 
@@ -99,7 +103,7 @@ results in
     <> schema:url <http://example.com>;
        schema:title "NBA Eastern Conference".
 
-#### Magnetic @typeof
+#### Magnetic @about/@typeof
 The @typeof attribute has changed; previously, it always created a new subject, either using a resource from @about, @resource and so forth. This has long been a source of errors for people using RDFa. The new rules cause @typeof to bind to a subject if used with @about, otherwise, to an object, if either used alone, or in combination with some other resource attribute (such as @href, @src or @resource).
 
 For example:
@@ -357,6 +361,7 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
+* [Ruby](http://ruby-lang.org/) (>= 1.9) or (>= 1.8.1 with [Backports][])
 * [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.1)
 * [Haml](https://rubygems.org/gems/haml) (>= 3.0.0)
 * [HTMLEntities](https://rubygems.org/gems/htmlentities) ('>= 4.3.0')
@@ -436,6 +441,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
 [RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/     "RDFa 1.1 Core"
+[RDFa Lite 1.1]:    http://www.w3.org/2010/02/rdfa/drafts/2011/ED-rdfa-lite-20111030/   "RDFa Lite 1.1"
 [XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/   "XHTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
 [RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/frames

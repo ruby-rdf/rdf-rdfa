@@ -1,6 +1,7 @@
 ### 0.3.8
 * Remove hard dependency on Nokogiri. Use it if it is available, otherwise fallback to REXML.
   * JRuby uses REXML due to some implementation issues with the pure-java implementation of Nokogiri.
+* Support for RDF Lite 1.1
 * Add support for @property doing object references if used with @href/@src/@resource (but no @rel)
 * Add support for @property chaining if used with @typeof.
 * Change @typeof behavior to add type to object, not subject, unless used with @about.
