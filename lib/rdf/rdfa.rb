@@ -25,7 +25,6 @@ module RDF
   module RDFa
     require 'rdf/rdfa/format'
     require 'rdf/rdfa/vocab'
-    require 'rdf/rdfa/patches/literal_hacks'
     require 'rdf/rdfa/patches/string_hacks'
     autoload :Expansion,  'rdf/rdfa/expansion'
     autoload :Profile,    'rdf/rdfa/profile'

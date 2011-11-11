@@ -1,6 +1,7 @@
 # coding: utf-8
 $:.unshift "."
 require 'spec_helper'
+require 'nokogiri'
 require 'rdf/spec/reader'
 
 # Some specific issues that fail with jRuby to be resolved
