@@ -1,4 +1,9 @@
-require 'nokogiri' rescue :rexml
+begin
+  raise LoadError, "not with java" if RUBY_PLATFORM == "java"
+  require 'nokogiri'
+rescue LoadError => e
+  :rexml
+end
 require 'rdf/ntriples'
 require 'rdf/xsd'
 
@@ -661,7 +666,7 @@ module RDF::RDFa
           typed_resource = new_subject if attrs[:typeof]
         else
           # If the current element contains the @property attribute, but does not contain the @content or the @datatype attribute
-          if attrs[:property] && !(attrs[:content] || attrs[:datatype])
+          if attrs[:property] && !(attrs[:content] || attrs[:datatype]) && evaluation_context.incomplete_triples.empty?
             new_subject = process_uri(element, attrs[:about], evaluation_context, base,
                         :uri_mappings => uri_mappings,
                         :restrictions => SafeCURIEorCURIEorURI.fetch(@version, [])) if attrs[:about]
@@ -787,12 +792,19 @@ module RDF::RDFa
           process_uri(element, attrs[:src], evaluation_context, base,
                       :restrictions => [:uri])
         elsif attrs[:typeof] && !attrs[:about] && @version != :"rdfa1.0"
-          # otherwise, if @typeof is present and @about is not, use a newly created bnode
+          # otherwise, if @typeof is present and @about is not and the  incomplete triples
+          # within the current context is empty, use a newly created bnode
           RDF::Node.new
         end
 
         # and also set the value typed resource to this bnode
-        typed_resource = current_object_resource if attrs[:typeof] && !attrs[:about] && @version != :"rdfa1.0"
+        if attrs[:typeof]
+          if @version == :"rdfa1.0"
+            typed_resource = new_subject
+          else
+            typed_resource = current_object_resource if !attrs[:about]
+          end
+        end
 
         add_debug(element) {
           "[Step 6] new_subject: #{new_subject}, " +
@@ -950,7 +962,10 @@ module RDF::RDFa
               # plain literal
               add_debug(element, "[Step 11(1.1)] plain literal (value)")
               RDF::Literal.new(attrs[:value], :validate => validate?, :canonicalize => canonicalize?)
-            elsif (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) && !(attrs[:rel] || attrs[:rev]) && @version != :"rdfa1.0"
+            elsif (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) &&
+                 !(attrs[:rel] || attrs[:rev]) &&
+                 evaluation_context.incomplete_triples.empty? &&
+                 @version != :"rdfa1.0"
               if attrs[:resource]
                 add_debug(element, "[Step 11(1.1)] IRI literal (resource)")
                 process_uri(element, attrs[:resource], evaluation_context, base,
@@ -960,8 +975,8 @@ module RDF::RDFa
                 add_debug(element, "[Step 11(1.1)] IRI literal (href/src/data)")
                 process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
               end
-            elsif typed_resource && !attrs[:about] && @version != :"rdfa1.0"
-              add_debug(element, "[Step 11(1.1)] @datatype")
+            elsif typed_resource && !attrs[:about] && evaluation_context.incomplete_triples.empty? && @version != :"rdfa1.0"
+              add_debug(element, "[Step 11(1.1)] typed_resource")
               typed_resource
             else
               # plain literal

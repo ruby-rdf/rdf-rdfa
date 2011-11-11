@@ -80,7 +80,7 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
-  [:nokogiri].each do |library|
+  [:nokogiri, :rexml].each do |library|
     context library.to_s, :library => library do
       next if library == :nokogiri && RUBY_PLATFORM == 'java'
       before(:all) {@library = library}
@@ -766,6 +766,34 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 <http://www.example.org> rdf:value ( <http://www.example.org#foo> <http://www.example.org#bar> ).
+              )
+            ],
+            "@property and @typeof and incomplete triples" => [
+              %q(
+                <div about="http://greggkellogg.net/foaf#me" rel="foaf:knows">
+                  <span property="foaf:name" typeof="foaf:Person">Ivan Herman</span>
+                </div>
+              ),
+              %q(
+                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                <http://greggkellogg.net/foaf#me> foaf:knows [
+                  a foaf:Person;
+                  foaf:name "Ivan Herman"
+                ].
+              )
+            ],
+            "@property, @href and @typeof and incomplete triples" => [
+              %q(
+                <div about="http://greggkellogg.net/foaf#me" rel="foaf:knows">
+                  <a href="http://www.ivan-herman.net/foaf#me" property="foaf:name" typeof="foaf:Person">Ivan Herman</a>
+                </div>
+              ),
+              %q(
+                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                <http://greggkellogg.net/foaf#me> foaf:knows <http://www.ivan-herman.net/foaf#me> .
+                <http://www.ivan-herman.net/foaf#me> a foaf:Person;
+                  foaf:name "Ivan Herman"
+                ].
               )
             ],
           }.each do |test, (input, expected)|
