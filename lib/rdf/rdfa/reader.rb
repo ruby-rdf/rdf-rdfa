@@ -253,6 +253,9 @@ module RDF::RDFa
         self.extend(@implementation)
 
         detect_host_language_version(input, options)
+
+        add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{@library}")
+
         initialize_xml(input, options) rescue raise RDF::ReaderError.new($!.message)
 
         if (root.nil? && validate?)
@@ -263,11 +266,11 @@ module RDF::RDFa
 
         # Section 4.2 RDFa Host Language Conformance
         #
-        # The Host Language may require the automatic inclusion of one or more default RDFa Profiles.
+        # The Host Language may require the automatic inclusion of one or more Initial Contexts
         @host_defaults = {
-          :vocabulary   => nil,
-          :uri_mappings => {},
-          :profiles     => [],
+          :vocabulary       => nil,
+          :uri_mappings     => {},
+          :initial_contexts => [],
         }
 
         if @version == :"rdfa1.0"
@@ -280,12 +283,10 @@ module RDF::RDFa
 
         case @host_language
         when :xml1, :svg
-          @host_defaults[:profiles] = [XML_RDFA_PROFILE]
+          @host_defaults[:initial_contexts] = [XML_RDFA_CONTEXT]
         when :xhtml1, :xhtml5, :html4, :html5
-          @host_defaults[:profiles] = [XML_RDFA_PROFILE, XHTML_RDFA_PROFILE]
+          @host_defaults[:initial_contexts] = [XML_RDFA_CONTEXT, XHTML_RDFA_CONTEXT]
         end
-
-        add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{@library}")
 
         block.call(self) if block_given?
       end
@@ -413,7 +414,7 @@ module RDF::RDFa
       
       if @version != :"rdfa1.0"
         # Process default vocabularies
-        process_profile(root, @host_defaults[:profiles]) do |which, value|
+        load_initial_contexts(@host_defaults[:initial_contexts]) do |which, value|
           add_debug(root) { "parse_whole_document, #{which}: #{value.inspect}"}
           case which
           when :uri_mappings        then evaluation_context.uri_mappings.merge!(value)
@@ -430,24 +431,24 @@ module RDF::RDFa
     # Parse and process URI mappings, Term mappings and a default vocabulary from @profile
     #
     # Yields each mapping
-    def process_profile(element, profiles)
-      profiles.
+    def load_initial_contexts(initial_contexts)
+      initial_contexts.
         map {|uri| uri(uri).normalize}.
         each do |uri|
           # Don't try to open ourselves!
           if base_uri == uri
-            add_debug(element) {"process_profile: skip recursive profile <#{uri}>"}
+            add_debug(root) {"load_initial_contexts: skip recursive profile <#{uri}>"}
             next
           end
 
           old_debug = RDF::RDFa.debug?
           begin
-            add_info(element, "process_profile: load <#{uri}>")
+            add_info(root, "load_initial_contexts: load <#{uri}>")
             RDF::RDFa.debug = false
             profile = Profile.find(uri)
           rescue Exception => e
             RDF::RDFa.debug = old_debug
-            add_error(element, e.message, RDF::RDFA.ProfileReferenceError)
+            add_error(root, e.message, RDF::RDFA.ProfileReferenceError)
             raise # In case we're not in strict mode, we need to be sure processing stops
           ensure
             RDF::RDFa.debug = old_debug
