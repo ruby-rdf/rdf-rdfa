@@ -47,14 +47,14 @@ end
 
 options = {
   :base_uri      => "http://example.com",
-  :host_language => "xhtml1",
+  :host_language => nil,
   :input_format  => :rdfa,
   :output        => STDOUT,
   :output_format => :ntriples,
   :strict        => true,
   :validate      => false,
   :verbose       => false,
-  :version       => "rdfa1.1",
+  :version       => nil,
 }
 input = nil
 
