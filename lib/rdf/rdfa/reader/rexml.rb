@@ -246,21 +246,22 @@ module RDF::RDFa
           when /html 4/i        then :html4
           when /xhtml/i         then :xhtml1
           when /html/i          then :html5
+          else                       :html5
           end
         when "application/xhtml+xml"
           case doc_type_string
           when /html 4/i        then :html4
           when /xhtml/i         then :xhtml1
           when /html/i          then :xhtml5
+          else                       :xhtml5
           end
         else
           case root_element
           when /svg/i           then :svg
-          when /html/i          then :html4
+          when /html/i          then :html5
+          else                       :xml1
           end
         end
-
-        @host_language ||= :xml1
       end
 
       # Accessor methods to mask native elements & attributes
