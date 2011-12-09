@@ -51,8 +51,9 @@ end
 desc "Update RDFa Profiles"
 task :update_profiles do
   {
-    :xhtml => "http://www.w3.org/profile/html-rdfa-1.1",
-    :xml => "http://www.w3.org/profile/rdfa-1.1",
+    :html => "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1.html",
+    :xhtml => "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1.html",
+    :xml => "http://www.w3.org/2011/rdfa-context/rdfa-1.1.html",
   }.each do |v, uri|
     puts "Build #{uri}"
     vocab = File.expand_path(File.join(File.dirname(__FILE__), "lib", "rdf", "rdfa", "profile", "#{v}.rb"))

@@ -284,8 +284,10 @@ module RDF::RDFa
         case @host_language
         when :xml1, :svg
           @host_defaults[:initial_contexts] = [XML_RDFA_CONTEXT]
-        when :xhtml1, :xhtml5, :html4, :html5
+        when :xhtml1
           @host_defaults[:initial_contexts] = [XML_RDFA_CONTEXT, XHTML_RDFA_CONTEXT]
+        when :xhtml5, :html4, :html5
+          @host_defaults[:initial_contexts] = [XML_RDFA_CONTEXT, HTML_RDFA_CONTEXT]
         end
 
         block.call(self) if block_given?
