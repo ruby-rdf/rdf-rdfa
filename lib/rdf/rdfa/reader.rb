@@ -575,6 +575,7 @@ module RDF::RDFa
         rev
         src
         typeof
+        value
         vocab
       ).each do |a|
         attrs[a.to_sym] = element.attributes[a].to_s.strip if element.attributes[a]
@@ -950,6 +951,7 @@ module RDF::RDFa
                 add_error(element, e.message)
               end
             elsif element.name == 'time'
+              # HTML5 support
               # Lexically scan value and assign appropriate type, otherwise, leave untyped
               v = (attrs[:datetime] || element.inner_text).to_s
               datatype = %w(Date Time DateTime Year YearMonth Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
@@ -961,10 +963,11 @@ module RDF::RDFa
               # plain literal
               add_debug(element, "[Step 11(1.1)] plain literal (content)")
               RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
-            elsif attrs[:value]
+            elsif element.name.to_s == 'data' && attrs[:value]
+              # HTML5 support
               # plain literal
               add_debug(element, "[Step 11(1.1)] plain literal (value)")
-              RDF::Literal.new(attrs[:value], :validate => validate?, :canonicalize => canonicalize?)
+              RDF::Literal.new(attrs[:value],  :language => language, :validate => validate?, :canonicalize => canonicalize?)
             elsif (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) &&
                  !(attrs[:rel] || attrs[:rev]) &&
                  evaluation_context.incomplete_triples.empty? &&

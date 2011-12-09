@@ -151,6 +151,12 @@ The `time` element allows the creation of a datatyped-literal based on the lexic
 The `time` element is described in the WHATWG version of the [HTML5 spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-time-element).
 This is related to [RDFa ISSUE-97](http://www.w3.org/2010/02/rdfa/track/issues/97).
 
+#### Support for HTML5 `data` element
+This is an alternate way of adding data using the `@value` property. Similar to `meta`
+
+The `data` element is described in the WHATWG version of the [HTML5 spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-data-element).
+This is related to [RDFa ISSUE-113](http://www.w3.org/2010/02/rdfa/track/issues/113)
+
 ## Usage
 
 ### Reading RDF data in the RDFa format

@@ -568,6 +568,30 @@ describe "RDF::RDFa::Reader" do
                 <> rdf:value "Foo" .
               )
             ],
+            "with @lang" => [
+              %q(
+                <div about="">
+                  <p property="rdf:value" lang="en">Foo</p>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "Foo"@en .
+              )
+            ],
+            "with @xml:lang" => [
+              %q(
+                <div about="">
+                  <p property="rdf:value" xml:lang="en">Foo</p>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "Foo"@en .
+              )
+            ],
             "with @content" => [
               %q(
                 <div about="">
@@ -710,6 +734,30 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
                 <> rdf:value "foo" .
+              )
+            ],
+            "with <data> @value=plain" => [
+              %q(
+                <div about="">
+                  <data property="rdf:value" value="foo">Foo</data>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "foo" .
+              )
+            ],
+            "with <data> @value=plain and @lang=en" => [
+              %q(
+                <div about="">
+                  <data property="rdf:value" value="foo" lang="en">Foo</data>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "foo"@en .
               )
             ],
             "with @resource" => [
