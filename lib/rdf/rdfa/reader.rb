@@ -949,13 +949,13 @@ module RDF::RDFa
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
-            elsif attrs[:datetime]
+            elsif element.name == 'time'
               # Lexically scan value and assign appropriate type, otherwise, leave untyped
-              v = element.attribute('datetime').to_s
-              datatype = %w(Date Time DateTime Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
+              v = (attrs[:datetime] || element.inner_text).to_s
+              datatype = %w(Date Time DateTime Year YearMonth Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
                 v.match(dt::GRAMMAR)
               end || RDF::Literal
-              add_debug(element) {"[Step 11(1.1)] datetime literal: #{v.class}"}
+              add_debug(element) {"[Step 11(1.1)] <time> literal: #{datatype} #{v.inspect}"}
               datatype.new(v)
             elsif attrs[:content]
               # plain literal

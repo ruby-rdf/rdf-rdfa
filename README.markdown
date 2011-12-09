@@ -145,6 +145,12 @@ this results in
 #### Property chaining
 If used without @rel, but with @typeof and a resource attribute, @property will cause chaining to another object just like @rel. The effect of this and other changes is to allow pretty much all RDFa to be marked up using just @property; @rel/@rev is no longer required. Although, @rel and @rev have useful features that @property does not, so it's worth keeping them in your toolkit.
 
+#### Support for HTML5 `time` element
+The `time` element allows the creation of a datatyped-literal based on the lexical scope of either the ``@datetime`` attribute, or the element content. We parse it according to xsd:date, xsd:time, xsd:dateTime, xsd:gYear, xsd:gYearMonth, and xsd:duration. If it matches none of these, a plain literal is emitted.
+
+The `time` element is described in the WHATWG version of the [HTML5 spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-time-element).
+This is related to [RDFa ISSUE-97](http://www.w3.org/2010/02/rdfa/track/issues/97).
+
 ## Usage
 
 ### Reading RDF data in the RDFa format
@@ -399,7 +405,7 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [RDF.rb][RDF.rb]
 * [Distiller](http://rdf.greggkellogg.net/distiller)
 * [Documentation][RDFa doc]
-* [History](file:file.History.html)
+* [History]{file:History.markdown}
 * [RDFa 1.1 Core][RDFa 1.1 Core]
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
 * [RDFa-test-suite](http://rdfa.digitalbazaar.com/test-suite/              "RDFa test suite")
