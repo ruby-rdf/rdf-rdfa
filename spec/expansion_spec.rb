@@ -63,6 +63,7 @@ class ExpansionTester
   def parse(ttl)
     RDF::Graph.new << RDF::Turtle::Reader.new(ttl, :prefixes => {
       :foaf => RDF::FOAF.to_uri,
+      :owl  => RDF::OWL.to_uri,
       :rdf  => RDF.to_uri,
       :rdfa => RDF::RDFA.to_uri,
       :rdfs => RDF::RDFS.to_uri,
@@ -79,7 +80,7 @@ describe RDF::RDFa::Expansion do
     RDF::RDFa::Reader.send(:class_variable_set, :@@vocab_repo, nil)
   end
 
-  describe :rdfs_entailment do
+  describe :owl_entailment do
     {
       "empty"   => {
         :default => %q(),
@@ -89,7 +90,7 @@ describe RDF::RDFa::Expansion do
         :default => %q(:a a rdfs:Class .),
         :result => %q(:a a rdfs:Class .)
       },
-      "rule5"   => {
+      "scm-spo"   => {
         :default => %q(<#me> :name "Gregg Kellogg" .),
         :rules => %q(
           :name rdfs:subPropertyOf foaf:name .
@@ -99,25 +100,7 @@ describe RDF::RDFa::Expansion do
           <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg"; rdfs:label "Gregg Kellogg" .
         )
       },
-      "rule7"   => {
-        :default => %q(<#me> :name "Gregg Kellogg" .),
-        :rules => %q(
-          :name rdfs:subPropertyOf foaf:name .
-        ),
-        :result => %q(
-          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
-        )
-      },
-      "rule9"   => {
-        :default => %q(<#me> a foaf:Person .),
-        :rules => %q(
-          foaf:Person rdfs:subClassOf foaf:Agent .
-        ),
-        :result => %q(
-          <#me> a foaf:Person, foaf:Agent .
-        )
-      },
-      "rule11"   => {
+      "scm-sco"   => {
         :default => %q(<#me> a foaf:Person .),
         :rules => %q(
           foaf:Person rdfs:subClassOf foaf:Agent .
@@ -127,12 +110,66 @@ describe RDF::RDFa::Expansion do
           <#me> a foaf:Person, foaf:Agent, rdfs:Resource .
         )
       },
+      "prp-spo1"   => {
+        :default => %q(<#me> :name "Gregg Kellogg" .),
+        :rules => %q(
+          :name rdfs:subPropertyOf foaf:name .
+        ),
+        :result => %q(
+          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+        )
+      },
+      "prp-eqp1"   => {
+        :default => %q(<#me> :name "Gregg Kellogg" .),
+        :rules => %q(
+          :name owl:equivalentProperty foaf:name .
+        ),
+        :result => %q(
+          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+        )
+      },
+      "prp-eqp2"   => {
+        :default => %q(<#me> foaf:name "Gregg Kellogg" .),
+        :rules => %q(
+          :name owl:equivalentProperty foaf:name .
+        ),
+        :result => %q(
+          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+        )
+      },
+      "cax-sco"   => {
+        :default => %q(<#me> a foaf:Person .),
+        :rules => %q(
+          foaf:Person rdfs:subClassOf foaf:Agent .
+        ),
+        :result => %q(
+          <#me> a foaf:Person, foaf:Agent .
+        )
+      },
+      "cax-eqc1"   => {
+        :default => %q(<#me> a foaf:Person .),
+        :rules => %q(
+          foaf:Person owl:equivalentClass foaf:Agent .
+        ),
+        :result => %q(
+          <#me> a foaf:Person, foaf:Agent .
+        )
+      },
+      "cax-eqc2"   => {
+        :default => %q(<#me> a foaf:Agent .),
+        :rules => %q(
+          foaf:Person owl:equivalentClass foaf:Agent .
+        ),
+        :result => %q(
+          <#me> a foaf:Person, foaf:Agent .
+        )
+      },
     }.each do |test, elements|
       it test do
         mt = ExpansionTester.new(test)
         result = mt.load(elements)
         mt.add_vocabs_to_repo(mt.repo)
-        mt.send(:rdfs_entailment, mt.repo)
+        mt.send(:owl_entailment, mt.repo)
         mt.graph.should be_equivalent_graph(result, mt)
       end
     end
@@ -144,7 +181,7 @@ describe RDF::RDFa::Expansion do
         :default => %q(<document> rdfa:hasVocabulary ex: .),
         :result => %q(<document> rdfa:hasVocabulary ex: .)
       },
-      "rule5"   => {
+      "scm-spo"   => {
         :default => %q(
           <document> rdfa:hasVocabulary ex: .
           <#me> ex:name "Gregg Kellogg" .
@@ -160,7 +197,21 @@ describe RDF::RDFa::Expansion do
             rdfs:label "Gregg Kellogg" .
         )
       },
-      "rule7"   => {
+      "scm-sco"   => {
+        :default => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> a ex:Person .
+        ),
+        "http://example.org/vocab#" => %q(
+          ex:Person rdfs:subClassOf foaf:Person .
+          foaf:Person rdfs:subClassOf foaf:Agent .
+        ),
+        :result => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> a ex:Person, foaf:Person, foaf:Agent .
+        )
+      },
+      "prp-spo1"   => {
         :default => %q(
           <document> rdfa:hasVocabulary ex: .
           <#me> ex:name "Gregg Kellogg" .
@@ -174,7 +225,35 @@ describe RDF::RDFa::Expansion do
             foaf:name "Gregg Kellogg" .
         )
       },
-      "rule9"   => {
+      "prp-eqp1"   => {
+        :default => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> ex:name "Gregg Kellogg" .
+        ),
+        "http://example.org/vocab#" => %q(
+          ex:name owl:equivalentProperty foaf:name .
+        ),
+        :result => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> ex:name "Gregg Kellogg";
+            foaf:name "Gregg Kellogg" .
+        )
+      },
+      "prp-eqp2"   => {
+        :default => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> foaf:name "Gregg Kellogg" .
+        ),
+        "http://example.org/vocab#" => %q(
+          ex:name owl:equivalentProperty foaf:name .
+        ),
+        :result => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> ex:name "Gregg Kellogg";
+            foaf:name "Gregg Kellogg" .
+        )
+      },
+      "cax-sco"   => {
         :default => %q(
           <document> rdfa:hasVocabulary ex: .
           <#me> a ex:Person .
@@ -187,18 +266,30 @@ describe RDF::RDFa::Expansion do
           <#me> a ex:Person, foaf:Person .
         )
       },
-      "rule11"   => {
+      "cax-eqc1"   => {
         :default => %q(
           <document> rdfa:hasVocabulary ex: .
           <#me> a ex:Person .
         ),
         "http://example.org/vocab#" => %q(
-          ex:Person rdfs:subClassOf foaf:Person .
-          foaf:Person rdfs:subClassOf foaf:Agent .
+          ex:Person owl:equivalentClass foaf:Person .
         ),
         :result => %q(
           <document> rdfa:hasVocabulary ex: .
-          <#me> a ex:Person, foaf:Person, foaf:Agent .
+          <#me> a ex:Person, foaf:Person .
+        )
+      },
+      "cax-eqc2"   => {
+        :default => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> a foaf:Person .
+        ),
+        "http://example.org/vocab#" => %q(
+          ex:Person owl:equivalentClass foaf:Person .
+        ),
+        :result => %q(
+          <document> rdfa:hasVocabulary ex: .
+          <#me> a ex:Person, foaf:Person .
         )
       },
     }.each do |test, elements|

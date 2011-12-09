@@ -30,7 +30,11 @@ RDFa Profiles were a mechanism added to allow groups of terms and prefixes to be
 #### Vocabulary Expansion
 One of the issues with vocabularies was that they discourage re-use of existing vocabularies when terms from several vocabularies are used at the same time. As it is common (encouraged) for RDF vocabularies to form sub-class and/or sub-property relationships with well defined vocabularies, the RDFa vocabulary expansion mechanism takes advantage of this.
 
-As an optional part of RDFa processing, an RDFa processor will perform limited [RDFS entailment](http://www.w3.org/TR/rdf-mt/#rules), specifically rules rdfs5, 7, 9 and 11. This causes sub-classes and sub-properties of type and property IRIs to be added to the output graph.
+As an optional part of RDFa processing, an RDFa processor will perform limited
+[OWL 2 RL Profile entailment](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules),
+specifically rules scm-spo, scm-sco, prp-spo1, prp-eqp1, prp-eqp2, cax-sco, cax-eqc1, and
+cax-eqc2. This causes sub-classes and sub-properties of type and property IRIs to be added
+to the output graph.
 
 {RDF::RDFa::Reader} implements this using the `#expand` method, which looks for `rdfa:hasVocabulary` properties within the output graph and performs such expansion. See an example in the usage section.
 

@@ -1,6 +1,6 @@
 module RDF::RDFa
   ##
-  # The Expansion module performs a subset of RDFS entailment rules on the base class,
+  # The Expansion module performs a subset of OWL entailment rules on the base class,
   # which implementes RDF::Readable.
   module Expansion
     ##
@@ -10,29 +10,32 @@ module RDF::RDFa
     ##
     # Perform vocabulary expansion on the resulting default graph.
     #
-    #   Vocabulary expansion relies on a sub-set of RDFS [RDF-SCHEMA] entailment to add triples to the default graph
-    #   based on rules and property/class relationships described in referenced vocabularies.
+    #   Vocabulary expansion relies on a sub-set of OWL [OWL2-PROFILES] entailment to add
+    #   triples to the default graph based on rules and property/class relationships
+    #   described in referenced vocabularies.
     #
     # For all objects that are the target of an rdfa:hasVocabulary property, load the IRI into
     # a repository.
     #
-    # Subsequently, perform RDFS expansion using rules rdfs5, rdfs7, rdfs9, and rdfs11 placing
-    # resulting triples into the default graph. Iterate on this step until no more triples are added.
+    # Subsequently, perform OWL expansion using rules scm-spo, scm-sco, prp-spo1, prp-eqp1,
+    # prp-eqp2, cax-sco, cax-eqc1, and cax-eqc2 placing resulting triples into the default
+    # graph. Iterate on this step until no more triples are added.
     #
     # @example
-    #    rdfs5
-    #    {uuu rdfs:subPropertyOf vvv . vvv rdfs:subPropertyOf xxx} => {uuu rdfs:subPropertyOf xxx}
+    #    scm-spo
+    #    {pq rdfs:subPropertyOf pw . pw rdfs:subPropertyOf p3} => {p1 rdfs:subPropertyOf p3}
     #
-    #    rdfs7
-    #    {aaa rdfs:subPropertyOf bbb . uuu aaa yyy} => {uuu bbb yyy}
+    #    rdprp-spo1fs7
+    #    {p1 rdfs:subPropertyOf p2 . x p1 y} => {x p2 y}
     #
-    #    rdfs9
-    #    {uuu rdfs:subClassOf xxx . vvv rdf:type uuu} => {vvv rdf:type xxx}
+    #    cax-sco
+    #    {c1 rdfs:subClassOf c2 . x rdf:type c1} => {x rdf:type c2}
     #
-    #    rdfs11
-    #    {uuu rdfs:subClassOf vvv . vvv rdfs:subClassOf xxx} => {uuu rdfs:subClassOf xxx}
+    #    scm-sco
+    #    {c1 rdfs:subClassOf c2 . c2 rdfs:subClassOf c3} => {c1 rdfs:subClassOf c3}
     #
     # @return [RDF::Graph]
+    # @see [OWL2 PROFILES](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules)
     def expand
       repo = RDF::Repository.new
       repo << self  # Add default graph
@@ -67,7 +70,7 @@ module RDF::RDFa
       if repo.count == count
         add_debug("expand", "No vocabularies loaded")
       else
-        repo = rdfs_entailment(repo)
+        repo = owl_entailment(repo)
       end
 
       # Return graph with default context
@@ -97,10 +100,10 @@ module RDF::RDFa
 
       ##
       # @example
-      #   r = Rule.new("rdfs5") do
-      #     antecedent :uuu, RDF::RDFS.subPropertyOf, :vvv
-      #     antecedent :vvv, RDF::RDFS.subPropertyOf, :xxx
-      #     consequent :uuu, RDF::RDFS.subPropertyOf, :xxx, "t-box"
+      #   r = Rule.new("scm-spo") do
+      #     antecedent :p1, RDF::RDFS.subPropertyOf, :p2
+      #     antecedent :p2, RDF::RDFS.subPropertyOf, :p3
+      #     consequent :p1, RDF::RDFS.subPropertyOf, :p3, "t-box"
       #   end
       #
       #   r.execute(queryable) {|statement| puts statement.inspect}
@@ -155,33 +158,53 @@ module RDF::RDFa
   private
 
     RULES = [
-      Rule.new("rdfs5") do
-        antecedent :uuu, RDF::RDFS.subPropertyOf, :vvv
-        antecedent :vvv, RDF::RDFS.subPropertyOf, :xxx
-        consequent :uuu, RDF::RDFS.subPropertyOf, :xxx, "t-box"
+      Rule.new("scm-spo") do
+        antecedent :p1, RDF::RDFS.subPropertyOf, :p2
+        antecedent :p2, RDF::RDFS.subPropertyOf, :p3
+        consequent :p1, RDF::RDFS.subPropertyOf, :p3, "t-box"
       end,
-      Rule.new("rdfs7") do
-        antecedent :aaa, RDF::RDFS.subPropertyOf, :bbb
-        antecedent :uuu, :aaa, :yyy
-        consequent :uuu, :bbb, :yyy
+      Rule.new("scm-sco") do
+        antecedent :c1, RDF::RDFS.subClassOf, :c2
+        antecedent :c2, RDF::RDFS.subClassOf, :c3
+        consequent :c1, RDF::RDFS.subClassOf, :c3, "t-box"
       end,
-      Rule.new("rdfs9") do
-        antecedent :uuu, RDF::RDFS.subClassOf, :xxx
-        antecedent :vvv, RDF.type, :uuu
-        consequent :vvv, RDF.type, :xxx
+      Rule.new("prp-spo1") do
+        antecedent :p1, RDF::RDFS.subPropertyOf, :p2
+        antecedent :x, :p1, :y
+        consequent :x, :p2, :y
       end,
-      Rule.new("rdfs11") do
-        antecedent :uuu, RDF::RDFS.subClassOf, :vvv
-        antecedent :vvv, RDF::RDFS.subClassOf, :xxx
-        consequent :uuu, RDF::RDFS.subClassOf, :xxx, "t-box"
-      end
+      Rule.new("prp-eqp1") do
+        antecedent :p1, RDF::OWL.equivalentProperty, :p2
+        antecedent :x, :p1, :y
+        consequent :x, :p2, :y
+      end,
+      Rule.new("prp-eqp2") do
+        antecedent :p1, RDF::OWL.equivalentProperty, :p2
+        antecedent :x, :p2, :y
+        consequent :x, :p1, :y
+      end,
+      Rule.new("cax-sco") do
+        antecedent :c1, RDF::RDFS.subClassOf, :c2
+        antecedent :x, RDF.type, :c1
+        consequent :x, RDF.type, :c2
+      end,
+      Rule.new("cax-eqc1") do
+        antecedent :c1, RDF::OWL.equivalentClass, :c2
+        antecedent :x, RDF.type, :c1
+        consequent :x, RDF.type, :c2
+      end,
+      Rule.new("cax-eqc2") do
+        antecedent :c1, RDF::OWL.equivalentClass, :c2
+        antecedent :x, RDF.type, :c2
+        consequent :x, RDF.type, :c1
+      end,
     ]
 
     ##
-    # Perform RDFS entailment rules on repository
+    # Perform OWL entailment rules on repository
     # @param [RDF::Repository] repo
     # @return [RDF::Repository]
-    def rdfs_entailment(repo)
+    def owl_entailment(repo)
       old_count = 0
 
       while old_count < (count = repo.count)
