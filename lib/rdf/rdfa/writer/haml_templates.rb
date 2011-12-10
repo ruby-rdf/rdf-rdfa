@@ -29,30 +29,17 @@ module RDF::RDFa
       # to a previous subject. If _element_ is :li, the tag will be written
       # with <li> instead of <div>.
       #
-      # Note that @rel and @resource can be used together, or @about and @typeof, but
-      # not both.
-      #
       # Locals: subject, typeof, predicates, rel, element, inlist
       # Yield: predicates.each
       :subject => %q(
         - if element == :li
-          %li{:rel => rel, :resource => resource, :inlist => inlist}
+          %li{:rel => rel, :resource => (about || resource), :inlist => inlist, :typeof => typeof}
             - if typeof
-              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
-            - predicates.each do |predicate|
-              != yield(predicate)
-        - elsif rel && typeof
-          %div{:rel => rel}
-            %div{:about => resource, :typeof => typeof}
               %span.type!= typeof
-              - predicates.each do |predicate|
-                != yield(predicate)
-        - elsif rel
-          %div{:rel => rel, :resource => resource}
             - predicates.each do |predicate|
               != yield(predicate)
         - else
-          %div{:about => about, :typeof => typeof}
+          %div{:rel => rel, :resource => (about || resource), :typeof => typeof}
             - if typeof
               %span.type!= typeof
             - predicates.each do |predicate|
@@ -134,28 +121,9 @@ module RDF::RDFa
       # Locals: about, typeof, predicates, :inlist
       # Yield: predicates.each
       :subject => %q(
-        - if element == :li
-          %li{:rel => rel, :resource => resource, :inlist => inlist}
-            - if typeof
-              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
-            - predicates.each do |predicate|
-              != yield(predicate)
-          %li{:about => resource, :typeof => typeof}
-            - predicates.each do |predicate|
-              != yield(predicate)
-        - elsif rel && typeof
-          %div{:rel => rel, :inlist => inlist}
-            %div{:about => resource, :typeof => typeof}
-              - predicates.each do |predicate|
-                != yield(predicate)
-        - elsif rel
-          %div{:rel => rel, :resource => resource, :inlist => inlist}
-            - predicates.each do |predicate|
-              != yield(predicate)
-        - else
-          %div{:about => about, :typeof => typeof}
-            - predicates.each do |predicate|
-              != yield(predicate)
+        %div{:rel => rel, :resource => (about || resource), :typeof => typeof}
+          - predicates.each do |predicate|
+            != yield(predicate)
       ),
 
       # Output for single-valued properties.
@@ -165,15 +133,18 @@ module RDF::RDFa
       # If nil is returned, render as a leaf
       # Otherwise, render result
       :property_value => %q(
-        %div.property
-          - if get_curie(object) == 'rdf:nil'
-            %span{:rel => get_curie(predicate), :inlist => ''}
-          - elsif object.resource?
-            %span{:resource => get_curie(object), :rel => get_curie(predicate), :inlist => inlist}
-          - elsif object.datatype == RDF.XMLLiteral
-            %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
-          - else
-            %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(object.to_s)
+      - if res = yield(object)
+        != res
+      - elsif get_curie(object) == 'rdf:nil'
+        %span{:rel => get_curie(predicate), :inlist => ''}
+      - elsif object.node?
+        %span{:resource => get_curie(object), :rel => get_curie(predicate), :inlist => inlist}= get_curie(object)
+      - elsif object.uri?
+        %a{:href => object.to_s, :rel => get_curie(predicate), :inlist => inlist}= object.to_s
+      - elsif object.datatype == RDF.XMLLiteral
+        %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
+      - else
+        %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
       )
     }
 
@@ -218,26 +189,14 @@ module RDF::RDFa
       # Yield: predicates.each
       :subject => %q(
         - if element == :li
-          %li{:rel => rel, :resource => resource, :inlist => inlist}
+          %li{:rel => rel, :resource => (about || resource), :inlist => inlist, :typeof => typeof}
             - if typeof
-              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
-            %table.properties
-              - predicates.each do |predicate|
-                != yield(predicate)
-        - elsif rel && typeof
-          %td{:rel => rel, :inlist => inlist}
-            %div{:about => resource, :typeof => typeof}
               %span.type!= typeof
-              %table.properties
-                - predicates.each do |predicate|
-                  != yield(predicate)
-        - elsif rel
-          %td{:rel => rel, :resource => resource, :inlist => inlist}
             %table.properties
               - predicates.each do |predicate|
                 != yield(predicate)
         - else
-          %div{:about => about, :typeof => typeof}
+          %td{:rel => rel, :resource => (about || resource), :typeof => typeof, :inlist => inlist}
             - if typeof
               %span.type!= typeof
             %table.properties
@@ -262,10 +221,10 @@ module RDF::RDFa
             - elsif get_curie(object) == 'rdf:nil'
               %td{:rel => get_curie(predicate), :inlist => ''}= "Empty"
             - elsif object.node?
-              %td{:resource => get_curie(object), :rel => get_curie(predicate), :inlist => inlist}= get_curie(object)
+              %td{:property => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
             - elsif object.uri?
               %td
-                %a{:href => object.to_s, :rel => get_curie(predicate), :inlist => inlist}= object.to_s
+                %a{:property => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
             - elsif object.datatype == RDF.XMLLiteral
               %td{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
             - else
@@ -285,10 +244,10 @@ module RDF::RDFa
                 - if res = yield(object)
                   != res
                 - elsif object.node?
-                  %li{:rel => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
+                  %li{:property => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
                 - elsif object.uri?
                   %li
-                    %a{:rel => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
+                    %a{:property => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
                 - elsif object.datatype == RDF.XMLLiteral
                   %li{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_curie(object.datatype), :inlist => inlist}<!= get_value(object)
                 - else

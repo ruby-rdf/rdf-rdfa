@@ -65,7 +65,7 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
+        "/xhtml:html/xhtml:body/xhtml:div/@resource" => "ex:a",
         "//xhtml:div[@class='property']/xhtml:span[@property]/@property" => "ex:b",
         "//xhtml:div[@class='property']/xhtml:span[@property]/text()" => "foo",
       }.each do |path, value|
@@ -83,7 +83,7 @@ describe RDF::RDFa::Writer do
 
       {
         "/xhtml:html/xhtml:head/xhtml:title/text()" => "foo",
-        "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
+        "/xhtml:html/xhtml:body/xhtml:div/@resource" => "ex:a",
         "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/@property" => "dc:title",
         "/xhtml:html/xhtml:body/xhtml:div/xhtml:h1/text()" => "foo",
       }.each do |path, value|
@@ -101,7 +101,7 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
+          "/xhtml:html/xhtml:body/xhtml:div/@resource" => "ex:a",
           "/xhtml:html/xhtml:body/xhtml:div/@typeof" => "ex:Type",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
@@ -118,7 +118,7 @@ describe RDF::RDFa::Writer do
         end
 
         {
-          "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
+          "/xhtml:html/xhtml:body/xhtml:div/@resource" => "ex:a",
           "/xhtml:html/xhtml:body/xhtml:div/@typeof" => "ex:t1 ex:t2",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
@@ -326,7 +326,7 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "//xhtml:div/@about" => "ex:a",
+        "//xhtml:div/@resource" => "ex:a",
         "//xhtml:a/@rel" => "ex:b",
         "//xhtml:a/@href" => EX.c.to_s,
       }.each do |path, value|
@@ -344,7 +344,7 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "//xhtml:div/@about" => "ex:a",
+        "//xhtml:div/@resource" => "ex:a",
         "//xhtml:ul/xhtml:li[1]/xhtml:a[@rel='ex:b']/@href" => EX.c.to_s,
         "//xhtml:ul/xhtml:li[2]/xhtml:a[@rel='ex:b']/@href" => EX.d.to_s,
       }.each do |path, value|
@@ -463,8 +463,8 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "/xhtml:html/xhtml:body/xhtml:div/@about" => "ex:a",
-        "//xhtml:div[@about='ex:a']/xhtml:div[@class='property']/xhtml:div[@rel]/@rel" => "ex:b",
+        "/xhtml:html/xhtml:body/xhtml:div/@resource" => "ex:a",
+        "//xhtml:div[@resource='ex:a']/xhtml:div[@class='property']/xhtml:div[@rel]/@rel" => "ex:b",
         "//xhtml:div[@rel]/@resource" => "ex:c",
         "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@href" => EX.e.to_s,
         "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@rel" => "ex:d",
