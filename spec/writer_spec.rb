@@ -482,11 +482,11 @@ describe RDF::RDFa::Writer do
       # Generate with each template set
       RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
         context "Using #{name} template" do
-          Fixtures::TestCase.for_specific("xhtml1", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
+          Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
             specify "test #{t.name}: #{t.title}" do
               begin
-                input = t.input("xhtml1", "rdfa1.1")
-                @graph = RDF::Graph.load(t.input("xhtml1", "rdfa1.1"))
+                input = t.input("html5", "rdfa1.1")
+                @graph = RDF::Graph.load(t.input("html5", "rdfa1.1"))
                 result = serialize(:haml => template, :haml_options => {:ugly => false})
                 graph2 = parse(result, :format => :rdfa)
                 # Need to put this in to avoid problems with added markup

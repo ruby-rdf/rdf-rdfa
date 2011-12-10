@@ -450,7 +450,7 @@ module RDF::RDFa
       # Load initial contexts
       # Add terms and prefixes to local store for converting URIs
       # Keep track of vocabulary from left-most profile
-      [XML_RDFA_CONTEXT, XHTML_RDFA_CONTEXT].each do |uri|
+      [XML_RDFA_CONTEXT, HTML_RDFA_CONTEXT].each do |uri|
         prof = Profile.find(uri)
         prof.prefixes.each_pair do |k, v|
           @uri_to_prefix[v] = k
