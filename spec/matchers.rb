@@ -131,7 +131,7 @@ RSpec::Matchers.define :pass_query do |expected, info|
       "Query returned true (expected #{@info.expectedResults})"
     end +
     "\n#{@expected}" +
-    "\nResults:\n#{@actual.dump(:ntriples)}" +
+    "\nResults:\n#{@actual.dump(:ttl, :standard_prefixes => true)}" +
     "\nDebug:\n#{@info.trace}"
   end  
 end

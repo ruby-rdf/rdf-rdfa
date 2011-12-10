@@ -32,9 +32,9 @@ module RDF
     autoload :Writer,     'rdf/rdfa/writer'
     autoload :VERSION,    'rdf/rdfa/version'
     
-    HTML_RDFA_CONTEXT   = "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1.html"
-    XHTML_RDFA_CONTEXT  = "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1.html"
-    XML_RDFA_CONTEXT    = "http://www.w3.org/2011/rdfa-context/rdfa-1.1.html"
+    HTML_RDFA_CONTEXT   = "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1"
+    XHTML_RDFA_CONTEXT  = "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1"
+    XML_RDFA_CONTEXT    = "http://www.w3.org/2011/rdfa-context/rdfa-1.1"
     
     def self.debug?; @debug; end
     def self.debug=(value); @debug = value; end

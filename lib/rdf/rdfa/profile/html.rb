@@ -3,8 +3,8 @@
 
 class RDF::RDFa::Profile
   def self.find_with_html_rdfa_1_1_html(uri)
-    if uri.to_s == "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1.html"
-      @_html_rdfa_1_1_html_prof ||= RDF::RDFa::Profile.new(RDF::URI("http://www.w3.org/2011/rdfa-context/html-rdfa-1.1.html"), {
+    if uri.to_s == "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1"
+      @_html_rdfa_1_1_html_prof ||= RDF::RDFa::Profile.new(RDF::URI("http://www.w3.org/2011/rdfa-context/html-rdfa-1.1"), {
       })
     else
       find_without_html_rdfa_1_1_html(uri)

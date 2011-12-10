@@ -3,8 +3,8 @@
 
 class RDF::RDFa::Profile
   def self.find_with_rdfa_1_1_html(uri)
-    if uri.to_s == "http://www.w3.org/2011/rdfa-context/rdfa-1.1.html"
-      @_rdfa_1_1_html_prof ||= RDF::RDFa::Profile.new(RDF::URI("http://www.w3.org/2011/rdfa-context/rdfa-1.1.html"), {
+    if uri.to_s == "http://www.w3.org/2011/rdfa-context/rdfa-1.1"
+      @_rdfa_1_1_html_prof ||= RDF::RDFa::Profile.new(RDF::URI("http://www.w3.org/2011/rdfa-context/rdfa-1.1"), {
         :prefixes => {
           :cc     => "http://creativecommons.org/ns#",
           :ctag   => "http://commontag.org/ns#",

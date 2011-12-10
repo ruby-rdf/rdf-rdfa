@@ -3,8 +3,8 @@
 
 class RDF::RDFa::Profile
   def self.find_with_xhtml_rdfa_1_1_html(uri)
-    if uri.to_s == "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1.html"
-      @_xhtml_rdfa_1_1_html_prof ||= RDF::RDFa::Profile.new(RDF::URI("http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1.html"), {
+    if uri.to_s == "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1"
+      @_xhtml_rdfa_1_1_html_prof ||= RDF::RDFa::Profile.new(RDF::URI("http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1"), {
         :terms => {
           :alternate  => "http://www.w3.org/1999/xhtml/vocab#alternate",
           :appendix   => "http://www.w3.org/1999/xhtml/vocab#appendix",
@@ -30,7 +30,7 @@ class RDF::RDFa::Profile
           :stylesheet => "http://www.w3.org/1999/xhtml/vocab#stylesheet",
           :subsection => "http://www.w3.org/1999/xhtml/vocab#subsection",
           :top        => "http://www.w3.org/1999/xhtml/vocab#top",
-          :up         => "http://www.w3.org/1999/xhtml/vocab#subsection",
+          :up         => "http://www.w3.org/1999/xhtml/vocab#up",
         },
       })
     else
