@@ -393,6 +393,50 @@ describe "RDF::RDFa::Reader" do
             )
             parse(@sampledoc).should pass_query(query, @debug)
           end
+          
+          context "with terms" do
+            [
+              %q(term),
+              %q(A/B),
+              %q(a09b),
+              %q(a_b),
+              %q(a.b),
+              #%q(\u002e_escaped_unicode),
+            ].each do |term|
+              it "accepts #{term.inspect}" do
+                input = %(
+                  <span vocab="http://example.com/" property="#{term}">Foo</span>
+                )
+                query = %(
+                  ASK WHERE { <> <http://example.com/#{term}> "Foo" }
+                )
+                parse(input).should pass_query(query, @debug)
+              end
+            end
+
+            [
+              %q(prefix:suffix),
+              %q(a b),
+              %q(/path),
+              %q(1leading_numeric),
+              %q(_leading_underscore),
+              %q(\u0301foo),
+            ].each do |term|
+              it "rejects #{term.inspect}" do
+                input = %(
+                  <span vocab="http://example.com/" property="#{term}">Foo</span>
+                )
+                query = %(
+                  ASK WHERE { <> <http://example.com/#{term}> "Foo" }
+                )
+                begin
+                  parse(input).should_not pass_query(query, @debug)
+                rescue
+                  # It's okay for SPARQL to throw an error
+                end
+              end
+            end
+          end
         end
 
         context "@inlist" do

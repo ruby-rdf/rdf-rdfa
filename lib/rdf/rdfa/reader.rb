@@ -44,19 +44,40 @@ module RDF::RDFa
       :"rdfa1.1" => [:term, :curie, :absuri],
     }
 
+    # This expression matches an NCName as defined in
+    # [XML-NAMES](http://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName)
+    #
+    # @see http://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName
     NC_REGEXP = Regexp.new(
       %{^
         (?!\\\\u0301)             # &#x301; is a non-spacing acute accent.
                                   # It is legal within an XML Name, but not as the first character.
         (  [a-zA-Z_]
-         | \\\\u[0-9a-fA-F]
+         | \\\\u[0-9a-fA-F]{4}
+        )
+        (  [0-9a-zA-Z_\.-/]
+         | \\\\u([0-9a-fA-F]{4})
+        )*
+      $},
+      Regexp::EXTENDED)
+
+    # This expression matches an term as defined in
+    # [RDFA-CORE](http://www.w3.org/TR/2011/WD-rdfa-core-20111215/#s_terms)
+    #
+    # @see http://www.w3.org/TR/2011/WD-rdfa-core-20111215/#s_terms
+    TERM_REGEXP = Regexp.new(
+      %{^
+        (?!\\\\u0301)             # &#x301; is a non-spacing acute accent.
+                                  # It is legal within an XML Name, but not as the first character.
+        (  [a-zA-Z_]
+         | \\\\u[0-9a-fA-F]{4}
         )
         (  [0-9a-zA-Z_\.-]
          | \\\\u([0-9a-fA-F]{4})
         )*
       $},
       Regexp::EXTENDED)
-  
+
     # Host language
     # @attr [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg]
     attr_reader :host_language
