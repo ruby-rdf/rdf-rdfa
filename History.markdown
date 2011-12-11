@@ -1,3 +1,21 @@
+### 0.3.9
+* Updated to latest working drafts:
+  * [RDFa 1.1 Core](http://www.w3.org/TR/2011/WD-rdfa-core-20110331/)
+  * [RDFa Lite 1.1](http://www.w3.org/2010/02/rdfa/drafts/2011/ED-rdfa-lite-20111030/)
+  * [XHTML+RDFa 1.1](http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/)
+  * [HTML+RDFa 1.1](http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/)
+* In reader:
+  * Don't default xhtml1 and rdfa1.1 in parser; depend on host_detect.
+  * Use separate context documents for XML, XHTML and HTML.
+  * Remove Facet gem, which was causing problems with Active Record.
+  * Added full support for HTML5 <time> element.
+  * Added support for HTML5 <data> element with @value attribute to create a plain literal with possible language.
+  * Change vocabulary expansion rules to use OWL 2 RL entailment.
+  * Terms can now include a '/', to allow for use with @vocab where the class/property is a relative IRI.
+* In writer:
+  * Don't serialize using XHTML initial context, as it is not used universally.
+  * Simplify Haml templates using latest RDFa attribute semantics
+
 ### 0.3.8
 * Remove hard dependency on Nokogiri. Use it if it is available, otherwise fallback to REXML.
   * JRuby uses REXML due to some implementation issues with the pure-java implementation of Nokogiri.
