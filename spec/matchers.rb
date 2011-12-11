@@ -68,7 +68,7 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     @info.format ||= :ntriples
     @expected = normalize(expected)
     @actual = normalize(actual)
-    @actual.isomorphic_with?(@expected)
+    @actual.isomorphic_with?(@expected) rescue false
   end
   
   failure_message_for_should do |actual|

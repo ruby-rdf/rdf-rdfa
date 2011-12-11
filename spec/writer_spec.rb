@@ -186,7 +186,7 @@ describe RDF::RDFa::Writer do
 
         {
           "/xhtml:html/xhtml:body/xhtml:div/xhtml:div/xhtml:ul/xhtml:li[@property='rdf:value']/text()" => "foo",
-          "/xhtml:html/xhtml:body/xhtml:div/xhtml:div/xhtml:ul/xhtml:li/xhtml:a[@rel='rdf:value']/@href" => EX.b.to_s,
+          "/xhtml:html/xhtml:body/xhtml:div/xhtml:div/xhtml:ul/xhtml:li/xhtml:a[@property='rdf:value']/@href" => EX.b.to_s,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             subject.should have_xpath(path, value, @debug)
@@ -327,7 +327,7 @@ describe RDF::RDFa::Writer do
 
       {
         "//xhtml:div/@resource" => "ex:a",
-        "//xhtml:a/@rel" => "ex:b",
+        "//xhtml:a/@property" => "ex:b",
         "//xhtml:a/@href" => EX.c.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
@@ -345,8 +345,8 @@ describe RDF::RDFa::Writer do
 
       {
         "//xhtml:div/@resource" => "ex:a",
-        "//xhtml:ul/xhtml:li[1]/xhtml:a[@rel='ex:b']/@href" => EX.c.to_s,
-        "//xhtml:ul/xhtml:li[2]/xhtml:a[@rel='ex:b']/@href" => EX.d.to_s,
+        "//xhtml:ul/xhtml:li[1]/xhtml:a[@property='ex:b']/@href" => EX.c.to_s,
+        "//xhtml:ul/xhtml:li[2]/xhtml:a[@property='ex:b']/@href" => EX.d.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value, @debug)
@@ -388,7 +388,7 @@ describe RDF::RDFa::Writer do
             <> rdf:value (<foo>) .
           ),
           {
-            "//xhtml:div/xhtml:a[@inlist]/@rel" => 'rdf:value',
+            "//xhtml:div/xhtml:a[@inlist]/@property" => 'rdf:value',
             "//xhtml:div/xhtml:a[@inlist]/@href" => 'foo',
           }
         ],
@@ -402,7 +402,7 @@ describe RDF::RDFa::Writer do
           {
             "//xhtml:ul/xhtml:li[1][@inlist]/@property" => 'rdf:value',
             "//xhtml:ul/xhtml:li[1][@inlist]/text()" => 'Foo',
-            "//xhtml:ul/xhtml:li[2]/xhtml:a[@inlist]/@rel" => 'rdf:value',
+            "//xhtml:ul/xhtml:li[2]/xhtml:a[@inlist]/@property" => 'rdf:value',
             "//xhtml:ul/xhtml:li[2]/xhtml:a[@inlist]/@href" => 'foo',
           }
         ],
@@ -427,8 +427,8 @@ describe RDF::RDFa::Writer do
             <> rdf:value (<foo> <bar>) .
           ),
           {
-            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[1]/xhtml:a[@inlist][@rel='rdf:value']/@href" => 'foo',
-            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[2]/xhtml:a[@inlist][@rel='rdf:value']/@href" => 'bar',
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[1]/xhtml:a[@inlist][@property='rdf:value']/@href" => 'foo',
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[2]/xhtml:a[@inlist][@property='rdf:value']/@href" => 'bar',
           }
         ],
         "multiple collections" => [
@@ -467,7 +467,7 @@ describe RDF::RDFa::Writer do
         "//xhtml:div[@resource='ex:a']/xhtml:div[@class='property']/xhtml:div[@rel]/@rel" => "ex:b",
         "//xhtml:div[@rel]/@resource" => "ex:c",
         "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@href" => EX.e.to_s,
-        "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@rel" => "ex:d",
+        "//xhtml:div[@rel]/xhtml:div[@class='property']/xhtml:a/@property" => "ex:d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           subject.should have_xpath(path, value, @debug)

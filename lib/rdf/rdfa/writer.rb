@@ -52,16 +52,16 @@ module RDF::RDFa
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Writer < RDF::Writer
     format RDF::RDFa::Format
-    
+
     # Defines rdf:type of subjects to be emitted at the beginning of the document.
     # @return [Array<URI>]
     attr :top_classes
-    
+
     # Defines order of predicates to to emit at begninning of a resource description. Defaults to
     # [rdf:type, rdfs:label, dc:title]
     # @return [Array<URI>]
     attr :predicate_order
-    
+
     # Defines order of predicates to use in heading.
     # @return [Array<URI>]
     attr :heading_predicates
@@ -75,7 +75,7 @@ module RDF::RDFa
 
     # @return [RDF::URI] Base URI used for relativizing URIs
     attr_accessor :base_uri
-    
+
     ##
     # Initializes the RDFa writer instance.
     #
@@ -177,7 +177,7 @@ module RDF::RDFa
       add_debug {"\nserialize: prefixes: #{prefix.inspect}"}
 
       subjects = order_subjects
-      
+
       # Take title from first subject having a heading predicate
       doc_title = nil
       titles = {}
@@ -221,7 +221,7 @@ module RDF::RDFa
     #
     # @param [Array<RDF::Resource>] subjects
     #   Ordered list of subjects. Template must yield to each subject, which returns
-    #   the serialization of that subject (@see subject_template)
+    #   the serialization of that subject (@see #subject_template)
     # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
     # @option options [RDF::URI] base (nil)
     #   Base URI added to document, used for shortening URIs within the document.
@@ -251,38 +251,29 @@ module RDF::RDFa
         yield(subject) if block_given?
       end
     end
-    
+
     # Render a subject using haml_template[:subject].
     #
     # The _subject_ template may be called either as a top-level element, or recursively under another element
     # if the _rel_ local is not nil.
     #
-    # Yields each predicate/property to be rendered separately (@see render_property_value and
-    # render_property_values).
+    # Yields each predicate/property to be rendered separately (@see #render_property_value and
+    # {#render_property_values}).
     #
     # The default Haml template is:
     #     - if element == :li
-    #       %li{:about => resource, :typeof => typeof}
+    #       %li{:rel => rel, :resource => (about || resource), :typeof => typeof, :inlist => inlist}
     #         - if typeof
     #           %span.type!= typeof
-    #         - predicates.each do |predicate|
-    #           != yield(predicate)
-    #     - elsif rel && typeof
-    #       %div{:rel => rel}
-    #         %div{:about => about, :typeof => typeof}
-    #           %span.type!= typeof
-    #           - predicates.each do |predicate|
-    #             != yield(predicate)
-    #     - elsif rel
-    #       %div{:rel => rel, :resource => resource}
     #         - predicates.each do |predicate|
     #           != yield(predicate)
     #     - else
-    #       %div{:about => about, :typeof => typeof}
+    #       %div{:rel => rel, :resource => (about || resource), :typeof => typeof, :inlist => inlist}
     #         - if typeof
     #           %span.type!= typeof
     #         - predicates.each do |predicate|
     #           != yield(predicate)
+    #
     #
     # @param [Array<RDF::Resource>] subject
     #   Subject to render
@@ -328,7 +319,7 @@ module RDF::RDFa
         yield(predicate) if block_given?
       end
     end
-    
+
     # Render a single- or multi-valued predicate using haml_template[:property_value] or haml_template[:property_values].
     # Yields each object for optional rendering. The block should only
     # render for recursive subject definitions (i.e., where the object
@@ -346,9 +337,9 @@ module RDF::RDFa
     #         - elsif get_curie(object) == 'rdf:nil'
     #           %span{:rel => get_curie(predicate), :inlist => ''}
     #         - elsif object.node?
-    #           %span{:resource => get_curie(object), :rel => get_curie(predicate), :inlist => inlist}= get_curie(object)
+    #           %span{:property => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
     #         - elsif object.uri?
-    #           %a{:href => object.to_s, :rel => get_curie(predicate), :inlist => inlist}= object.to_s
+    #           %a{:property => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
     #         - elsif object.datatype == RDF.XMLLiteral
     #           %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
     #         - else
@@ -364,10 +355,10 @@ module RDF::RDFa
     #           - if res = yield(object)
     #             != res
     #           - elsif object.node?
-    #             %li{:rel => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
+    #             %li{:property => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
     #           - elsif object.uri?
     #             %li
-    #               %a{:rel => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
+    #               %a{:property => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
     #           - elsif object.datatype == RDF.XMLLiteral
     #             %li{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_curie(object.datatype), :inlist => inlist}<!= get_value(object)
     #           - else
@@ -397,7 +388,7 @@ module RDF::RDFa
       add_debug {"render_property(#{predicate}): #{objects.inspect}"}
       # If there are multiple objects, and no :property_values is defined, call recursively with
       # each object
-      
+
       template = options[:haml]
       template ||= objects.length > 1 ? haml_template[:property_values] : haml_template[:property_value]
 
@@ -411,7 +402,7 @@ module RDF::RDFa
           # Render each list as multiple properties and set :inlist to true
           list = RDF::List.new(object, @graph)
           list.each_statement {|st| subject_done(st.subject)}
-          
+
           add_debug {"list: #{list.inspect} #{list.to_a}"}
           render_property(predicate, list.to_a, options.merge(:inlist => ""), &block)
         end.join(" ")
@@ -443,7 +434,7 @@ module RDF::RDFa
         end
       end
     end
-    
+
     # Perform any preprocessing of statements required
     # @return [ignored]
     def preprocess
@@ -455,24 +446,24 @@ module RDF::RDFa
         prof.prefixes.each_pair do |k, v|
           @uri_to_prefix[v] = k
         end
-        
+
         prof.terms.each_pair do |k, v|
           @uri_to_term_or_curie[v] = k
         end
-        
+
         @vocabulary = prof.vocabulary.to_s if prof.vocabulary
       end
-      
+
       # Load defined prefixes
       (@options[:prefixes] || {}).each_pair do |k, v|
         @uri_to_prefix[v.to_s] = k
       end
       @options[:prefixes] = {}  # Will define actual used when matched
-      
+
       # Process each statement to establish CURIEs and Terms
       @graph.each {|statement| preprocess_statement(statement)}
     end
-    
+
     # Order subjects for output. Override this to output subjects in another order.
     #
     # Uses #top_classes and #base_uri.
@@ -480,13 +471,13 @@ module RDF::RDFa
     def order_subjects
       seen = {}
       subjects = []
-      
+
       # Start with base_uri
       if base_uri && @subjects.keys.include?(base_uri)
         subjects << base_uri
         seen[base_uri] = true
       end
-      
+
       # Add distinguished classes
       top_classes.
       select {|s| !seen.include?(s)}.
@@ -497,18 +488,18 @@ module RDF::RDFa
           seen[subject] = true
         end
       end
-      
+
       # Sort subjects by resources over nodes, ref_counts and the subject URI itself
       recursable = @subjects.keys.
         select {|s| !seen.include?(s)}.
         map {|r| [r.is_a?(RDF::Node) ? 1 : 0, ref_count(r), r]}.
         sort
-      
+
       add_debug {"order_subjects: #{recursable.inspect}"}
 
       subjects += recursable.map{|r| r.last}
     end
-    
+
     # Take a hash from predicate uris to lists of values.
     # Sort the lists of values.  Return a sorted list of properties.
     #
@@ -517,17 +508,17 @@ module RDF::RDFa
     def order_properties(properties)
       # Make sorted list of properties
       prop_list = []
-      
+
       predicate_order.each do |prop|
         next unless properties[prop.to_s]
         prop_list << prop.to_s
       end
-      
+
       properties.keys.sort.each do |prop|
         next if prop_list.include?(prop.to_s)
         prop_list << prop.to_s
       end
-      
+
       add_debug {"order_properties: #{prop_list.join(', ')}"}
       prop_list
     end
@@ -546,7 +537,7 @@ module RDF::RDFa
       get_curie(statement.object)
       get_curie(statement.object.datatype) if statement.object.literal? && statement.object.has_datatype?
     end
-    
+
     # Reset parser to run again
     def reset
       @depth = 0
@@ -580,16 +571,16 @@ module RDF::RDFa
     # @return [Nokogiri::XML::Element, {Namespace}]
     def subject(subject, options = {})
       return if is_done?(subject)
-      
+
       subject_done(subject)
-      
+
       properties = {}
       @graph.query(:subject => subject) do |st|
         properties[st.predicate.to_s] ||= []
         properties[st.predicate.to_s] << st.object
       end
       prop_list = order_properties(properties)
-      
+
       # Find appropriate template
       curie ||= case
       when subject.node?
@@ -604,7 +595,7 @@ module RDF::RDFa
 
       typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
-      
+
       # Nodes without a curie need a blank @typeof to generate a subject
       typeof ||= "" unless curie
       prop_list -= [RDF.type.to_s]
@@ -627,7 +618,7 @@ module RDF::RDFa
         end
       end
     end
-    
+
     # Write a predicate with one or more values.
     #
     # Values may be a combination of Literal and Resource (Node or URI).
@@ -638,9 +629,9 @@ module RDF::RDFa
     # @return [String]
     def predicate(predicate, objects)
       add_debug {"predicate: #{predicate.inspect}, objects: #{objects}"}
-      
+
       return if objects.to_a.empty?
-      
+
       add_debug {"predicate: #{get_curie(predicate)}"}
       render_property(predicate, objects) do |o|
         # Yields each object, for potential recursive definition.
@@ -648,7 +639,7 @@ module RDF::RDFa
         depth {subject(o, :rel => get_curie(predicate), :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
       end
     end
-    
+
     # Haml rendering helper. Return CURIE for the literal datatype, if the literal is a typed literal.
     #
     # @param [RDF::Resource] resource
@@ -749,7 +740,7 @@ module RDF::RDFa
         add_debug {"get_curie(#{uri}): none"}
         uri
       end
-      
+
       #add_debug {"get_curie(#{resource}) => #{curie}"}
 
       @uri_to_term_or_curie[uri] = curie
@@ -757,7 +748,7 @@ module RDF::RDFa
       raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
     end
     private
-    
+
     ##
     # Haml rendering helper. Escape entities to avoid whitespace issues.
     #
@@ -777,7 +768,7 @@ module RDF::RDFa
       @depth -= 1
       ret
     end
-    
+
     # Set the template to use within block
     def with_template(templ)
       if templ
@@ -792,10 +783,10 @@ module RDF::RDFa
       res = yield
       # Restore template
       @haml_template = old_template
-      
+
       res
     end
-    
+
     # Render HAML
     # @param [Symbol, String] template
     #   If a symbol, finds a matching template from haml_template, otherwise uses template as is
@@ -821,7 +812,7 @@ module RDF::RDFa
     end
 
     ##
-    # Find a template appropriate for the subject. 
+    # Find a template appropriate for the subject.
     # Override this method to provide templates based on attributes of a given subject
     #
     # @param [RDF::URI] subject
@@ -832,7 +823,7 @@ module RDF::RDFa
     def subject_done(subject)
       @serialized[subject] = true
     end
-    
+
     def is_done?(subject)
       @serialized.include?(subject)
     end
