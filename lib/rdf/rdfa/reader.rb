@@ -21,8 +21,9 @@ module RDF::RDFa
   #
   # Based on processing rules described here:
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/TR/2011/WD-rdfa-core-20110331/ RDFa Core 1.1
-  # @see http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/ XHTML+RDFa 1.1
+  # @see http://www.w3.org/TR/2011/WD-rdfa-core-20111215/ RDFa Core 1.1
+  # @see http://www.w3.org/TR/2011/WD-xhtml-rdfa-20111215/ XHTML+RDFa 1.1
+  # @see http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/ HTML+RDFa 1.1
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader

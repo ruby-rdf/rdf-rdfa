@@ -32,7 +32,7 @@ One of the issues with vocabularies was that they discourage re-use of existing 
 
 As an optional part of RDFa processing, an RDFa processor will perform limited
 [OWL 2 RL Profile entailment](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules),
-specifically rules scm-spo, scm-sco, prp-spo1, prp-eqp1, prp-eqp2, cax-sco, cax-eqc1, and
+specifically rules prp-eqp1, prp-eqp2, cax-sco, cax-eqc1, and
 cax-eqc2. This causes sub-classes and sub-properties of type and property IRIs to be added
 to the output graph.
 
@@ -205,21 +205,9 @@ To specify an alternative Haml template, consider the following:
 
 The template hash defines four Haml templates:
 
-*   _doc_: Document Template, takes an ordered list of _subject_s and yields each one to be rendered.
-    Described further in {RDF::RDFa::Writer#render_document}.
+*   _doc_: Document Template, takes an ordered list of _subject_s and yields each one to be rendered. From {RDF::RDFa::Writer#render_document}:
 
-        !!! XML
-        !!! 5
-        %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :prefix => prefix}
-          - if base || title
-            %head
-              - if base
-                %base{:href => base}
-              - if title
-                %title= title
-          %body
-            - subjects.each do |subject|
-              != yield(subject)
+    {include:RDF::RDFa::Writer#render_document}
 
     This template takes locals _lang_, _prefix_, _base_, _title_ in addition to _subjects_
     to create output similar to the following:
@@ -238,67 +226,29 @@ The template hash defines four Haml templates:
     Options passed to the Writer are used to supply _lang_ and _base_ locals.
     _prefix_ is generated based upon prefixes found from the default profiles, as well
     as those provided by a previous Reader. _title_ is taken from the first top-level subject
-    having an appropriate title property (as defined by the _heading_predicates_ option).
+    having an appropriate title property (as defined by the _heading\_predicates_ option).
 
 *   _subject_: Subject Template, take a _subject_ and an ordered list of _predicate_s and yields
-    each _predicate_ to be rendered. Described further in {RDF::RDFa::Writer#render_subject}.
+    each _predicate_ to be rendered. From {RDF::RDFa::Writer#render_subject}:
     
-        - if element == :li
-          %li{:rel => rel, :resource => resource, :inlist => inlist}
-            - if typeof
-              %span{:rel => 'rdf:type', :resource => typeof}.type!= typeof
-            - predicates.each do |predicate|
-              != yield(predicate)
-        - elsif rel && typeof
-          %div{:rel => rel}
-            %div{:about => resource, :typeof => typeof}
-              %span.type!= typeof
-              - predicates.each do |predicate|
-                != yield(predicate)
-        - elsif rel
-          %div{:rel => rel, :resource => resource}
-            - predicates.each do |predicate|
-              != yield(predicate)
-        - else
-          %div{:about => about, :typeof => typeof}
-            - if typeof
-              %span.type!= typeof
-            - predicates.each do |predicate|
-              != yield(predicate)
+    {include:RDF::RDFa::Writer#render_subject}
     
     The template takes locals _rel_ and _typeof_ in addition to _predicates_ and _subject_ to
     create output similar to the following:
     
-        <div about="http://example/">
+        <div resource="http://example/">
           ...
         </div>
 
     Note that if _typeof_ is defined, in this template, it will generate a textual description.
     
 *   _property\_value_: Property Value Template, used for predicates having a single value; takes
-    a _predicate_, and a single-valued Array of _objects_. Described further in {RDF::RDFa::Writer#render\_property}.
-    
-        - if heading_predicates.include?(predicate) && object.literal?
-          %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
-        - else
-          %div.property
-            %span.label
-              = get_predicate_name(predicate)
-            - if res = yield(object)
-              != res
-            - elsif get_curie(object) == 'rdf:nil'
-              %span{:rel => get_curie(predicate), :inlist => ''}
-            - elsif object.node?
-              %span{:resource => get_curie(object), :rel => get_curie(predicate), :inlist => inlist}= get_curie(object)
-            - elsif object.uri?
-              %a{:href => object.to_s, :rel => get_curie(predicate), :inlist => inlist}= object.to_s
-            - elsif object.datatype == RDF.XMLLiteral
-              %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
-            - else
-              %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
+    a _predicate_, and a single-valued Array of _objects_. From {RDF::RDFa::Writer#render_property}:
+
+    {include:RDF::RDFa::Writer#render_property}
    
     In addition to _predicate_ and _objects_, the template takes _inlist_ to indicate that the
-    property is part of an rdf:List.
+    property is part of an `rdf:List`.
 
     Also, if the predicate is identified as a _heading predicate_ (via _:heading\_predicates_ option),
     it will generate a heading element, and may use the value as the document title.
@@ -313,31 +263,14 @@ The template hash defines four Haml templates:
           <span class='label'>
             xhv:alternate
           </span>
-          <a href='http://rdfa.info/feed/' rel='xhv:alternate'>http://rdfa.info/feed/</a>
+          <a property='xhv:alternate' href='http://rdfa.info/feed/'>http://rdfa.info/feed/</a>
         </div>
     
     Note the use of methods defined in {RDF::RDFa::Writer} useful in rendering the output.
     
 *   _property\_values_: Similar to _property\_value_, but for predicates having more than one value.
-    Locals are identical to _property\_values_, but _objects_ is expected to have more than one value.
+    Locals are identical to _property\_values_, but _objects_ is expected to have more than one value. Described further in {RDF::RDFa::Writer#render_property}.
     
-        %div.property
-          %span.label
-            = get_predicate_name(predicate)
-          %ul
-            - objects.each do |object|
-              - if res = yield(object)
-                != res
-              - elsif object.node?
-                %li{:rel => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
-              - elsif object.uri?
-                %li
-                  %a{:rel => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
-              - elsif object.datatype == RDF.XMLLiteral
-                %li{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_curie(object.datatype), :inlist => inlist}<!= get_value(object)
-              - else
-                %li{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
-  
     In this case, and unordered list is used for output. Creates output similar to the following:
     
         <div class='property'>
@@ -459,6 +392,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/     "RDFa 1.1 Core"
 [RDFa Lite 1.1]:    http://www.w3.org/2010/02/rdfa/drafts/2011/ED-rdfa-lite-20111030/   "RDFa Lite 1.1"
 [XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/   "XHTML+RDFa 1.1"
+[HTML+RDFa 1.1]:    http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/ "HTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
 [RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
