@@ -90,26 +90,6 @@ describe RDF::RDFa::Expansion do
         :default => %q(:a a rdfs:Class .),
         :result => %q(:a a rdfs:Class .)
       },
-      "scm-spo"   => {
-        :default => %q(<#me> :name "Gregg Kellogg" .),
-        :rules => %q(
-          :name rdfs:subPropertyOf foaf:name .
-          foaf:name rdfs:subPropertyOf rdfs:label .
-        ),
-        :result => %q(
-          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg"; rdfs:label "Gregg Kellogg" .
-        )
-      },
-      "scm-sco"   => {
-        :default => %q(<#me> a foaf:Person .),
-        :rules => %q(
-          foaf:Person rdfs:subClassOf foaf:Agent .
-          foaf:Agent rdfs:subClassOf rdfs:Resource .
-        ),
-        :result => %q(
-          <#me> a foaf:Person, foaf:Agent, rdfs:Resource .
-        )
-      },
       "prp-spo1"   => {
         :default => %q(<#me> :name "Gregg Kellogg" .),
         :rules => %q(
@@ -180,36 +160,6 @@ describe RDF::RDFa::Expansion do
       "simple"   => {
         :default => %q(<document> rdfa:hasVocabulary ex: .),
         :result => %q(<document> rdfa:hasVocabulary ex: .)
-      },
-      "scm-spo"   => {
-        :default => %q(
-          <document> rdfa:hasVocabulary ex: .
-          <#me> ex:name "Gregg Kellogg" .
-        ),
-        "http://example.org/vocab#" => %q(
-          ex:name rdfs:subPropertyOf foaf:name .
-          foaf:name rdfs:subPropertyOf rdfs:label .
-        ),
-        :result => %q(
-          <document> rdfa:hasVocabulary ex: .
-          <#me> ex:name "Gregg Kellogg";
-            foaf:name "Gregg Kellogg";
-            rdfs:label "Gregg Kellogg" .
-        )
-      },
-      "scm-sco"   => {
-        :default => %q(
-          <document> rdfa:hasVocabulary ex: .
-          <#me> a ex:Person .
-        ),
-        "http://example.org/vocab#" => %q(
-          ex:Person rdfs:subClassOf foaf:Person .
-          foaf:Person rdfs:subClassOf foaf:Agent .
-        ),
-        :result => %q(
-          <document> rdfa:hasVocabulary ex: .
-          <#me> a ex:Person, foaf:Person, foaf:Agent .
-        )
       },
       "prp-spo1"   => {
         :default => %q(

@@ -17,7 +17,7 @@ module RDF::RDFa
     # For all objects that are the target of an rdfa:hasVocabulary property, load the IRI into
     # a repository.
     #
-    # Subsequently, perform OWL expansion using rules scm-spo, scm-sco, prp-spo1, prp-eqp1,
+    # Subsequently, perform OWL expansion using rules prp-spo1, prp-eqp1,
     # prp-eqp2, cax-sco, cax-eqc1, and cax-eqc2 placing resulting triples into the default
     # graph. Iterate on this step until no more triples are added.
     #
@@ -158,16 +158,6 @@ module RDF::RDFa
   private
 
     RULES = [
-      Rule.new("scm-spo") do
-        antecedent :p1, RDF::RDFS.subPropertyOf, :p2
-        antecedent :p2, RDF::RDFS.subPropertyOf, :p3
-        consequent :p1, RDF::RDFS.subPropertyOf, :p3, "t-box"
-      end,
-      Rule.new("scm-sco") do
-        antecedent :c1, RDF::RDFS.subClassOf, :c2
-        antecedent :c2, RDF::RDFS.subClassOf, :c3
-        consequent :c1, RDF::RDFS.subClassOf, :c3, "t-box"
-      end,
       Rule.new("prp-spo1") do
         antecedent :p1, RDF::RDFS.subPropertyOf, :p2
         antecedent :x, :p1, :y
