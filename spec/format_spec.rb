@@ -54,6 +54,36 @@ describe RDF::RDFa::Format do
       end
     end
 
+    describe RDF::RDFa::HTML do
+      formats = [
+        :html
+      ].each do |arg|
+        it "discovers with #{arg.inspect}" do
+          RDF::Format.for(arg).should == RDF::RDFa::HTML
+        end
+      end
+
+      it "should discover 'html'" do
+        RDF::Format.for(:html).reader.should == RDF::RDFa::Reader
+        RDF::Format.for(:html).writer.should == RDF::RDFa::Writer
+      end
+    end
+
+    describe RDF::RDFa::Lite do
+      formats = [
+        :lite
+      ].each do |arg|
+        it "discovers with #{arg.inspect}" do
+          RDF::Format.for(arg).should == RDF::RDFa::Lite
+        end
+      end
+
+      it "should discover 'lite'" do
+        RDF::Format.for(:lite).reader.should == RDF::RDFa::Reader
+        RDF::Format.for(:lite).writer.should == RDF::RDFa::Writer
+      end
+    end
+
     describe RDF::RDFa::SVG do
       formats = [
         :svg,

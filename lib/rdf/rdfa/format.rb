@@ -44,6 +44,20 @@ module RDF::RDFa
   # This allows the following:
   #
   # @example Obtaining an HTML format class
+  #   RDF::Format.for(:lite)         # RDF::RDFa::Lite
+  #   RDF::Format.for(:lite).reader  # RDF::RDFa::Reader
+  #   RDF::Format.for(:lite).writer  # RDF::RDFa::Writer
+  class Lite < RDF::Format
+    content_encoding 'utf-8'
+    reader { RDF::RDFa::Reader }
+    writer { RDF::RDFa::Writer }
+  end
+
+  # Aliases for RDFa::Format
+  #
+  # This allows the following:
+  #
+  # @example Obtaining an HTML format class
   #   RDF::Format.for(:html)         # RDF::RDFa::HTML
   #   RDF::Format.for(:html).reader  # RDF::RDFa::Reader
   #   RDF::Format.for(:html).writer  # RDF::RDFa::Writer
