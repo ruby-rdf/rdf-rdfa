@@ -248,7 +248,7 @@ describe RDF::RDFa::Expansion do
         result = mt.load(elements)
         vocab = RDF::URI("http://example.org/vocab#")
         graph = RDF::Graph.new
-        RDF::Graph.should_receive(:new).and_return(graph)
+        RDF::Graph.should_receive(:new).at_least(1).times.and_return(graph)
         graph = mt.expand
         graph.should be_equivalent_graph(result, mt)
       end
