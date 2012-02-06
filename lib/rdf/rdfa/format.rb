@@ -49,6 +49,7 @@ module RDF::RDFa
   #   RDF::Format.for(:lite).writer  # RDF::RDFa::Writer
   class Lite < RDF::Format
     content_encoding 'utf-8'
+    content_type     'text/html', :extension => :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
@@ -63,6 +64,7 @@ module RDF::RDFa
   #   RDF::Format.for(:html).writer  # RDF::RDFa::Writer
   class HTML < RDF::Format
     content_encoding 'utf-8'
+    content_type     'text/html', :extension => :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
