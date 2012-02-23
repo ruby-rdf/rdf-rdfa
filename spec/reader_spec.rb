@@ -78,6 +78,68 @@ describe "RDF::RDFa::Reader" do
         inner.called(subject.class, predicate.class, object.class)
       end
     end
+    
+    it "should call Proc with processor statements for :processor_callback" do
+      lam = mock("lambda")
+      lam.should_receive(:call).with(kind_of(RDF::Statement))
+      RDF::RDFa::Reader.new(@sampledoc, :processor_callback => lam).each_triple {}
+    end
+    
+    context "rdfagraph option" do
+      let(:source) do
+        %(<!DOCTYPE html>
+          <html>
+            <span property="dc:title">Title</span>
+            <span property="undefined:curie">Undefined Curie</span>
+          </html>
+        )
+      end
+
+      let(:output) do
+        %(
+          PREFIX dc: <http://purl.org/dc/terms/>
+          ASK WHERE {
+            ?s dc:title "Title" .
+          }
+        )
+      end
+      
+      let(:processor) do
+        %(
+          PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
+          ASK WHERE {
+            ?s a rdfa:Info .
+          }
+        )
+      end
+
+      it "generates output graph by default" do
+        parse(source).should pass_query(output, :trace => @debug)
+      end
+
+      it "generates output graph with rdfagraph=output" do
+        parse(source, :rdfagraph => :output).should pass_query(output, :trace => @debug)
+        parse(source, :rdfagraph => :output).should_not pass_query(processor, :trace => @debug)
+      end
+
+      it "generates output graph by with rdfagraph=[output]" do
+        parse(source, :rdfagraph => [:output]).should pass_query(output, :trace => @debug)
+      end
+
+      it "generates output graph by with rdfagraph=foo" do
+        parse(source, :rdfagraph => :foo).should pass_query(output, :trace => @debug)
+      end
+
+      it "generates processor graph by with rdfagraph=[processor]" do
+        parse(source, :rdfagraph => :processor).should pass_query(processor, :trace => @debug)
+        parse(source, :rdfagraph => :processor).should_not pass_query(output, :trace => @debug)
+      end
+
+      it "generates both output and processor graphs by with rdfagraph=[output,processor]" do
+        parse(source, :rdfagraph => [:output, :processor]).should pass_query(output, :trace => @debug)
+        parse(source, :rdfagraph => [:output, :processor]).should pass_query(processor, :trace => @debug)
+      end
+    end
   end
 
   [:nokogiri, :rexml].each do |library|

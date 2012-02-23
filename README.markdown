@@ -169,11 +169,19 @@ This is related to [RDFa ISSUE-113](http://www.w3.org/2010/02/rdfa/track/issues/
 
 ### Reading RDF data with vocabulary expansion
 
-    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa, :expand => true)
+    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa, :vocab_expansion => true)
 
 or
 
     graph = RDF::RDFa::Reader.open("etc/doap.html").expand
+
+### Reading Processor Graph
+
+    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa, :rdfagraph => :processor)
+
+### Reading Both Processor and Output Graphs
+
+    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa, :rdfagraph => [:output, :processor])
 
 ### Writing RDF data using the XHTML+RDFa format
 

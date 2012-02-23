@@ -234,14 +234,17 @@ module RDF::RDFa
     #   any additional options (see `RDF::Reader#initialize`)
     # @option options [Symbol] :library
     #   One of :nokogiri or :rexml. If nil/unspecified uses :nokogiri if available, :rexml otherwise.
-    # @option options [Boolean]  :expand (false)
+    # @option options [Boolean]  :vocab_expansion (false)
     #   whether to perform RDFS expansion on the resulting graph
     # @option options [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:xhtml1)
     #   Host Language
     # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
     #   Parser version information
-    # @option options [RDF::Writable]    :processor_graph (nil)
-    #   Graph to record information, warnings and errors.
+    # @option options [Proc]    :processor_callback (nil)
+    #   Callback used to provide processor graph triples.
+    # @option options [Array<Symbol>]    :rdfagraph ([:output])
+    #   Used to indicate if either or both of the :output or :processor graphs are output.
+    #   Value is an array containing on or both of :output or :processor.
     # @option options [Repository] :vocab_repository (nil)
     #   Repository to save loaded vocabularies.
     # @option options [Array] :debug
@@ -254,8 +257,9 @@ module RDF::RDFa
     def initialize(input = $stdin, options = {}, &block)
       super do
         @debug = options[:debug]
-
-        @processor_graph = options[:processor_graph]
+        
+        @options[:rdfagraph] = [@options[:rdfagraph]].flatten.compact.map(&:to_sym).select {|o| [:output, :processor].include?(o)}
+        @options[:rdfagraph] << :output if @options[:rdfagraph].empty?
 
         @library = case options[:library]
           when nil
@@ -325,10 +329,10 @@ module RDF::RDFa
     # @yieldparam [RDF::Statement] statement
     # @return [void]
     def each_statement(&block)
-      if @options[:expand]
-        @options[:expand] = false
+      if @options[:vocab_expansion]
+        @options[:vocab_expansion] = false
         expand.each_statement(&block)
-        @options[:expand] = true
+        @options[:vocab_expansion] = true
       else
         @callback = block
 
@@ -396,16 +400,25 @@ module RDF::RDFa
     def add_processor_message(node, message, process_class)
       puts "#{node_path(node)}: #{message}" if ::RDF::RDFa.debug?
       @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
-      if @processor_graph
+      if @options[:processor_callback] || @options[:rdfagraph].include?(:processor)
+        g = RDF::Graph.new
         n = RDF::Node.new
-        @processor_graph << RDF::Statement.new(n, RDF["type"], process_class)
-        @processor_graph << RDF::Statement.new(n, RDF::DC.description, message)
-        @processor_graph << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
-        @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, base_uri)
+        g << RDF::Statement.new(n, RDF["type"], process_class)
+        g << RDF::Statement.new(n, RDF::DC.description, message)
+        g << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
+        g << RDF::Statement.new(n, RDF::RDFA.context, base_uri) if base_uri
         nc = RDF::Node.new
-        @processor_graph << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
-        @processor_graph << RDF::Statement.new(nc, RDF::PTR.expression, node.path) if node.respond_to?(:path)
-        @processor_graph << RDF::Statement.new(n, RDF::RDFA.context, nc)
+        g << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
+        g << RDF::Statement.new(nc, RDF::PTR.expression, node.path) if node.respond_to?(:path)
+        g << RDF::Statement.new(n, RDF::RDFA.context, nc)
+        
+        g.each do |s|
+          # Provide as callback
+          @options[:processor_callback].call(s) if @options[:processor_callback]
+
+          # Yield as result
+          @callback.call(s) if @callback && @options[:rdfagraph].include?(:processor)
+        end
       end
     end
 
@@ -420,7 +433,7 @@ module RDF::RDFa
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
       add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
-      @callback.call(statement)
+      @callback.call(statement) if @options[:rdfagraph].include?(:output)
     end
 
     # Parsing an RDFa document (this is *not* the recursive method)
