@@ -51,8 +51,6 @@ module RDF::RDFa
     # @see http://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName
     NC_REGEXP = Regexp.new(
       %{^
-        (?!\\\\u0301)             # &#x301; is a non-spacing acute accent.
-                                  # It is legal within an XML Name, but not as the first character.
         (  [a-zA-Z_]
          | \\\\u[0-9a-fA-F]{4}
         )
@@ -65,6 +63,8 @@ module RDF::RDFa
     # This expression matches an term as defined in
     # [RDFA-CORE](http://www.w3.org/TR/2011/WD-rdfa-core-20111215/#s_terms)
     #
+    # For the avoidance of doubt, this definition means a 'term'
+    # in RDFa is an XML NCName that also permits slash as a non-leading character.
     # @see http://www.w3.org/TR/2011/WD-rdfa-core-20111215/#s_terms
     TERM_REGEXP = Regexp.new(
       %{^
@@ -73,7 +73,7 @@ module RDF::RDFa
         (  [a-zA-Z_]
          | \\\\u[0-9a-fA-F]{4}
         )
-        (  [0-9a-zA-Z_\.-]
+        (  [0-9a-zA-Z_\.-\/]
          | \\\\u([0-9a-fA-F]{4})
         )*
       $},
@@ -282,13 +282,13 @@ module RDF::RDFa
 
         add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{@library}")
 
-        initialize_xml(input, options) rescue raise RDF::ReaderError.new($!.message)
-
-        if (root.nil? && validate?)
-          add_error(nil, "Empty document", RDF::RDFA.DocumentError)
-          raise RDF::ReaderError, "Empty Document"
+        begin
+          initialize_xml(input, options)
+        rescue
+          add_error(nil, "Malformed document: #{$!.message}")
         end
-        add_warning(nil, "Syntax errors:\n#{doc_errors}", RDF::RDFA.DocumentError) if !doc_errors.empty? && validate?
+        add_error(nil, "Empty document") if root.nil?
+        add_error(nil, "Syntax errors:\n#{doc_errors}") if !doc_errors.empty?
 
         # Section 4.2 RDFa Host Language Conformance
         #
@@ -335,6 +335,9 @@ module RDF::RDFa
         @options[:vocab_expansion] = true
       else
         @callback = block
+
+        # Process any saved callbacks (processor graph issues)
+        @saved_callbacks.each {|s| @callback.call(s) } if @saved_callbacks
 
         # Add prefix definitions from host defaults
         @host_defaults[:uri_mappings].each_pair do |prefix, value|
@@ -407,17 +410,27 @@ module RDF::RDFa
         g << RDF::Statement.new(n, RDF::DC.description, message)
         g << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
         g << RDF::Statement.new(n, RDF::RDFA.context, base_uri) if base_uri
-        nc = RDF::Node.new
-        g << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
-        g << RDF::Statement.new(nc, RDF::PTR.expression, node.path) if node.respond_to?(:path)
-        g << RDF::Statement.new(n, RDF::RDFA.context, nc)
+        if node.respond_to?(:path)
+          nc = RDF::Node.new
+          g << RDF::Statement.new(n, RDF::RDFA.context, nc)
+          g << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
+          g << RDF::Statement.new(nc, RDF::PTR.expression, node.path)
+        end
         
         g.each do |s|
           # Provide as callback
           @options[:processor_callback].call(s) if @options[:processor_callback]
 
           # Yield as result
-          @callback.call(s) if @callback && @options[:rdfagraph].include?(:processor)
+          if @options[:rdfagraph].include?(:processor)
+            if @callback
+              @callback.call(s) 
+            else
+              # Save messages for later callback
+              @saved_callbacks ||= []
+              @saved_callbacks << s
+            end
+          end
         end
       end
     end
@@ -485,7 +498,7 @@ module RDF::RDFa
             profile = Profile.find(uri)
           rescue Exception => e
             RDF::RDFa.debug = old_debug
-            add_error(root, e.message, RDF::RDFA.ProfileReferenceError)
+            add_error(root, e.message)
             raise # In case we're not in strict mode, we need to be sure processing stops
           ensure
             RDF::RDFa.debug = old_debug
@@ -1166,15 +1179,19 @@ module RDF::RDFa
       restrictions = options[:restrictions]
       add_debug(element) {"process_uri: #{value}, restrictions = #{restrictions.inspect}"}
       options = {:uri_mappings => {}}.merge(options)
-      if !options[:term_mappings] && options[:uri_mappings] && value.to_s.match(/^\[(.*)\]$/) && restrictions.include?(:safe_curie)
+      if !options[:term_mappings] && options[:uri_mappings] && restrictions.include?(:safe_curie) && value.to_s.match(/^\[(.*)\]$/)
         # SafeCURIEorCURIEorURI
         # When the value is surrounded by square brackets, then the content within the brackets is
         # evaluated as a CURIE according to the CURIE Syntax definition. If it is not a valid CURIE, the
         # value must be ignored.
         uri = curie_to_resource_or_bnode(element, $1, options[:uri_mappings], evaluation_context.parent_subject, restrictions)
-        add_debug(element) {"process_uri: #{value} => safeCURIE => <#{uri}>"}
+        if uri
+          add_debug(element) {"process_uri: #{value} => safeCURIE => <#{uri}>"}
+        else
+          add_warning(element, "#{value} not matched as a safeCURIE")
+        end
         uri
-      elsif options[:term_mappings] && NC_REGEXP.match(value.to_s) && restrictions.include?(:term)
+      elsif options[:term_mappings] && TERM_REGEXP.match(value.to_s) && restrictions.include?(:term)
         # TERMorCURIEorAbsURI
         # If the value is an NCName, then it is evaluated as a term according to General Use of Terms in
         # Attributes. Note that this step may mean that the value is to be ignored.
@@ -1197,17 +1214,17 @@ module RDF::RDFa
               uri = uri(value)
               unless uri.absolute?
                 uri = nil
-                raise RDF::ReaderError, "Relative URI #{value}" 
+                add_warning(element, "Malformed IRI #{uri.inspect}")
               end
             else
               uri = uri(base, Addressable::URI.parse(value))
             end
           rescue Addressable::URI::InvalidURIError => e
-            add_warning(element, "Malformed prefix #{value}", RDF::RDFA.UnresolvedCURIE)
+            add_warning(element, "Malformed IRI #{value}")
           rescue RDF::ReaderError => e
             add_debug(element, e.message)
             if value.to_s =~ /^\(^\w\):/
-              add_warning(element, "Undefined prefix #{$1}", RDF::RDFA.UnresolvedCURIE)
+              add_warning(element, "Undefined prefix #{$1}")
             else
               add_warning(element, "Relative URI #{value}")
             end
@@ -1220,30 +1237,28 @@ module RDF::RDFa
     
     # [7.4.3] General Use of Terms in Attributes
     def process_term(element, value, options)
-      if options[:term_mappings].is_a?(Hash)
+      if options[:vocab]
+        # If there is a local default vocabulary, the IRI is obtained by concatenating that value and the term
+        return uri(options[:vocab] + value)
+      elsif options[:term_mappings].is_a?(Hash)
         # If the term is in the local term mappings, use the associated URI (case sensitive).
         return uri(options[:term_mappings][value.to_s.to_sym]) if options[:term_mappings].has_key?(value.to_s.to_sym)
-        
+      
         # Otherwise, check for case-insensitive match
         options[:term_mappings].each_pair do |term, uri|
           return uri(uri) if term.to_s.downcase == value.to_s.downcase
         end
       end
-      
-      if options[:vocab]
-        # Otherwise, if there is a local default vocabulary the URI is obtained by concatenating that value and the term.
-        uri(options[:vocab] + value)
-      else
-        # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
-        add_warning(element, "Term #{value} is not defined", RDF::RDFA.UnresolvedTerm)
-        nil
-      end
+
+      # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
+      add_warning(element, "Term #{value} is not defined")
+      nil
     end
 
     # From section 6. CURIE Syntax Definition
     def curie_to_resource_or_bnode(element, curie, uri_mappings, subject, restrictions)
       # URI mappings for CURIEs default to XHV, rather than the default doc namespace
-      prefix, reference = curie.to_s.split(":")
+      prefix, reference = curie.to_s.split(":", 2)
 
       # consider the bnode situation
       if prefix == "_" && restrictions.include?(:bnode)
@@ -1266,7 +1281,7 @@ module RDF::RDFa
         if ns
           uri(ns + reference.to_s)
         else
-          add_debug(element) {"curie_to_resource_or_bnode No namespace mapping for #{prefix}"}
+          add_debug(element) {"curie_to_resource_or_bnode No namespace mapping for #{prefix.inspect}"}
           nil
         end
       end

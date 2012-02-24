@@ -81,7 +81,7 @@ describe "RDF::RDFa::Reader" do
     
     it "should call Proc with processor statements for :processor_callback" do
       lam = mock("lambda")
-      lam.should_receive(:call).with(kind_of(RDF::Statement))
+      lam.should_receive(:call).at_least(1).times.with(kind_of(RDF::Statement))
       RDF::RDFa::Reader.new(@sampledoc, :processor_callback => lam).each_triple {}
     end
     
@@ -412,6 +412,22 @@ describe "RDF::RDFa::Reader" do
                 end
               end
             end
+          end
+        end
+
+        context "CURIEs" do
+          it "accepts a CURIE with a local part having a ':'" do
+            html = %(
+              <html prefix="foo: http://example.com/">
+                <div property="foo:due:to:facebook:interpretation:of:CURIE">Value</div>
+              </html>
+            )
+            expected = RDF::Graph.new << RDF::Statement.new(
+              RDF::URI(""),
+              RDF::URI("http://example.com/due:to:facebook:interpretation:of:CURIE"),
+              "Value"
+            )
+            parse(html).should be_equivalent_graph(expected, :trace => @debug)
           end
         end
 
@@ -1068,6 +1084,85 @@ describe "RDF::RDFa::Reader" do
             g_ttl = RDF::Graph.new << RDF::Turtle::Reader.new(ttl)
             parse(html, :validate => false).should be_equivalent_graph(g_ttl, :trace => @debug, :format => :ttl)
           end
+        end
+      end
+
+      context :rdfagraph do
+        it "generates rdfa:Error on malformed content" do
+          html = %(<!DOCTYPE html>
+            <div Invalid markup
+          )
+          query = %(
+            PREFIX dc: <http://purl.org/dc/terms/>
+            PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            ASK WHERE {
+              ?s a rdfa:Error;
+                 dc:date ?date;
+                 dc:description ?description .
+              FILTER (datatype(?date) = xsd:date)
+            }
+          )
+          parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
+        end
+        
+        it "generates rdfa:Warning on missing CURIE definition" do
+          html = %(<!DOCTYPE html>
+            <div property="rdf:value" resource="[undefined:curie]">Undefined Curie</div>
+          )
+          query = %(
+            PREFIX dc: <http://purl.org/dc/terms/>
+            PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            ASK WHERE {
+              ?s a rdfa:Warning;
+                 dc:date ?date;
+                 dc:description ?description .
+              FILTER (datatype(?date) = xsd:date)
+            }
+          )
+          parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
+        end
+        
+        %w(
+          \x01foo
+          foo\x01
+        ).each do |prefix|
+          it "generates rdfa:Warning on mal-formed CURIE prefix #{prefix.inspect}" do
+            html = %(<!DOCTYPE html>
+              <div property="rdf:value" resource="[#{prefix}:malformed]">Malformed Prefix</div>
+            )
+            query = %(
+              PREFIX dc: <http://purl.org/dc/terms/>
+              PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
+              PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+              ASK WHERE {
+                ?s a rdfa:Warning;
+                   dc:date ?date;
+                   dc:description ?description .
+                FILTER (datatype(?date) = xsd:date)
+              }
+            )
+            parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
+          end
+        end
+        
+        it "generates rdfa:Warning on missing Term definition" do
+          html = %(<!DOCTYPE html>
+            <div property="undefined_term">Undefined Term</div>
+          )
+          query = %(
+            PREFIX dc: <http://purl.org/dc/terms/>
+            PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            ASK WHERE {
+              ?s a rdfa:Warning;
+                 dc:date ?date;
+                 dc:description ?description .
+              FILTER (datatype(?date) = xsd:date)
+            }
+          )
+          parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
         end
       end
 
