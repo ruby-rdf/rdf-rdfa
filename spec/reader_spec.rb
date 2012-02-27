@@ -139,6 +139,11 @@ describe "RDF::RDFa::Reader" do
         parse(source, :rdfagraph => [:output, :processor]).should pass_query(output, :trace => @debug)
         parse(source, :rdfagraph => [:output, :processor]).should pass_query(processor, :trace => @debug)
       end
+
+      it "generates both output and processor graphs by with rdfagraph=output,processor" do
+        parse(source, :rdfagraph => "output, processor").should pass_query(output, :trace => @debug)
+        parse(source, :rdfagraph => "output, processor").should pass_query(processor, :trace => @debug)
+      end
     end
   end
 
@@ -1127,10 +1132,15 @@ describe "RDF::RDFa::Reader" do
         %w(
           \x01foo
           foo\x01
+          $foo
         ).each do |prefix|
-          it "generates rdfa:Warning on mal-formed CURIE prefix #{prefix.inspect}" do
+          it "generates rdfa:Warning on malformed CURIE prefix #{prefix.inspect}" do
             html = %(<!DOCTYPE html>
-              <div property="rdf:value" resource="[#{prefix}:malformed]">Malformed Prefix</div>
+              <div prefix="#{prefix}: http://example.com/"
+                   property="rdf:value"
+                   resource="[#{prefix}:malformed]">
+                Malformed Prefix
+              </div>
             )
             query = %(
               PREFIX dc: <http://purl.org/dc/terms/>

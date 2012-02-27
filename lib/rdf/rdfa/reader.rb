@@ -258,7 +258,11 @@ module RDF::RDFa
       super do
         @debug = options[:debug]
         
-        @options[:rdfagraph] = [@options[:rdfagraph]].flatten.compact.map(&:to_sym).select {|o| [:output, :processor].include?(o)}
+        @options[:rdfagraph] = case @options[:rdfagraph]
+        when String, Symbol then @options[:rdfagraph].to_s.split(',').map(&:strip).map(&:to_sym)
+        when Array then @options[:rdfagraph].map {|o| o.to_s.to_sym}
+        else  []
+        end.select {|o| [:output, :processor].include?(o)}
         @options[:rdfagraph] << :output if @options[:rdfagraph].empty?
 
         @library = case options[:library]
