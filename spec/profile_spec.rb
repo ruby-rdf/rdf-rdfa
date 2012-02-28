@@ -25,11 +25,11 @@ describe RDF::RDFa::Profile do
   end
   
   describe ".find" do
-    describe "foaf" do
-      subject { RDF::RDFa::Profile.find("http://rdfa.digitalbazaar.com/test-suite/profiles/foaf") }
+    describe "rdfa-1.1" do
+      subject { RDF::RDFa::Profile.find("http://www.w3.org/2011/rdfa-context/rdfa-1.1") }
 
-      it "has 74 terms" do
-        subject.terms.keys.length.should == 74
+      it "has 3 terms" do
+        subject.terms.keys.length.should == 3
       end
       
       it "uses symbols for term lookup" do
@@ -40,24 +40,44 @@ describe RDF::RDFa::Profile do
         subject.vocabulary.should be_nil
       end
 
-      it "has no prefixes" do
-        subject.prefixes.should be_empty
+      it "has 27 prefixes" do
+        subject.prefixes.keys.length.should == 27
       end
     end
 
-    describe "basic" do
-      subject { RDF::RDFa::Profile.find("http://rdfa.digitalbazaar.com/test-suite/profiles/basic") }
+    describe "html+rdfa-1.1" do
+      subject { RDF::RDFa::Profile.find("http://www.w3.org/2011/rdfa-context/html-rdfa-1.1") }
 
-      it "has no terms" do
-        subject.terms.should be_empty
+      it "has 0 terms" do
+        subject.terms.keys.length.should == 0
       end
 
       it "has no vocabulary" do
         subject.vocabulary.should be_nil
       end
 
-      it "has 6 prefixes" do
-        subject.prefixes.keys.length.should == 6
+      it "has 0 prefixes" do
+        subject.prefixes.keys.length.should == 0
+      end
+
+      it "uses symbols for prefix lookup" do
+        subject.prefixes.keys.all? {|k| k.is_a?(Symbol)}.should be_true
+      end
+    end
+
+    describe "xhtml+rdfa-1.1" do
+      subject { RDF::RDFa::Profile.find("http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1") }
+
+      it "has 25 terms" do
+        subject.terms.keys.length.should == 25
+      end
+
+      it "has no vocabulary" do
+        subject.vocabulary.should be_nil
+      end
+
+      it "has 0 prefixes" do
+        subject.prefixes.keys.length.should == 0
       end
 
       it "uses symbols for prefix lookup" do
