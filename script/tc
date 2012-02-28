@@ -22,12 +22,19 @@ def run_tc(tc, options)
   pg = RDF::Graph.new if options[:processor_graph]
 
   begin
-    reader = RDF::RDFa::Reader.new(Kernel.open(input_uri),
+    puts "open #{input_uri}"
+    options = {
       :base_uri => input_uri,
-      :validate => options[:validate],
       :processor_graph => pg,
-      :version => options[:version],
-      :library => options[:library])
+      :format => :rdfa,
+    }.merge(options)
+
+    if tc.queryParam
+      opt, arg = tc.queryParam.split('=').map(&:to_sym)
+      options[opt] = arg
+    end
+
+    reader = RDF::RDFa::Reader.new(Kernel.open(input_uri), options)
 
     graph = RDF::Graph.new << reader
   rescue Exception => e
@@ -87,10 +94,11 @@ def help(options)
   puts "Options:"
   puts "      --dump:               Dump raw output, otherwise serialize to Ruby"
   puts "      --debug:              Display detailed debug output"
+  puts "      --expand              Expand graph with vocab_expansion option"
   puts "      --format:             Format for output, defaults to #{options[:format].inspect}"
   puts "      --host-language:      Run for specified host language, defaults to #{options[:host_language]}"
   puts "      --library:            XML parsing library, defaults to :nokogiri if available, otherwise :rexml"
-  puts "      --processor-graph:    Output processor graph"
+  puts "      --rdfagraph:          output, processor or output,processor"
   puts "      --quiet:              Minimal output"
   puts "      --validate:           Validate input"
   puts "      --verbose:            Verbose processing"
@@ -102,15 +110,14 @@ end
 opts.each do |opt, arg|
   case opt
   when '--help'             then help(options)
-  when '--verbose'          then options[:verbose] = true
-  when '--quiet'            then options[:quiet] = true
   when '--dbg'              then ::RDF::RDFa::debug = true
   when '--format'           then options[:format] = arg.to_sym
-  when '--library'          then options[:library] = arg.to_sym
-  when '--processor-graph'  then options[:processor_graph] = true
   when '--host-language'    then options[:host_language] = arg
-  when '--version'          then options[:version] = arg
+  when '--library'          then options[:library] = arg.to_sym
+  when '--quiet'            then options[:quiet] = true
   when '--validate'         then options[:validate] = true
+  when '--verbose'          then options[:verbose] = true
+  when '--version'          then options[:version] = arg
   end
 end
 

@@ -5,7 +5,7 @@ require 'rdf/turtle'
 require 'open-uri'
 
 module Fixtures
-  SUITE = RDF::URI("http://rdfa.digitalbazaar.com/test-suite/")
+  SUITE = RDF::URI("http://rdfa.info/test-suite/")
 
   class TestCase
     HTMLRE = Regexp.new('([0-9]{4,4})\.xhtml')
@@ -23,19 +23,20 @@ module Fixtures
     ]
 
     class Test < RDF::Vocabulary("http://www.w3.org/2006/03/test-description#"); end
-    class RdfaTest < RDF::Vocabulary("http://rdfa.digitalbazaar.com/vocabs/rdfa-test#"); end
+    class RdfaTest < RDF::Vocabulary("http://rdfa.info/vocabs/rdfa-test#"); end
 
     attr_accessor :debug
     include Spira::Resource
 
     type Test.TestCase
-    property :title,          :predicate => DC11.title,                   :type => XSD.string
+    property :title,          :predicate => DC.title,                     :type => XSD.string
     property :purpose,        :predicate => Test.purpose,                 :type => XSD.string
     has_many :hostLanguage,   :predicate => RdfaTest.hostLanguage,        :type => XSD.string
     has_many :version,        :predicate => RdfaTest.rdfaVersion,         :type => XSD.string
     property :expected,       :predicate => Test.expectedResults
-    property :contributor,    :predicate => DC11.contributor,             :type => XSD.string
+    property :contributor,    :predicate => DC.contributor,               :type => XSD.string
     property :reference,      :predicate => Test.specificationRefference, :type => XSD.string
+    property :queryParam,     :predicate => RdfaTest.queryParam,          :type => XSD.string
     property :classification, :predicate => Test.classification
     property :inputDocument,  :predicate => Test.informationResourceInput
     property :resultDocument, :predicate => Test.informationResourceResults
@@ -59,7 +60,9 @@ module Fixtures
     def information; title; end
 
     def input(host_language, version)
-      base = self.inputDocument.to_s.sub('test-cases/', "test-cases/#{host_language}/#{version}/")
+      base = self.inputDocument.to_s.
+        sub('test-cases/', "test-cases/#{host_language}/#{version}/").
+        sub('rdfa.info', 'rdfa.info')
       case host_language
       when /^xml/   then RDF::URI(base.sub(".html", ".xml"))
       when /^xhtml/ then RDF::URI(base.sub(".html", ".xhtml"))
@@ -69,7 +72,9 @@ module Fixtures
     end
     
     def results(host_language, version)
-      RDF::URI(self.resultDocument.to_s.sub('test-cases/', "test-cases/#{host_language}/#{version}/"))
+      RDF::URI(self.resultDocument.to_s.
+        sub('test-cases/', "test-cases/#{host_language}/#{version}/").
+        sub('rdfa.info', 'rdfa.info'))
     end
 
     def trace
@@ -85,6 +90,7 @@ module Fixtures
         inputDocument
         resultDocument
         expectedResults
+        queryParam
       ).map {|a| v = self.send(a); "#{a}='#{v}'" if v}.compact.join(", ") +
       "]"
     end

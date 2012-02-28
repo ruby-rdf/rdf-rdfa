@@ -16,10 +16,16 @@ describe "RDF::RDFa::Reader" do
               specify "test #{t.name}: #{t.title}#{",  (negative test)" if t.expectedResults.false?}" do
                 begin
                   t.debug = []
-                  reader = RDF::Reader.open(t.input(host_language, version),
+                  options = {
                     :base_uri => t.input(host_language, version),
                     :debug => t.debug,
-                    :format => :rdfa)
+                    :format => :rdfa
+                  }
+                  if t.queryParam
+                    opt, arg = t.queryParam.split('=').map(&:to_sym)
+                    options[opt] = arg
+                  end
+                  reader = RDF::Reader.open(t.input(host_language, version), options)
                   reader.should be_a RDF::Reader
 
                   # Make sure auto-detect works
