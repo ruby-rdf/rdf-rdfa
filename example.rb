@@ -17,7 +17,7 @@ data = <<-EOF;
   </html>
 EOF
 
-reader = RDF::RDFa::Reader.new(data, :base_uri => 'http://rdfa.digitalbazaar.com/test-suite/test-cases/xhtml1/0001.xhtml')
+reader = RDF::RDFa::Reader.new(data, :base_uri => 'http://rdfa.info/test-suite/test-cases/xhtml1/0001.xhtml')
 reader.each_statement do |statement|
   statement.inspect!
 end

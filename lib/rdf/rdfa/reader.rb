@@ -284,7 +284,7 @@ module RDF::RDFa
 
         detect_host_language_version(input, options)
 
-        add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{@library}")
+        add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{@library}, rdfagraph = #{@options[:rdfagraph].inspect}, expand = #{@options[:vocab_expansion]}")
 
         begin
           initialize_xml(input, options)
@@ -648,7 +648,7 @@ module RDF::RDFa
           @host_defaults.fetch(:vocabulary, nil)
         else
           # Generate a triple indicating that the vocabulary is used
-          add_triple(element, base, RDF::RDFA.hasVocabulary, uri(attrs[:vocab]))
+          add_triple(element, base, RDF::RDFA.usesVocabulary, uri(attrs[:vocab]))
 
           uri(attrs[:vocab])
         end

@@ -36,7 +36,7 @@ specifically rules prp-eqp1, prp-eqp2, cax-sco, cax-eqc1, and
 cax-eqc2. This causes sub-classes and sub-properties of type and property IRIs to be added
 to the output graph.
 
-{RDF::RDFa::Reader} implements this using the `#expand` method, which looks for `rdfa:hasVocabulary` properties within the output graph and performs such expansion. See an example in the usage section.
+{RDF::RDFa::Reader} implements this using the `#expand` method, which looks for `rdfa:usesVocabulary` properties within the output graph and performs such expansion. See an example in the usage section.
 
 #### RDF Collections (lists)
 One significant RDF feature missing from RDFa was support for ordered collections, or lists. RDF supports this with special properties `rdf:first`, `rdf:rest`, and `rdf:nil`, but other RDF languages have first-class support for this concept. For example, in [Turtle][Turtle], a list can be defined as follows:
@@ -359,7 +359,7 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [History]{file:History.markdown}
 * [RDFa 1.1 Core][RDFa 1.1 Core]
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
-* [RDFa-test-suite](http://rdfa.digitalbazaar.com/test-suite/              "RDFa test suite")
+* [RDFa-test-suite](http://rdfa.info/test-suite/              "RDFa test suite")
 
 ## Author
 * [Gregg Kellogg](http://github.com/gkellogg) - <http://kellogg-assoc.com/>
@@ -397,11 +397,11 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [YARD]:             http://yardoc.org/
 [YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
-[RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/     "RDFa 1.1 Core"
+[RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/                    "RDFa 1.1 Core"
 [RDFa Lite 1.1]:    http://www.w3.org/2010/02/rdfa/drafts/2011/ED-rdfa-lite-20111030/   "RDFa Lite 1.1"
-[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/   "XHTML+RDFa 1.1"
-[HTML+RDFa 1.1]:    http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/ "HTML+RDFa 1.1"
-[RDFa-test-suite]:  http://rdfa.digitalbazaar.com/test-suite/           "RDFa test suite"
+[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/                   "XHTML+RDFa 1.1"
+[HTML+RDFa 1.1]:    http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/                 "HTML+RDFa 1.1"
+[RDFa-test-suite]:  http://rdfa.info/test-suite/                                        "RDFa test suite"
 [RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
 [Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/

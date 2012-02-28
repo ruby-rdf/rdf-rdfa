@@ -472,7 +472,7 @@ describe "RDF::RDFa::Reader" do
             query = %q(
               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
               PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
-              ASK WHERE { <http://example.org/> rdfa:hasVocabulary foaf: }
+              ASK WHERE { <http://example.org/> rdfa:usesVocabulary foaf: }
             )
             parse(@sampledoc).should pass_query(query, @debug)
           end
@@ -1033,7 +1033,7 @@ describe "RDF::RDFa::Reader" do
               </div>
             </div></root>),
             %q(
-            <> <http://www.w3.org/ns/rdfa#hasVocabulary> <#>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            <> <http://www.w3.org/ns/rdfa#usesVocabulary> <#>, <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             _:a <#flavor> ("Lemon sorbet" "Apricot sorbet") .
             )
           ],
@@ -1052,7 +1052,7 @@ describe "RDF::RDFa::Reader" do
             ),
             %q(
               @prefix schema: <http://schema.org/> .
-              <> <http://www.w3.org/ns/rdfa#hasVocabulary> <http://schema.org/> .
+              <> <http://www.w3.org/ns/rdfa#usesVocabulary> <http://schema.org/> .
               [ a schema:Event;
                 schema:url <nba-miami-philidelphia-game3.html>;
                 schema:description """
@@ -1074,7 +1074,7 @@ describe "RDF::RDFa::Reader" do
             ),
             %q(
               @prefix schema: <http://schema.org/> .
-              <> <http://www.w3.org/ns/rdfa#hasVocabulary> <http://schema.org/> .
+              <> <http://www.w3.org/ns/rdfa#usesVocabulary> <http://schema.org/> .
               [ a schema:Event;
                 schema:offers [
                   a schema:AggregateOffer;

@@ -14,7 +14,7 @@ module RDF::RDFa
     #   triples to the default graph based on rules and property/class relationships
     #   described in referenced vocabularies.
     #
-    # For all objects that are the target of an rdfa:hasVocabulary property, load the IRI into
+    # For all objects that are the target of an rdfa:usesVocabulary property, load the IRI into
     # a repository.
     #
     # Subsequently, perform OWL expansion using rules prp-spo1, prp-eqp1,
@@ -48,7 +48,7 @@ module RDF::RDFa
       @@vocab_repo = @options[:vocab_repository] if @options.has_key?(:vocab_repository)
       @@vocab_repo ||= RDF::Repository.new.insert(*COOKED_VOCAB_STATEMENTS)
       
-      vocabs = repo.query(:predicate => RDF::RDFA.hasVocabulary).to_a.map(&:object)
+      vocabs = repo.query(:predicate => RDF::RDFA.usesVocabulary).to_a.map(&:object)
       vocabs.each do |vocab|
         begin
           unless @@vocab_repo.has_context?(vocab)

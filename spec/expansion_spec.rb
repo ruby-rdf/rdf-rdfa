@@ -158,87 +158,87 @@ describe RDF::RDFa::Expansion do
   describe :expand do
     {
       "simple"   => {
-        :default => %q(<document> rdfa:hasVocabulary ex: .),
-        :result => %q(<document> rdfa:hasVocabulary ex: .)
+        :default => %q(<document> rdfa:usesVocabulary ex: .),
+        :result => %q(<document> rdfa:usesVocabulary ex: .)
       },
       "prp-spo1"   => {
         :default => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> ex:name "Gregg Kellogg" .
         ),
         "http://example.org/vocab#" => %q(
           ex:name rdfs:subPropertyOf foaf:name .
         ),
         :result => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> ex:name "Gregg Kellogg";
             foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp1"   => {
         :default => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> ex:name "Gregg Kellogg" .
         ),
         "http://example.org/vocab#" => %q(
           ex:name owl:equivalentProperty foaf:name .
         ),
         :result => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> ex:name "Gregg Kellogg";
             foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp2"   => {
         :default => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> foaf:name "Gregg Kellogg" .
         ),
         "http://example.org/vocab#" => %q(
           ex:name owl:equivalentProperty foaf:name .
         ),
         :result => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> ex:name "Gregg Kellogg";
             foaf:name "Gregg Kellogg" .
         )
       },
       "cax-sco"   => {
         :default => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> a ex:Person .
         ),
         "http://example.org/vocab#" => %q(
           ex:Person rdfs:subClassOf foaf:Person .
         ),
         :result => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> a ex:Person, foaf:Person .
         )
       },
       "cax-eqc1"   => {
         :default => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> a ex:Person .
         ),
         "http://example.org/vocab#" => %q(
           ex:Person owl:equivalentClass foaf:Person .
         ),
         :result => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> a ex:Person, foaf:Person .
         )
       },
       "cax-eqc2"   => {
         :default => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> a foaf:Person .
         ),
         "http://example.org/vocab#" => %q(
           ex:Person owl:equivalentClass foaf:Person .
         ),
         :result => %q(
-          <document> rdfa:hasVocabulary ex: .
+          <document> rdfa:usesVocabulary ex: .
           <#me> a ex:Person, foaf:Person .
         )
       },
@@ -317,7 +317,7 @@ describe RDF::RDFa::Expansion do
         @prefix dc:   <http://purl.org/dc/terms/> .
 
         <> a doap:Project, wn:Project, foaf:Project;
-          rdfa:hasVocabulary <http://usefulinc.com/ns/doap#>;
+          rdfa:usesVocabulary <http://usefulinc.com/ns/doap#>;
           doap:name "RDF::RDFa";
           rdfs:label "RDF::RDFa";
           dc:creator <http://greggkellogg.net/foaf#me> .
