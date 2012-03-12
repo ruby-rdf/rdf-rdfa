@@ -32,16 +32,16 @@ module RDF::RDFa
 
     XHTML = "http://www.w3.org/1999/xhtml"
     
-    SafeCURIEorCURIEorURI = {
-      :"rdfa1.0" => [:term, :safe_curie, :uri, :bnode],
-      :"rdfa1.1" => [:safe_curie, :curie, :term, :uri, :bnode],
+    # Content model for @about and @resource. In RDFa 1.0, this was URIorSafeCURIE
+    SafeCURIEorCURIEorIRI = {
+      :"rdfa1.0" => [:safe_curie, :uri, :bnode],
+      :"rdfa1.1" => [:safe_curie, :curie, :uri, :bnode],
     }
-    TERMorCURIEorAbsURI = {
+
+    # Content model for @datatype. In RDFa 1.0, this was CURIE
+    # Also plural TERMorCURIEorAbsIRIs, content model for @rel, @rev, @property and @typeof
+    TERMorCURIEorAbsIRI = {
       :"rdfa1.0" => [:term, :curie],
-      :"rdfa1.1" => [:term, :curie, :absuri],
-    }
-    TERMorCURIEorAbsURIprop = {
-      :"rdfa1.0" => [:curie],
       :"rdfa1.1" => [:term, :curie, :absuri],
     }
 
@@ -672,12 +672,12 @@ module RDF::RDFa
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
-                          :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
+                          :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
       revs = process_uris(element, attrs[:rev], evaluation_context, base,
                           :uri_mappings => uri_mappings,
                           :term_mappings => term_mappings,
                           :vocab => default_vocabulary,
-                          :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
+                          :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
     
       add_debug(element) do
         "rels: #{rels.join(" ")}, revs: #{revs.join(" ")}"
@@ -690,11 +690,11 @@ module RDF::RDFa
           new_subject = if attrs[:about]
             process_uri(element, attrs[:about], evaluation_context, base,
                         :uri_mappings => uri_mappings,
-                        :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                        :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
           elsif attrs[:resource]
             process_uri(element, attrs[:resource], evaluation_context, base,
                         :uri_mappings => uri_mappings,
-                        :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                        :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
           elsif attrs[:href] || attrs[:src]
             process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
           end
@@ -722,10 +722,10 @@ module RDF::RDFa
           typed_resource = new_subject if attrs[:typeof]
         else
           # If the current element contains the @property attribute, but does not contain the @content or the @datatype attribute
-          if attrs[:property] && !(attrs[:content] || attrs[:datatype]) && evaluation_context.incomplete_triples.empty?
+          if attrs[:property] && !(attrs[:content] || attrs[:datatype])
             new_subject = process_uri(element, attrs[:about], evaluation_context, base,
                         :uri_mappings => uri_mappings,
-                        :restrictions => SafeCURIEorCURIEorURI.fetch(@version, [])) if attrs[:about]
+                        :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:about]
 
             # if the @typeof attribute is present, set typed resource to new subject
             typed_resource = new_subject if attrs[:typeof]
@@ -750,7 +750,7 @@ module RDF::RDFa
               typed_resource ||= if attrs[:resource]
                 process_uri(element, attrs[:resource], evaluation_context, base,
                             :uri_mappings => uri_mappings,
-                            :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
               elsif attrs[:href] || attrs[:src]
                 process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
               else
@@ -767,11 +767,11 @@ module RDF::RDFa
             new_subject = if attrs[:about]
               process_uri(element, attrs[:about], evaluation_context, base,
                           :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
             elsif attrs[:resource]
               process_uri(element, attrs[:resource], evaluation_context, base,
                           :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
             elsif attrs[:href] || attrs[:src]
               process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
             end
@@ -812,7 +812,7 @@ module RDF::RDFa
         # establish both a value for new subject and a value for current object resource:
         new_subject = process_uri(element, attrs[:about], evaluation_context, base,
                                   :uri_mappings => uri_mappings,
-                                  :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                                  :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
         new_subject ||= process_uri(element, attrs[:src], evaluation_context, base,
                                   :uri_mappings => uri_mappings,
                                   :restrictions => [:uri]) if @version == :"rdfa1.0"
@@ -840,7 +840,7 @@ module RDF::RDFa
         current_object_resource = if attrs[:resource]
           process_uri(element, attrs[:resource], evaluation_context, base,
                       :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                      :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
         elsif attrs[:href]
           process_uri(element, attrs[:href], evaluation_context, base,
                       :restrictions => [:uri])
@@ -871,12 +871,12 @@ module RDF::RDFa
     
       # Process @typeof if there is a subject [Step 7]
       if typed_resource
-        # Typeof is TERMorCURIEorAbsURIs
+        # Typeof is TERMorCURIEorAbsIRIs
         types = process_uris(element, attrs[:typeof], evaluation_context, base,
                             :uri_mappings => uri_mappings,
                             :term_mappings => term_mappings,
                             :vocab => default_vocabulary,
-                            :restrictions => TERMorCURIEorAbsURI.fetch(@version, []))
+                            :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
         add_debug(element, "[Step 7] typeof: #{attrs[:typeof]}")
         types.each do |one_type|
           add_triple(element, typed_resource, RDF["type"], one_type)
@@ -957,7 +957,7 @@ module RDF::RDFa
                                   :uri_mappings => uri_mappings,
                                   :term_mappings => term_mappings,
                                   :vocab => default_vocabulary,
-                                  :restrictions => TERMorCURIEorAbsURIprop.fetch(@version, []))
+                                  :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
 
         properties.reject! do |p|
           if p.is_a?(RDF::URI)
@@ -972,7 +972,7 @@ module RDF::RDFa
                               :uri_mappings => uri_mappings,
                               :term_mappings => term_mappings,
                               :vocab => default_vocabulary,
-                              :restrictions => TERMorCURIEorAbsURI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
+                              :restrictions => TERMorCURIEorAbsIRI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
         begin
           current_property_value = if datatype && datatype != RDF.XMLLiteral
             # typed literal
@@ -1028,7 +1028,7 @@ module RDF::RDFa
                 add_debug(element, "[Step 11(1.1)] IRI literal (resource)")
                 process_uri(element, attrs[:resource], evaluation_context, base,
                             :uri_mappings => uri_mappings,
-                            :restrictions => SafeCURIEorCURIEorURI.fetch(@version, []))
+                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
               else
                 add_debug(element, "[Step 11(1.1)] IRI literal (href/src/data)")
                 process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
@@ -1171,7 +1171,7 @@ module RDF::RDFa
       end
     end
 
-    # space-separated TERMorCURIEorAbsURI or SafeCURIEorCURIEorURI
+    # space-separated TERMorCURIEorAbsIRI or SafeCURIEorCURIEorIRI
     def process_uris(element, value, evaluation_context, base, options)
       return [] if value.to_s.empty?
       add_debug(element) {"process_uris: #{value}"}
@@ -1184,7 +1184,7 @@ module RDF::RDFa
       add_debug(element) {"process_uri: #{value}, restrictions = #{restrictions.inspect}"}
       options = {:uri_mappings => {}}.merge(options)
       if !options[:term_mappings] && options[:uri_mappings] && restrictions.include?(:safe_curie) && value.to_s.match(/^\[(.*)\]$/)
-        # SafeCURIEorCURIEorURI
+        # SafeCURIEorCURIEorIRI
         # When the value is surrounded by square brackets, then the content within the brackets is
         # evaluated as a CURIE according to the CURIE Syntax definition. If it is not a valid CURIE, the
         # value must be ignored.
@@ -1196,14 +1196,14 @@ module RDF::RDFa
         end
         uri
       elsif options[:term_mappings] && TERM_REGEXP.match(value.to_s) && restrictions.include?(:term)
-        # TERMorCURIEorAbsURI
+        # TERMorCURIEorAbsIRI
         # If the value is an NCName, then it is evaluated as a term according to General Use of Terms in
         # Attributes. Note that this step may mean that the value is to be ignored.
         uri = process_term(element, value.to_s, options)
         add_debug(element) {"process_uri: #{value} => term => <#{uri}>"}
         uri
       else
-        # SafeCURIEorCURIEorURI or TERMorCURIEorAbsURI
+        # SafeCURIEorCURIEorIRI or TERMorCURIEorAbsIRI
         # Otherwise, the value is evaluated as a CURIE.
         # If it is a valid CURIE, the resulting URI is used; otherwise, the value will be processed as a URI.
         uri = curie_to_resource_or_bnode(element, value, options[:uri_mappings], evaluation_context.parent_subject, restrictions)
