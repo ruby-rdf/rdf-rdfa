@@ -290,6 +290,39 @@ describe "RDF::RDFa::Reader" do
             expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF::DC.title, "Title")
             parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
+
+          context :SafeCURIEorCURIEorIRI do
+            {
+              :term => [
+                %(<link about="" property="rdf:value" resource="describedby"/>),
+                %q(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                  @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                  <> rdf:value <describedby> .
+                )
+              ],
+              :curie => [
+                %(<link about="" property="rdf:value" resource="xhv:describedby"/>),
+                %q(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                  @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                  <> rdf:value xhv:describedby .
+                )
+              ],
+              :save_curie => [
+                %(<link about="" property="rdf:value" resource="[xhv:describedby]"/>),
+                %q(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                  @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                  <> rdf:value xhv:describedby .
+                )
+              ],
+            }.each do |test, (input, expected)|
+              it "expands #{test}" do
+                parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              end
+            end
+          end
         end
 
         describe "@href" do
