@@ -22,7 +22,7 @@ def run_tc(tc, options)
   pg = RDF::Graph.new if options[:processor_graph]
 
   begin
-    puts "open #{input_uri}"
+    puts "open #{input_uri}" if options[:verbose]
     options = {
       :base_uri => input_uri,
       :processor_graph => pg,

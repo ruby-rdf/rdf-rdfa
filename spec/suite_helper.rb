@@ -61,7 +61,7 @@ module Fixtures
 
     def input(host_language, version)
       base = self.inputDocument.to_s.
-        sub('test-cases/', "test-cases/#{host_language}/#{version}/").
+        sub('test-cases/', "test-cases/#{version}/#{host_language}/").
         sub('rdfa.info', 'rdfa.info')
       case host_language
       when /^xml/   then RDF::URI(base.sub(".html", ".xml"))
@@ -73,7 +73,7 @@ module Fixtures
     
     def results(host_language, version)
       RDF::URI(self.resultDocument.to_s.
-        sub('test-cases/', "test-cases/#{host_language}/#{version}/").
+        sub('test-cases/', "test-cases/#{version}/#{host_language}/").
         sub('rdfa.info', 'rdfa.info'))
     end
 
@@ -96,7 +96,7 @@ module Fixtures
     end
   end
 
-  local_manifest = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa-test-suite', 'manifest.ttl')
+  local_manifest = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa.info', 'manifest.ttl')
   repo = if File.exist?(local_manifest)
     RDF::Repository.load(local_manifest, :base_uri => SUITE.join("manifest.ttl"), :format => :ttl)
   else
