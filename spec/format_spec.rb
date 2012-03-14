@@ -110,7 +110,12 @@ describe RDF::RDFa::Format do
 
   describe ".detect" do
     {
-      :rdfa   => '<div about="foo"></div>',
+      :about    => '<div about="foo"></div>',
+      :typeof   => '<div typeof="foo"></div>',
+      :resource => '<div resource="foo"></div>',
+      :vocab    => '<div vocab="foo"></div>',
+      :prefix   => '<div prefix="foo"></div>',
+      :property => '<div property="foo"></div>',
     }.each do |sym, str|
       it "detects #{sym}" do
         @format_class.detect(str).should be_true
@@ -123,7 +128,11 @@ describe RDF::RDFa::Format do
       :rdfxml               => '<rdf:RDF about="foo"></rdf:RDF>',
       :jsonld               => '{"@context" => "foo"}',
       :ntriples             => "<a> <b> <c> .",
-      :microdata            => '<div itemref="bar"></div>',
+      :itemprop =>  '<div itemprop="bar"></div>',
+      :itemtype =>  '<div itemtype="bar"></div>',
+      :itemref =>   '<div itemref="bar"></div>',
+      :itemscope => '<div itemscope=""></div>',
+      :itemid =>    '<div itemid="bar"></div>',
       :multi_line           => '<a>\n  <b>\n  "literal"\n .',
       :turtle               => "@prefix foo: <bar> .\n foo:a foo:b <c> .",
       :STRING_LITERAL1      => %(<a> <b> 'literal' .),
