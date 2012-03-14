@@ -1021,9 +1021,9 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
                 <http://greggkellogg.net/foaf#me> foaf:knows [
-                  a foaf:Person;
                   foaf:name "Ivan Herman"
                 ].
+                [ a foaf:Person ] .
               )
             ],
             "@property, @href and @typeof and incomplete triples" => [
@@ -1034,10 +1034,8 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-                <http://greggkellogg.net/foaf#me> foaf:knows <http://www.ivan-herman.net/foaf#me> .
-                <http://www.ivan-herman.net/foaf#me> a foaf:Person;
-                  foaf:name "Ivan Herman"
-                ].
+                <http://greggkellogg.net/foaf#me> foaf:knows [ foaf:name "Ivan Herman"] .
+                <http://www.ivan-herman.net/foaf#me> a foaf:Person .
               )
             ],
           }.each do |test, (input, expected)|
