@@ -4,6 +4,6 @@ require 'rdf/rdfa/expansion'
 
 module RDF::RDFa::Expansion
   [
-    RDF::Statement.new(RDF::URI('http://www.w3.org/2008/05/skos-xl#Label'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::Node.new('g2153612920'), :context => RDF::URI('http://www.w3.org/2008/05/skos-xl#')),
+    RDF::Statement.new(RDF::URI('http://www.w3.org/2008/05/skos-xl#Label'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::Node.new('g70249981758620'), :context => RDF::URI('http://www.w3.org/2008/05/skos-xl#')),
   ].each {|st| COOKED_VOCAB_STATEMENTS << st }
 end
