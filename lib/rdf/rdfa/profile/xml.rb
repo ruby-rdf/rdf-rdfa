@@ -14,6 +14,7 @@ class RDF::RDFa::Profile
           :gr      => "http://purl.org/goodrelations/v1#",
           :grddl   => "http://www.w3.org/2003/g/data-view#",
           :ical    => "http://www.w3.org/2002/12/cal/icaltzd#",
+          :ma      => "http://www.w3.org/ns/ma-ont#",
           :og      => "http://ogp.me/ns#",
           :owl     => "http://www.w3.org/2002/07/owl#",
           :rdf     => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
