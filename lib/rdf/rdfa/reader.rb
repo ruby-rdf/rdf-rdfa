@@ -704,7 +704,7 @@ module RDF::RDFa
           new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
             # From XHTML+RDFa 1.1:
             # if no URI is provided, then first check to see if the element is the head or body element.
-            # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
+            # If it is, then act as if the new subject is set to the parent object.
             uri(base)
           elsif element == root && base
             # if the element is the root element of the document, then act as if there is an empty @about present,
@@ -735,8 +735,8 @@ module RDF::RDFa
             new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
               # From XHTML+RDFa 1.1:
               # if no URI is provided, then first check to see if the element is the head or body element.
-              # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-              uri(base)
+              # If it is, then act as if the new subject is set to the parent object.
+              evaluation_context.parent_object
             elsif element == root && base
               # if the element is the root element of the document, then act as if there is an empty @about present,
               # and process it according to the rule for @about, above;
@@ -781,8 +781,8 @@ module RDF::RDFa
             new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
               # From XHTML+RDFa 1.1:
               # if no URI is provided, then first check to see if the element is the head or body element.
-              # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-              uri(base)
+              # If it is, then act as if the new subject is set to the parent object.
+              evaluation_context.parent_object
             elsif element == root && base
               # if the element is the root element of the document, then act as if there is an empty @about present,
               # and process it according to the rule for @about, above;
@@ -826,8 +826,8 @@ module RDF::RDFa
         elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
-          # If it is, then act as if there is an empty @about present, and process it according to the rule for @about.
-          uri(base)
+          # If it is, then act as if the new subject is set to the parent object.
+          evaluation_context.parent_object
         elsif attrs[:typeof] && @version == :"rdfa1.0"
           RDF::Node.new
         else

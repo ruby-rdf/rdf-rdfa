@@ -1,3 +1,13 @@
+### 0.3.10
+* Change `:expand\_reader` option to `:vocab\_expansion`, to conform with RDFa Core 1.1 definition.
+* Changed `:processor\_graph` to `:processor\_callback` and added `:rdfagraph` option, taking either or both of `:output` and `:processor`.
+* Better error recovery is there is no document root.
+* Updates to CURIE definition, Term resolution (use @vocab first), and Error/Warning generation in the processor graph.
+* `rdfa:usesVocabulary` changed to `rdfa:hasVocabulary`.
+* Tolerate errors in vocabulary download when missing.
+* Change `SafeCURIEorCURIEorIRI` to not include term.
+* Remove `TERMorCURIEorAbsIRIprop`, as it doesn't seem necessary.
+
 ### 0.3.9
 * Updated to latest working drafts:
   * [RDFa 1.1 Core](http://www.w3.org/TR/2011/WD-rdfa-core-20110331/)
