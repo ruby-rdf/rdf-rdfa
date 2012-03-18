@@ -800,6 +800,18 @@ describe "RDF::RDFa::Reader" do
                 <> rdf:value <#foo> .
               )
             ],
+            "with <time>=xsd:time" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value">00:00:00Z</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
+              )
+            ],
             "with @datetime=xsd:date" => [
               %q(
                 <div about="">
@@ -824,18 +836,6 @@ describe "RDF::RDFa::Reader" do
                 <> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
               )
             ],
-            "with <time>=xsd:time" => [
-              %q(
-                <div about="">
-                  <time property="rdf:value">00:00:00Z</time>
-                </div>
-              ),
-              %q(
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
-                <> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
-              )
-            ],
             "with @datetime=xsd:dateTime" => [
               %q(
                 <div about="">
@@ -846,6 +846,31 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
                 <> rdf:value "2011-06-28T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+              )
+            ],
+            "with @datetime=xsd:dateTime with TZ offset" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="2011-06-28T00:00:00-08:00">28 June 2011 at midnight in San Francisco</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "2011-06-28T00:00:00-08:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+              )
+            ],
+            "with @datetime=xsd:dateTime with @datatype" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="2012-03-18T00:00:00Z" datatype="xsd:string"> March 2012 at midnight in San Francisco</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+          
+                <> rdf:value "2012-03-18T00:00:00Z"^^xsd:string .
               )
             ],
             "with @datetime=xsd:gYear" => [
@@ -894,6 +919,19 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
                 <> rdf:value "foo" .
+              )
+            ],
+            "with @datetime and @content" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datetime="2012-03-18" content="not this">18 March 2012</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+          
+                <> rdf:value "2012-03-18"^^xsd:date .
               )
             ],
             "with <data> @value=plain" => [

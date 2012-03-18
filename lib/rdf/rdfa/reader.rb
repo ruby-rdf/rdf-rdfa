@@ -977,7 +977,7 @@ module RDF::RDFa
           current_property_value = if datatype && datatype != RDF.XMLLiteral
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
-            RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            RDF::Literal.new(attrs[:datetime] || attrs[:value] || attrs[:content] || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
           elsif @version == :"rdfa1.1"
             if datatype == RDF.XMLLiteral
               # XML Literal
@@ -1011,15 +1011,15 @@ module RDF::RDFa
               end || RDF::Literal
               add_debug(element) {"[Step 11(1.1)] <time> literal: #{datatype} #{v.inspect}"}
               datatype.new(v)
-            elsif attrs[:content]
-              # plain literal
-              add_debug(element, "[Step 11(1.1)] plain literal (content)")
-              RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
             elsif element.name.to_s == 'data' && attrs[:value]
               # HTML5 support
               # plain literal
               add_debug(element, "[Step 11(1.1)] plain literal (value)")
               RDF::Literal.new(attrs[:value],  :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            elsif attrs[:content]
+              # plain literal
+              add_debug(element, "[Step 11(1.1)] plain literal (content)")
+              RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
             elsif (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) &&
                  !(attrs[:rel] || attrs[:rev]) &&
                  evaluation_context.incomplete_triples.empty? &&
