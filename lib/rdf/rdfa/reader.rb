@@ -1010,7 +1010,7 @@ module RDF::RDFa
                 v.match(dt::GRAMMAR)
               end || RDF::Literal
               add_debug(element) {"[Step 11(1.1)] <time> literal: #{datatype} #{v.inspect}"}
-              datatype.new(v)
+              datatype.new(v, :language => language)
             elsif element.name.to_s == 'data' && attrs[:value]
               # HTML5 support
               # plain literal

@@ -873,6 +873,19 @@ describe "RDF::RDFa::Reader" do
                 <> rdf:value "2012-03-18T00:00:00Z"^^xsd:string .
               )
             ],
+            "with @datetime=xsd:dateTime with @datatype and not-quite matching lexical value" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" datatype="xsd:dateTime"> 2012-03-18Z</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+          
+                <> rdf:value " 2012-03-18Z"^^xsd:dateTime .
+              )
+            ],
             "with @datetime=xsd:gYear" => [
               %q(
                 <div about="">
@@ -921,6 +934,18 @@ describe "RDF::RDFa::Reader" do
                 <> rdf:value "foo" .
               )
             ],
+            "with @datetime=plain with @lang" => [
+              %q(
+                <div about="">
+                  <time property="rdf:value" lang="en" datetime="D-Day">Foo</time>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "D-Day"@en .
+              )
+            ],
             "with @datetime and @content" => [
               %q(
                 <div about="">
@@ -956,6 +981,30 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
                 <> rdf:value "foo"@en .
+              )
+            ],
+            "with <data> @value and @content" => [
+              %q(
+                <div about="">
+                  <data property="rdf:value" value="veni, vidi, vici" content="I came, I saw, I conquered">Foo</data>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "veni, vidi, vici" .
+              )
+            ],
+            "with <data> @value, @lang and @content" => [
+              %q(
+                <div about="">
+                  <data property="rdf:value" lang="lat" value="veni, vidi, vici" content="I came, I saw, I conquered">Foo</data>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+          
+                <> rdf:value "veni, vidi, vici"@lat .
               )
             ],
             "with @resource" => [
