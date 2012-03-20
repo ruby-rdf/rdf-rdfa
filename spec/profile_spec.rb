@@ -40,8 +40,8 @@ describe RDF::RDFa::Profile do
         subject.vocabulary.should be_nil
       end
 
-      it "has 27 prefixes" do
-        subject.prefixes.keys.length.should == 27
+      it "has more than 10 prefixes" do
+        subject.prefixes.keys.length.should be > 10
       end
     end
 
