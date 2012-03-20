@@ -440,18 +440,18 @@ module RDF::RDFa
     def preprocess
       # Load initial contexts
       # Add terms and prefixes to local store for converting URIs
-      # Keep track of vocabulary from left-most profile
+      # Keep track of vocabulary from left-most context
       [XML_RDFA_CONTEXT, HTML_RDFA_CONTEXT].each do |uri|
-        prof = Profile.find(uri)
-        prof.prefixes.each_pair do |k, v|
+        ctx = Context.find(uri)
+        ctx.prefixes.each_pair do |k, v|
           @uri_to_prefix[v] = k
         end
 
-        prof.terms.each_pair do |k, v|
+        ctx.terms.each_pair do |k, v|
           @uri_to_term_or_curie[v] = k
         end
 
-        @vocabulary = prof.vocabulary.to_s if prof.vocabulary
+        @vocabulary = ctx.vocabulary.to_s if ctx.vocabulary
       end
 
       # Load defined prefixes

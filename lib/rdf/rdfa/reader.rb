@@ -158,7 +158,7 @@ module RDF::RDFa
       #
       # This specification does not define an initial list.
       # Host Languages may define an initial list.
-      # If a Host Language provides an initial list, it should do so via an RDFa Profile document.
+      # If a Host Language provides an initial list, it should do so via an RDFa Context document.
       #
       # @attr [Hash{Symbol => RDF::URI}]
       attr :term_mappings, true
@@ -450,7 +450,7 @@ module RDF::RDFa
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
       add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
-      @callback.call(statement) if @options[:rdfagraph].include?(:output)
+      @callback.call(statement) if @options[:rdfagraph].include?(:output) && statement.valid?
     end
 
     # Parsing an RDFa document (this is *not* the recursive method)
@@ -482,7 +482,7 @@ module RDF::RDFa
       add_debug("", "parse_whole_doc: traversal complete'")
     end
   
-    # Parse and process URI mappings, Term mappings and a default vocabulary from @profile
+    # Parse and process URI mappings, Term mappings and a default vocabulary from @context
     #
     # Yields each mapping
     def load_initial_contexts(initial_contexts)
@@ -491,7 +491,7 @@ module RDF::RDFa
         each do |uri|
           # Don't try to open ourselves!
           if base_uri == uri
-            add_debug(root) {"load_initial_contexts: skip recursive profile <#{uri}>"}
+            add_debug(root) {"load_initial_contexts: skip recursive context <#{uri}>"}
             next
           end
 
@@ -499,7 +499,7 @@ module RDF::RDFa
           begin
             add_info(root, "load_initial_contexts: load <#{uri}>")
             RDF::RDFa.debug = false
-            profile = Profile.find(uri)
+            context = Context.find(uri)
           rescue Exception => e
             RDF::RDFa.debug = old_debug
             add_error(root, e.message)
@@ -509,12 +509,12 @@ module RDF::RDFa
           end
 
           # Add URI Mappings to prefixes
-          profile.prefixes.each_pair do |prefix, value|
+          context.prefixes.each_pair do |prefix, value|
             prefix(prefix, value)
           end
-          yield :uri_mappings, profile.prefixes unless profile.prefixes.empty?
-          yield :term_mappings, profile.terms unless profile.terms.empty?
-          yield :default_vocabulary, profile.vocabulary if profile.vocabulary
+          yield :uri_mappings, context.prefixes unless context.prefixes.empty?
+          yield :term_mappings, context.terms unless context.terms.empty?
+          yield :default_vocabulary, context.vocabulary if context.vocabulary
         end
     end
 

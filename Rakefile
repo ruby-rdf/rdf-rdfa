@@ -48,17 +48,17 @@ task :update_vocabularies do
   end
 end
 
-desc "Update RDFa Profiles"
-task :update_profiles do
+desc "Update RDFa Contexts"
+task :update_contexts do
   {
     :html => "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1",
     :xhtml => "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1",
     :xml => "http://www.w3.org/2011/rdfa-context/rdfa-1.1",
   }.each do |v, uri|
     puts "Build #{uri}"
-    vocab = File.expand_path(File.join(File.dirname(__FILE__), "lib", "rdf", "rdfa", "profile", "#{v}.rb"))
+    vocab = File.expand_path(File.join(File.dirname(__FILE__), "lib", "rdf", "rdfa", "context", "#{v}.rb"))
     FileUtils.rm_rf(vocab)
-    `./script/intern_profile -o #{vocab} #{uri}`
+    `./script/intern_context -o #{vocab} #{uri}`
   end
 end
 

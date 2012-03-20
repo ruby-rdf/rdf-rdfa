@@ -215,5 +215,5 @@ module RDF::RDFa
   end
 end
 
-# Load cooked profiles
+# Load cooked vocabularies
 Dir.glob(File.join(File.expand_path(File.dirname(__FILE__)), 'expansion', '*')).each {|f| load f}

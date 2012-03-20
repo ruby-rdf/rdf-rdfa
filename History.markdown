@@ -4,6 +4,8 @@
   * [RDFa Lite 1.1](http://www.w3.org/TR/2012/CR-rdfa-lite-20120313/)
   * [XHTML+RDFa 1.1](http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/)
   * [HTML+RDFa 1.1](http://dev.w3.org/html5/rdfa/)
+* change profile to context to conform with change in use in RDFa 1.1.
+
 ### 0.3.10
 * Change `:expand\_reader` option to `:vocab\_expansion`, to conform with RDFa Core 1.1 definition.
 * Changed `:processor\_graph` to `:processor\_callback` and added `:rdfagraph` option, taking either or both of `:output` and `:processor`.

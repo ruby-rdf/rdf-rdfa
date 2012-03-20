@@ -1,10 +1,10 @@
 $:.unshift "."
 require 'spec_helper'
 
-describe RDF::RDFa::Profile do
+describe RDF::RDFa::Context do
   describe ".new" do
     describe "foaf" do
-      subject { RDF::RDFa::Profile.new("http://example/") }
+      subject { RDF::RDFa::Context.new("http://example/") }
       
       it "has a URI" do
         subject.uri.should == RDF::URI("http://example/")
@@ -26,7 +26,7 @@ describe RDF::RDFa::Profile do
   
   describe ".find" do
     describe "rdfa-1.1" do
-      subject { RDF::RDFa::Profile.find("http://www.w3.org/2011/rdfa-context/rdfa-1.1") }
+      subject { RDF::RDFa::Context.find("http://www.w3.org/2011/rdfa-context/rdfa-1.1") }
 
       it "has 3 terms" do
         subject.terms.keys.length.should == 3
@@ -46,7 +46,7 @@ describe RDF::RDFa::Profile do
     end
 
     describe "html+rdfa-1.1" do
-      subject { RDF::RDFa::Profile.find("http://www.w3.org/2011/rdfa-context/html-rdfa-1.1") }
+      subject { RDF::RDFa::Context.find("http://www.w3.org/2011/rdfa-context/html-rdfa-1.1") }
 
       it "has 0 terms" do
         subject.terms.keys.length.should == 0
@@ -66,7 +66,7 @@ describe RDF::RDFa::Profile do
     end
 
     describe "xhtml+rdfa-1.1" do
-      subject { RDF::RDFa::Profile.find("http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1") }
+      subject { RDF::RDFa::Context.find("http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1") }
 
       it "has 25 terms" do
         subject.terms.keys.length.should == 25

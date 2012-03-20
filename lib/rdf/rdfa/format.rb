@@ -4,8 +4,8 @@ module RDF::RDFa
   #
   # @example Obtaining an RDFa format class
   #   RDF::Format.for(:rdfa)     #=> RDF::RDFa::Format
-  #   RDF::Format.for("etc/foaf.html")
-  #   RDF::Format.for(:file_name      => "etc/foaf.html")
+  #   RDF::Format.for("etc/doap.html")
+  #   RDF::Format.for(:file_name      => "etc/doap.html")
   #   RDF::Format.for(:file_extension => "html")
   #   RDF::Format.for(:content_type   => "text/html")
   #   RDF::Format.for(:content_type   => "application/xhtml+xml")

@@ -1,18 +1,18 @@
 module RDF::RDFa
   ##
-  # Profile representation existing of a hash of terms, prefixes, a default vocabulary and a URI.
+  # Context representation existing of a hash of terms, prefixes, a default vocabulary and a URI.
   #
-  # Profiles are used for storing RDFa profile representations. A representation is created
-  # by serializing a profile graph (typically also in RDFa, but may be in other representations).
+  # Contexts are used for storing RDFa context representations. A representation is created
+  # by serializing a context graph (typically also in RDFa, but may be in other representations).
   #
-  # The class may be backed by an RDF::Repository, which will be used to retrieve a profile graph
+  # The class may be backed by an RDF::Repository, which will be used to retrieve a context graph
   # or to load into, if no such graph exists
-  class Profile
-    # Prefix mappings defined in this profile
+  class Context
+    # Prefix mappings defined in this context
     # @return [Hash{Symbol => RDF::URI}]
     attr_reader :prefixes
 
-    # Term mappings defined in this profile
+    # Term mappings defined in this context
     # @return [Hash{Symbol => RDF::URI}]
     attr_reader :terms
     
@@ -20,20 +20,20 @@ module RDF::RDFa
     # @return [RDF::URI]
     attr_reader :vocabulary
 
-    # URI defining this profile
+    # URI defining this context
     # @return [RDF::URI]
     attr_reader :uri
     
     ##
-    # Initialize a new profile from the given URI.
+    # Initialize a new context from the given URI.
     #
-    # Parses the profile and places it in the repository and cache
+    # Parses the context and places it in the repository and cache
     #
-    # @param [RDF::URI, #to_s] uri URI of profile to be represented
-    # @yield [profile]
-    # @yieldparam [RDF::RDFa::Profile] profile
+    # @param [RDF::URI, #to_s] uri URI of context to be represented
+    # @yield [context]
+    # @yieldparam [RDF::RDFa::Context] context
     # @yieldreturn [void] ignored
-    # @return [RDF::RDFa::Profile]
+    # @return [RDF::RDFa::Context]
     def initialize(uri, options = {}, &block)
       @uri = RDF::URI.intern(uri)
       @prefixes = options.fetch(:prefixes, {})
@@ -55,24 +55,24 @@ module RDF::RDFa
     end
 
     ##
-    # Repository used for saving profiles
+    # Repository used for saving contexts
     # @return [RDF::Repository]
-    # @raise [RDF::RDFa::ProfileError] if profile does not support contexts
+    # @raise [RDF::RDFa::ContextError] if context does not support contexts
     def self.repository
-      @repository ||= RDF::Repository.new(:title => "RDFa Profiles")
+      @repository ||= RDF::Repository.new(:title => "RDFa Contexts")
     end
     
     ##
-    # Set repository used for saving profiles
+    # Set repository used for saving contexts
     # @param [RDF::Repository] repo
     # @return [RDF::Repository]
     def self.repository=(repo)
-      raise ProfileError, "Profile Repository must support context" unless repo.supports?(:context)
+      raise ContextError, "Context Repository must support context" unless repo.supports?(:context)
       @repository = repo
     end
     
-    # Return a profile faulting through the cache
-    # @return [RDF::RDFa::Profile]
+    # Return a context faulting through the cache
+    # @return [RDF::RDFa::Context]
     def self.find(uri)
       uri = RDF::URI.intern(uri)
       
@@ -82,16 +82,16 @@ module RDF::RDFa
       # Return something to make the caller happy if we're re-entered
       cache[uri] = Struct.new(:prefixes, :terms, :vocabulary).new({}, {}, nil)
       # Now do the actual load
-      cache[uri] = new(uri) do |profile|
-        STDERR.puts("process_profile: retrieve profile <#{uri}>") if RDF::RDFa.debug?
-        Profile.load(uri)
-        profile.parse(repository.query(:context => uri))
+      cache[uri] = new(uri) do |context|
+        STDERR.puts("process_context: retrieve context <#{uri}>") if RDF::RDFa.debug?
+        Context.load(uri)
+        context.parse(repository.query(:context => uri))
       end
     rescue Exception => e
-      raise ProfileError, "Profile #{uri}: #{e.message}"
+      raise ContextError, "Context #{uri}: #{e.message}"
     end
 
-    # Load profile into repository
+    # Load context into repository
     def self.load(uri)
       uri = RDF::URI.intern(uri)
       repository.load(uri.to_s, :base_uri => uri, :context => uri) unless repository.has_context?(uri)
@@ -99,17 +99,17 @@ module RDF::RDFa
     
     # @return [RDF::Repository]
     def repository
-      Profile.repository
+      Context.repository
     end
     
     ##
-    # Defines the given named URI prefix for this profile.
+    # Defines the given named URI prefix for this context.
     #
     # @example Defining a URI prefix
-    #   profile.prefix :dc, RDF::URI('http://purl.org/dc/terms/')
+    #   context.prefix :dc, RDF::URI('http://purl.org/dc/terms/')
     #
     # @example Returning a URI prefix
-    #   profile.prefix(:dc)    #=> RDF::URI('http://purl.org/dc/terms/')
+    #   context.prefix(:dc)    #=> RDF::URI('http://purl.org/dc/terms/')
     #
     # @overload prefix(name, uri)
     #   @param  [Symbol, #to_s]   name
@@ -125,13 +125,13 @@ module RDF::RDFa
     end
 
     ##
-    # Defines the given named URI term for this profile.
+    # Defines the given named URI term for this context.
     #
     # @example Defining a URI term
-    #   profile.term :title, RDF::URI('http://purl.org/dc/terms/title')
+    #   context.term :title, RDF::URI('http://purl.org/dc/terms/title')
     #
-    # @example Returning a URI profile
-    #   profile.term(:title)    #=> RDF::URI('http://purl.org/dc/terms/TITLE')
+    # @example Returning a URI context
+    #   context.term(:title)    #=> RDF::URI('http://purl.org/dc/terms/TITLE')
     #
     # @overload term(name, uri)
     #   @param  [Symbol, #to_s]   name
@@ -152,12 +152,12 @@ module RDF::RDFa
     # @param [RDF::Enumerable, Enumerator] queryable
     # @return [void] ignored
     def parse(enumerable)
-      STDERR.puts("process_profile: parse profile <#{uri}>") if RDF::RDFa.debug?
+      STDERR.puts("process_context: parse context <#{uri}>") if RDF::RDFa.debug?
       resource_info = {}
       enumerable.each do |statement|
         res = resource_info[statement.subject] ||= {}
         next unless statement.object.is_a?(RDF::Literal)
-        STDERR.puts("process_profile: statement=#{statement.inspect}") if RDF::RDFa.debug?
+        STDERR.puts("process_context: statement=#{statement.inspect}") if RDF::RDFa.debug?
         %w(uri term prefix vocabulary).each do |term|
           res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
         end
@@ -170,7 +170,7 @@ module RDF::RDFa
         term = res["term"]
         prefix = res["prefix"]
         vocab = res["vocabulary"]
-        STDERR.puts("process_profile: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}") if RDF::RDFa.debug?
+        STDERR.puts("process_context: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}") if RDF::RDFa.debug?
 
         @vocabulary = vocab if vocab
         
@@ -190,9 +190,9 @@ module RDF::RDFa
   end
 
   ##
-  # The base class for RDF profile errors.
-  class ProfileError < IOError; end
+  # The base class for RDF context errors.
+  class ContextError < IOError; end
 end
 
-# Load cooked profiles
-Dir.glob(File.join(File.expand_path(File.dirname(__FILE__)), 'profile', '*')).each {|f| load f}
+# Load cooked contexts
+Dir.glob(File.join(File.expand_path(File.dirname(__FILE__)), 'context', '*')).each {|f| load f}
