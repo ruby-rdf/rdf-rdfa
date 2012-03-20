@@ -16,10 +16,9 @@ module RDF
   #   end
   #
   # @see http://rdf.rubyforge.org/
-  # @see http://www.w3.org/TR/xhtml-rdfa-primer/
-  # @see http://www.w3.org/2010/02/rdfa/wiki/Main_Page
-  # @see http://www.w3.org/TR/2011/WD-rdfa-core-20111215/
-  # @see http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/
+  # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
+  # @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/
+  # @see http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/
   # @see http://dev.w3.org/html5/rdfa/
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)

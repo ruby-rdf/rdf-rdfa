@@ -21,9 +21,9 @@ module RDF::RDFa
   #
   # Based on processing rules described here:
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/TR/2011/WD-rdfa-core-20111215/ RDFa Core 1.1
-  # @see http://www.w3.org/TR/2011/WD-xhtml-rdfa-20111215/ XHTML+RDFa 1.1
-  # @see http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/ HTML+RDFa 1.1
+  # @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/
+  # @see http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/
+  # @see http://dev.w3.org/html5/rdfa/
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Reader < RDF::Reader
@@ -61,11 +61,11 @@ module RDF::RDFa
       Regexp::EXTENDED)
 
     # This expression matches an term as defined in
-    # [RDFA-CORE](http://www.w3.org/TR/2011/WD-rdfa-core-20111215/#s_terms)
+    # [RDFA-CORE](# @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/#s_terms)
     #
     # For the avoidance of doubt, this definition means a 'term'
     # in RDFa is an XML NCName that also permits slash as a non-leading character.
-    # @see http://www.w3.org/TR/2011/WD-rdfa-core-20111215/#s_terms
+    # @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/#s_terms
     TERM_REGEXP = Regexp.new(
       %{^
         (?!\\\\u0301)             # &#x301; is a non-spacing acute accent.

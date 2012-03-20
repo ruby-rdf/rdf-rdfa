@@ -397,10 +397,10 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [YARD]:             http://yardoc.org/
 [YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
-[RDFa 1.1 Core]:    http://www.w3.org/TR/2011/WD-rdfa-core-20110331/                    "RDFa 1.1 Core"
-[RDFa Lite 1.1]:    http://www.w3.org/2010/02/rdfa/drafts/2011/ED-rdfa-lite-20111030/   "RDFa Lite 1.1"
-[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/                   "XHTML+RDFa 1.1"
-[HTML+RDFa 1.1]:    http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/                 "HTML+RDFa 1.1"
+[RDFa 1.1 Core]:    http://www.w3.org/TR/2012/CR-rdfa-core-20120313/                    "RDFa 1.1 Core"
+[RDFa Lite 1.1]:    http://www.w3.org/TR/2012/CR-rdfa-lite-20120313//   "RDFa Lite 1.1"
+[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/                   "XHTML+RDFa 1.1"
+[HTML+RDFa 1.1]:    http://dev.w3.org/html5/rdfa/                 "HTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.info/test-suite/                                        "RDFa test suite"
 [RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
