@@ -1,12 +1,13 @@
-### 0.3.11
+### 0.3.10.1
+* Fix case where @datatype and @property are present, but @datatype is empty. (TC 290)
+
+### 0.3.10
 * Updated to Candidate Recommendation of drafts:
   * [RDFa 1.1 Core](http://www.w3.org/TR/2012/CR-rdfa-core-20120313/)
   * [RDFa Lite 1.1](http://www.w3.org/TR/2012/CR-rdfa-lite-20120313/)
   * [XHTML+RDFa 1.1](http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/)
   * [HTML+RDFa 1.1](http://dev.w3.org/html5/rdfa/)
 * change profile to context to conform with change in use in RDFa 1.1.
-
-### 0.3.10
 * Change `:expand\_reader` option to `:vocab\_expansion`, to conform with RDFa Core 1.1 definition.
 * Changed `:processor\_graph` to `:processor\_callback` and added `:rdfagraph` option, taking either or both of `:output` and `:processor`.
 * Better error recovery is there is no document root.

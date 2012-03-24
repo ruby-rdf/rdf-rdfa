@@ -1125,6 +1125,15 @@ describe "RDF::RDFa::Reader" do
                 <http://www.ivan-herman.net/foaf#me> a foaf:Person .
               )
             ],
+            "@property, @href and @datatype" => [
+              %q(
+                <a href="http://example.org/" property="rdf:value" datatype="">value</a>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                <http://example.org/> rdf:value "value" .
+              )
+            ],
           }.each do |test, (input, expected)|
             it test do
               parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)

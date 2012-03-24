@@ -721,7 +721,10 @@ module RDF::RDFa
           # if the @typeof attribute is present, set typed resource to new subject
           typed_resource = new_subject if attrs[:typeof]
         else
-          # If the current element contains the @property attribute, but does not contain the @content or the @datatype attribute
+          # Uf the current element contains no @rel or @rev attribute, then the next step is to establish a value for new subject.
+          # This step has two possible alternatives.
+          #  1. If the current element contains the @property attribute, but does not contain the @content
+          #     or the @datatype attribute
           if attrs[:property] && !(attrs[:content] || attrs[:datatype])
             new_subject = process_uri(element, attrs[:about], evaluation_context, base,
                         :uri_mappings => uri_mappings,
@@ -762,7 +765,7 @@ module RDF::RDFa
               current_object_resource = typed_resource
             end
           else
-            # otherwise (ie, the @property element is not present)
+            # otherwise (ie, the @content or @datatype)
 
             new_subject = if attrs[:about]
               process_uri(element, attrs[:about], evaluation_context, base,
@@ -974,14 +977,16 @@ module RDF::RDFa
                               :vocab => default_vocabulary,
                               :restrictions => TERMorCURIEorAbsIRI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
         begin
-          current_property_value = if datatype && datatype != RDF.XMLLiteral
+          current_property_value = case
+          when datatype && datatype != RDF.XMLLiteral
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
             RDF::Literal.new(attrs[:datetime] || attrs[:value] || attrs[:content] || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
-          elsif @version == :"rdfa1.1"
-            if datatype == RDF.XMLLiteral
+          when @version == :"rdfa1.1"
+            case
+            when datatype == RDF.XMLLiteral
               # XML Literal
-              add_debug(element) {"[Step 11(1.1)] XML Literal: #{element.inner_html}"}
+              add_debug(element) {"[Step 11] XML Literal: #{element.inner_html}"}
 
               # In order to maintain maximum portability of this literal, any children of the current node that are
               # elements must have the current in scope XML namespace declarations (if any) declared on the
@@ -1002,43 +1007,50 @@ module RDF::RDFa
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
-            elsif element.name == 'time'
+            when element.name == 'time'
               # HTML5 support
               # Lexically scan value and assign appropriate type, otherwise, leave untyped
               v = (attrs[:datetime] || element.inner_text).to_s
               datatype = %w(Date Time DateTime Year YearMonth Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
                 v.match(dt::GRAMMAR)
               end || RDF::Literal
-              add_debug(element) {"[Step 11(1.1)] <time> literal: #{datatype} #{v.inspect}"}
+              add_debug(element) {"[Step 11] <time> literal: #{datatype} #{v.inspect}"}
               datatype.new(v, :language => language)
-            elsif element.name.to_s == 'data' && attrs[:value]
+            when element.name.to_s == 'data' && attrs[:value]
               # HTML5 support
               # plain literal
-              add_debug(element, "[Step 11(1.1)] plain literal (value)")
+              add_debug(element, "[Step 11] plain literal (value)")
               RDF::Literal.new(attrs[:value],  :language => language, :validate => validate?, :canonicalize => canonicalize?)
-            elsif attrs[:content]
+            when attrs[:datatype]
+              # otherwise, as a plain literal if @datatype is present but has an empty value.
+              # The actual literal is either the value of @content (if present) or a string created by
+              # concatenating the value of all descendant text nodes, of the current element in turn.
+              # typed literal
+              add_debug(element, "[Step 11] plain plain (#{datatype})")
+              RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            when attrs[:content]
               # plain literal
-              add_debug(element, "[Step 11(1.1)] plain literal (content)")
+              add_debug(element, "[Step 11] plain literal (content)")
               RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
-            elsif (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) &&
+            when (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) &&
                  !(attrs[:rel] || attrs[:rev]) &&
                  evaluation_context.incomplete_triples.empty? &&
                  @version != :"rdfa1.0"
               if attrs[:resource]
-                add_debug(element, "[Step 11(1.1)] IRI literal (resource)")
+                add_debug(element, "[Step 11] IRI literal (resource)")
                 process_uri(element, attrs[:resource], evaluation_context, base,
                             :uri_mappings => uri_mappings,
                             :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
               else
-                add_debug(element, "[Step 11(1.1)] IRI literal (href/src/data)")
+                add_debug(element, "[Step 11] IRI literal (href/src/data)")
                 process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
               end
-            elsif typed_resource && !attrs[:about] && evaluation_context.incomplete_triples.empty? && @version != :"rdfa1.0"
-              add_debug(element, "[Step 11(1.1)] typed_resource")
+            when typed_resource && !attrs[:about] && evaluation_context.incomplete_triples.empty? && @version != :"rdfa1.0"
+              add_debug(element, "[Step 11] typed_resource")
               typed_resource
             else
               # plain literal
-              add_debug(element, "[Step 11(1.1)] plain literal (inner text)")
+              add_debug(element, "[Step 11] plain literal (inner text)")
               RDF::Literal.new(element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             end
           else
