@@ -168,9 +168,9 @@ module RDF::RDFa
           root_namespace = input.root.namespace.to_s
           root_attrs = input.root.attributes
           content_type = case
-          when root_element == "html" && input.is_a?(Nokogiri::HTML::Document)
+          when root_element == "html" && input.is_a?(::Nokogiri::HTML::Document)
             "text/html"
-          when root_element == "html" && input.is_a?(Nokogiri::XML::Document)
+          when root_element == "html" && input.is_a?(::Nokogiri::XML::Document)
             "application/xhtml+html"
           end
         else
