@@ -80,7 +80,7 @@ module RDF::RDFa
       Regexp::EXTENDED)
 
     # Host language
-    # @attr [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg]
+    # @attr [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg]
     attr_reader :host_language
     
     # Version
@@ -236,7 +236,7 @@ module RDF::RDFa
     #   One of :nokogiri or :rexml. If nil/unspecified uses :nokogiri if available, :rexml otherwise.
     # @option options [Boolean]  :vocab_expansion (false)
     #   whether to perform RDFS expansion on the resulting graph
-    # @option options [:xml1, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:xhtml1)
+    # @option options [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:html5)
     #   Host Language
     # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
     #   Parser version information
@@ -312,7 +312,7 @@ module RDF::RDFa
         end
 
         case @host_language
-        when :xml1, :svg
+        when :xml, :svg
           @host_defaults[:initial_contexts] = [XML_RDFA_CONTEXT]
         when :xhtml1
           @host_defaults[:initial_contexts] = [XML_RDFA_CONTEXT, XHTML_RDFA_CONTEXT]
@@ -608,7 +608,8 @@ module RDF::RDFa
       list_mapping = evaluation_context.list_mapping
 
       xml_base = element.base
-      base = xml_base.to_s if xml_base && ![:xhtml1, :xhtml5, :html4, :html5].include?(@host_language)
+      base = xml_base.to_s if xml_base && ![:xhtml1, :html4, :html5].include?(@host_language)
+      add_debug(element) {"base: #{base.inspect}"} if base
       base ||= evaluation_context.base
 
       # Pull out the attributes needed for the skip test.

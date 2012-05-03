@@ -421,6 +421,65 @@ describe "RDF::RDFa::Reader" do
           parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
         end
 
+        describe "xml:base" do
+          {
+            :xml => true,
+            :xhtml1 => false,
+            :html4 => false,
+            :html5 => false,
+            :xhtml5 => true,
+            :svg => true
+          }.each do |hl, does|
+            context "#{hl}" do
+              it %(#{does ? "uses" : "does not use"} xml:base in root) do
+                html = %(<div xml:base="http://example.com/">
+                    <span property="rdf:value">Value</span>
+                  </div>
+                )
+                expected_true = %(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+                  <http://example.com/> rdf:value "Value" .
+                )
+                expected_false = %(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+                  <http://example.org/doc_base> rdf:value "Value" .
+                )
+                expected = does ? expected_true : expected_false
+
+                parse(html, :base_uri => "http://example.org/doc_base",
+                  :version => :"rdfa1.1",
+                  :host_language => hl,
+                ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              end
+              
+              it %(#{does ? "uses" : "does not use"} xml:base in non-root) do
+                html = %(<div xml:base="http://example.com/">
+                    <a xml:base="http://example.org/" property="rdf:value" href="">Value</a>
+                  </div>
+                )
+                expected_true = %(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+                  <http://example.com/> rdf:value <http://example.org/> .
+                )
+                expected_false = %(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+                  <http://example.org/doc_base> rdf:value <http://example.org/doc_base> .
+                )
+                expected = does ? expected_true : expected_false
+
+                parse(html, :base_uri => "http://example.org/doc_base",
+                  :version => :"rdfa1.1",
+                  :host_language => hl,
+                ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              end
+            end
+          end
+        end
+
         context "malformed datatypes" do
           {
             "xsd:boolean" => %w(foo),

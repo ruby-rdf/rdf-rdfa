@@ -239,7 +239,7 @@ module RDF::RDFa
         @version ||= :"rdfa1.1"
 
         @host_language ||= case content_type
-        when "application/xml"  then :xml1
+        when "application/xml"  then :xml
         when "image/svg+xml"    then :svg
         when "text/html"
           case doc_type_string
@@ -259,7 +259,7 @@ module RDF::RDFa
           case root_element
           when /svg/i           then :svg
           when /html/i          then :html5
-          else                       :xml1
+          else                       :xml
           end
         end
       end
