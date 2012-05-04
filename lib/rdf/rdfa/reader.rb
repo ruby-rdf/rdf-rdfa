@@ -722,7 +722,7 @@ module RDF::RDFa
           # if the @typeof attribute is present, set typed resource to new subject
           typed_resource = new_subject if attrs[:typeof]
         else
-          # Uf the current element contains no @rel or @rev attribute, then the next step is to establish a value for new subject.
+          # If the current element contains no @rel or @rev attribute, then the next step is to establish a value for new subject.
           # This step has two possible alternatives.
           #  1. If the current element contains the @property attribute, but does not contain the @content
           #     or the @datatype attribute
@@ -751,16 +751,14 @@ module RDF::RDFa
             end
 
             if attrs[:typeof]
-              typed_resource ||= if attrs[:resource]
+              typed_resource ||= 
                 process_uri(element, attrs[:resource], evaluation_context, base,
                             :uri_mappings => uri_mappings,
-                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
-              elsif attrs[:href] || attrs[:src]
-                process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
-              else
-                # if none of these are present, the value of typed resource is set to a newly defined bnode.
-                RDF::Node.new
-              end
+                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
+              typed_resource ||= 
+                process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base,
+                            :restrictions => [:uri]) if attrs[:href] || attrs[:src]
+              typed_resource ||= RDF::Node.new
               
               # The value of the current object resource is set to the value of typed resource.
               current_object_resource = typed_resource
@@ -768,17 +766,17 @@ module RDF::RDFa
           else
             # otherwise (ie, the @content or @datatype)
 
-            new_subject = if attrs[:about]
+            new_subject =
               process_uri(element, attrs[:about], evaluation_context, base,
                           :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
-            elsif attrs[:resource]
+                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:about]
+            new_subject ||=
               process_uri(element, attrs[:resource], evaluation_context, base,
                           :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
-            elsif attrs[:href] || attrs[:src]
-              process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
-            end
+                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
+            new_subject ||=
+              process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base,
+                          :restrictions => [:uri]) if attrs[:href] || attrs[:src]
 
             # If no URI is provided by a resource attribute, then the first match from the following rules
             # will apply:
@@ -841,21 +839,14 @@ module RDF::RDFa
         end
       
         # Then the current object resource is set to the URI obtained from the first match from the following rules:
-        current_object_resource = if attrs[:resource]
-          process_uri(element, attrs[:resource], evaluation_context, base,
+        current_object_resource = process_uri(element, attrs[:resource], evaluation_context, base,
                       :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
-        elsif attrs[:href]
-          process_uri(element, attrs[:href], evaluation_context, base,
-                      :restrictions => [:uri])
-        elsif attrs[:src] && @version != :"rdfa1.0"
-          process_uri(element, attrs[:src], evaluation_context, base,
-                      :restrictions => [:uri])
-        elsif attrs[:typeof] && !attrs[:about] && @version != :"rdfa1.0"
-          # otherwise, if @typeof is present and @about is not and the  incomplete triples
-          # within the current context is empty, use a newly created bnode
-          RDF::Node.new
-        end
+                      :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
+        current_object_resource ||= process_uri(element, attrs[:href], evaluation_context, base,
+                      :restrictions => [:uri]) if attrs[:href]
+        current_object_resource ||= process_uri(element, attrs[:src], evaluation_context, base,
+                      :restrictions => [:uri]) if attrs[:src] && @version != :"rdfa1.0"
+        current_object_resource ||= RDF::Node.new if attrs[:typeof] && !attrs[:about] && @version != :"rdfa1.0"
 
         # and also set the value typed resource to this bnode
         if attrs[:typeof]
@@ -1037,15 +1028,11 @@ module RDF::RDFa
                  !(attrs[:rel] || attrs[:rev]) &&
                  evaluation_context.incomplete_triples.empty? &&
                  @version != :"rdfa1.0"
-              if attrs[:resource]
-                add_debug(element, "[Step 11] IRI literal (resource)")
-                process_uri(element, attrs[:resource], evaluation_context, base,
-                            :uri_mappings => uri_mappings,
-                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
-              else
-                add_debug(element, "[Step 11] IRI literal (href/src/data)")
-                process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
-              end
+              add_debug(element, "[Step 11] IRI literal (resource|href|src|data)")
+              res = process_uri(element, attrs[:resource], evaluation_context, base,
+                                :uri_mappings => uri_mappings,
+                                :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
+              res ||= process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
             when typed_resource && !attrs[:about] && evaluation_context.incomplete_triples.empty? && @version != :"rdfa1.0"
               add_debug(element, "[Step 11] typed_resource")
               typed_resource

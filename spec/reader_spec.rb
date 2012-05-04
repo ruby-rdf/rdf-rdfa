@@ -450,7 +450,7 @@ describe "RDF::RDFa::Reader" do
 
                 parse(html, :base_uri => "http://example.org/doc_base",
                   :version => :"rdfa1.1",
-                  :host_language => hl,
+                  :host_language => hl
                 ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
               end
               
@@ -473,9 +473,51 @@ describe "RDF::RDFa::Reader" do
 
                 parse(html, :base_uri => "http://example.org/doc_base",
                   :version => :"rdfa1.1",
-                  :host_language => hl,
+                  :host_language => hl
                 ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
               end
+            end
+          end
+        end
+
+        describe "empty CURIE" do
+          {
+            "ignores about with typeof" => [
+              %(<div about="[]" typeof="foaf:Person" property="foaf:name">Alex Milowski</div>),
+              %(
+                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                <> foaf:name "Alex Milowski" .
+                [ a foaf:Person ] .
+              )
+            ],
+            "ignores about with chaining" => [
+              %(
+                <div about="[]" typeof="foaf:Person">
+                  <span property="foaf:name">Alex Milowski</span>
+                </div>
+              ),
+              %(
+                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+                [a foaf:Person; foaf:name "Alex Milowski"] .
+              )
+            ],
+            "ignores resource with href (rel)" => [
+              %(<a href="license.xhtml" rel="license" resource="[]">The Foo Document</a>),
+              %(
+                @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                <> xhv:license <license.xhtml> .
+              )
+            ],
+            "ignores resource with href (property)" => [
+              %(<a href="license.xhtml" property="license" resource="[]">The Foo Document</a>),
+              %(
+                @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                <> xhv:license <license.xhtml> .
+              )
+            ],
+          }.each do |name, (html,expected)|
+            it name do
+              parse("<html>#{html}</html>", :version => :"rdfa1.1").should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
         end
