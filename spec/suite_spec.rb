@@ -16,6 +16,8 @@ describe "RDF::RDFa::Reader" do
               specify "test #{t.name}: #{t.title}#{",  (negative test)" if t.expectedResults.false?}" do
                 begin
                   t.debug = []
+                  t.debug << "source:"
+                  t.debug << RDF::Util::File.open_file(t.input(host_language, version)).read
                   options = {
                     :base_uri => t.input(host_language, version),
                     :debug => t.debug,
@@ -30,8 +32,8 @@ describe "RDF::RDFa::Reader" do
 
                   # Make sure auto-detect works
                   unless host_language =~ /svg/ || t.name == "0216" # due to http-equiv
-                    reader.host_language.should == host_language.to_sym
-                    reader.version.should == version.sub('-vocab', '').to_sym
+                    reader.host_language.should produce(host_language.to_sym, t.debug)
+                    reader.version.should produce(version.sub('-vocab', '').to_sym, t.debug)
                   end
 
                   graph = RDF::Graph.new << reader

@@ -212,6 +212,8 @@ module RDF::RDFa
         @version ||= :"rdfa1.1" if version_attr =~ /RDFa 1\.1/
         @version ||= :"rdfa1.1"
 
+        @host_language ||= :xhtml1 if @version == :"rdfa1.0" && doc_type_string =~ /html/i
+
         @host_language ||= case content_type
         when "application/xml"  then :xml
         when "image/svg+xml"    then :svg

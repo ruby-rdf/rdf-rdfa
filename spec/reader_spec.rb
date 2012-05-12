@@ -889,18 +889,6 @@ describe "RDF::RDFa::Reader" do
                 <> rdf:value <#foo> .
               )
             ],
-            "with @data" => [
-              %q(
-                <div about="">
-                  <object property="rdf:value" data="#foo"/>
-                </div>
-              ),
-              %q(
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
-                <> rdf:value <#foo> .
-              )
-            ],
             "with <time>=xsd:time" => [
               %q(
                 <div about="">

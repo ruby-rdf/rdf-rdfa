@@ -617,7 +617,6 @@ module RDF::RDFa
       %w(
         about
         content
-        data
         datatype
         datetime
         href
@@ -765,7 +764,6 @@ module RDF::RDFa
             end
           else
             # otherwise (ie, the @content or @datatype)
-
             new_subject =
               process_uri(element, attrs[:about], evaluation_context, base,
                           :uri_mappings => uri_mappings,
@@ -1024,15 +1022,15 @@ module RDF::RDFa
               # plain literal
               add_debug(element, "[Step 11] plain literal (content)")
               RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
-            when (attrs[:resource] || attrs[:href] || attrs[:src] || attrs[:data]) &&
+            when (attrs[:resource] || attrs[:href] || attrs[:src]) &&
                  !(attrs[:rel] || attrs[:rev]) &&
                  evaluation_context.incomplete_triples.empty? &&
                  @version != :"rdfa1.0"
-              add_debug(element, "[Step 11] IRI literal (resource|href|src|data)")
+              add_debug(element, "[Step 11] IRI literal (resource|href|src)")
               res = process_uri(element, attrs[:resource], evaluation_context, base,
                                 :uri_mappings => uri_mappings,
                                 :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
-              res ||= process_uri(element, (attrs[:href] || attrs[:src] || attrs[:data]), evaluation_context, base, :restrictions => [:uri])
+              res ||= process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
             when typed_resource && !attrs[:about] && evaluation_context.incomplete_triples.empty? && @version != :"rdfa1.0"
               add_debug(element, "[Step 11] typed_resource")
               typed_resource
