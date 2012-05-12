@@ -287,7 +287,7 @@ module RDF::RDFa
         # find if the document has a base element
         case @host_language
         when :xhtml1, :xhtml5, :html4, :html5
-          base_el = ::REXML::XPath.first(@doc, "/html/head/base") 
+          base_el = ::REXML::XPath.first(@doc, "/html/head/base") rescue nil
           base = base_el.attribute("href").to_s.split("#").first if base_el
         else
           xml_base = root.attribute("base", RDF::XML.to_s) if root

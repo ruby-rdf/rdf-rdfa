@@ -635,6 +635,20 @@ module RDF::RDFa
 
       add_debug(element) {"attrs " + attrs.inspect} unless attrs.empty?
 
+      # If @property and @rel/@rev are on the same elements, the non-CURIE and non-URI @rel/@rev values are ignored. If, after this, the value of @rel/@rev becomes empty, then the then the processor must act as if the attribute is not present.
+      if attrs.has_key?(:property) && @version == :"rdfa1.1" && (@host_language == :html5 || @host_language == :xhtml5)
+        [:rel, :rev].each do |attr|
+          next unless attrs.has_key?(attr)
+          add_debug(element) {"Remove non-CURIE/non-IRI @#{attr} values from #{attrs[attr].inspect}"}
+          attrs[attr] = attrs[attr].
+            split(/\s+/).
+            select {|a| a.index(':')}.
+            join(" ")
+          add_debug(element) {" => #{attrs[attr].inspect}"}
+          attrs.delete(attr) if attrs[attr].empty?
+        end
+      end
+
       # Default vocabulary [7.5 Step 2]
       # Next the current element is examined for any change to the default vocabulary via @vocab.
       # If @vocab is present and contains a value, its value updates the local default vocabulary.

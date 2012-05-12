@@ -1229,6 +1229,46 @@ describe "RDF::RDFa::Reader" do
             end
           end
         end
+
+        context "with @rel/@rev" do
+          {
+            "with CURIE" => [
+              %q(<a about="" property="rdf:value" rel="xhv:license" href="http://example.com/">Foo</a>),
+              %q(<> rdf:value "Foo"; xhv:license <http://example.com/> .),
+              %q(<> rdf:value "Foo"; xhv:license <http://example.com/> .)
+            ],
+            "with Term" => [
+              %q(<a about="" property="rdf:value" rel="license" href="http://example.com/">Foo</a>),
+              %q(<> rdf:value "Foo"; xhv:license <http://example.com/> .),
+              %q(<> rdf:value <http://example.com/> .)
+            ],
+            "with Term and CURIE" => [
+              %q(<a about="" property="rdf:value" rel="license cc:license" href="http://example.com/">Foo</a>),
+              %q(<> rdf:value "Foo"; cc:license <http://example.com/>; xhv:license <http://example.com/> .),
+              %q(<> rdf:value "Foo"; cc:license <http://example.com/> .),
+            ],
+          }.each do |test, (input, expected1, expected5)|
+            context test do
+              it "xhtml1" do
+                expected1 = %(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                  @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                  @prefix cc: <http://creativecommons.org/ns#> .
+                ) + expected1
+                parse(input, :host_language => :xhtml1).should be_equivalent_graph(expected1, :trace => @debug, :format => :ttl)
+              end
+            
+              it "xhtml5" do
+                expected5 = %(
+                  @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                  @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                  @prefix cc: <http://creativecommons.org/ns#> .
+                ) + expected5
+                parse(input, :host_language => :xhtml5).should be_equivalent_graph(expected5, :trace => @debug, :format => :ttl)
+              end
+            end
+          end
+        end
       end
 
       context "problematic examples" do
