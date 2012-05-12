@@ -636,7 +636,7 @@ module RDF::RDFa
       add_debug(element) {"attrs " + attrs.inspect} unless attrs.empty?
 
       # If @property and @rel/@rev are on the same elements, the non-CURIE and non-URI @rel/@rev values are ignored. If, after this, the value of @rel/@rev becomes empty, then the then the processor must act as if the attribute is not present.
-      if attrs.has_key?(:property) && @version == :"rdfa1.1" && (@host_language == :html5 || @host_language == :xhtml5)
+      if attrs.has_key?(:property) && @version == :"rdfa1.1" && (@host_language == :html5 || @host_language == :xhtml5 || @host_language == :html4)
         [:rel, :rev].each do |attr|
           next unless attrs.has_key?(attr)
           add_debug(element) {"Remove non-CURIE/non-IRI @#{attr} values from #{attrs[attr].inspect}"}

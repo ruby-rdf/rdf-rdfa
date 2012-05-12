@@ -1,3 +1,10 @@
+### 0.3.11
+* Up to date with RDFa Proposed Recomendation versions of specs.
+* Fix problems with @resource=[] or @about=[], which should be ignored and use the next most appropriate attribute.
+* Remove support for @data, which was previously a synonym for @src in HTML5.
+* More robust detection of XHTML1 if version is rdfa1.0
+* Support change to remove @rel/@rev elements that aren't CURIES or IRIs when in the presense of @property
+
 ### 0.3.10.1
 * Fix case where @datatype and @property are present, but @datatype is empty. (TC 290)
 
