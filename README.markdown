@@ -390,7 +390,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 
 * gregg@kellogg-assoc.com
 * <http://rubygems.org/rdf-rdfa>
-* <http://github.com/gkellogg/rdf-rdfa>
+* <http://github.com/ruby-rdf/rdf-rdfa>
 * <http://lists.w3.org/Archives/Public/public-rdf-ruby/>
 
 [RDF.rb]:           http://rdf.rubyforge.org/
@@ -402,6 +402,6 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [XHTML+RDFa 1.1]:   http://www.w3.org/TR/2012/PR-xhtml-rdfa-20120508/                   "XHTML+RDFa 1.1"
 [HTML+RDFa 1.1]:    http://www.w3.org/TR/rdfa-in-html/                                   "HTML+RDFa 1.1"
 [RDFa-test-suite]:  http://rdfa.info/test-suite/                                        "RDFa test suite"
-[RDFa doc]:         http://rubydoc.info/github/gkellogg/rdf-rdfa/frames
+[RDFa doc]:         http://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
 [Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/
