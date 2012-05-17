@@ -382,8 +382,8 @@ module RDF::RDFa
     
     # Add debug event to debug array, if specified
     #
-    # @param [#display_path, #to_s] node:: XML Node or string for showing context
-    # @param [String] message::
+    # @param [#display_path, #to_s] node XML Node or string for showing context
+    # @param [String] message
     # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
     def add_debug(node, message = "")
       return unless ::RDF::RDFa.debug? || @debug
@@ -441,12 +441,12 @@ module RDF::RDFa
 
     # add a statement, object can be literal or URI or bnode
     #
-    # @param [#display_path, #to_s] node:: XML Node or string for showing context
-    # @param [RDF::URI, RDF::BNode] subject:: the subject of the statement
-    # @param [RDF::URI] predicate:: the predicate of the statement
-    # @param [URI, RDF::BNode, RDF::Literal] object:: the object of the statement
-    # @return [RDF::Statement]:: Added statement
-    # @raise [RDF::ReaderError]:: Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
+    # @param [#display_path, #to_s] node XML Node or string for showing context
+    # @param [RDF::URI, RDF::BNode] subject the subject of the statement
+    # @param [RDF::URI] predicate the predicate of the statement
+    # @param [URI, RDF::BNode, RDF::Literal] object the object of the statement
+    # @return [RDF::Statement] Added statement
+    # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_triple(node, subject, predicate, object)
       statement = RDF::Statement.new(subject, predicate, object)
       add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")

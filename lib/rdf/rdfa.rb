@@ -15,7 +15,7 @@ module RDF
   #     end
   #   end
   #
-  # @see http://rdf.rubyforge.org/
+  # @see http://rubygems.org/gems/rdf
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
   # @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/
   # @see http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/

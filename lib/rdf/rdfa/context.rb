@@ -149,7 +149,7 @@ module RDF::RDFa
     ##
     # Extract vocabulary, prefix mappings and terms from a enumerable object into an instance
     #
-    # @param [RDF::Enumerable, Enumerator] queryable
+    # @param [RDF::Enumerable, Enumerator] enumerable
     # @return [void] ignored
     def parse(enumerable)
       STDERR.puts("process_context: parse context <#{uri}>") if RDF::RDFa.debug?

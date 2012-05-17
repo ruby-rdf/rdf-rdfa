@@ -338,7 +338,8 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * {RDF::RDFa::Reader}
   * {RDF::RDFa::Reader::Nokogiri}
   * {RDF::RDFa::Reader::REXML}
-* {RDF::RDFa::Profile}
+* {RDF::RDFa::Context}
+* {RDF::RDFa::Expansion}
 * {RDF::RDFa::Writer}
 
 ### Additional vocabularies
@@ -393,7 +394,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 * <http://github.com/ruby-rdf/rdf-rdfa>
 * <http://lists.w3.org/Archives/Public/public-rdf-ruby/>
 
-[RDF.rb]:           http://rdf.rubyforge.org/
+[RDF.rb]:           http://rubygems.org/gems/rdf
 [YARD]:             http://yardoc.org/
 [YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html

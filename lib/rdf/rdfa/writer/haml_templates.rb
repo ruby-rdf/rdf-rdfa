@@ -172,7 +172,7 @@ module RDF::RDFa
             - subjects.each do |subject|
               != yield(subject)
             %footer
-              %p= "Written by <a href='http://rdf.rubyforge.org/rdfa'>RDF::RDFa</a> version #{RDF::RDFa::VERSION}"
+              %p= "Written by <a href='http://rubygems.org/gems/rdf-rdfa'>RDF::RDFa</a> version #{RDF::RDFa::VERSION}"
       ),
 
       # Output for non-leaf resources

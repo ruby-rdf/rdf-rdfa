@@ -642,7 +642,7 @@ module RDF::RDFa
 
     # Haml rendering helper. Return CURIE for the literal datatype, if the literal is a typed literal.
     #
-    # @param [RDF::Resource] resource
+    # @param [RDF::Resource] literal
     # @return [String, nil]
     # @raise [RDF::WriterError]
     def get_dt_curie(literal)
@@ -835,7 +835,7 @@ module RDF::RDFa
 
     # Add debug event to debug array, if specified
     #
-    # @param [String] message::
+    # @param [String] message
     # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
     def add_debug(message = "")
       return unless ::RDF::RDFa.debug? || @debug

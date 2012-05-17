@@ -1,0 +1,457 @@
+@base <http://example.com> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<> a bibo:Document;
+   dcterms:title "RDFa Core 1.1";
+   dcterms:abstract """Abstract
+      The current Web is primarily made up of an enormous number of documents
+        that have been created using HTML. These documents contain significant
+        amounts of structured data, which is largely unavailable to tools and
+        applications. When publishers can express this data more completely, and
+        when tools can read it, a new world of user functionality becomes
+        available, letting users transfer structured data between applications
+        and web sites, and allowing browsing applications to improve the user
+        experience: an event on a web page can be directly imported into a
+        user's desktop calendar; a license on a document can be detected so that
+        users can be informed of their rights automatically; a photo's creator,
+        camera setting information, resolution, location and topic can be
+        published as easily as the original photo itself, enabling structured
+        search and sharing.
+      RDFa Core is a specification for attributes to express structured data
+        in any markup language. The embedded data already available in the
+        markup language (e.g., HTML) can often be reused by the RDFa markup, so
+        that publishers don't need to repeat significant data in the document
+        content. The underlying abstract representation is RDF [RDF-PRIMER],
+        which lets publishers build their own vocabulary, extend others, and
+        evolve their vocabulary with maximal interoperability over time. The
+        expressed structure is closely tied to the data, so that rendered data
+        can be copied and pasted along with its relevant structure.
+      The rules for interpreting the data are generic, so that there is no
+        need for different rules for different formats; this allows authors and
+        publishers of data to define their own formats without having to update
+        software, register formats via a central authority, or worry that two
+        formats may interfere with each other.
+      RDFa shares some of the same goals with microformats [MICROFORMATS].
+        Whereas microformats specify both a syntax for embedding structured data
+        into HTML documents and a vocabulary of specific terms for each
+        microformat, RDFa specifies only a syntax and relies on independent
+        specification of terms (often called vocabularies or taxonomies) by
+        others. RDFa allows terms from multiple independently-developed
+        vocabularies to be freely intermixed and is designed such that the
+        language can be parsed without knowledge of the specific vocabulary
+        being used. 
+      This document is a detailed syntax specification for RDFa, aimed at:
+      
+        those looking to create an RDFa Processor, and who therefore need a
+          detailed description of the parsing rules;
+        those looking to integrate RDFa into a new markup language;
+        those looking to recommend the use of RDFa within their
+          organization, and who would like to create some guidelines for their
+          users;
+        anyone familiar with RDF, and who wants to understand more about
+          what is happening 'under the hood', when an RDFa Processor runs.
+      
+       For those looking for an introduction to the use of RDFa and some
+        real-world examples, please consult the [RDFA-PRIMER].
+      
+        How to Read this Document
+        First, if you are not familiar with either RDFa or RDF, and
+          simply want to add RDFa to your documents, then you may find the RDFa
+          Primer [RDFA-PRIMER] to be a better introduction.
+        If you are already familiar with RDFa, and you want to examine the
+          processing rules — perhaps to create an RDFa Processor — then you'll
+          find the Processing Model section of most
+          interest. It contains an overview of each of the processing steps,
+          followed by more detailed sections, one for each rule.
+        If you are not familiar with RDFa, but you are familiar
+          with RDF, then you might find reading the Syntax
+
+            Overview useful, before looking at the Processing
+
+            Model since it gives a range of examples of markup that use
+          RDFa. Seeing some examples first should make reading the processing
+          rules easier.
+        If you are not familiar with RDF, then you might want to take a look
+          at the section on RDF Terminology
+          before trying to do too much with RDFa. Although RDFa is designed to
+          be easy to author — and authors don't need to understand RDF to use it
+          — anyone writing applications that consume RDFa will need to
+          understand RDF. There is a lot of material about RDF on the web, and a
+          growing range of tools that support RDFa. This document only contains
+          enough background on RDF to make the goals of RDFa more clear.
+        RDFa is a way of expressing RDF-style
+          relationships using simple attributes in existing markup languages
+          such as HTML. RDF is fully internationalized, and permits the use of
+          Internationalized Resource Identifiers, or IRIs. You will see the term
+          'IRI' used throughout this specification. Even if you are not familiar
+          with the term IRI, you probably have seen the term 'URI' or 'URL'.
+          IRIs are an extension of URIs that permits the use of characters
+          outside those of plain ASCII. RDF allows the use of these characters,
+          and so does RDFa. This specification has been careful to use the
+          correct term, IRI, to make it clear that this is the case.
+          Even though this specification exclusively
+          references IRIs, it is possible that a Host Language will
+          restrict the syntax for its attributes to a subset of IRIs
+          (e.g., @href in HTML5).  Regardless of
+          validation constraints in Host Languages, an RDFa Processor
+          is capable of processing IRIs.
+      
+    """;
+   dcterms:issued "2012-05-08T05:00:00+0000"^^xsd:dateTime;
+   dcterms:language "en";
+   dcterms:publisher [ a foaf:Organization;
+     foaf:homepage <http://www.w3.org/>;
+     foaf:name "World Wide Web Consortium"];
+   dcterms:references <http://www.w3.org/TR/1999/REC-html401-19991224>,
+     <http://microformats.org>,
+     <http://www.w3.org/2001/tag/doc/qnameids-2004-03-17>,
+     <http://www.w3.org/TR/2004/REC-rdf-concepts-20040210>,
+     <http://www.w3.org/TR/2004/REC-rdf-primer-20040210/>,
+     <http://www.w3.org/TR/1999/REC-rdf-syntax-19990222>,
+     <http://www.w3.org/TR/2004/REC-rdf-testcases-20040210>,
+     <http://www.w3.org/TR/2011/WD-rdfa-primer-20111208>,
+     <http://www.w3.org/TR/2008/REC-rdfa-syntax-20081014>,
+     <http://standards.iso.org/ittf/PubliclyAvailableStandards/c052348_ISO_IEC_19757-2_2008(E).zip>,
+     <http://www.megginson.com/downloads/SAX/>,
+     <http://www.w3.org/TeamSubmission/turtle/>,
+     <http://www.w3.org/TR/2011/WD-widgets-uri-20110927>,
+     <http://www.w3.org/TR/2001/REC-xhtml11-20010531>,
+     <http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/>,
+     <http://www.w3.org/TR/2008/REC-xml-20081126/>,
+     <http://www.w3.org/TR/2012/REC-xmlschema11-1-20120405/>;
+   dcterms:replaces <http://www.w3.org/TR/2012/CR-rdfa-core-20120313/>;
+   dcterms:requires <http://www.w3.org/TR/2009/REC-owl2-overview-20091027/>,
+     <http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/>,
+     <http://www.w3.org/TR/2009/REC-owl2-rdf-based-semantics-20091027/>,
+     <http://www.w3.org/TR/2004/REC-rdf-mt-20040210>,
+     <http://www.w3.org/TR/2004/REC-rdf-syntax-grammar-20040210>,
+     <http://www.ietf.org/rfc/rfc2119.txt>,
+     <http://www.ietf.org/rfc/rfc3987.txt>,
+     <http://www.w3.org/TR/2012/PR-xhtml-rdfa-20120508/>,
+     <http://www.w3.org/TR/2009/REC-xml-names-20091208/>,
+     <http://www.w3.org/TR/2006/REC-xml-20060816/>,
+     <http://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/>;
+   bibo:chapter <#abstract>,
+     <#sotd>,
+     <#toc>,
+     <#s_motivation>,
+     <#s_Syntax_overview>,
+     <#s_rdfterminology>,
+     <#conformance>,
+     <#s_syntax>,
+     <#s_curies>,
+     <#s_model>,
+     <#s_rdfaindetail>,
+     <#s_initialcontexts>,
+     <#s_vocab_expansion>,
+     <#s_datatypes>,
+     <#vocabulary>,
+     <#a_history>,
+     <#a_acks>,
+     <#references>;
+   bibo:editor ([ a foaf:Person;
+       foaf:mbox <mailto:ben@adida.net>;
+       foaf:name "Ben Adida"] [ a foaf:Person;
+       foaf:mbox <mailto:mark.birbeck@webBackplane.com>;
+       foaf:name "Mark Birbeck"] [ a foaf:Person;
+       foaf:homepage <http://blog.halindrome.com>;
+       foaf:mbox <mailto:shane@aptest.com>;
+       foaf:name "Shane McCarron"] [ a foaf:Person;
+       foaf:homepage <http://www.w3.org/People/Ivan/>;
+       foaf:mbox <mailto:ivan@w3.org>;
+       foaf:name "Ivan Herman"]);
+   bibo:subtitle "Syntax and processing rules for embedding RDF through attributes";
+   xhv:license <http://www.w3.org/Consortium/Legal/ipr-notice#Copyright>;
+   xhv:stylesheet <chrome-extension://cpngackimfmofbokmjmljamhdncknpmg/style.css>,
+     <http://www.w3.org/StyleSheets/TR/W3C-PR> .
+
+<#web-service-output-graph-preference> bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-07-01#resolution_1> .
+
+<#T-IRI-reference> a bibo:Chapter .
+
+<#a-description-of-rdfa-in-rdf-terms> a bibo:Chapter .
+
+<#a_acks> a bibo:Chapter .
+
+<#a_history> a bibo:Chapter;
+   bibo:chapter <#major-differences-with-rdfa-syntax-1.0> .
+
+<#abstract> a bibo:Chapter;
+   bibo:chapter <#how-to-read-this-document> .
+
+<#accessing-the-processor-graph> a bibo:Chapter;
+   bibo:issue [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-07-01#resolution_1>],
+     [ a bibo:Issue] .
+
+<#attribute_roles> a bibo:Chapter .
+
+<#chaining-with--property-and--typeof> a bibo:Chapter .
+
+<#changing-the-evaluation-context> a bibo:Chapter;
+   bibo:chapter <#setting-the-current-subject> .
+
+<#compact-uri-expressions> a bibo:Chapter .
+
+<#conformance> a bibo:Chapter;
+   bibo:chapter <#processorconf>,
+     <#hostlangconf>,
+     <#xmlrdfaconformance> .
+
+<#determining-the-subject-with-neither--about-nor--typeof> a bibo:Chapter;
+   bibo:chapter <#inheriting-subject-from--resource>,
+     <#inheriting-an-anonymous-subject> .
+
+<#evaluation-context> a bibo:Chapter .
+
+<#examples> a bibo:Chapter .
+
+<#general-use-of-curies-in-attributes> a bibo:Chapter .
+
+<#graphs> a bibo:Chapter .
+
+<#hostlangconf> a bibo:Chapter .
+
+<#how-to-read-this-document> a bibo:Chapter .
+
+<#incomplete-triples> a bibo:Chapter .
+
+<#informative-references> a bibo:Chapter .
+
+<#inheriting-an-anonymous-subject> a bibo:Chapter .
+
+<#inheriting-subject-from--resource> a bibo:Chapter .
+
+<#iri-object-resolution> a bibo:Chapter;
+   bibo:chapter <#using--resource-to-set-the-object>,
+     <#using--href-or--src-to-set-the-subject>,
+     <#incomplete-triples> .
+
+<#language-tags> a bibo:Chapter .
+
+<#list-generation> a bibo:Chapter .
+
+<#major-differences-with-rdfa-syntax-1.0> a bibo:Chapter .
+
+<#markup-fragments-and-rdfa> a bibo:Chapter .
+
+<#normative-references> a bibo:Chapter .
+
+<#object-resolution> a bibo:Chapter;
+   bibo:chapter <#object-resolution-for-the--property-attribute>,
+     <#iri-object-resolution> .
+
+<#object-resolution-for-the--property-attribute> a bibo:Chapter;
+   bibo:chapter <#plain-literals-1>,
+     <#typed-literals-1>,
+     <#s-xml-literals> .
+
+<#overview> a bibo:Chapter .
+
+<#plain-literals> a bibo:Chapter .
+
+<#plain-literals-1> a bibo:Chapter;
+   bibo:chapter <#language-tags> .
+
+<#processor-graph-reporting> a bibo:Chapter .
+
+<#processor-graph-terms> a bibo:Chapter .
+
+<#processor-status> a bibo:Chapter;
+   bibo:chapter <#accessing-the-processor-graph>,
+     <#processor-graph-terms>;
+   bibo:issue [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-07-15#resolution_1>] .
+
+<#processorconf> a bibo:Chapter .
+
+<#rdfa-attributes> a bibo:Chapter .
+
+<#references> a bibo:Chapter;
+   bibo:chapter <#normative-references>,
+     <#informative-references> .
+
+<#s-xml-literals> a bibo:Chapter .
+
+<#s_Completing_Incomplete_Triples> a bibo:Chapter .
+
+<#s_Syntax_overview> a bibo:Chapter;
+   bibo:chapter <#rdfa-attributes>,
+     <#examples> .
+
+<#s_blankNodes> a bibo:Chapter;
+   bibo:issue [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-10-21#resolution_3>] .
+
+<#s_chaining> a bibo:Chapter .
+
+<#s_curieprocessing> a bibo:Chapter;
+   bibo:chapter <#scoping-of-prefix-mappings>,
+     <#general-use-of-curies-in-attributes>,
+     <#s_terms>,
+     <#use-of-curies-in-specific-attributes>,
+     <#s_blankNodes>;
+   bibo:issue [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-07-01#resolution_3>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-05-20#resolution_2>] .
+
+<#s_curies> a bibo:Chapter;
+   bibo:chapter <#why-curies-and-not-qnames> .
+
+<#s_datatypes> a bibo:Chapter;
+   bibo:chapter <#xml-schema-definition>,
+     <#xml-dtd-definition> .
+
+<#s_expansion_control> a bibo:Chapter;
+   bibo:chapter <#s_vocab_guidelines> .
+
+<#s_initialcontexts> a bibo:Chapter;
+   bibo:issue [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-10-21#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-10-21#resolution_2>] .
+
+<#s_model> a bibo:Chapter;
+   bibo:chapter <#overview>,
+     <#evaluation-context>,
+     <#s_chaining>,
+     <#s_curieprocessing>,
+     <#s_sequence>,
+     <#processor-status>,
+     <#vocabulary-expansion> .
+
+<#s_motivation> a bibo:Chapter .
+
+<#s_rdfaindetail> a bibo:Chapter;
+   bibo:chapter <#changing-the-evaluation-context>,
+     <#s_Completing_Incomplete_Triples>,
+     <#object-resolution>,
+     <#list-generation> .
+
+<#s_rdfterminology> a bibo:Chapter;
+   bibo:chapter <#statements>,
+     <#triples>,
+     <#T-IRI-reference>,
+     <#plain-literals>,
+     <#typed-literals>,
+     <#turtle>,
+     <#graphs>,
+     <#compact-uri-expressions>,
+     <#markup-fragments-and-rdfa>,
+     <#a-description-of-rdfa-in-rdf-terms> .
+
+<#s_sequence> a bibo:Chapter;
+   bibo:issue [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-07-22#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-07-22#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-07-22#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-01-13#ISSUE__2d_62__3a____40_prefix_processing_order>,
+       <http://www.w3.org/2010/02/rdfa/meetings/2011-02-14#resolution_3>,
+       <http://www.w3.org/2010/02/rdfa/meetings/2010-05-13#resolution_1>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-05-13#resolution_3>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-11-10#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-11-10#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-11-10#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-11-10#resolution_2>],
+     [ a bibo:Issue],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-06-17#resolution_2>;
+     bibo:issue [ a bibo:Issue;
+       bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-01-13#ISSUE__2d_60__3a__XMLLiteral_context_preservation>]],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-11-10#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-11-10#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2011-11-10#resolution_2>],
+     [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-05-13#resolution_2>] .
+
+<#s_syntax> a bibo:Chapter;
+   bibo:chapter <#attribute_roles>,
+     <#white_space> .
+
+<#s_terms> a bibo:Chapter .
+
+<#s_vocab_entailment> a bibo:Chapter .
+
+<#s_vocab_expansion> a bibo:Chapter;
+   bibo:chapter <#s_vocab_expansion_details>,
+     <#s_expansion_control> .
+
+<#s_vocab_expansion_details> a bibo:Chapter;
+   bibo:chapter <#s_vocab_entailment> .
+
+<#s_vocab_guidelines> a bibo:Chapter .
+
+<#scoping-of-prefix-mappings> a bibo:Chapter .
+
+<#setting-the-current-subject> a bibo:Chapter;
+   bibo:chapter <#the-current-document>,
+     <#using--about>,
+     <#typing-resources-with--typeof>,
+     <#determining-the-subject-with-neither--about-nor--typeof> .
+
+<#sotd> a bibo:Chapter .
+
+<#statements> a bibo:Chapter .
+
+<#term-prefix-definitions-vocabulary> a bibo:Chapter .
+
+<#the-current-document> a bibo:Chapter .
+
+<#toc> a bibo:Chapter .
+
+<#triples> a bibo:Chapter .
+
+<#turtle> a bibo:Chapter .
+
+<#typed-literals> a bibo:Chapter .
+
+<#typed-literals-1> a bibo:Chapter .
+
+<#typing-resources-with--typeof> a bibo:Chapter;
+   bibo:chapter <#chaining-with--property-and--typeof> .
+
+<#use-of-curies-in-specific-attributes> a bibo:Chapter .
+
+<#using--about> a bibo:Chapter .
+
+<#using--href-or--src-to-set-the-subject> a bibo:Chapter .
+
+<#using--resource-to-set-the-object> a bibo:Chapter .
+
+<#vocabulary> a bibo:Chapter;
+   bibo:chapter <#term-prefix-definitions-vocabulary>,
+     <#processor-graph-reporting>,
+     <#vocabulary-relationship> .
+
+<#vocabulary-expansion> a bibo:Chapter .
+
+<#vocabulary-relationship> a bibo:Chapter .
+
+<#white_space> a bibo:Chapter;
+   bibo:issue [ a bibo:Issue;
+     bibo:affirmedBy <http://www.w3.org/2010/02/rdfa/meetings/2010-05-20#resolution_1>] .
+
+<#why-curies-and-not-qnames> a bibo:Chapter .
+
+<#xml-dtd-definition> a bibo:Chapter .
+
+<#xml-schema-definition> a bibo:Chapter .
+
+<#xmlrdfaconformance> a bibo:Chapter .
