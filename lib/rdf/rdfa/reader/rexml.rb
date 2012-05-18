@@ -94,6 +94,11 @@ module RDF::RDFa
           NodeSetProxy.new(@node.children, self)
         end
         
+        # Ancestors of this element, in order
+        def ancestors
+          @ancestors ||= parent ? parent.ancestors + [parent] : []
+        end
+
         ##
         # Inner text of an element
         #
@@ -121,6 +126,21 @@ module RDF::RDFa
         # @return [Boolean]
         def element?
           @node.is_a?(::REXML::Element)
+        end
+
+        def attribute_nodes
+          @attribute_nodes ||= NodeSetProxy.new(@node.children.select {|n| n.is_a?(::REXML::Attribute)}, self)
+        end
+
+        def xpath(*args)
+          #NodeSetProxy.new(::REXML::XPath.match(@node, path, namespaces), self)
+          ::REXML::XPath.match(@node, *args).map do |n|
+            # Get node ancestors
+            parent = n.ancestors.reverse.inject(nil) do |p,node|
+              NodeProxy.new(node, p)
+            end
+            NodeProxy.new(n, parent)
+          end
         end
 
         ##

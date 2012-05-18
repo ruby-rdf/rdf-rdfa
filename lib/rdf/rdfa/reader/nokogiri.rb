@@ -91,6 +91,34 @@ module RDF::RDFa
           NodeSetProxy.new(@node.children, self)
         end
 
+        # Ancestors of this element, in order
+        def ancestors
+          @ancestors ||= parent ? parent.ancestors + [parent] : []
+        end
+
+        ##
+        # Inner text of an element. Decode Entities
+        #
+        # @return [String]
+        #def inner_text
+        #  coder = HTMLEntities.new
+        #  coder.decode(@node.inner_text)
+        #end
+
+        def attribute_nodes
+          @attribute_nodes ||= NodeSetProxy.new(@node.attribute_nodes, self)
+        end
+
+        def xpath(*args)
+          @node.xpath(*args).map do |n|
+            # Get node ancestors
+            parent = n.ancestors.reverse.inject(nil) do |p,node|
+              NodeProxy.new(node, p)
+            end
+            NodeProxy.new(n, parent)
+          end
+        end
+
         ##
         # Proxy for everything else to @node
         def method_missing(method, *args)

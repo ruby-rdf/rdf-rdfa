@@ -1348,6 +1348,39 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
+      context "SVG metadata", :pending => (library == :rexml) do
+        it "extracts RDF/XML from <metadata> element" do
+          svg = %(<?xml version="1.0" encoding="UTF-8"?>
+            <svg width="12cm" height="4cm" viewBox="0 0 1200 400"
+            xmlns:dc="http://purl.org/dc/terms/"
+            xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xml:base="http://example.net/"
+            xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny">
+              <desc property="dc:description">A yellow rectangle with sharp corners.</desc>
+              <metadata>
+                <rdf:RDF>
+                  <rdf:Description rdf:about="">
+                    <dc:title>Test 0304</dc:title>
+                  </rdf:Description>
+                </rdf:RDF>
+              </metadata>
+              <!-- Show outline of canvas using 'rect' element -->
+              <rect x="1" y="1" width="1198" height="398"
+                    fill="none" stroke="blue" stroke-width="2"/>
+              <rect x="400" y="100" width="400" height="200"
+                    fill="yellow" stroke="navy" stroke-width="10"  />
+            </svg>
+          )
+          query = %(
+            ASK WHERE {
+            	<http://example.net/> <http://purl.org/dc/terms/title> "Test 0304" .
+            	<http://example.net/> <http://purl.org/dc/terms/description> "A yellow rectangle with sharp corners." .
+            }
+          )
+          parse(svg).should pass_query(query, :trace => @debug)
+        end
+      end
+
       context :rdfagraph do
         it "generates rdfa:Error on malformed content" do
           html = %(<!DOCTYPE html>

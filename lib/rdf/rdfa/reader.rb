@@ -350,6 +350,21 @@ module RDF::RDFa
 
         # parse
         parse_whole_document(@doc, RDF::URI(base_uri))
+        
+        # Look for Embedded Turtle and RDF/XML
+        unless @root.nil? || @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
+          begin
+            require 'rdf/rdfxml'
+            add_debug("", "extract RDF/XML")
+            RDF::RDFXML::Reader.new(@doc, @options).each_statement do |statement|
+              add_debug("", "extracted #{statement.to_ntriples} from RDF/XML")
+              block.call(statement)
+            end
+          rescue
+            # Silently fail if RDF/XML not loaded or generates an error
+            add_warning("", "error loading rdf/xml parser: #{$!}")
+          end
+        end
       end
     end
 
