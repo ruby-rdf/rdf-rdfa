@@ -1,3 +1,9 @@
+### 0.3.13
+
+* Parse any include RDF/XML if RDF::RDFXML is available.
+* Add support for extracting RDF from &lt;script&gt; elements.
+* Places triples in a named graph if the script has an @id attribute.
+
 ### 0.3.11
 * Up to date with RDFa Proposed Recomendation versions of specs.
 * Fix problems with @resource=[] or @about=[], which should be ignored and use the next most appropriate attribute.
