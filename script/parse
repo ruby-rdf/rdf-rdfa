@@ -35,7 +35,7 @@ def run(input, options)
     end
   else
     r = reader_class.new(input, options)
-    g = RDF::Graph.new << r
+    g = RDF::Repository.new << r
     num = g.count
     STDERR.puts "graph: #{g.dump(:ttl)}" if options[:verbose]
     options[:output].puts g.dump(options[:output_format], options.merge(:prefixes => r.prefixes))

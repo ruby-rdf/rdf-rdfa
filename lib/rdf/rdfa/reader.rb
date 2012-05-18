@@ -333,6 +333,7 @@ module RDF::RDFa
     # @yieldparam [RDF::Statement] statement
     # @return [void]
     def each_statement(&block)
+
       if @options[:vocab_expansion]
         @options[:vocab_expansion] = false
         expand.each_statement(&block)
@@ -349,20 +350,59 @@ module RDF::RDFa
         end
 
         # parse
+        return unless @root
         parse_whole_document(@doc, RDF::URI(base_uri))
-        
-        # Look for Embedded Turtle and RDF/XML
-        unless @root.nil? || @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
+
+        def extract_script(el, input, type, options, &block)
+          add_debug(el, "script element of type #{type}")
           begin
-            require 'rdf/rdfxml'
-            add_debug("", "extract RDF/XML")
-            RDF::RDFXML::Reader.new(@doc, @options).each_statement do |statement|
-              add_debug("", "extracted #{statement.to_ntriples} from RDF/XML")
-              block.call(statement)
+            # Formats don't exist unless they've been required
+            case type
+            when 'application/rdf+xml' then require 'rdf/rdfxml'
+            when 'text/ntriples' then require 'rdf/ntriples'
+            when 'text/turtle' then require 'text/turtle'
             end
           rescue
-            # Silently fail if RDF/XML not loaded or generates an error
-            add_warning("", "error loading rdf/xml parser: #{$!}")
+          end
+
+          if reader = RDF::Reader.for(:content_type => type)
+            add_debug(el, "=> reader #{reader.to_sym}")
+            reader.new(input, options).each(&block)
+          end
+        end
+        
+        # Look for Embedded Turtle and RDF/XML
+        unless @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
+          extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
+            block.call(statement)
+          end
+        end
+
+#        # Look for Embedded RDF/XML
+#        unless @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
+#          extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
+#            block.call(statement)
+#          end
+#        end
+
+        # Look for Embedded scripts
+        @root.css("script[type]") do |el|
+          ctx = RDF::URI(el.attribute("id")) if el.attribute("id")
+          type = el.attribute("type")
+          
+          extract_script(el, el.inner_text, type, @options) do |statement|
+            statement.context = ctx if ctx
+            block.call(statement)
+          end
+        end
+        
+        # Just incase root is a <script> element
+        if @root.name == 'script' && type = root.attribute('type')
+          ctx = RDF::URI(@root.attribute("id")) if @root.attribute("id")
+          
+          extract_script(@root, @root.inner_text, type, @options) do |statement|
+            statement.context = ctx if ctx
+            block.call(statement)
           end
         end
       end
@@ -454,15 +494,17 @@ module RDF::RDFa
       end
     end
 
+    ##
     # add a statement, object can be literal or URI or bnode
+    # Yields {RDF::Statement} to the saved callback
     #
     # @param [#display_path, #to_s] node XML Node or string for showing context
-    # @param [RDF::URI, RDF::BNode] subject the subject of the statement
+    # @param [RDF::Resource] subject the subject of the statement
     # @param [RDF::URI] predicate the predicate of the statement
-    # @param [URI, RDF::BNode, RDF::Literal] object the object of the statement
-    # @return [RDF::Statement] Added statement
+    # @param [RDF::Value] object the object of the statement
+    # @param [RDF::Value] context the context of the statement
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
-    def add_triple(node, subject, predicate, object)
+    def add_triple(node, subject, predicate, object, context = nil)
       statement = RDF::Statement.new(subject, predicate, object)
       add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
       @callback.call(statement) if @options[:rdfagraph].include?(:output) && statement.valid?

@@ -161,6 +161,72 @@ This is an alternate way of adding data using the `@value` property. Similar to 
 The `data` element is described in the WHATWG version of the [HTML5 spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-data-element).
 This is related to [RDFa ISSUE-113](http://www.w3.org/2010/02/rdfa/track/issues/113)
 
+### Support for embedded RDF/XML
+If the document includes embedded RDF/XML, as is the case with many SVG documents, and the RDF::RDFXML gem is installed, the reader will add extracted triples to the default graph.
+
+For example:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <svg width="12cm" height="4cm" viewBox="0 0 1200 400"
+        xmlns:dc="http://purl.org/dc/terms/"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xml:base="http://example.net/"
+        xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny">
+      <desc property="dc:description">A yellow rectangle with sharp corners.</desc>
+      <metadata>
+        <rdf:RDF>
+          <rdf:Description rdf:about="">
+            <dc:title>Test 0304</dc:title>
+          </rdf:Description>
+        </rdf:RDF>
+      </metadata>
+      <!-- Show outline of canvas using 'rect' element -->
+      <rect x="1" y="1" width="1198" height="398"
+            fill="none" stroke="blue" stroke-width="2"/>
+      <rect x="400" y="100" width="400" height="200"
+            fill="yellow" stroke="navy" stroke-width="10"  />
+    </svg>
+
+generates the following turtle:
+
+    @prefix dc: <http://purl.org/dc/terms/> .
+
+  	<http://example.net/> dc:title "Test 0304" ;
+  	  dc:description "A yellow rectangle with sharp corners." .
+
+### Support for embedded N-Triples or Turtle
+If the document includes a `&lt;script&gt;` element having an `@type` attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are availble), the data will be extracted and added to the default graph.
+
+Additionally, if the `&lt;script&gt;` element has an `@id` attribute, the triples will be placed into a graph named by appending the value of `@id` as a frament of the base IRI of the input document. For example:
+
+    <html>
+      <body>
+        <script type="text/turtle" id="graph1"><![CDATA[
+           @prefix foo:  <http://www.example.com/xyz#> .
+           @prefix gr:   <http://purl.org/goodrelations/v1#> .
+           @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+           @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+           foo:myCompany
+             a gr:BusinessEntity ;
+             rdfs:seeAlso <http://www.example.com/xyz> ;
+             gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+        ]]></script>
+      </body>
+    </html>
+
+generates the following TriG:
+
+    @prefix gr: <http://purl.org/goodrelations/v1#> .
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+    <http://www.example.com/xyz#graph1> {
+      <http://www.example.com/xyz#myCompany> a gr:BusinessEntity ;
+        rdfs:seeAlso <http://www.example.com/xyz> ;
+        gr:hasLegalName "Hepp Industries Ltd." .
+    }
+
+
 ## Usage
 
 ### Reading RDF data in the RDFa format

@@ -138,9 +138,14 @@ module RDF::RDFa
             # Get node ancestors
             parent = n.ancestors.reverse.inject(nil) do |p,node|
               NodeProxy.new(node, p)
-            end
+            end rescue nil
             NodeProxy.new(n, parent)
           end
+        end
+
+        # Simple case for <script>
+        def css(path)
+          xpath("//script[@type]")
         end
 
         ##
@@ -149,7 +154,7 @@ module RDF::RDFa
           @node.send(method, *args)
         end
       end
-
+      
       ##
       # NodeSet proxy
       class NodeSetProxy

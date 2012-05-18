@@ -36,7 +36,7 @@ describe "RDF::RDFa::Reader" do
                     reader.version.should produce(version.sub('-vocab', '').to_sym, t.debug)
                   end
 
-                  graph = RDF::Graph.new << reader
+                  graph = RDF::Repository.new << reader
                   query = Kernel.open(t.results(host_language, version))
                   graph.should pass_query(query, t)
                 rescue RSpec::Expectations::ExpectationNotMetError => e

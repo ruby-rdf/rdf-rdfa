@@ -1380,6 +1380,91 @@ describe "RDF::RDFa::Reader" do
           parse(svg).should pass_query(query, :trace => @debug)
         end
       end
+      
+      context "script" do
+        {
+          "text/turtle" => [
+            %q(
+              <script type="text/turtle">
+              # <![CDATA[
+              @prefix dc: <http://purl.org/dc/terms/> .
+              @prefix frbr: <http://purl.org/vocab/frbr/core#> .
+
+              <http://books.example.com/works/45U8QJGZSQKDH8N> a frbr:Work ;
+                   dc:creator "Wil Wheaton"@en ;
+                   dc:title "Just a Geek"@en ;
+                   frbr:realization <http://books.example.com/products/9780596007683.BOOK>,
+                       <http://books.example.com/products/9780596802189.EBOOK> .
+
+              <http://books.example.com/products/9780596007683.BOOK> a frbr:Expression ;
+                   dc:type <http://books.example.com/product-types/BOOK> .
+
+              <http://books.example.com/products/9780596802189.EBOOK> a frbr:Expression ;
+                   dc:type <http://books.example.com/product-types/EBOOK> .
+              # ]]>
+              </script>
+            ),
+            %q(
+              @prefix dc: <http://purl.org/dc/terms/> .
+              @prefix frbr: <http://purl.org/vocab/frbr/core#> .
+
+              <http://books.example.com/works/45U8QJGZSQKDH8N> a frbr:Work ;
+                   dc:creator "Wil Wheaton"@en ;
+                   dc:title "Just a Geek"@en ;
+                   frbr:realization <http://books.example.com/products/9780596007683.BOOK>,
+                       <http://books.example.com/products/9780596802189.EBOOK> .
+
+              <http://books.example.com/products/9780596007683.BOOK> a frbr:Expression ;
+                   dc:type <http://books.example.com/product-types/BOOK> .
+
+              <http://books.example.com/products/9780596802189.EBOOK> a frbr:Expression ;
+                   dc:type <http://books.example.com/product-types/EBOOK> .
+            )
+          ],
+          "text/ntriples" => [
+            %q(
+              <script type="text/turtle">
+              # <![CDATA[
+              <http://one.example/subject1> <http://one.example/predicate1> <http://one.example/object1> . # comments here
+              # or on a line by themselves
+              _:subject1 <http://an.example/predicate1> "object1" .
+              _:subject2 <http://an.example/predicate2> "object2" .
+              # ]]>
+              </script>
+            ),
+            %q(
+              <http://one.example/subject1> <http://one.example/predicate1> <http://one.example/object1> . # comments here
+              # or on a line by themselves
+              _:subject1 <http://an.example/predicate1> "object1" .
+              _:subject2 <http://an.example/predicate2> "object2" .
+            )
+          ],
+          "text/turtle with @id" => [
+            %q(
+              <script type="text/turtle" id="graph1"><![CDATA[
+                 @prefix foo:  <http://www.example.com/xyz#> .
+                 @prefix gr:   <http://purl.org/goodrelations/v1#> .
+                 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+                 foo:myCompany
+                   a gr:BusinessEntity ;
+                   rdfs:seeAlso <http://www.example.com/xyz> ;
+                   gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+              ]]></script>
+            ),
+            %q(
+            <http://www.example.com/xyz#myCompany> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/goodrelations/v1#BusinessEntity> <http://www.example.com/xyz#graph1> .
+            <http://www.example.com/xyz#myCompany> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://www.example.com/xyz> <http://www.example.com/xyz#graph1> .
+            <http://www.example.com/xyz#myCompany> <http://purl.org/goodrelations/v1#hasLegalName> "Hepp Industries Ltd." <http://www.example.com/xyz#graph1> .
+            )
+          ]
+        }.each do |title, (input,result)|
+          it title do
+            parse(input).should be_equivalent_graph(result, :base_uri => "http://example.com/", :trace => @debug)
+          end
+        end
+      end
 
       context :rdfagraph do
         it "generates rdfa:Error on malformed content" do

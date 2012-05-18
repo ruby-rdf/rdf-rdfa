@@ -36,7 +36,7 @@ def run_tc(tc, options)
 
     reader = RDF::RDFa::Reader.new(Kernel.open(input_uri), options)
 
-    graph = RDF::Graph.new << reader
+    graph = RDF::Repository.new << reader
   rescue Exception => e
     puts "#{"exception:" unless options[:quiet]}: #{e}"
     if options[:quiet]
