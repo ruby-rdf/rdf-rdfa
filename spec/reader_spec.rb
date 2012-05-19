@@ -178,7 +178,7 @@ describe "RDF::RDFa::Reader" do
 
       context :features do
         describe "XML Literal" do
-          it "xmlns=" do
+          it "rdf:XMLLitereal" do
             html = %(<?xml version="1.0" encoding="UTF-8"?>
               <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
               <html xmlns="http://www.w3.org/1999/xhtml">
@@ -196,6 +196,30 @@ describe "RDF::RDFa::Reader" do
               @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
               <> dc:title "E = mc<sup xmlns=\"http://www.w3.org/1999/xhtml\">2</sup>: The Most Urgent Problem of Our Time"^^rdf:XMLLiteral .
+            )
+
+            parse(html).should be_equivalent_graph(expected, :trace => @debug)
+          end
+        end
+
+        describe "HTML Literal" do
+          it "rdf:HTML" do
+            html = %(<!DOCTYPE html>
+              <html>
+                <head><base href=""/></head>
+                <body>
+                  <div about="http://example.com/">
+                    <h2 property="dc:title" datatype="rdf:HTML">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
+                </div>
+                </body>
+              </html>
+              )
+            expected = %q(
+              @base <http://example.com/> .
+              @prefix dc: <http://purl.org/dc/terms/> .
+              @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+              <> dc:title "E = mc<sup>2</sup>: The Most Urgent Problem of Our Time"^^rdf:HTML .
             )
 
             parse(html).should be_equivalent_graph(expected, :trace => @debug)

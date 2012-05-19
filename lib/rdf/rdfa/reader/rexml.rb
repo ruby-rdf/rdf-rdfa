@@ -178,6 +178,11 @@ module RDF::RDFa
         end
 
         ##
+        def to_html
+          node_set.map(&:to_s).join("")
+        end
+
+        ##
         # Proxy for everything else to @node_set
         def method_missing(method, *args)
           @node_set.send(method, *args)

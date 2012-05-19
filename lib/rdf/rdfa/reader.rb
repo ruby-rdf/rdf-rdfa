@@ -1039,7 +1039,7 @@ module RDF::RDFa
                               :restrictions => TERMorCURIEorAbsIRI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
         begin
           current_property_value = case
-          when datatype && datatype != RDF.XMLLiteral
+          when datatype && ![RDF.XMLLiteral, RDF.HTML].include?(datatype)
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
             RDF::Literal.new(attrs[:datetime] || attrs[:value] || attrs[:content] || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
@@ -1063,6 +1063,20 @@ module RDF::RDFa
                 RDF::Literal.new(c14nxl,
                   :library => @library,
                   :datatype => RDF.XMLLiteral,
+                  :validate => validate?,
+                  :canonicalize => canonicalize?)
+              rescue ArgumentError => e
+                add_error(element, e.message)
+              end
+            when datatype == RDF.HTML
+              # HTML Literal
+              add_debug(element) {"[Step 11] HTML Literal: #{element.inner_html}"}
+
+              # Just like XMLLiteral, but without the c14nxl
+              begin
+                RDF::Literal.new(element.children.to_html,
+                  :library => @library,
+                  :datatype => RDF.HTML,
                   :validate => validate?,
                   :canonicalize => canonicalize?)
               rescue ArgumentError => e
@@ -1110,12 +1124,12 @@ module RDF::RDFa
               add_debug(element, "[Step 11] plain literal (inner text)")
               RDF::Literal.new(element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             end
-          else
+          else # rdfa1.0
             if element.text_content? || (element.children.length == 0) || attrs[:datatype] == ""
               # plain literal
               add_debug(element, "[Step 11 (1.0)] plain literal")
               RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
-            elsif !element.text_content? and (datatype == nil or datatype.to_s == RDF.XMLLiteral.to_s)
+            elsif !element.text_content? and (datatype == nil or datatype == RDF.XMLLiteral)
               # XML Literal
               add_debug(element) {"[Step 11 (1.0)] XML Literal: #{element.inner_html}"}
               recurse = false

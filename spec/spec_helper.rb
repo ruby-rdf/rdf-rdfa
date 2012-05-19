@@ -1,6 +1,7 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift File.dirname(__FILE__)
 
+require "bundler/setup"
 require 'backports' if RUBY_VERSION < "1.9"
 require 'rubygems'
 require 'rspec'
