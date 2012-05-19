@@ -1,5 +1,7 @@
-### 0.3.13
+### 0.3.14
+* Support for rdf:HTML literal.
 
+### 0.3.13
 * Parse any include RDF/XML if RDF::RDFXML is available.
 * Add support for extracting RDF from &lt;script&gt; elements.
 * Places triples in a named graph if the script has an @id attribute.
