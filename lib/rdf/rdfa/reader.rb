@@ -677,11 +677,13 @@ module RDF::RDFa
         datatype
         datetime
         href
+        id
         inlist
         property
         rel
         resource
         rev
+        role
         src
         typeof
         value
@@ -1249,6 +1251,24 @@ module RDF::RDFa
             else
               add_triple(element, new_subject, p, l.subject)
             end
+          end
+        end
+
+        # Role processing
+        # @id is used as subject, bnode otherwise.
+        # Predicate is xhv:role
+        # Objects are TERMorCURIEorAbsIRIs.
+        # Act as if the default vocabulary is XHV
+        if attrs[:role]
+          subject = attrs[:id] ? uri("##{attrs[:id]}") : RDF::Node.new
+          roles = process_uris(element, attrs[:role], evaluation_context, base,
+                                    :uri_mappings => uri_mappings,
+                                    :term_mappings => term_mappings,
+                                    :vocab => RDF::XHV.to_s,
+                                    :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
+
+          roles.each do |r|
+            add_triple(element, subject, RDF::XHV.role, r)
           end
         end
       end

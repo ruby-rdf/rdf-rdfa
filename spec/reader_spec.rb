@@ -1293,6 +1293,77 @@ describe "RDF::RDFa::Reader" do
             end
           end
         end
+        
+        context "@role" do
+          {
+            "with @id" => [
+              %(
+                <div id="heading1" role="heading">
+                  <p>Some contents that are a header</p>
+                </div>
+              ),
+              %(
+                @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                <#heading1> xhv:role xhv:heading.
+              )
+            ],
+            "no @id" => [
+              %(
+                <div role="heading">
+                  <p>Some contents that are a header</p>
+                </div>
+              ),
+              %(
+                @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                [xhv:role xhv:heading].
+              )
+            ],
+            "@id and IRI object" => [
+              %(
+                <div id="therole" role="http://www.example.com/roles/somerole">
+                  <p>Some contents that are a header</p>
+                </div>
+              ),
+              %(
+                @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                <#therole> xhv:role <http://www.example.com/roles/somerole>.
+              )
+            ],
+            "@id and CURIE object" => [
+              %(
+                <div prefix="ex: http://www.example.com/roles/"
+                     id="therole"
+                     role="ex:somerole">
+                  <p>Some contents that are a header</p>
+                </div>
+              ),
+              %(
+                @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                <#therole> xhv:role <http://www.example.com/roles/somerole>.
+              )
+            ],
+            "multiple values" => [
+              %(
+                <div prefix="ex: http://www.example.com/roles/"
+                     id="therole"
+                     role="ex:somerole someOtherRole http://www.example.com/alternate/role noprefix:final">
+                  <p>Some contents that are a header</p>
+                </div>
+              ),
+              %(
+                @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+                <#therole> xhv:role <http://www.example.com/roles/somerole>,
+                  xhv:someOtherRole,
+                  <http://www.example.com/alternate/role>,
+                  <noprefix:final>.
+              )
+            ],
+          }.each do |title, (input, expected)|
+            it title do
+              parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            end
+          end
+        end
       end
 
       context "problematic examples" do
