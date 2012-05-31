@@ -112,12 +112,12 @@ The @typeof attribute has changed; previously, it always created a new subject, 
 
 For example:
 
-  <div typeof="foaf:Person" about="http://greggkellogg.net/foaf#me">
-    <p property="name">Gregg Kellogg</span>
-    <a rel="knows" typeof="foaf:Person" href="http://manu.sporny.org/#this">
-      <span property="name">Manu Sporny</span>
-    </a>
-  </div>
+    <div typeof="foaf:Person" about="http://greggkellogg.net/foaf#me">
+      <p property="name">Gregg Kellogg</span>
+      <a rel="knows" typeof="foaf:Person" href="http://manu.sporny.org/#this">
+        <span property="name">Manu Sporny</span>
+      </a>
+    </div>
 
 results in
 
@@ -195,13 +195,11 @@ generates the following turtle:
   	  dc:description "A yellow rectangle with sharp corners." .
 
 ### Support for embedded N-Triples or Turtle
-If the document includes a `&lt;script&gt;` element having an `@type` attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are availble), the data will be extracted and added to the default graph.
-
-Additionally, if the `&lt;script&gt;` element has an `@id` attribute, the triples will be placed into a graph named by appending the value of `@id` as a frament of the base IRI of the input document. For example:
+If the document includes a `&lt;script&gt;` element having an `@type` attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are availble), the data will be extracted and added to the default graph. For example:
 
     <html>
       <body>
-        <script type="text/turtle" id="graph1"><![CDATA[
+        <script type="text/turtle"><![CDATA[
            @prefix foo:  <http://www.example.com/xyz#> .
            @prefix gr:   <http://purl.org/goodrelations/v1#> .
            @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
@@ -215,17 +213,29 @@ Additionally, if the `&lt;script&gt;` element has an `@id` attribute, the triple
       </body>
     </html>
 
-generates the following TriG:
+generates the following Turtle:
 
-    @prefix gr: <http://purl.org/goodrelations/v1#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+   @prefix foo:  <http://www.example.com/xyz#> .
+   @prefix gr:   <http://purl.org/goodrelations/v1#> .
+   @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+   @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-    <http://www.example.com/xyz#graph1> {
-      <http://www.example.com/xyz#myCompany> a gr:BusinessEntity ;
-        rdfs:seeAlso <http://www.example.com/xyz> ;
-        gr:hasLegalName "Hepp Industries Ltd." .
-    }
+   foo:myCompany
+     a gr:BusinessEntity ;
+     rdfs:seeAlso <http://www.example.com/xyz> ;
+     gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
 
+### Support for Role Attribute
+The processor will generate RDF triples consistent with the [Role Attr]() specification.
+
+    <div id="heading1" role="heading">
+      <p>Some contents that are a header</p>
+    </div>
+
+generates the following Turtle:
+
+    @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
+    <#heading1> xhv:role xhv:heading.
 
 ## Usage
 
@@ -464,11 +474,12 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [YARD]:             http://yardoc.org/
 [YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
-[RDFa 1.1 Core]:    http://www.w3.org/TR/2012/PR-rdfa-core-20120508/                    "RDFa 1.1 Core"
-[RDFa Lite 1.1]:    http://www.w3.org/TR/2012/PR-rdfa-lite-20120508/                    "RDFa Lite 1.1"
-[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2012/PR-xhtml-rdfa-20120508/                   "XHTML+RDFa 1.1"
+[RDFa 1.1 Core]:    http://www.w3.org/TR/2012/REC-rdfa-core-20120607/                    "RDFa 1.1 Core"
+[RDFa Lite 1.1]:    http://www.w3.org/TR/2012/REC-rdfa-lite-20120607/                    "RDFa Lite 1.1"
+[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2012/REC-xhtml-rdfa-20120607/                   "XHTML+RDFa 1.1"
 [HTML+RDFa 1.1]:    http://www.w3.org/TR/rdfa-in-html/                                   "HTML+RDFa 1.1"
-[RDFa-test-suite]:  http://rdfa.info/test-suite/                                        "RDFa test suite"
+[RDFa-test-suite]:  http://rdfa.info/test-suite/                                         "RDFa test suite"
+[Role Attr]:        http://www.w3.org/TR/role-attribute/                                 "Role Attribute"
 [RDFa doc]:         http://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
 [Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/

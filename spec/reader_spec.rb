@@ -1549,9 +1549,15 @@ describe "RDF::RDFa::Reader" do
               ]]></script>
             ),
             %q(
-            <http://www.example.com/xyz#myCompany> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/goodrelations/v1#BusinessEntity> <http://www.example.com/xyz#graph1> .
-            <http://www.example.com/xyz#myCompany> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://www.example.com/xyz> <http://www.example.com/xyz#graph1> .
-            <http://www.example.com/xyz#myCompany> <http://purl.org/goodrelations/v1#hasLegalName> "Hepp Industries Ltd." <http://www.example.com/xyz#graph1> .
+              @prefix foo:  <http://www.example.com/xyz#> .
+              @prefix gr:   <http://purl.org/goodrelations/v1#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              foo:myCompany
+                a gr:BusinessEntity ;
+                rdfs:seeAlso <http://www.example.com/xyz> ;
+                gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
             )
           ]
         }.each do |title, (input,result)|

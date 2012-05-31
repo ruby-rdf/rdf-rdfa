@@ -378,30 +378,18 @@ module RDF::RDFa
           end
         end
 
-#        # Look for Embedded RDF/XML
-#        unless @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
-#          extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
-#            block.call(statement)
-#          end
-#        end
-
         # Look for Embedded scripts
         @root.css("script[type]") do |el|
-          ctx = RDF::URI(el.attribute("id")) if el.attribute("id")
           type = el.attribute("type")
           
           extract_script(el, el.inner_text, type, @options) do |statement|
-            statement.context = ctx if ctx
             block.call(statement)
           end
         end
         
         # Just incase root is a <script> element
         if @root.name == 'script' && type = root.attribute('type')
-          ctx = RDF::URI(@root.attribute("id")) if @root.attribute("id")
-          
           extract_script(@root, @root.inner_text, type, @options) do |statement|
-            statement.context = ctx if ctx
             block.call(statement)
           end
         end
