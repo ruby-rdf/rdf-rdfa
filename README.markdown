@@ -226,7 +226,7 @@ generates the following Turtle:
      gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
 
 ### Support for Role Attribute
-The processor will generate RDF triples consistent with the [Role Attr]() specification.
+The processor will generate RDF triples consistent with the [Role Attr][] specification.
 
     <div id="heading1" role="heading">
       <p>Some contents that are a header</p>

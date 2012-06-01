@@ -111,13 +111,8 @@ module RDF::RDFa
     # @example Returning a URI prefix
     #   context.prefix(:dc)    #=> RDF::URI('http://purl.org/dc/terms/')
     #
-    # @overload prefix(name, uri)
-    #   @param  [Symbol, #to_s]   name
-    #   @param  [RDF::URI, #to_s] uri
-    #
-    # @overload prefix(name)
-    #   @param  [Symbol, #to_s]   name
-    #
+    # @param  [Symbol, #to_s]   name
+    # @param  [RDF::URI, #to_s] uri
     # @return [RDF::URI]
     def prefix(name, uri = nil)
       name = name.to_s.empty? ? nil : (name.respond_to?(:to_sym) ? name.to_sym : name.to_s.to_sym)
@@ -133,13 +128,8 @@ module RDF::RDFa
     # @example Returning a URI context
     #   context.term(:title)    #=> RDF::URI('http://purl.org/dc/terms/TITLE')
     #
-    # @overload term(name, uri)
-    #   @param  [Symbol, #to_s]   name
-    #   @param  [RDF::URI, #to_s] uri
-    #
-    # @overload term(name)
-    #   @param  [Symbol, #to_s]   name
-    #
+    # @param  [Symbol, #to_s]   name
+    # @param  [RDF::URI, #to_s] uri
     # @return [RDF::URI]
     def term(name, uri = nil)
       name = name.to_s.empty? ? nil : (name.respond_to?(:to_sym) ? name.to_sym : name.to_s.to_sym)
