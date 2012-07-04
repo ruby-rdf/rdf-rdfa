@@ -262,8 +262,7 @@ module RDF::RDFa
         else
           case root_element
           when /svg/i           then :svg
-          when /html/i          then :html5
-          else                       :xml
+          else                       :html5
           end
         end
       end

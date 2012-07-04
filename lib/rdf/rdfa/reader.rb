@@ -794,6 +794,11 @@ module RDF::RDFa
             # if the @typeof attribute is present, set typed resource to new subject
             typed_resource = new_subject if attrs[:typeof]
 
+            add_debug(element) {
+              "[Step 5] new_subject: #{new_subject.to_ntriples rescue 'nil'}, " +
+              "typed_resource: #{typed_resource.to_ntriples rescue 'nil'}"
+            }
+
             # If no URI is provided by a resource attribute, then the first match from the following rules
             # will apply:
             new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
