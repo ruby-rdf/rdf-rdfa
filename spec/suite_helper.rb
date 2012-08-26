@@ -14,10 +14,11 @@ module Fixtures
     HOST_LANGUAGE_VERSION_SETS = [
       ["xhtml1",      "rdfa1.1"],
       ["xml1",        "rdfa1.1"],
-      ["html4",       "rdfa1.1"],
       ["html5",       "rdfa1.1"],
       ["xhtml5",      "rdfa1.1"],
-      ["xml1",        "rdfa1.1-vocab"],
+      ["xhtml5",      "rdfa1.1-role"],
+      ["xhtml5",      "rdfa1.1-proc"],
+      ["xhtml5",      "rdfa1.1-vocab"],
       ["xhtml1",      "rdfa1.0"],
       ["svgtiny1.2",  "rdfa1.0"],
       ["svg",         "rdfa1.1"],

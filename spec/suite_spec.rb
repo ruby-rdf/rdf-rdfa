@@ -33,7 +33,7 @@ describe "RDF::RDFa::Reader" do
                   # Make sure auto-detect works
                   unless host_language =~ /svg/ || t.name == "0216" # due to http-equiv
                     reader.host_language.should produce(host_language.to_sym, t.debug)
-                    reader.version.should produce(version.sub('-vocab', '').to_sym, t.debug)
+                    reader.version.should produce(version.sub(/-.*$/, '').to_sym, t.debug)
                   end
 
                   graph = RDF::Repository.new << reader
