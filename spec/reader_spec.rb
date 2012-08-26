@@ -1567,6 +1567,29 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
+      it "extracts microdata" do
+        html = %(
+          <html>
+            <head>
+              <title>Test 001</title>
+            </head>
+            <body>
+              <p itemscope='true' itemtype="http://schema.org/Person">
+                This test created by
+                <span itemprop="name">Gregg Kellogg</span>.
+              </p>
+            </body>
+          </html>
+        )
+        ttl = %(
+          @prefix md: <http://www.w3.org/ns/md#> .
+          @prefix schema: <http://schema.org/> .
+
+          <> md:item ([ a schema:Person; schema:name "Gregg Kellogg"]) .
+        )
+        parse(html).should be_equivalent_graph(ttl, :trace => @debug)
+      end
+
       context :rdfagraph do
         it "generates rdfa:Error on malformed content" do
           html = %(<!DOCTYPE html>

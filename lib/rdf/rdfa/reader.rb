@@ -380,11 +380,21 @@ module RDF::RDFa
 
         # Look for Embedded scripts
         @root.css("script[type]").each do |el|
-          add_debug("each_statement") { "script: #{el.inspect}"}
           type = el.attribute("type")
           
           extract_script(el, el.inner_text, type, @options) do |statement|
             block.call(statement)
+          end
+        end
+        
+        # Look for Embedded microdata
+        unless @root.xpath("//@itemscope").empty?
+          begin
+            require 'rdf/microdata'
+            add_debug(@doc, "process microdata")
+            RDF::Microdata::Reader.new(@doc, options).each(&block)
+          rescue
+            add_debug(@doc, "microdata detected, not processed")
           end
         end
       end
