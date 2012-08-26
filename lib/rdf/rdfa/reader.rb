@@ -379,17 +379,11 @@ module RDF::RDFa
         end
 
         # Look for Embedded scripts
-        @root.css("script[type]") do |el|
+        @root.css("script[type]").each do |el|
+          add_debug("each_statement") { "script: #{el.inspect}"}
           type = el.attribute("type")
           
           extract_script(el, el.inner_text, type, @options) do |statement|
-            block.call(statement)
-          end
-        end
-        
-        # Just incase root is a <script> element
-        if @root.name == 'script' && type = root.attribute('type')
-          extract_script(@root, @root.inner_text, type, @options) do |statement|
             block.call(statement)
           end
         end
