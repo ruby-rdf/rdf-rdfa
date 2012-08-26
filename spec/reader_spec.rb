@@ -412,7 +412,7 @@ describe "RDF::RDFa::Reader" do
           end
           
           it "empty @typeof on root" do
-            html = %(<div typeof=""><span property="dc:title">Title</span></div>)
+            html = %(<html typeof=""><span property="dc:title">Title</span></html>)
             expected = RDF::Graph.new << RDF::Statement.new(RDF::URI(""), RDF::DC.title, "Title")
 
             parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
