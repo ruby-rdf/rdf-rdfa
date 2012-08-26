@@ -1,3 +1,10 @@
+### 0.3.15
+* Add support for `@role` attribute.
+* Processing defaults to HTML, rather than XML, unless XML is explicitly detected.
+* Process embedded RDF:XML, if RDF::RDFXML is loaded, and a RDF/XML is detected.
+* Process alternate readers where content is contained within a &lt;script&gt; tag, based on the @type attribute. This is commonly used for N-Triples and Turtle embedded in HTML.
+* If @itemscope detected, and RDF::Microdata is loaded, process embedded microdata.
+
 ### 0.3.14
 * Support for rdf:HTML literal.
 

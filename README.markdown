@@ -237,6 +237,9 @@ generates the following Turtle:
     @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
     <#heading1> xhv:role xhv:heading.
 
+### Support for microdata
+The RDFa reader will call out to `RDF::Microdata::Reader`, if an `@itemscope` attribute is detected, and the microdata reader is loaded. This avoids a common problem when pages contain both microdata and RDFa, and only one processor is run.
+
 ## Usage
 
 ### Reading RDF data in the RDFa format
