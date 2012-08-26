@@ -475,36 +475,38 @@ describe RDF::RDFa::Writer do
       end
     end
 
-    # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
-    describe "w3c xhtml testcases" do
-      require 'suite_helper'
+    unless ENV['CI'] # Not for continuous integration
+      # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
+      describe "w3c xhtml testcases" do
+        require 'suite_helper'
 
-      # Generate with each template set
-      RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
-        context "Using #{name} template" do
-          Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
-            specify "test #{t.name}: #{t.title}" do
-              begin
-                input = t.input("html5", "rdfa1.1")
-                @graph = RDF::Graph.load(t.input("html5", "rdfa1.1"))
-                result = serialize(:haml => template, :haml_options => {:ugly => false})
-                graph2 = parse(result, :format => :rdfa)
-                # Need to put this in to avoid problems with added markup
-                statements = graph2.query(:object => RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
-                statements.each {|st| graph2.delete(st)}
-                #puts graph2.dump(:ttl)
-                graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
-              rescue RSpec::Expectations::ExpectationNotMetError => e
-                if %w(0198).include?(t.name) || t.title =~ /XMLLiteral/
-                  pending("XMLLiteral aren't serialized canonically")
-                elsif %w(0225).include?(t.name)
-                  pending("Serializing multiple lists")
-                elsif %w(0284).include?(t.name)
-                  pending("Minor change in time element")
-                elsif %w(0295).include?(t.name)
-                  pending("Benchmark entry count")
-                else
-                  raise
+        # Generate with each template set
+        RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
+          context "Using #{name} template" do
+            Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
+              specify "test #{t.name}: #{t.title}" do
+                begin
+                  input = t.input("html5", "rdfa1.1")
+                  @graph = RDF::Graph.load(t.input("html5", "rdfa1.1"))
+                  result = serialize(:haml => template, :haml_options => {:ugly => false})
+                  graph2 = parse(result, :format => :rdfa)
+                  # Need to put this in to avoid problems with added markup
+                  statements = graph2.query(:object => RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
+                  statements.each {|st| graph2.delete(st)}
+                  #puts graph2.dump(:ttl)
+                  graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
+                rescue RSpec::Expectations::ExpectationNotMetError => e
+                  if %w(0198).include?(t.name) || t.title =~ /XMLLiteral/
+                    pending("XMLLiteral aren't serialized canonically")
+                  elsif %w(0225).include?(t.name)
+                    pending("Serializing multiple lists")
+                  elsif %w(0284).include?(t.name)
+                    pending("Minor change in time element")
+                  elsif %w(0295).include?(t.name)
+                    pending("Benchmark entry count")
+                  else
+                    raise
+                  end
                 end
               end
             end
