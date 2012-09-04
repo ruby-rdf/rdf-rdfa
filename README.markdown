@@ -1,4 +1,5 @@
 # RDF::RDFa reader/writer
+[![Build Status](https://secure.travis-ci.org/ruby-rdf/rdf-rdfa.png?branch=master)](http://travis-ci.org/ruby-rdf/rdf-rdfa)
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
 
