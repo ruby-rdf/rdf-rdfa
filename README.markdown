@@ -443,10 +443,10 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [RDFa-test-suite](http://rdfa.info/test-suite/              "RDFa test suite")
 
 ## Author
-* [Gregg Kellogg](http://github.com/gkellogg) - <http://kellogg-assoc.com/>
+* [Gregg Kellogg](http://github.com/gkellogg) - <http://greggkellogg.net/>
 
 ## Contributors
-* [Nicholas Humfrey](http://github.com/njh)
+* [Nicholas Humfrey](http://github.com/njh) - <http://njh.me/>
 
 ## Contributing
 

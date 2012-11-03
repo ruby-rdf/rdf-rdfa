@@ -235,7 +235,7 @@ module RDF::RDFa
     # @option options [Symbol] :library
     #   One of :nokogiri or :rexml. If nil/unspecified uses :nokogiri if available, :rexml otherwise.
     # @option options [Boolean]  :vocab_expansion (false)
-    #   whether to perform RDFS expansion on the resulting graph
+    #   whether to perform OWL2 expansion on the resulting graph
     # @option options [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:html5)
     #   Host Language
     # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
