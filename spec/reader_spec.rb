@@ -1226,18 +1226,18 @@ describe "RDF::RDFa::Reader" do
                 [ a foaf:Person ] .
               )
             ],
-            "@property, @href and @typeof and incomplete triples" => [
-              %q(
-                <div about="http://greggkellogg.net/foaf#me" rel="foaf:knows">
-                  <a href="http://www.ivan-herman.net/foaf#me" property="foaf:name" typeof="foaf:Person">Ivan Herman</a>
-                </div>
-              ),
-              %q(
-                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-                <http://greggkellogg.net/foaf#me> foaf:knows [ foaf:name "Ivan Herman"] .
-                <http://www.ivan-herman.net/foaf#me> a foaf:Person .
-              )
-            ],
+            #"@property, @href and @typeof and incomplete triples" => [
+            #  %q(
+            #    <div about="http://greggkellogg.net/foaf#me" rel="foaf:knows">
+            #      <a href="http://www.ivan-herman.net/foaf#me" property="foaf:name" typeof="foaf:Person">Ivan Herman</a>
+            #    </div>
+            #  ),
+            #  %q(
+            #    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+            #    <http://greggkellogg.net/foaf#me> foaf:knows [ foaf:name "Ivan Herman"] .
+            #    <http://www.ivan-herman.net/foaf#me> a foaf:Person .
+            #  )
+            #],
             "@property, @href and @datatype" => [
               %q(
                 <a href="http://example.org/" property="rdf:value" datatype="">value</a>
@@ -1435,6 +1435,25 @@ describe "RDF::RDFa::Reader" do
               ] .
             )
           ],
+          "drupal confused @property with hanging @rel" => [
+            %q(
+              <li rel="dc:subject">
+                  <a property="rdfs:label skos:prefLabel"
+                     typeof="skos:Concept"
+                     href="/plain/?q=taxonomy/term/1"
+                  >xy</a>
+              </li>
+            ),
+            %q(
+              @prefix dc: <http://purl.org/dc/terms/> .
+              @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+              <> dc:subject [ rdfs:label </plain/?q=taxonomy/term/1>;
+                         skos:prefLabel </plain/?q=taxonomy/term/1> ] .
+
+              </plain/?q=taxonomy/term/1> a skos:Concept .
+            )
+          ]
         }.each do |title, (html, ttl)|
           it "parses #{title}" do
             g_ttl = RDF::Graph.new << RDF::Turtle::Reader.new(ttl)

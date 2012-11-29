@@ -788,60 +788,61 @@ module RDF::RDFa
         else
           # If the current element contains no @rel or @rev attribute, then the next step is to establish a value for new subject.
           # This step has two possible alternatives.
-          #  1. If the current element contains the @property attribute, but does not contain the @content
-          #     or the @datatype attribute
+          #  1. If the current element contains the @property attribute, but does not contain the @content or the @datatype attributes, then
           if attrs[:property] && !(attrs[:content] || attrs[:datatype])
-            new_subject = process_uri(element, attrs[:about], evaluation_context, base,
-                        :uri_mappings => uri_mappings,
-                        :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:about]
+            # new subject is set to the resource obtained from the first match from the following rule:
+            new_subject ||= if attrs[:about]
+              # by using the resource from @about, if present, obtained according to the section on CURIE and IRI Processing;
+              process_uri(element, attrs[:about], evaluation_context, base,
+                          :uri_mappings => uri_mappings,
+                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
+            elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+              # From XHTML+RDFa 1.1:
+              # if no URI is provided, then first check to see if the element is the head or body element. If it is, then act as if the new subject is set to the parent object.
+              evaluation_context.parent_object
+            elsif element == root && base
+              # otherwise, if the element is the root element of the document, then act as if there is an empty @about present, and process it according to the rule for @about, above;
+              uri(base)
+            end
 
             # if the @typeof attribute is present, set typed resource to new subject
             typed_resource = new_subject if attrs[:typeof]
 
-            add_debug(element) {
-              "[Step 5] new_subject: #{new_subject.to_ntriples rescue 'nil'}, " +
-              "typed_resource: #{typed_resource.to_ntriples rescue 'nil'}"
-            }
+            # otherwise, if parent object is present, new subject is set to the value of parent object.
+            new_subject ||= evaluation_context.parent_object
 
-            # If no URI is provided by a resource attribute, then the first match from the following rules
-            # will apply:
-            new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
-              # From XHTML+RDFa 1.1:
-              # if no URI is provided, then first check to see if the element is the head or body element.
-              # If it is, then act as if the new subject is set to the parent object.
-              evaluation_context.parent_object
-            elsif element == root && base
-              # if the element is the root element of the document, then act as if there is an empty @about present,
-              # and process it according to the rule for @about, above;
-              uri(base)
-            else
-              # otherwise, if parent object is present, new subject is set to the value of parent object.
-              evaluation_context.parent_object
-            end
+            # If @typeof is present then typed resource is set to the resource obtained from the first match from the following rules:
 
-            if attrs[:typeof]
-              typed_resource ||= 
+            # by using the resource from @about, if present, obtained according to the section on CURIE and IRI Processing; (done above)
+            # otherwise, if the element is the root element of the document, then act as if there is an empty @about present and process it according to the previous rule; (done above)
+
+            if attrs[:typeof] && typed_resource.nil?
+              # otherwise,
+              typed_resource ||= if attrs[:resource]
+                # by using the resource from @resource, if present, obtained according to the section on CURIE and IRI Processing;
                 process_uri(element, attrs[:resource], evaluation_context, base,
                             :uri_mappings => uri_mappings,
-                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
-              typed_resource ||= 
+                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
+              elsif attrs[:href] || attrs[:src]
+                # otherwise, by using the IRI from @href, if present, obtained according to the section on CURIE and IRI Processing;
+                # otherwise, by using the IRI from @src, if present, obtained according to the section on CURIE and IRI Processing;
                 process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base,
-                            :restrictions => [:uri]) if attrs[:href] || attrs[:src]
-              typed_resource ||= RDF::Node.new
-              
+                            :restrictions => [:uri])
+              else
+                # otherwise, the value of typed resource is set to a newly created bnode.
+                RDF::Node.new
+              end
+
               # The value of the current object resource is set to the value of typed resource.
               current_object_resource = typed_resource
             end
           else
             # otherwise (ie, the @content or @datatype)
             new_subject =
-              process_uri(element, attrs[:about], evaluation_context, base,
+              process_uri(element, (attrs[:about] || attrs[:resource]),
+                          evaluation_context, base,
                           :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:about]
-            new_subject ||=
-              process_uri(element, attrs[:resource], evaluation_context, base,
-                          :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
+                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:about] ||attrs[:resource]
             new_subject ||=
               process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base,
                           :restrictions => [:uri]) if attrs[:href] || attrs[:src]
@@ -874,6 +875,7 @@ module RDF::RDFa
         add_debug(element) {
           "[Step 5] new_subject: #{new_subject.to_ntriples rescue 'nil'}, " +
           "typed_resource: #{typed_resource.to_ntriples rescue 'nil'}, " +
+          "current_object_resource: #{current_object_resource.to_ntriples rescue 'nil'}, " +
           "skip = #{skip}"
         }
       else
@@ -932,7 +934,7 @@ module RDF::RDFa
         }
       end
     
-      # Process @typeof if there is a subject [Step 7]
+      # [Step 7] If in any of the previous steps a typed resource was set to a non-null value, it is now used to provide a subject for type values;
       if typed_resource
         # Typeof is TERMorCURIEorAbsIRIs
         types = process_uris(element, attrs[:typeof], evaluation_context, base,
@@ -961,8 +963,7 @@ module RDF::RDFa
 
       # Generate triples with given object [Step 9]
       #
-      # If the current element has a @inlist attribute, add the property to the
-      # list associated with that property, creating a new list if necessary.
+      # If in any of the previous steps a current object resource was set to a non-null value, it is now used to generate triples and add entries to the local list mapping:
       if new_subject && current_object_resource && (attrs[:rel] || attrs[:rev])
         add_debug(element) {"[Step 9] rels: #{rels.inspect} revs: #{revs.inspect}"}
         rels.each do |r|
@@ -976,6 +977,7 @@ module RDF::RDFa
             add_debug(element) {"[Step 9] add #{current_object_resource.to_ntriples} to #{r} #{list_mapping[r].inspect}"}
             list_mapping[r] << current_object_resource
           else
+            # Predicates for the current object resource can be set by using one or both of the @rel and the @rev attributes but, in case of the @rel attribute, only if the @inlist is not present:
             add_triple(element, new_subject, r, current_object_resource)
           end
         end
@@ -1108,9 +1110,8 @@ module RDF::RDFa
               RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
             when (attrs[:resource] || attrs[:href] || attrs[:src]) &&
                  !(attrs[:rel] || attrs[:rev]) &&
-                 evaluation_context.incomplete_triples.empty? &&
                  @version != :"rdfa1.0"
-              add_debug(element, "[Step 11] IRI literal (resource|href|src)")
+              add_debug(element, "[Step 11] resource (resource|href|src)")
               res = process_uri(element, attrs[:resource], evaluation_context, base,
                                 :uri_mappings => uri_mappings,
                                 :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
