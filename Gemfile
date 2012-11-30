@@ -8,4 +8,5 @@ gemspec
 group :debug, :test do
   gem "wirble"
   gem "syntax"
+  gem 'debugger'
 end
