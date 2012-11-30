@@ -26,7 +26,7 @@ module RDF::RDFa
         ##
         # Element language
         #
-        # From HTML5 [3.2.3.3]
+        # From HTML5 3.2.3.3
         #   If both the lang attribute in no namespace and the lang attribute in the XML namespace are set
         #   on an element, user agents must use the lang attribute in the XML namespace, and the lang
         #   attribute in no namespace must be ignored for the purposes of determining the element's
@@ -140,8 +140,8 @@ module RDF::RDFa
         ##
         # Return a proxy for each child
         #
-        # @yield(child)
-        # @yieldparam(NodeProxy)
+        # @yield child
+        # @yieldparam [NodeProxy]
         def each
           @node_set.each do |c|
             yield NodeProxy.new(c, parent)

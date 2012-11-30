@@ -21,7 +21,7 @@ module RDF::RDFa
   #
   # Based on processing rules described here:
   # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/
+  # @see http://www.w3.org/TR/2012/REC-rdfa-core-20120607/
   # @see http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/
   # @see http://dev.w3.org/html5/rdfa/
   #
@@ -61,11 +61,11 @@ module RDF::RDFa
       Regexp::EXTENDED)
 
     # This expression matches an term as defined in
-    # [RDFA-CORE](# @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/#s_terms)
+    # [RDFA-CORE](http://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms)
     #
     # For the avoidance of doubt, this definition means a 'term'
     # in RDFa is an XML NCName that also permits slash as a non-leading character.
-    # @see http://www.w3.org/TR/2012/CR-rdfa-core-20120313/#s_terms
+    # @see http://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms
     TERM_REGEXP = Regexp.new(
       %{^
         (?!\\\\u0301)             # &#x301; is a non-spacing acute accent.
@@ -253,7 +253,7 @@ module RDF::RDFa
     # @yield  [reader] `self`
     # @yieldparam  [RDF::Reader] reader
     # @yieldreturn [void] ignored
-    # @raise [Error]:: Raises RDF::ReaderError if _validate_
+    # @raise [RDF::ReaderError] if _validate_
     def initialize(input = $stdin, options = {}, &block)
       super do
         @debug = options[:debug]

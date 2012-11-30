@@ -3,51 +3,47 @@ require 'cgi'
 
 module RDF::RDFa
   ##
-  # An RDFa 1.1 serialiser in Ruby. The RDFa serializer makes use of Haml templates,
-  # allowing runtime-replacement with alternate templates. Note, however, that templates
-  # should be checked against the W3C test suite to ensure that valid RDFa is emitted.
+  # An RDFa 1.1 serialiser in Ruby. The RDFa serializer makes use of Haml templates, allowing runtime-replacement with alternate templates. Note, however, that templates should be checked against the W3C test suite to ensure that valid RDFa is emitted.
   #
-  # Note that the natural interface is to write a whole graph at a time.
-  # Writing statements or Triples will create a graph to add them to
-  # and then serialize the graph.
+  # Note that the natural interface is to write a whole graph at a time. Writing statements or Triples will create a graph to add them to and then serialize the graph.
   #
   # The writer will add prefix definitions, and use them for creating @prefix definitions, and minting CURIEs
   #
   # @example Obtaining a RDFa writer class
-  #   RDF::Writer.for(:html)         #=> RDF::RDFa::Writer
-  #   RDF::Writer.for("etc/test.html")
-  #   RDF::Writer.for(:file_name      => "etc/test.html")
-  #   RDF::Writer.for(:file_extension => "html")
-  #   RDF::Writer.for(:content_type   => "application/xhtml+xml")
-  #   RDF::Writer.for(:content_type   => "text/html")
+  #     RDF::Writer.for(:html)          => RDF::RDFa::Writer
+  #     RDF::Writer.for("etc/test.html")
+  #     RDF::Writer.for(:file_name      => "etc/test.html")
+  #     RDF::Writer.for(:file_extension => "html")
+  #     RDF::Writer.for(:content_type   => "application/xhtml+xml")
+  #     RDF::Writer.for(:content_type   => "text/html")
   #
   # @example Serializing RDF graph into an XHTML+RDFa file
-  #   RDF::RDFa::Write.open("etc/test.html") do |writer|
-  #     writer << graph
-  #   end
+  #     RDF::RDFa::Write.open("etc/test.html") do |writer|
+  #       writer << graph
+  #     end
   #
   # @example Serializing RDF statements into an XHTML+RDFa file
-  #   RDF::RDFa::Writer.open("etc/test.html") do |writer|
-  #     graph.each_statement do |statement|
-  #       writer << statement
+  #     RDF::RDFa::Writer.open("etc/test.html") do |writer|
+  #       graph.each_statement do |statement|
+  #         writer << statement
+  #       end
   #     end
-  #   end
   #
   # @example Serializing RDF statements into an XHTML+RDFa string
-  #   RDF::RDFa::Writer.buffer do |writer|
-  #     graph.each_statement do |statement|
-  #       writer << statement
+  #     RDF::RDFa::Writer.buffer do |writer|
+  #       graph.each_statement do |statement|
+  #         writer << statement
+  #       end
   #     end
-  #   end
   #
   # @example Creating @base and @prefix definitions in output
-  #   RDF::RDFa::Writer.buffer(:base_uri => "http://example.com/", :prefixes => {
-  #       :foaf => "http://xmlns.com/foaf/0.1/"}
-  #   ) do |writer|
-  #     graph.each_statement do |statement|
-  #       writer << statement
+  #     RDF::RDFa::Writer.buffer(:base_uri => "http://example.com/", :prefixes => {
+  #         :foaf => "http://xmlns.com/foaf/0.1/"}
+  #     ) do |writer|
+  #       graph.each_statement do |statement|
+  #         writer << statement
+  #       end
   #     end
-  #   end
   #
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Writer < RDF::Writer
@@ -57,8 +53,7 @@ module RDF::RDFa
     # @return [Array<URI>]
     attr :top_classes
 
-    # Defines order of predicates to to emit at begninning of a resource description. Defaults to
-    # [rdf:type, rdfs:label, dc:title]
+    # Defines order of predicates to to emit at begninning of a resource description. Defaults to `[rdf:type, rdfs:label, dc:title]`
     # @return [Array<URI>]
     attr :predicate_order
 
@@ -99,11 +94,9 @@ module RDF::RDFa
     #   Defines order of predicates to to emit at begninning of a resource description..
     # @option options [Array<RDF::URI>] :heading_predicates ([RDF::RDFS.label, RDF::DC.title])
     #   Defines order of predicates to use in heading.
-    # @option options [String, Symbol, Hash{Symbol => String}] :haml (DEFAULT_HAML)
-    #   HAML templates used for generating code
+    # @option options [String, Symbol, Hash{Symbol => String}] :haml (DEFAULT_HAML) HAML templates used for generating code
     # @option options [Hash] :haml_options (HAML_OPTIONS)
-    #   Options to pass to Haml::Engine.new. Default options set :ugly => false
-    #   to ensure that whitespace in literals with newlines is properly preserved.
+    #   Options to pass to Haml::Engine.new. Default options set `:ugly => false` to ensure that whitespace in literals with newlines is properly preserved.
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
     def initialize(output = $stdout, options = {}, &block)
@@ -202,22 +195,7 @@ module RDF::RDFa
 
     protected
 
-    # Render document using haml_template[:doc].
-    # Yields each subject to be rendered separately.
-    #
-    # The default Haml template is:
-    #     !!! XML
-    #     !!! 5
-    #     %html{:xmlns => "http://www.w3.org/1999/xhtml", :lang => lang, :prefix => prefix}
-    #       - if base || title
-    #         %head
-    #           - if base
-    #             %base{:href => base}
-    #           - if title
-    #             %title= title
-    #       %body
-    #         - subjects.each do |subject|
-    #           != yield(subject)
+    # Render document using `haml_template[:doc]`. Yields each subject to be rendered separately.
     #
     # @param [Array<RDF::Resource>] subjects
     #   Ordered list of subjects. Template must yield to each subject, which returns
@@ -252,28 +230,11 @@ module RDF::RDFa
       end
     end
 
-    # Render a subject using haml_template[:subject].
+    # Render a subject using `haml_template[:subject]`.
     #
-    # The _subject_ template may be called either as a top-level element, or recursively under another element
-    # if the _rel_ local is not nil.
+    # The _subject_ template may be called either as a top-level element, or recursively under another element if the _rel_ local is not nil.
     #
-    # Yields each predicate/property to be rendered separately (@see #render_property_value and
-    # {#render_property_values}).
-    #
-    # The default Haml template is:
-    #     - if element == :li
-    #       %li{:rel => rel, :resource => (about || resource), :typeof => typeof, :inlist => inlist}
-    #         - if typeof
-    #           %span.type!= typeof
-    #         - predicates.each do |predicate|
-    #           != yield(predicate)
-    #     - else
-    #       %div{:rel => rel, :resource => (about || resource), :typeof => typeof, :inlist => inlist}
-    #         - if typeof
-    #           %span.type!= typeof
-    #         - predicates.each do |predicate|
-    #           != yield(predicate)
-    #
+    # Yields each predicate/property to be rendered separately (@see #render_property_value and `#render_property_values`).
     #
     # @param [Array<RDF::Resource>] subject
     #   Subject to render
@@ -292,7 +253,7 @@ module RDF::RDFa
     #   RDF type as a CURIE, URI or Node definition.
     #   If :about is nil, this defaults to the empty string ("").
     # @option options [:li, nil] element (nil)
-    #   Render with <li>, otherwise with template default.
+    #   Render with &lt;li&gt;, otherwise with template default.
     # @option options [String] haml (haml_template[:subject])
     #   Haml template to render.
     # @yield [predicate]
@@ -301,7 +262,7 @@ module RDF::RDFa
     # @yieldreturn [:ignored]
     # @return String
     #   The rendered document is returned as a string
-    # Return Haml template for document from haml_template[:subject]
+    # Return Haml template for document from `haml_template[:subject]`
     def render_subject(subject, predicates, options = {})
       template = options[:haml] || :subject
       options = {
@@ -320,62 +281,17 @@ module RDF::RDFa
       end
     end
 
-    # Render a single- or multi-valued predicate using haml_template[:property_value] or haml_template[:property_values].
-    # Yields each object for optional rendering. The block should only
-    # render for recursive subject definitions (i.e., where the object
-    # is also a subject and is rendered underneath the first referencing subject).
+    # Render a single- or multi-valued predicate using `haml_template[:property_value]` or `haml_template[:property_values]`. Yields each object for optional rendering. The block should only render for recursive subject definitions (i.e., where the object is also a subject and is rendered underneath the first referencing subject).
     #
-    # The default Haml template for a single-valued property is:
-    #     - if heading_predicates.include?(predicate) && object.literal?
-    #       %h1{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
-    #     - else
-    #       %div.property
-    #         %span.label
-    #           = get_predicate_name(predicate)
-    #         - if res = yield(object)
-    #           != res
-    #         - elsif get_curie(object) == 'rdf:nil'
-    #           %span{:rel => get_curie(predicate), :inlist => ''}
-    #         - elsif object.node?
-    #           %span{:property => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
-    #         - elsif object.uri?
-    #           %a{:property => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
-    #         - elsif object.datatype == RDF.XMLLiteral
-    #           %span{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}<!= get_value(object)
-    #         - else
-    #           %span{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
-    #
-    #
-    # The default Haml template for a multi-valued property is:
-    #     %div.property
-    #       %span.label
-    #         = get_predicate_name(predicate)
-    #       %ul
-    #         - objects.each do |object|
-    #           - if res = yield(object)
-    #             != res
-    #           - elsif object.node?
-    #             %li{:property => get_curie(predicate), :resource => get_curie(object), :inlist => inlist}= get_curie(object)
-    #           - elsif object.uri?
-    #             %li
-    #               %a{:property => get_curie(predicate), :href => object.to_s, :inlist => inlist}= object.to_s
-    #           - elsif object.datatype == RDF.XMLLiteral
-    #             %li{:property => get_curie(predicate), :lang => get_lang(object), :datatype => get_curie(object.datatype), :inlist => inlist}<!= get_value(object)
-    #           - else
-    #             %li{:property => get_curie(predicate), :content => get_content(object), :lang => get_lang(object), :datatype => get_dt_curie(object), :inlist => inlist}= escape_entities(get_value(object))
-    #
-    # If a multi-valued property definition is not found within the template,
-    # the writer will use the single-valued property definition multiple times.
+    # If a multi-valued property definition is not found within the template, the writer will use the single-valued property definition multiple times.
     #
     # @param [Array<RDF::Resource>] predicate
     #   Predicate to render.
     # @param [Array<RDF::Resource>] objects
-    #   List of objects to render.
-    #   If the list contains only a single element, the :property_value template will be used.
-    #   Otherwise, the :property_values template is used.
+    #   List of objects to render. If the list contains only a single element, the :property_value template will be used. Otherwise, the :property_values template is used.
     # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
     # @option options [String] haml (haml_template[:property_value], haml_template[:property_values])
-    #   Haml template to render. Otherwise, uses haml_template[:property_value] or haml_template[:property_values]
+    #   Haml template to render. Otherwise, uses `haml_template[:property_value] or haml_template[:property_values]`
     #   depending on the cardinality of objects.
     # @yield [object]
     #   Yields object.
@@ -523,8 +439,7 @@ module RDF::RDFa
       prop_list
     end
 
-    # Perform any statement preprocessing required. This is used to perform reference counts and determine required
-    # prefixes.
+    # Perform any statement preprocessing required. This is used to perform reference counts and determine required prefixes.
     # @param [RDF::Statement] statement
     # @return [ignored]
     def preprocess_statement(statement)
@@ -551,21 +466,20 @@ module RDF::RDFa
 
     # Display a subject.
     #
-    # If the Haml template contains an entry matching the subject's rdf:type URI,
-    # that entry will be used as the template for this subject and it's properties.
+    # If the Haml template contains an entry matching the subject's rdf:type URI, that entry will be used as the template for this subject and it's properties.
     #
     # @example Displays a subject as a Resource Definition:
-    #   <div typeof="rdfs:Resource" about="http://example.com/resource">
-    #     <h1 property="dc:title">label</h1>
-    #     <ul>
-    #       <li content="2009-04-30T06:15:51Z" property="dc:created">2009-04-30T06:15:51+00:00</li>
-    #     </ul>
-    #   </div>
+    #     <div typeof="rdfs:Resource" about="http://example.com/resource">
+    #       <h1 property="dc:title">label</h1>
+    #       <ul>
+    #         <li content="2009-04-30T06:15:51Z" property="dc:created">2009-04-30T06:15:51+00:00</li>
+    #       </ul>
+    #     </div>
     #
     # @param [RDF::Resource] subject
     # @param [Hash{Symbol => Object}] options
     # @option options [:li, nil] :element(:div)
-    #   Serialize using <li> rather than template default element
+    #   Serialize using &lt;li&gt; rather than template default element
     # @option options [RDF::Resource] :rel (nil)
     #   Optional @rel property
     # @return [Nokogiri::XML::Element, {Namespace}]

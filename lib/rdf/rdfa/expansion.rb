@@ -10,7 +10,7 @@ module RDF::RDFa
     ##
     # Perform vocabulary expansion on the resulting default graph.
     #
-    #   Vocabulary expansion relies on a sub-set of OWL [OWL2-PROFILES] entailment to add
+    #   Vocabulary expansion relies on a sub-set of OWL entailment to add
     #   triples to the default graph based on rules and property/class relationships
     #   described in referenced vocabularies.
     #

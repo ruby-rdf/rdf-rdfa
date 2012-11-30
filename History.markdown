@@ -15,7 +15,7 @@
 
 ### 0.3.11
 * Up to date with RDFa Proposed Recomendation versions of specs.
-* Fix problems with @resource=[] or @about=[], which should be ignored and use the next most appropriate attribute.
+* Fix problems with @resource=\[\] or @about=\[\], which should be ignored and use the next most appropriate attribute.
 * Remove support for @data, which was previously a synonym for @src in HTML5.
 * More robust detection of XHTML1 if version is rdfa1.0
 * Support change to remove @rel/@rev elements that aren't CURIES or IRIs when in the presense of @property
@@ -49,8 +49,8 @@
   * Don't default xhtml1 and rdfa1.1 in parser; depend on host_detect.
   * Use separate context documents for XML, XHTML and HTML.
   * Remove Facet gem, which was causing problems with Active Record.
-  * Added full support for HTML5 <time> element.
-  * Added support for HTML5 <data> element with @value attribute to create a plain literal with possible language.
+  * Added full support for HTML5 &lt;time&gt; element.
+  * Added support for HTML5 &lt;data&gt; element with @value attribute to create a plain literal with possible language.
   * Change vocabulary expansion rules to use OWL 2 RL entailment.
   * Terms can now include a '/', to allow for use with @vocab where the class/property is a relative IRI.
 * In writer:
@@ -79,9 +79,9 @@
   * Add rdfa:hasVocabulary when encountering @vocab
   * Implemented Reader#expand to perform vocabulary expansion using RDFS rules 5, 7, 9 and 11.
   * Support for RDF collections (rdf:List) using @member attribute.
-  *Implemented :expand option to reader, which allows normal use of reader interface without requiring the use of the #expand method.
+  * Implemented :expand option to reader, which allows normal use of reader interface without requiring the use of the #expand method.
   * Add caches for popular vocabularies to speed load time.
-  Add :vocabulary_profile as Reader option to allow for use of persistent vocabulary caches.
+  * Add :vocabulary_profile as Reader option to allow for use of persistent vocabulary caches.
   * Performance improvements by evaluating debug statements in block only when debug enabled.
   
 ### 0.3.5

@@ -279,11 +279,11 @@ use the same prefix definitions found during parsing:
     puts graph.dump(:rdfa, :prefixes => prefixes)
 
 ### Template-based Writer
-The RDFa writer uses [Haml][Haml] templates for code generation. This allows fully
-customizable RDFa output in a variety of host languages.
-The [default template]({RDF::RDFa::Writer::DEFAULT_HAML}) generates human readable HTML5
-output. A [minimal template]({RDF::RDFa::Writer::MIN_HAML}) generates HTML, which is not
-intended for human consumption.
+The RDFa writer uses [Haml][Haml] templates for code generation. This allows
+fully customizable RDFa output in a variety of host languages. The [default
+template]({RDF::RDFa::Writer::DEFAULT_HAML}) generates human readable HTML5
+output. A [minimal template]({RDF::RDFa::Writer::MIN_HAML}) generates HTML,
+which is not intended for human consumption.
 
 To specify an alternative Haml template, consider the following:
 
@@ -437,7 +437,7 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [RDF.rb][RDF.rb]
 * [Distiller](http://rdf.greggkellogg.net/distiller)
 * [Documentation][RDFa doc]
-* [History]{file:History.markdown}
+* [History](file:History.markdown)
 * [RDFa 1.1 Core][RDFa 1.1 Core]
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
 * [RDFa-test-suite](http://rdfa.info/test-suite/              "RDFa test suite")
@@ -487,3 +487,4 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 [RDFa doc]:         http://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
 [Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/
+[Backports]:        http://rubygems.org/gems/backports

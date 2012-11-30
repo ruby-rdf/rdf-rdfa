@@ -124,7 +124,7 @@
      <http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/>,
      <http://www.w3.org/TR/2008/REC-xml-20081126/>,
      <http://www.w3.org/TR/2012/REC-xmlschema11-1-20120405/>;
-   dcterms:replaces <http://www.w3.org/TR/2012/CR-rdfa-core-20120313/>;
+   dcterms:replaces <http://www.w3.org/TR/2012/REC-rdfa-core-20120607/>;
    dcterms:requires <http://www.w3.org/TR/2009/REC-owl2-overview-20091027/>,
      <http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/>,
      <http://www.w3.org/TR/2009/REC-owl2-rdf-based-semantics-20091027/>,
