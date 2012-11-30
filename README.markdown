@@ -399,10 +399,10 @@ The template hash defines four Haml templates:
 
 ## Dependencies
 * [Ruby](http://ruby-lang.org/) (>= 1.9) or (>= 1.8.1 with [Backports][])
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.1)
-* [Haml](https://rubygems.org/gems/haml) (>= 3.0.0)
-* [HTMLEntities](https://rubygems.org/gems/htmlentities) ('>= 4.3.0')
-* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.3.3)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.11)
+* [Haml](https://rubygems.org/gems/haml) (>= 3.1.7)
+* [HTMLEntities](https://rubygems.org/gems/htmlentities) ('>= 4.3.1')
+* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.5.5)
 
 ## Documentation
 Full documentation available on [Rubydoc.info][RDFa doc]
