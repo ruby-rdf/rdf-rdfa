@@ -7,7 +7,7 @@ describe "RDF::RDFa::Reader" do
     @reader = RDF::RDFa::Reader.new(StringIO.new("<html></html>"))
   end
 
-  it_should_behave_like RDF_Reader
+  include RDF_Reader
 
   describe ".for" do
     formats = [
@@ -904,7 +904,7 @@ describe "RDF::RDFa::Reader" do
             "with @src" => [
               %q(
                 <div about="">
-                  <image property="rdf:value" src="#foo"/>
+                  <img property="rdf:value" src="#foo"/>
                 </div>
               ),
               %q(
@@ -984,19 +984,6 @@ describe "RDF::RDFa::Reader" do
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
           
                 <> rdf:value "2012-03-18T00:00:00Z"^^xsd:string .
-              )
-            ],
-            "with @datetime=xsd:dateTime with @datatype and not-quite matching lexical value" => [
-              %q(
-                <div about="">
-                  <time property="rdf:value" datatype="xsd:dateTime"> 2012-03-18Z</time>
-                </div>
-              ),
-              %q(
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-          
-                <> rdf:value " 2012-03-18Z"^^xsd:dateTime .
               )
             ],
             "with @datetime=xsd:gYear" => [
