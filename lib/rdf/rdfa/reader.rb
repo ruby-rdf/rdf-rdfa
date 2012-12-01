@@ -568,7 +568,7 @@ module RDF::RDFa
         end
     end
 
-    # Extract the XMLNS mappings from an element
+    # Extract the prefix mappings from an element
     def extract_mappings(element, uri_mappings, namespaces)
       # look for xmlns
       # (note, this may be dependent on @host_language)
@@ -600,6 +600,9 @@ module RDF::RDFa
         # Downcase prefix for RDFa 1.1
         pfx_lc = (@version == :"rdfa1.0" || prefix.nil?) ? prefix : prefix.downcase
         if prefix
+          if uri_mappings.fetch(pfx_lc.to_sym, href) != href
+            add_warning(element, "Redefining prefix #{pfx_lc}: from <#{uri_mappings[pfx_lc]}> to <#{href}>", RDF::RDFA.PrefixRedefinition)
+          end
           uri_mappings[pfx_lc.to_sym] = href
           namespaces[pfx_lc] ||= href
           prefix(pfx_lc, href)
@@ -619,7 +622,7 @@ module RDF::RDFa
         #puts "uri_mappings prefix #{prefix} <#{uri}>"
         next unless prefix.match(/:$/)
         prefix.chop!
-        
+
         unless prefix.match(NC_REGEXP)
           add_error(element, "extract_mappings: Prefix #{prefix.inspect} does not match NCName production")
           next
@@ -628,7 +631,11 @@ module RDF::RDFa
         # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
         next if prefix == "_"
 
-        uri_mappings[prefix.to_s.empty? ? nil : prefix.to_s.to_sym] = uri
+        pfx_index = prefix.to_s.empty? ? nil : prefix.to_s.to_sym
+        if uri_mappings.fetch(pfx_index, uri) != uri
+          add_warning(element, "Redefining prefix #{prefix}: from <#{uri_mappings[pfx_index]}> to <#{uri}>", RDF::RDFA.PrefixRedefinition)
+        end
+        uri_mappings[pfx_index] = uri
         prefix(prefix, uri)
         add_info(element, "extract_mappings: prefix #{prefix} => <#{uri}>")
       end unless @version == :"rdfa1.0"
