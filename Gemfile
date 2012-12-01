@@ -8,5 +8,5 @@ gemspec
 group :debug do
   gem "wirble"
   gem "syntax"
-  gem 'debugger' if RUBY_ENGINE == 'ruby'
+  gem 'debugger' if defined(RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
 end

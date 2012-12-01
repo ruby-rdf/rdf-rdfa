@@ -1,3 +1,6 @@
+### 0.3.17
+* Added rdfa:PrefixReDefinition warning.
+
 ### 0.3.16
 * Fix step 11 when there is @resource, @href and @src but not @rel or @rev to not also depend on the state of incomplete triples. This addresses an odd Drupal case.
 * respec shared examples updates to match rdf-spec 0.3.11
