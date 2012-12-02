@@ -9,19 +9,23 @@ module RDF::RDFa
   # or to load into, if no such graph exists
   class Context
     # Prefix mappings defined in this context
-    # @attr_reader [Hash{Symbol => RDF::URI}]
+    # @!attribute [r] prefixes
+    # @return  [Hash{Symbol => RDF::URI}]
     attr_reader :prefixes
 
     # Term mappings defined in this context
-    # @attr_reader [Hash{Symbol => RDF::URI}]
+    # @!attribute [r] terms
+    # @return [Hash{Symbol => RDF::URI}]
     attr_reader :terms
     
     # Default URI defined for this vocabulary
-    # @attr_reader [RDF::URI]
+    # @!attribute [r] vocabulary
+    # @return [RDF::URI]
     attr_reader :vocabulary
 
     # URI defining this context
-    # @attr_reader [RDF::URI]
+    # @!attribute [r] uri
+    # @return [RDF::URI]
     attr_reader :uri
     
     ##

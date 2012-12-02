@@ -89,13 +89,16 @@ module RDF::RDFa
     # Takes a list of antecedent patterns used to find solutions against a queryable
     # object. Yields each consequent with bindings from the solution
     class Rule
-      # @attr_reader [Array<RDF::Query::Pattern>]
+      # @!attribute [r] antecedents
+      # @return [Array<RDF::Query::Pattern>]
       attr_reader :antecedents
 
-      # @attr_reader [Array<RDF::Query::Pattern>]
+      # @!attribute [r] consequents
+      # @return [Array<RDF::Query::Pattern>]
       attr_reader :consequents
 
-      # @attr_reader [String] name
+      # @!attribute [r] name
+      # @return [String]
       attr_reader :name
 
       ##

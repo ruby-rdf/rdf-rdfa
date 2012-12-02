@@ -80,11 +80,13 @@ module RDF::RDFa
       Regexp::EXTENDED)
 
     # Host language
-    # @attr_reader [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg]
+    # @!attribute [r] host_language
+    # @return [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg]
     attr_reader :host_language
     
     # Version
-    # @attr_reader [:"rdfa1.0", :"rdfa1.1"]
+    # @!attribute [r] version
+    # @return [:"rdfa1.0", :"rdfa1.1"]
     attr_reader :version
     
     # The Recursive Baggage
@@ -98,7 +100,8 @@ module RDF::RDFa
       # such as the (X)HTML base element. The important thing is that it establishes
       # a URL against which relative paths can be resolved.
       #
-      # @attr_accessor [RDF::URI]
+      # @!attribute [rw] base
+      # @return [RDF::URI]
       attr_accessor :base
 
       ##
@@ -107,7 +110,8 @@ module RDF::RDFa
       # The initial value will be the same as the initial value of base,
       # but it will usually change during the course of processing.
       #
-      # @attr_accessor [RDF::URI]
+      # @!attribute [rw] parent_subject
+      # @return [RDF::URI]
       attr_accessor :parent_subject
       
       ##
@@ -120,20 +124,23 @@ module RDF::RDFa
       # This means that the bnode must be set in the containing statement and passed down,
       # and this property is used to convey this value.
       #
-      # @attr_accessor [RDF::URI]
+      # @!attribute [rw] parent_object
+      # @return [RDF::URI]
       attr_accessor :parent_object
       
       ##
       # A list of current, in-scope URI mappings.
       #
-      # @attr_accessor [Hash{Symbol => String}]
+      # @!attribute [rw] uri_mappings
+      # @return [Hash{Symbol => String}]
       attr_accessor :uri_mappings
       
       ##
       # A list of current, in-scope Namespaces. This is the subset of uri_mappings
       # which are defined using xmlns.
       #
-      # @attr_accessor [Hash{String => Namespace}]
+      # @!attribute [rw] namespaces
+      # @return [Hash{String => Namespace}]
       attr_accessor :namespaces
       
       ##
@@ -144,13 +151,15 @@ module RDF::RDFa
       # The triples can be completed when a resource becomes available,
       # which will be when the next subject is specified (part of the process called chaining).
       #
-      # @attr_accessor [Array<Array<RDF::URI, RDF::Resource>>]
+      # @!attribute [rw] incomplete_triples
+      # @return [Array<Array<RDF::URI, RDF::Resource>>]
       attr_accessor :incomplete_triples
       
       ##
       # The language. Note that there is no default language.
       #
-      # @attr_accessor [Symbol]
+      # @!attribute [rw] language
+      # @return [Symbol]
       attr_accessor :language
       
       ##
@@ -160,7 +169,8 @@ module RDF::RDFa
       # Host Languages may define an initial list.
       # If a Host Language provides an initial list, it should do so via an RDFa Context document.
       #
-      # @attr_accessor [Hash{Symbol => RDF::URI}]
+      # @!attribute [rw] term_mappings
+      # @return [Hash{Symbol => RDF::URI}]
       attr_accessor :term_mappings
       
       ##
@@ -170,14 +180,16 @@ module RDF::RDFa
       # This specification does not define an initial setting for the default vocabulary.
       # Host Languages may define an initial setting.
       #
-      # @attr_accessor [RDF::URI]
+      # @!attribute [rw] default_vocabulary
+      # @return [RDF::URI]
       attr_accessor :default_vocabulary
 
       ##
       # lists
       #
       # A hash associating lists with properties.
-      # @attr_accessor [Hash{RDF::URI => Array<RDF::Resource>}]
+      # @!attribute [rw] list_mapping
+      # @return [Hash{RDF::URI => Array<RDF::Resource>}]
       attr_accessor :list_mapping
 
       # @param [RDF::URI] base
@@ -222,7 +234,8 @@ module RDF::RDFa
 
     # Returns the XML implementation module for this reader instance.
     #
-    # @attr_reader [Module]
+    # @!attribute [rw] implementation
+    # @return [Module]
     attr_reader :implementation
 
     ##
