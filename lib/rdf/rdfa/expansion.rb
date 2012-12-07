@@ -56,8 +56,8 @@ module RDF::RDFa
             @@vocab_repo.load(vocab, :context => vocab)
           end
         rescue Exception => e
-          # XXX: update spec to indicate the error if the vocabulary fails to laod
-          add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresovedVocabulary)
+          # indicate the warning if the vocabulary fails to laod
+          add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresolvedVocabulary)
         end
       end
       
@@ -66,16 +66,13 @@ module RDF::RDFa
           repo << statement
         end
       end
-      
-      if repo.count == count
-        add_debug("expand", "No vocabularies loaded")
-      else
-        repo = owl_entailment(repo)
-      end
+
+      repo = entailment(repo)
 
       # Return graph with default context
       graph = RDF::Graph.new
       repo.statements.each {|st| graph << st if st.context.nil?}
+
       graph
     end
 
@@ -96,6 +93,10 @@ module RDF::RDFa
       # @!attribute [r] consequents
       # @return [Array<RDF::Query::Pattern>]
       attr_reader :consequents
+
+      # @!attribute [r] deletions
+      # @return [Array<RDF::Query::Pattern>]
+      attr_reader :deletions
 
       # @!attribute [r] name
       # @return [String]
@@ -191,27 +192,57 @@ module RDF::RDFa
         antecedent :x, RDF.type, :c2
         consequent :x, RDF.type, :c1
       end,
+      Rule.new("rdfa-ref") do
+        antecedent :x, RDF::RDFA.ref, :PR
+        antecedent :PR, RDF.type, RDF::RDFA.Prototype
+        antecedent :PR, :p, :y
+        consequent :x, :p, :y
+      end,
     ]
 
+    REMOVAL_RULES = [
+      Rule.new("rdfa-ref-remove") do
+        antecedent :x, RDF::RDFA.ref, :PR
+        antecedent :PR, RDF.type, RDF::RDFA.Prototype
+        antecedent :PR, :p, :y
+        consequent :x, RDF::RDFA.ref, :PR
+        consequent :x, RDF.type, RDF::RDFA.Prototype
+        consequent :PR, :p, :y
+      end,
+    ]
     ##
     # Perform OWL entailment rules on repository
     # @param [RDF::Repository] repo
     # @return [RDF::Repository]
-    def owl_entailment(repo)
+    def entailment(repo)
       old_count = 0
 
+      # Continue as long as new statements are added to repo
       while old_count < (count = repo.count)
         add_debug("entailment", "old: #{old_count} count: #{count}")
         old_count = count
+        to_add = []
 
         RULES.each do |rule|
           rule.execute(repo) do |statement|
             add_debug("entailment(#{rule.name})") {statement.inspect}
-            repo << statement
+            to_add << statement
           end
         end
+        
+        repo.insert(*to_add)
       end
-      
+
+      # Remove statements matched by removal rules
+      to_remove = []
+      REMOVAL_RULES.each do |rule|
+        rule.execute(repo) do |statement|
+          add_debug("removal(#{rule.name})") {statement.inspect}
+          to_remove << statement
+        end
+      end
+      repo.delete(*to_remove)
+
       add_debug("entailment", "final count: #{count}")
       repo
     end

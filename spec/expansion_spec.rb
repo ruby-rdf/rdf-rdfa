@@ -80,7 +80,7 @@ describe RDF::RDFa::Expansion do
     RDF::RDFa::Reader.send(:class_variable_set, :@@vocab_repo, nil)
   end
 
-  describe :owl_entailment do
+  describe :entailment do
     {
       "empty"   => {
         :default => %q(),
@@ -149,7 +149,7 @@ describe RDF::RDFa::Expansion do
         mt = ExpansionTester.new(test)
         result = mt.load(elements)
         mt.add_vocabs_to_repo(mt.repo)
-        mt.send(:owl_entailment, mt.repo)
+        mt.send(:entailment, mt.repo)
         mt.graph.should be_equivalent_graph(result, mt)
       end
     end
@@ -242,6 +242,13 @@ describe RDF::RDFa::Expansion do
           <#me> a ex:Person, foaf:Person .
         )
       },
+      "rdfa-ref" => {
+        :default => %q(
+          <> rdfa:ref _:ref .
+          _:ref a rdfa:Prototype; rdf:value "Prototype" .
+        ),
+        :result => %q(<> rdf:value "Prototype" .)
+      }
     }.each do |test, elements|
       it test do
         mt = ExpansionTester.new(test)
@@ -326,6 +333,142 @@ describe RDF::RDFa::Expansion do
     end
   end
   
+  context "rdfa:Prototype" do
+    {
+      "to single id" =>
+      [
+        %q(
+          <div>
+            <div typeof="schema:Person">
+              <link property="rdfa:ref" resource="_:a"/>
+            </div>
+            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
+          </div>
+        ),
+        %q(
+          @prefix schema: <http://schema.org/> .
+          [a schema:Person; schema:name "Amanda"] .
+        )
+      ],
+      "to generate listed property values" =>
+      [
+        %q(
+        <div>
+          <div typeof="schema:Person">
+            <p>My name is <span property="schema:name">Gregg</span></p>
+            <link property="rdfa:ref" resource="_:surname"/>
+          </div>
+          <p resource="_:surname" typeof="rdfa:Prototype">My name is <span property="schema:name">Kellogg</span></p>
+        </div>
+        ),
+        %q(
+          @prefix schema: <http://schema.org/> .
+          [ a schema:Person; schema:name "Gregg", "Kellogg"] .
+        )
+      ],
+      "to single id with different types" =>
+      [
+        %q(
+          <div>
+            <div typeof="schema:Person">
+              <link property="rdfa:ref" resource="_:a"/>
+            </div>
+            <div typeof="foaf:Person">
+              <link property="rdfa:ref" resource="_:a"/>
+            </div>
+            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name foaf:name">Amanda</span></p>
+          </div>
+        ),
+        %q(
+          @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+          @prefix schema: <http://schema.org/> .
+          [ a schema:Person; schema:name "Amanda"; foaf:name "Amanda"] .
+          [ a foaf:Person; schema:name "Amanda"; foaf:name "Amanda"] .
+        )
+      ],
+      "to multiple prototypes" =>
+      [
+        %q(
+          <div>
+            <div typeof="schema:Person">
+              <link property="rdfa:ref" resource="_:a"/>
+              <link property="rdfa:ref" resource="_:b"/>
+            </div>
+            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
+            <p resource="_:b" typeof="rdfa:Prototype"><span property="schema:band">Jazz Band</span></p>
+          </div>
+        ),
+        %q(
+          @prefix schema: <http://schema.org/> .
+          [ a schema:Person;
+            schema:name "Amanda";
+            schema:band "Jazz Band";
+          ] .
+        )
+      ],
+      "with chaining" =>
+      [
+        %q(
+          <div>
+            <div typeof="schema:Person">
+              <link property="rdfa:ref" resource="_:a"/>
+              <link property="rdfa:ref" resource="_:b"/>
+            </div>
+            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
+            <div resource="_:b" typeof="rdfa:Prototype">
+              <div property="schema:band" typeof=" schema:MusicGroup">
+                <link property="rdfa:ref" resource="_:c"/>
+              </div>
+            </div>
+            <div resource="_:c" typeof="rdfa:Prototype">
+             <p>Band: <span property="schema:name">Jazz Band</span></p>
+             <p>Size: <span property="schema:size">12</span> players</p>
+            </div>
+          </div>
+        ),
+        %q(
+          @prefix schema: <http://schema.org/> .
+          [ a schema:Person;
+            schema:name "Amanda" ;
+            schema:band [
+              a schema:MusicGroup;
+              schema:name "Jazz Band";
+              schema:size "12"
+            ]
+          ] .
+        )
+      ],
+      "shared" =>
+      [
+        %q(
+          <div>
+            <div typeof=""><link property="rdfa:ref" resource="_:a"/></div>
+            <div typeof=""><link property="rdfa:ref" resource="_:a"/></div>
+            <div resource="_:a" typeof="rdfa:Prototype">
+              <div property="schema:refers-to" typeof="">
+                <span property="schema:name">Amanda</span>
+              </div>
+            </div>
+          </div>
+        ),
+        %q(
+          @prefix schema: <http://schema.org/> .
+          [ schema:refers-to _:a ] .
+          [ schema:refers-to _:a ] .
+          _:a schema:name "Amanda"
+        )
+          
+      ],
+    }.each do |title, (input, result)|
+      it title do
+        parse(input).should be_equivalent_graph(result,
+          :base_uri => "http://example.com/",
+          :format => :ttl,
+          :trace => @debug)
+      end
+    end
+  end
+
   def parse(input, options = {})
     @debug = options[:debug] || []
     RDF::Graph.new << RDF::RDFa::Reader.new(input, options.merge(
