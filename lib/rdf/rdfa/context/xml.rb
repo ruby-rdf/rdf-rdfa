@@ -22,6 +22,7 @@ class RDF::RDFa::Context
           :rdfs    => "http://www.w3.org/2000/01/rdf-schema#",
           :rev     => "http://purl.org/stuff/rev#",
           :rif     => "http://www.w3.org/2007/rif#",
+          :rr      => "http://www.w3.org/ns/r2rml#",
           :schema  => "http://schema.org/",
           :sioc    => "http://rdfs.org/sioc/ns#",
           :skos    => "http://www.w3.org/2004/02/skos/core#",
