@@ -31,6 +31,13 @@ class ExpansionTester
     #STDERR.puts "#{node}: #{message}"
   end
   
+  def add_warning(node, message, process_class = RDF::RDFA.Warning)
+    message = message + yield if block_given?
+    @trace ||= []
+    @trace << "#{node}(#{process_class}): #{message}"
+    #STDERR.puts "#{node}: #{message}"
+  end
+  
   def trace; @trace.join("\n"); end
   
   def load(elements)
