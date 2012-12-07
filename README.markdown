@@ -25,9 +25,6 @@ with Microdata. As a result, the RDF Webapps working group is currently looking 
 This version fully supports the limited syntax of [RDFa Lite 1.1][]. This includes the ability to use
 @property exclusively.
 
-#### Remove RDFa Profiles
-RDFa Profiles were a mechanism added to allow groups of terms and prefixes to be defined in an external resource and loaded to affect the processing of an RDFa document. This introduced a problem for some implementations needing to perform a cross-origin GET in order to retrieve the profiles. The working group elected to drop support for user-defined RDFa Profiles (the default profiles defined by RDFa Core and host languages still apply) and replace it with an inference regime using vocabularies. Parsing of @profile has been removed from this version.
-
 #### Vocabulary Expansion
 One of the issues with vocabularies was that they discourage re-use of existing vocabularies when terms from several vocabularies are used at the same time. As it is common (encouraged) for RDF vocabularies to form sub-class and/or sub-property relationships with well defined vocabularies, the RDFa vocabulary expansion mechanism takes advantage of this.
 
@@ -38,6 +35,29 @@ cax-eqc2. This causes sub-classes and sub-properties of type and property IRIs t
 to the output graph.
 
 {RDF::RDFa::Reader} implements this using the `#expand` method, which looks for `rdfa:usesVocabulary` properties within the output graph and performs such expansion. See an example in the usage section.
+
+#### Experimental support for rdf:ref template expansion
+RDFa 1.1 is just about an exact super-set of microdata, except for microdata's
+`@itemref` feature. Experimental support is added for `rdf:ref` and `rdf:Prototype` to get a similar effect using expansion. To use this,
+reference another resource using `rdfa:ref`. If that resource has the type
+`rdfa:Prototype`, the properties defined there will be added to the resource
+containing the `rdfa:ref`, and the prototype and `rdfa:ref` will be removed
+from the output.
+
+For example, consider the following:
+
+    <div>
+      <div typeof="schema:Person">
+        <link property="rdfa:ref" resource="_:a"/>
+      </div>
+      <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
+    </div>
+
+if run with vocabulary expansion, this will result in the following Turtle:
+
+    @prefix schema: <http://schema.org/> .
+    [a schema:Person; schema:name "Amanda"] .
+
 
 #### RDF Collections (lists)
 One significant RDF feature missing from RDFa was support for ordered collections, or lists. RDF supports this with special properties `rdf:first`, `rdf:rest`, and `rdf:nil`, but other RDF languages have first-class support for this concept. For example, in [Turtle][Turtle], a list can be defined as follows:
@@ -90,24 +110,6 @@ defines a playlist with an ordered set of tracks. RDFa adds the @inlist attribut
 
 This basically does the same thing, but places each track in an rdf:List in the defined order.
 
-#### Property relations
-The @property attribute has been updated to allow for creating URI references as well as object literals.
-
-1. If an element contains @property but no @rel, @datatype or @content and it contains a resource attribute (such as @href, @src, or @resource)
-    1. Generate an IRI object. Furthermore, sub-elements do not chain, i.e., the subject in effect when the @property is processed is also in effect for sub-elements.
-    2. Otherwise, generate a literal as before.
-
-For example:
-
-    <a vocab="http://schema.org" property="url" href="http://example.com">
-      <span property="title">NBA Eastern Conference ...</span>
-    </a>
-
-results in
-
-    <> schema:url <http://example.com>;
-       schema:title "NBA Eastern Conference".
-
 #### Magnetic @about/@typeof
 The @typeof attribute has changed; previously, it always created a new subject, either using a resource from @about, @resource and so forth. This has long been a source of errors for people using RDFa. The new rules cause @typeof to bind to a subject if used with @about, otherwise, to an object, if either used alone, or in combination with some other resource attribute (such as @href, @src or @resource).
 
@@ -146,15 +148,6 @@ this results in
             foaf:name "Manu Sporny" 
       ].
 
-
-#### Property chaining
-If used without @rel, but with @typeof and a resource attribute, @property will cause chaining to another object just like @rel. The effect of this and other changes is to allow pretty much all RDFa to be marked up using just @property; @rel/@rev is no longer required. Although, @rel and @rev have useful features that @property does not, so it's worth keeping them in your toolkit.
-
-#### Support for HTML5 `time` element
-The `time` element allows the creation of a datatyped-literal based on the lexical scope of either the ``@datetime`` attribute, or the element content. We parse it according to xsd:date, xsd:time, xsd:dateTime, xsd:gYear, xsd:gYearMonth, and xsd:duration. If it matches none of these, a plain literal is emitted.
-
-The `time` element is described in the WHATWG version of the [HTML5 spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-time-element).
-This is related to [RDFa ISSUE-97](http://www.w3.org/2010/02/rdfa/track/issues/97).
 
 #### Support for HTML5 `data` element
 This is an alternate way of adding data using the `@value` property. Similar to `meta`

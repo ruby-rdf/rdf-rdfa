@@ -1,3 +1,7 @@
+### 0.3.18
+* Fixed additional incomplete-triples bug with typed resource
+* Added experimental support for rdf:ref
+
 ### 0.3.17
 * Added rdfa:PrefixReDefinition warning.
 
