@@ -1199,20 +1199,20 @@ describe "RDF::RDFa::Reader" do
                 <http://www.example.org> rdf:value ( <http://www.example.org#foo> <http://www.example.org#bar> ).
               )
             ],
-            "@property and @typeof and incomplete triples" => [
-              %q(
-                <div about="http://greggkellogg.net/foaf#me" rel="foaf:knows">
-                  <span property="foaf:name" typeof="foaf:Person">Ivan Herman</span>
-                </div>
-              ),
-              %q(
-                @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-                <http://greggkellogg.net/foaf#me> foaf:knows [
-                  foaf:name "Ivan Herman"
-                ].
-                [ a foaf:Person ] .
-              )
-            ],
+            #"@property and @typeof and incomplete triples" => [
+            #  %q(
+            #    <div about="http://greggkellogg.net/foaf#me" rel="foaf:knows">
+            #      <span property="foaf:name" typeof="foaf:Person">Ivan Herman</span>
+            #    </div>
+            #  ),
+            #  %q(
+            #    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+            #    <http://greggkellogg.net/foaf#me> foaf:knows [
+            #      foaf:name "Ivan Herman"
+            #    ].
+            #    [ a foaf:Person ] .
+            #  )
+            #],
             #"@property, @href and @typeof and incomplete triples" => [
             #  %q(
             #    <div about="http://greggkellogg.net/foaf#me" rel="foaf:knows">
@@ -1440,7 +1440,20 @@ describe "RDF::RDFa::Reader" do
 
               </plain/?q=taxonomy/term/1> a skos:Concept .
             )
-          ]
+          ],
+          "bbc programs @rel=role with rfds:label" => [
+            %q(
+              <dt rel="po:role" class="role" prefix="po: http://example.org/">
+                <span typeof="po:Role" property="rdfs:label">Director</span>
+              </dt>
+            ),
+            %q(
+              @prefix po: <http://example.org/> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              <> po:role [ rdfs:label [ a po:Role ] ] .
+            )
+          ],
         }.each do |title, (html, ttl)|
           it "parses #{title}" do
             g_ttl = RDF::Graph.new << RDF::Turtle::Reader.new(ttl)

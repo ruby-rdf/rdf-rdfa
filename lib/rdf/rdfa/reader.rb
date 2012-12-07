@@ -222,7 +222,7 @@ module RDF::RDFa
       
       def inspect
         v = ['base', 'parent_subject', 'parent_object', 'language', 'default_vocabulary'].map do |a|
-          "#{a}=#{self.send(a).inspect}"
+          "#{a}=#{o = self.send(a); o.respond_to?(:to_ntriples) ? o.to_ntriples : o.inspect}"
         end
         v << "uri_mappings[#{uri_mappings.keys.length}]"
         v << "incomplete_triples[#{incomplete_triples.length}]"
@@ -1137,7 +1137,7 @@ module RDF::RDFa
                                 :uri_mappings => uri_mappings,
                                 :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
               res ||= process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
-            when typed_resource && !attrs[:about] && evaluation_context.incomplete_triples.empty? && @version != :"rdfa1.0"
+            when typed_resource && !attrs[:about] && @version != :"rdfa1.0"
               add_debug(element, "[Step 11] typed_resource")
               typed_resource
             else
