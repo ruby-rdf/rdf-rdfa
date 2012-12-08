@@ -1315,7 +1315,7 @@ module RDF::RDFa
         if uri
           add_debug(element) {"process_uri: #{value} => safeCURIE => <#{uri}>"}
         else
-          add_warning(element, "#{value} not matched as a safeCURIE")
+          add_warning(element, "#{value} not matched as a safeCURIE", RDF::RDFA.UnresolvedCURIE)
         end
         uri
       elsif options[:term_mappings] && TERM_REGEXP.match(value.to_s) && restrictions.include?(:term)
@@ -1378,7 +1378,7 @@ module RDF::RDFa
       end
 
       # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
-      add_warning(element, "Term #{value} is not defined")
+      add_warning(element, "Term #{value} is not defined", RDF::RDFA::UnresolvedTerm)
       nil
     end
 
