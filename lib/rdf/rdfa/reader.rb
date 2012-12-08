@@ -1378,7 +1378,7 @@ module RDF::RDFa
       end
 
       # Finally, if there is no local default vocabulary, the term has no associated URI and must be ignored.
-      add_warning(element, "Term #{value} is not defined", RDF::RDFA::UnresolvedTerm)
+      add_warning(element, "Term #{value} is not defined", RDF::RDFA.UnresolvedTerm)
       nil
     end
 
