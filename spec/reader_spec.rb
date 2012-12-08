@@ -1630,7 +1630,7 @@ describe "RDF::RDFa::Reader" do
           parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
         end
         
-        it "generates rdfa:Warning on missing CURIE definition" do
+        it "generates rdfa:UnresolvedCURIE on missing CURIE definition" do
           html = %(<!DOCTYPE html>
             <div property="rdf:value" resource="[undefined:curie]">Undefined Curie</div>
           )
@@ -1639,7 +1639,7 @@ describe "RDF::RDFa::Reader" do
             PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
             PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
             ASK WHERE {
-              ?s a rdfa:Warning;
+              ?s a rdfa:UnresolvedCURIE;
                  dc:date ?date;
                  dc:description ?description .
               FILTER (datatype(?date) = xsd:date)
@@ -1653,7 +1653,7 @@ describe "RDF::RDFa::Reader" do
           foo\x01
           $foo
         ).each do |prefix|
-          it "generates rdfa:Warning on malformed CURIE prefix #{prefix.inspect}" do
+          it "generates rdfa:UnresolvedCURIE on malformed CURIE prefix #{prefix.inspect}" do
             html = %(<!DOCTYPE html>
               <div prefix="#{prefix}: http://example.com/"
                    property="rdf:value"
@@ -1666,7 +1666,7 @@ describe "RDF::RDFa::Reader" do
               PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
               PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
               ASK WHERE {
-                ?s a rdfa:Warning;
+                ?s a rdfa:UnresolvedCURIE;
                    dc:date ?date;
                    dc:description ?description .
                 FILTER (datatype(?date) = xsd:date)
@@ -1676,7 +1676,7 @@ describe "RDF::RDFa::Reader" do
           end
         end
         
-        it "generates rdfa:Warning on missing Term definition" do
+        it "generates rdfa:UnresolvedTerm on missing Term definition" do
           html = %(<!DOCTYPE html>
             <div property="undefined_term">Undefined Term</div>
           )
@@ -1685,7 +1685,7 @@ describe "RDF::RDFa::Reader" do
             PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
             PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
             ASK WHERE {
-              ?s a rdfa:Warning;
+              ?s a rdfa:UnresolvedTerm;
                  dc:date ?date;
                  dc:description ?description .
               FILTER (datatype(?date) = xsd:date)
