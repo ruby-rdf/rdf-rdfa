@@ -512,8 +512,10 @@ module RDF::RDFa
     def add_triple(node, subject, predicate, object, context = nil)
       statement = RDF::Statement.new(subject, predicate, object)
       add_error(node, "statement #{RDF::NTriples.serialize(statement)} is invalid") unless statement.valid?
-      add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
-      @callback.call(statement) if @options[:rdfagraph].include?(:output)
+      if subject && predicate && object # Basic sanity checking
+        add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
+        @callback.call(statement) if @options[:rdfagraph].include?(:output)
+      end
     end
 
     # Parsing an RDFa document (this is *not* the recursive method)
