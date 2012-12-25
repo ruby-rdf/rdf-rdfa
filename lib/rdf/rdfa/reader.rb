@@ -754,7 +754,22 @@ module RDF::RDFa
       language = element.language || language
       language = nil if language.to_s.empty?
       add_debug(element) {"HTML5 [3.2.3.3] lang: #{language.inspect}"} if language
-    
+
+      # From HTML5, if the property attribute and the rel and/or rev attribute exists on the same element, the non-CURIE and non-URI rel and rev values are ignored. If, after this, the value of rel and/or rev becomes empty, then the processor must act as if the respective attribute is not present.
+      if [:html5, :xhtml5].include?(@host_language) && attrs[:property] && (attrs[:rel] || attrs[:rev])
+        old_rel, old_rev = attrs[:rel], attrs[:rev]
+        if old_rel
+          attrs[:rel] = (attrs[:rel]).split(/\s+/m).select {|r| !r.index(':').nil?}.join(" ")
+          attrs.delete(:rel) if attrs[:rel].empty?
+          add_debug(element) {"HTML5: @rel was #{old_rel}, now #{attrs[:rel]}"}
+        end
+        if old_rev
+          attrs[:rev] = (attrs[:rev]).split(/\s+/m).select {|r| !r.index(':').nil?}.join(" ")
+          attrs.delete(:rev) if attrs[:rev].empty?
+          add_debug(element) {"HTML5: @rev was #{old_rev}, now #{attrs[:rev]}"}
+        end
+      end
+
       # rels and revs
       rels = process_uris(element, attrs[:rel], evaluation_context, base,
                           :uri_mappings => uri_mappings,
@@ -808,7 +823,7 @@ module RDF::RDFa
 
           # if the @typeof attribute is present, set typed resource to new subject
           typed_resource = new_subject if attrs[:typeof]
-        else
+        else # rdfa1.1
           # If the current element contains no @rel or @rev attribute, then the next step is to establish a value for new subject.
           # This step has two possible alternatives.
           #  1. If the current element contains the @property attribute, but does not contain the @content or the @datatype attributes, then
@@ -819,7 +834,7 @@ module RDF::RDFa
               process_uri(element, attrs[:about], evaluation_context, base,
                           :uri_mappings => uri_mappings,
                           :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
-            elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+            elsif @host_language == :xhtml1 && element.name =~ /^(head|body)$/
               # From XHTML+RDFa 1.1:
               # if no URI is provided, then first check to see if the element is the head or body element. If it is, then act as if the new subject is set to the parent object.
               evaluation_context.parent_object
@@ -872,12 +887,12 @@ module RDF::RDFa
 
             # If no URI is provided by a resource attribute, then the first match from the following rules
             # will apply:
-            new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+            new_subject ||= if @host_language == :xhtml1 && element.name =~ /^(head|body)$/
               # From XHTML+RDFa 1.1:
               # if no URI is provided, then first check to see if the element is the head or body element.
               # If it is, then act as if the new subject is set to the parent object.
               evaluation_context.parent_object
-            elsif element == root && base
+            elsif element == root
               # if the element is the root element of the document, then act as if there is an empty @about present,
               # and process it according to the rule for @about, above;
               uri(base)
@@ -890,8 +905,8 @@ module RDF::RDFa
               evaluation_context.parent_object
             end
 
-            # if @typeof is present, set the typed resource to the value of new subject</code>
-            typed_resource ||= new_subject if attrs[:typeof]
+            # If @typeof is present then typed resource is set to the resource obtained from the first match from the following rules:
+            typed_resource = new_subject if attrs[:typeof]
           end
         end
 
@@ -918,7 +933,7 @@ module RDF::RDFa
         # If no URI is provided then the first match from the following rules will apply
         new_subject ||= if element == root && base
           uri(base)
-        elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
+        elsif @host_language == :xhtml1 && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if the new subject is set to the parent object.
