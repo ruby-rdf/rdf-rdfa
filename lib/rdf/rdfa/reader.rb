@@ -834,7 +834,7 @@ module RDF::RDFa
               process_uri(element, attrs[:about], evaluation_context, base,
                           :uri_mappings => uri_mappings,
                           :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
-            elsif @host_language == :xhtml1 && element.name =~ /^(head|body)$/
+            elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
               # From XHTML+RDFa 1.1:
               # if no URI is provided, then first check to see if the element is the head or body element. If it is, then act as if the new subject is set to the parent object.
               evaluation_context.parent_object
@@ -887,7 +887,7 @@ module RDF::RDFa
 
             # If no URI is provided by a resource attribute, then the first match from the following rules
             # will apply:
-            new_subject ||= if @host_language == :xhtml1 && element.name =~ /^(head|body)$/
+            new_subject ||= if [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
               # From XHTML+RDFa 1.1:
               # if no URI is provided, then first check to see if the element is the head or body element.
               # If it is, then act as if the new subject is set to the parent object.
@@ -933,7 +933,7 @@ module RDF::RDFa
         # If no URI is provided then the first match from the following rules will apply
         new_subject ||= if element == root && base
           uri(base)
-        elsif @host_language == :xhtml1 && element.name =~ /^(head|body)$/
+        elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
           # From XHTML+RDFa 1.1:
           # if no URI is provided, then first check to see if the element is the head or body element.
           # If it is, then act as if the new subject is set to the parent object.
