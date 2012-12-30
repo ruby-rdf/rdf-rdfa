@@ -1,3 +1,9 @@
+### 0.3.19
+* Generate UnresolvedTerm and UnresolvedCURIE as indicated. UnresolvedCURIE only generated for SafeCURIEs.
+* Perform basic sanity checking before emitting triples. Validation is too strict for most usage.
+* Add HTML5 logic to remove unwanted @rel and @rev items.
+* Make reference folding standard, under option control.
+
 ### 0.3.18
 * Fixed additional incomplete-triples bug with typed resource
 * Added experimental support for rdf:ref
