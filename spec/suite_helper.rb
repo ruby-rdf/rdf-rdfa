@@ -1,16 +1,12 @@
 # Spira class for manipulating test-manifest style test suites.
 # Used for SWAP tests
-require 'spira'
 require 'rdf/turtle'
-require 'open-uri'
+require 'json/ld'
 
 module Fixtures
-  SUITE = RDF::URI("http://rdfa.info/test-suite/")
+  RDFA_INFO = RDF::URI("http://rdfa.info/test-suite/")
 
-  class TestCase
-    HTMLRE = Regexp.new('([0-9]{4,4})\.xhtml')
-    TCPATHRE = Regexp.compile('\$TCPATH')
-
+  class TestCase < JSON::LD::Resource
     HOST_LANGUAGE_VERSION_SETS = [
       ["xhtml1",      "rdfa1.1"],
       ["xml1",        "rdfa1.1"],
@@ -25,46 +21,32 @@ module Fixtures
     ]
 
     class Test < RDF::Vocabulary("http://www.w3.org/2006/03/test-description#"); end
-    class RdfaTest < RDF::Vocabulary("http://rdfa.info/vocabs/rdfa-test#"); end
 
     attr_accessor :debug
-    include Spira::Resource
 
-    type Test.TestCase
-    property :title,          :predicate => DC.title,                     :type => XSD.string
-    property :purpose,        :predicate => Test.purpose,                 :type => XSD.string
-    has_many :hostLanguage,   :predicate => RdfaTest.hostLanguage,        :type => XSD.string
-    has_many :version,        :predicate => RdfaTest.rdfaVersion,         :type => XSD.string
-    property :expected,       :predicate => Test.expectedResults
-    property :contributor,    :predicate => DC.contributor,               :type => XSD.string
-    property :reference,      :predicate => Test.specificationRefference, :type => XSD.string
-    property :queryParam,     :predicate => RdfaTest.queryParam,          :type => XSD.string
-    property :classification, :predicate => Test.classification
-    property :inputDocument,  :predicate => Test.informationResourceInput
-    property :resultDocument, :predicate => Test.informationResourceResults
+    # @param [Hash] json framed JSON-LD`
+    # @return [Array<TestCase>]
+    def self.from_jsonld(json)
+      @@test_cases ||= json['@graph'].map {|e| TestCase.new(e)}
+    end
 
     def self.for_specific(host_language, version, classification = nil)
-      each do |tc|
-        yield(tc) if tc.hostLanguage.include?(host_language) &&
-                     tc.version.include?(version) &&
+      @@test_cases.each do |tc|
+        yield(tc) if tc.hostLanguages.include?(host_language) &&
+                     tc.versions.include?(version) &&
                      (classification.nil? || tc.classification == classification)
       end
     end
-    
+
+    def information; id; end
+
     def expectedResults
-      RDF::Literal::Boolean.new(expected.nil? ? "true" : expected)
+      RDF::Literal::Boolean.new(property('expectedResults'))
     end
-    
-    def name
-      subject.to_s.split("/").last
-    end
-    
-    def information; title; end
 
     def input(host_language, version)
-      base = self.inputDocument.to_s.
-        sub('test-cases/', "test-cases/#{version}/#{host_language}/").
-        sub('rdfa.info', 'rdfa.info')
+      base = self.property('input').to_s.
+        sub('test-cases/', "test-cases/#{version}/#{host_language}/")
       case host_language
       when /^xml/   then RDF::URI(base.sub(".html", ".xml"))
       when /^xhtml/ then RDF::URI(base.sub(".html", ".xhtml"))
@@ -74,35 +56,15 @@ module Fixtures
     end
     
     def results(host_language, version)
-      RDF::URI(self.resultDocument.to_s.
-        sub('test-cases/', "test-cases/#{version}/#{host_language}/").
-        sub('rdfa.info', 'rdfa.info'))
+      RDF::URI(self.property('results').to_s.
+        sub('test-cases/', "test-cases/#{version}/#{host_language}/"))
     end
 
     def trace
       @debug.to_a.join("\n")
     end
-    
-    def inspect
-      "[#{self.class.to_s} " + %w(
-        title
-        classification
-        hostLanguage
-        version
-        inputDocument
-        resultDocument
-        expectedResults
-        queryParam
-      ).map {|a| v = self.send(a); "#{a}='#{v}'" if v}.compact.join(", ") +
-      "]"
-    end
   end
 
-  local_manifest = File.join(File.expand_path(File.dirname(__FILE__)), 'rdfa.info', 'manifest.ttl')
-  repo = if File.exist?(local_manifest)
-    RDF::Repository.load(local_manifest, :base_uri => SUITE.join("manifest.ttl"), :format => :ttl)
-  else
-    RDF::Repository.load(SUITE.join("manifest.ttl"), :format => :ttl)
-  end
-  Spira.add_repository! :default, repo
+  manifest = RDF::URI(RDFA_INFO.join("manifest.json"))
+  TestCase.from_jsonld(JSON.load(Kernel.open(manifest).read))
 end

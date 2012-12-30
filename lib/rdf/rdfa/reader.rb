@@ -249,6 +249,8 @@ module RDF::RDFa
     #   One of :nokogiri or :rexml. If nil/unspecified uses :nokogiri if available, :rexml otherwise.
     # @option options [Boolean]  :vocab_expansion (false)
     #   whether to perform OWL2 expansion on the resulting graph
+    # @option options [Boolean]  :reference_folding (true)
+    #   whether to perform RDFa reference folding on the resulting graph
     # @option options [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:html5)
     #   Host Language
     # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
@@ -270,6 +272,7 @@ module RDF::RDFa
     def initialize(input = $stdin, options = {}, &block)
       super do
         @debug = options[:debug]
+        @options = {:reference_folding => true}.merge(@options)
         
         @options[:rdfagraph] = case @options[:rdfagraph]
         when String, Symbol then @options[:rdfagraph].to_s.split(',').map(&:strip).map(&:to_sym)
@@ -348,9 +351,15 @@ module RDF::RDFa
     def each_statement(&block)
 
       if @options[:vocab_expansion]
+        # Process vocabulary expansion after normal processing
         @options[:vocab_expansion] = false
         expand.each_statement(&block)
         @options[:vocab_expansion] = true
+      elsif @options[:reference_folding]
+        # Process reference folding after normal processing
+        @options[:reference_folding] = false
+        fold_references.each_statement(&block)
+        @options[:reference_folding] = true
       else
         @callback = block
 

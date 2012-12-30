@@ -76,6 +76,23 @@ module RDF::RDFa
       graph
     end
 
+    ##
+    # Perform reference folding on the resulting default graph.
+    #
+    # For all objects of type rdfa:Prototype that are the target of an rdfa:ref property, load the IRI into a repository.
+    #
+    # Subsequently, remove reference rdfa:Prototype objects.
+    #
+    # @return [RDF::Graph]
+    # @see [HTML+RDFa](http://www.w3.org/TR/rdfa-in-html/#rdfa-reference-folding)
+    def fold_references
+      graph = RDF::Graph.new << self
+
+      add_debug("fold") {"Loaded #{graph.size} triples into default graph"}
+
+      fold(graph)
+    end
+
     def rule(name, &block)
       Rule.new(name, block)
     end
@@ -192,6 +209,9 @@ module RDF::RDFa
         antecedent :x, RDF.type, :c2
         consequent :x, RDF.type, :c1
       end,
+    ]
+
+    FOLDING_RULES = [
       Rule.new("rdfa-ref") do
         antecedent :x, RDF::RDFA.ref, :PR
         antecedent :PR, RDF.type, RDF::RDFA.Prototype
@@ -210,6 +230,7 @@ module RDF::RDFa
         consequent :PR, :p, :y
       end,
     ]
+
     ##
     # Perform OWL entailment rules on repository
     # @param [RDF::Repository] repo
@@ -233,18 +254,37 @@ module RDF::RDFa
         repo.insert(*to_add)
       end
 
+      add_debug("entailment", "final count: #{count}")
+      repo
+    end
+
+    ##
+    # Perform RDFa folding rules on repository
+    # @param [RDF::Graph] graph
+    # @return [RDF::Graph]
+    def fold(graph)
+      to_add = []
+
+      FOLDING_RULES.each do |rule|
+        rule.execute(graph) do |statement|
+          add_debug("fold(#{rule.name})") {statement.inspect}
+          to_add << statement
+        end
+      end
+        
+      graph.insert(*to_add)
+
       # Remove statements matched by removal rules
       to_remove = []
       REMOVAL_RULES.each do |rule|
-        rule.execute(repo) do |statement|
+        rule.execute(graph) do |statement|
           add_debug("removal(#{rule.name})") {statement.inspect}
           to_remove << statement
         end
       end
-      repo.delete(*to_remove)
+      graph.delete(*to_remove)
 
-      add_debug("entailment", "final count: #{count}")
-      repo
+      graph
     end
   end
 end

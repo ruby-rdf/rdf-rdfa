@@ -166,6 +166,9 @@ describe RDF::RDFa::Expansion do
     {
       "simple"   => {
         :default => %q(<document> rdfa:usesVocabulary ex: .),
+        "http://example.org/vocab#" => %q(
+          ex:Person owl:equivalentClass foaf:Person .
+        ),
         :result => %q(<document> rdfa:usesVocabulary ex: .)
       },
       "prp-spo1"   => {
@@ -248,7 +251,21 @@ describe RDF::RDFa::Expansion do
           <document> rdfa:usesVocabulary ex: .
           <#me> a ex:Person, foaf:Person .
         )
-      },
+      }
+    }.each do |test, elements|
+      it test do
+        mt = ExpansionTester.new(test)
+        result = mt.load(elements)
+        graph = RDF::Graph.new
+        RDF::Graph.should_receive(:new).at_least(1).times.and_return(graph)
+        graph = mt.expand
+        graph.should be_equivalent_graph(result, mt)
+      end
+    end
+  end
+  
+  describe :fold_references do
+    {
       "rdfa-ref" => {
         :default => %q(
           <> rdfa:ref _:ref .
@@ -263,12 +280,12 @@ describe RDF::RDFa::Expansion do
         vocab = RDF::URI("http://example.org/vocab#")
         graph = RDF::Graph.new
         RDF::Graph.should_receive(:new).at_least(1).times.and_return(graph)
-        graph = mt.expand
+        graph = mt.fold_references
         graph.should be_equivalent_graph(result, mt)
       end
     end
   end
-  
+
   context "with empty graph" do
     it "returns an empty graph" do
       rdfa = %q(<http></http>)

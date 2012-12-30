@@ -11,7 +11,7 @@ def run_tc(tc, options)
   input_uri = tc.input(options[:host_language], options[:version])
   results_uri = tc.results(options[:host_language], options[:version])
 
-  STDOUT.write "run #{tc.name}"
+  STDOUT.write "run #{tc.num}"
 
   if options[:verbose]
     puts("\nTestCase: #{tc.inspect}") 
@@ -122,7 +122,7 @@ opts.each do |opt, arg|
 end
 
 Fixtures::TestCase.for_specific(options[:host_language], options[:version]) do |tc|
-  next unless ARGV.empty? || ARGV.any? {|n| tc.name.match(/#{n}/)}
+  next unless ARGV.empty? || ARGV.any? {|n| tc.num.match(/#{n}/)}
   next if tc.classification.to_s =~ /deprecated/
   run_tc(tc, options)
 end
