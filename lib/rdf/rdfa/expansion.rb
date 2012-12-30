@@ -263,16 +263,23 @@ module RDF::RDFa
     # @param [RDF::Graph] graph
     # @return [RDF::Graph]
     def fold(graph)
-      to_add = []
+      old_count = 0
 
-      FOLDING_RULES.each do |rule|
-        rule.execute(graph) do |statement|
-          add_debug("fold(#{rule.name})") {statement.inspect}
-          to_add << statement
+      # Continue as long as new statements are added to repo
+      while old_count < (count = graph.count)
+        add_debug("fold", "old: #{old_count} count: #{count}")
+        old_count = count
+        to_add = []
+
+        FOLDING_RULES.each do |rule|
+          rule.execute(graph) do |statement|
+            add_debug("fold(#{rule.name})") {statement.inspect}
+            to_add << statement
+          end
         end
-      end
         
-      graph.insert(*to_add)
+        graph.insert(*to_add)
+      end
 
       # Remove statements matched by removal rules
       to_remove = []

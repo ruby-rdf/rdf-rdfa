@@ -266,12 +266,23 @@ describe RDF::RDFa::Expansion do
   
   describe :fold_references do
     {
-      "rdfa-ref" => {
+      "simple" => {
         :default => %q(
           <> rdfa:ref _:ref .
           _:ref a rdfa:Prototype; rdf:value "Prototype" .
         ),
         :result => %q(<> rdf:value "Prototype" .)
+      },
+      "chaining ref" => {
+        :default => %q(
+          <> rdfa:ref _:ref .
+          _:ref a rdfa:Prototype;
+            rdf:value "Prototype";
+            rdfa:ref _:ref2 .
+          _:ref2 a rdfa:Prototype;
+          rdf:value "Prototype2" .
+        ),
+        :result => %q(<> rdf:value "Prototype", "Prototype2" .)
       }
     }.each do |test, elements|
       it test do
