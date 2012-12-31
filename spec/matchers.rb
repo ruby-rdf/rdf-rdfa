@@ -50,21 +50,21 @@ def normalize(graph)
   end
 end
 
-Info = Struct.new(:about, :information, :trace, :compare, :inputDocument, :outputDocument, :expectedResults, :format, :title)
+Info = Struct.new(:about, :num, :trace, :compare, :inputDocument, :outputDocument, :expectedResults, :format, :title)
 
 RSpec::Matchers.define :be_equivalent_graph do |expected, info|
   match do |actual|
     @info = if info.respond_to?(:about)
       info
     elsif info.is_a?(Hash)
-      identifier = info[:identifier] || expected.is_a?(RDF::Graph) ? expected.context : info[:about]
+      identifier = expected.is_a?(RDF::Graph) ? expected.context : info[:about]
       trace = info[:trace]
       trace = trace.join("\n") if trace.is_a?(Array)
-      i = Info.new(identifier, info[:information] || "", trace, info[:compare])
+      i = Info.new(identifier, "0000", trace, info[:compare])
       i.format = info[:format]
       i
     else
-      Info.new(expected.is_a?(RDF::Graph) ? expected.context : info, info.to_s)
+      Info.new(expected.is_a?(RDF::Graph) ? expected.context : info, "0000", info.to_s)
     end
     @info.format ||= :ntriples
     @expected = normalize(expected)
@@ -73,7 +73,7 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
   end
   
   failure_message_for_should do |actual|
-    info = @info.respond_to?(:information) ? @info.information : @info.inspect
+    info = @info.respond_to?(:about) ? @info.about : @info.inspect
     if @expected.is_a?(RDF::Graph) && @actual.size != @expected.size
       "Graph entry count differs:\nexpected: #{@expected.size}\nactual:   #{@actual.size}"
     elsif @expected.is_a?(Array) && @actual.size != @expected.length
@@ -92,12 +92,12 @@ end
 
 RSpec::Matchers.define :pass_query do |expected, info|
   match do |actual|
-    if info.respond_to?(:information)
+    if info.respond_to?(:about)
       @info = info
     elsif info.is_a?(Hash)
       trace = info[:trace]
       trace = trace.join("\n") if trace.is_a?(Array)
-      @info = Info.new(info[:identifier] || "", info[:information] || "", trace, info[:compare])
+      @info = Info.new(info[:about] || "", "", trace, info[:compare])
       @info[:expectedResults] = info[:expectedResults] || RDF::Literal::Boolean.new(true)
     elsif info.is_a?(Array)
       @info = Info.new()

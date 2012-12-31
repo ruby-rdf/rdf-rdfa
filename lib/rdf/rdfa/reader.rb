@@ -89,6 +89,17 @@ module RDF::RDFa
     # @return [:"rdfa1.0", :"rdfa1.1"]
     attr_reader :version
     
+    # Repository used for collecting triples.
+    # @!attribute [r] repository
+    # @return [RDF::Repository]
+    attr_reader :repository
+    
+    # Returns the XML implementation module for this reader instance.
+    #
+    # @!attribute [rw] implementation
+    # @return [Module]
+    attr_reader :implementation
+
     # The Recursive Baggage
     # @private
     class EvaluationContext # :nodoc:
@@ -232,12 +243,6 @@ module RDF::RDFa
       end
     end
 
-    # Returns the XML implementation module for this reader instance.
-    #
-    # @!attribute [rw] implementation
-    # @return [Module]
-    attr_reader :implementation
-
     ##
     # Initializes the RDFa reader instance.
     #
@@ -273,7 +278,8 @@ module RDF::RDFa
       super do
         @debug = options[:debug]
         @options = {:reference_folding => true}.merge(@options)
-        
+        @repository = RDF::Repository.new
+
         @options[:rdfagraph] = case @options[:rdfagraph]
         when String, Symbol then @options[:rdfagraph].to_s.split(',').map(&:strip).map(&:to_sym)
         when Array then @options[:rdfagraph].map {|o| o.to_s.to_sym}
@@ -349,30 +355,13 @@ module RDF::RDFa
     # @yieldparam [RDF::Statement] statement
     # @return [void]
     def each_statement(&block)
-
-      if @options[:vocab_expansion]
-        # Process vocabulary expansion after normal processing
-        @options[:vocab_expansion] = false
-        expand.each_statement(&block)
-        @options[:vocab_expansion] = true
-      elsif @options[:reference_folding]
-        # Process reference folding after normal processing
-        @options[:reference_folding] = false
-        fold_references.each_statement(&block)
-        @options[:reference_folding] = true
-      else
-        @callback = block
-
-        # Process any saved callbacks (processor graph issues)
-        @saved_callbacks.each {|s| @callback.call(s) } if @saved_callbacks
-
+      unless @processed || @root.nil?
         # Add prefix definitions from host defaults
         @host_defaults[:uri_mappings].each_pair do |prefix, value|
           prefix(prefix, value)
         end
 
         # parse
-        return unless @root
         parse_whole_document(@doc, RDF::URI(base_uri))
 
         def extract_script(el, input, type, options, &block)
@@ -396,7 +385,7 @@ module RDF::RDFa
         # Look for Embedded Turtle and RDF/XML
         unless @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
           extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
-            block.call(statement)
+            @repository << statement
           end
         end
 
@@ -405,7 +394,7 @@ module RDF::RDFa
           type = el.attribute("type")
           
           extract_script(el, el.inner_text, type, @options) do |statement|
-            block.call(statement)
+            @repository << statement
           end
         end
         
@@ -414,10 +403,30 @@ module RDF::RDFa
           begin
             require 'rdf/microdata'
             add_debug(@doc, "process microdata")
-            RDF::Microdata::Reader.new(@doc, options).each(&block)
+            @repository << RDF::Microdata::Reader.new(@doc, options)
           rescue
             add_debug(@doc, "microdata detected, not processed")
           end
+        end
+
+        # Perform reference folding
+        fold_references(@repository) if @options[:reference_folding]
+
+        # Perform vocabulary expansion
+        expand(@repository) if @options[:vocab_expansion]
+        
+        @processed = true
+      end
+
+      # Return statements in the default graph for
+      # statements in the associated named or default graph from the
+      # processed repository
+      @repository.each do |statement|
+        case statement.context
+        when nil
+          yield statement if @options[:rdfagraph].include?(:output)
+        when RDF::RDFA.ProcessorGraph
+          yield RDF::Statement.new(*statement.to_triple) if @options[:rdfagraph].include?(:processor)
         end
       end
     end
@@ -477,33 +486,25 @@ module RDF::RDFa
       puts "#{node_path(node)}: #{message}" if ::RDF::RDFa.debug?
       @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
       if @options[:processor_callback] || @options[:rdfagraph].include?(:processor)
-        g = RDF::Graph.new
         n = RDF::Node.new
-        g << RDF::Statement.new(n, RDF["type"], process_class)
-        g << RDF::Statement.new(n, RDF::DC.description, message)
-        g << RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now))
-        g << RDF::Statement.new(n, RDF::RDFA.context, base_uri) if base_uri
+        processor_statements = [
+          RDF::Statement.new(n, RDF["type"], process_class, :context => RDF::RDFA.ProcessorGraph),
+          RDF::Statement.new(n, RDF::DC.description, message, :context => RDF::RDFA.ProcessorGraph),
+          RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now), :context => RDF::RDFA.ProcessorGraph)
+        ]
+        processor_statements << RDF::Statement.new(n, RDF::RDFA.context, base_uri, :context => RDF::RDFA.ProcessorGraph) if base_uri
         if node.respond_to?(:path)
           nc = RDF::Node.new
-          g << RDF::Statement.new(n, RDF::RDFA.context, nc)
-          g << RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer)
-          g << RDF::Statement.new(nc, RDF::PTR.expression, node.path)
+          processor_statements += [
+            RDF::Statement.new(n, RDF::RDFA.context, nc, :context => RDF::RDFA.ProcessorGraph),
+            RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer, :context => RDF::RDFA.ProcessorGraph),
+            RDF::Statement.new(nc, RDF::PTR.expression, node.path, :context => RDF::RDFA.ProcessorGraph)
+          ]
         end
         
-        g.each do |s|
-          # Provide as callback
-          @options[:processor_callback].call(s) if @options[:processor_callback]
-
-          # Yield as result
-          if @options[:rdfagraph].include?(:processor)
-            if @callback
-              @callback.call(s) 
-            else
-              # Save messages for later callback
-              @saved_callbacks ||= []
-              @saved_callbacks << s
-            end
-          end
+        @repository.insert(*processor_statements)
+        if cb = @options[:processor_callback]
+          processor_statements.each {|s| cb.call(s)}
         end
       end
     end
@@ -523,7 +524,7 @@ module RDF::RDFa
       add_error(node, "statement #{RDF::NTriples.serialize(statement)} is invalid") unless statement.valid?
       if subject && predicate && object # Basic sanity checking
         add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
-        @callback.call(statement) if @options[:rdfagraph].include?(:output)
+        repository << statement
       end
     end
 

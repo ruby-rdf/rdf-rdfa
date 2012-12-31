@@ -122,25 +122,25 @@ describe "RDF::RDFa::Reader" do
         parse(source, :rdfagraph => :output).should_not pass_query(processor, :trace => @debug)
       end
 
-      it "generates output graph by with rdfagraph=[output]" do
+      it "generates output graph with rdfagraph=[output]" do
         parse(source, :rdfagraph => [:output]).should pass_query(output, :trace => @debug)
       end
 
-      it "generates output graph by with rdfagraph=foo" do
+      it "generates output graph with rdfagraph=foo" do
         parse(source, :rdfagraph => :foo).should pass_query(output, :trace => @debug)
       end
 
-      it "generates processor graph by with rdfagraph=[processor]" do
+      it "generates processor graph with rdfagraph=processor" do
         parse(source, :rdfagraph => :processor).should pass_query(processor, :trace => @debug)
         parse(source, :rdfagraph => :processor).should_not pass_query(output, :trace => @debug)
       end
 
-      it "generates both output and processor graphs by with rdfagraph=[output,processor]" do
+      it "generates both output and processor graphs with rdfagraph=[output,processor]" do
         parse(source, :rdfagraph => [:output, :processor]).should pass_query(output, :trace => @debug)
         parse(source, :rdfagraph => [:output, :processor]).should pass_query(processor, :trace => @debug)
       end
 
-      it "generates both output and processor graphs by with rdfagraph=output,processor" do
+      it "generates both output and processor graphs with rdfagraph=output,processor" do
         parse(source, :rdfagraph => "output, processor").should pass_query(output, :trace => @debug)
         parse(source, :rdfagraph => "output, processor").should pass_query(processor, :trace => @debug)
       end

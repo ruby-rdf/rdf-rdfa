@@ -6,7 +6,7 @@ class ExpansionTester
   include RDF::RDFa::Expansion
   include RDF::Enumerable
 
-  attr_reader :about, :information, :repo, :inputDocument, :outputDocument, :options
+  attr_reader :about, :information, :repo, :inputDocument, :outputDocument, :options, :repo
   attr_accessor :format
 
   def initialize(name)
@@ -256,10 +256,8 @@ describe RDF::RDFa::Expansion do
       it test do
         mt = ExpansionTester.new(test)
         result = mt.load(elements)
-        graph = RDF::Graph.new
-        RDF::Graph.should_receive(:new).at_least(1).times.and_return(graph)
-        graph = mt.expand
-        graph.should be_equivalent_graph(result, mt)
+        mt.expand(mt.repo)
+        mt.graph.should be_equivalent_graph(result, mt)
       end
     end
   end
@@ -289,10 +287,8 @@ describe RDF::RDFa::Expansion do
         mt = ExpansionTester.new(test)
         result = mt.load(elements)
         vocab = RDF::URI("http://example.org/vocab#")
-        graph = RDF::Graph.new
-        RDF::Graph.should_receive(:new).at_least(1).times.and_return(graph)
-        graph = mt.fold_references
-        graph.should be_equivalent_graph(result, mt)
+        mt.fold_references(mt.repo)
+        mt.graph.should be_equivalent_graph(result, mt)
       end
     end
   end

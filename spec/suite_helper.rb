@@ -38,7 +38,7 @@ module Fixtures
       end
     end
 
-    def information; id; end
+    def about; id; end
 
     def expectedResults
       RDF::Literal::Boolean.new(property('expectedResults'))

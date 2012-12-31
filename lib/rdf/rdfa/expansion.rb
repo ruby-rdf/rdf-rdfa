@@ -34,21 +34,18 @@ module RDF::RDFa
     #    scm-sco
     #    {c1 rdfs:subClassOf c2 . c2 rdfs:subClassOf c3} => {c1 rdfs:subClassOf c3}
     #
-    # @return [RDF::Graph]
+    # @param [RDF::Repository] repository
     # @see [OWL2 PROFILES](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules)
-    def expand
-      repo = RDF::Repository.new
-      repo << self  # Add default graph
-      
-      count = repo.count
-      add_debug("expand") {"Loaded #{repo.size} triples into default graph"}
+    def expand(repository)
+      count = repository.count
+      add_debug("expand") {"Repository has #{repository.size} statements"}
       
       # Vocabularies managed in vocab_repo, and copied to repo for processing.
       # This allows for persistent storage of vocabularies
       @@vocab_repo = @options[:vocab_repository] if @options.has_key?(:vocab_repository)
       @@vocab_repo ||= RDF::Repository.new.insert(*COOKED_VOCAB_STATEMENTS)
       
-      vocabs = repo.query(:predicate => RDF::RDFA.usesVocabulary).to_a.map(&:object)
+      vocabs = repository.query(:predicate => RDF::RDFA.usesVocabulary).to_a.map(&:object)
       vocabs.each do |vocab|
         begin
           unless @@vocab_repo.has_context?(vocab)
@@ -63,17 +60,11 @@ module RDF::RDFa
       
       @@vocab_repo.each do |statement|
         if vocabs.include?(statement.context)
-          repo << statement
+          repository << statement
         end
       end
 
-      repo = entailment(repo)
-
-      # Return graph with default context
-      graph = RDF::Graph.new
-      repo.statements.each {|st| graph << st if st.context.nil?}
-
-      graph
+      entailment(repository)
     end
 
     ##
@@ -83,14 +74,11 @@ module RDF::RDFa
     #
     # Subsequently, remove reference rdfa:Prototype objects.
     #
-    # @return [RDF::Graph]
+    # @param [RDF::Repository] repository
     # @see [HTML+RDFa](http://www.w3.org/TR/rdfa-in-html/#rdfa-reference-folding)
-    def fold_references
-      graph = RDF::Graph.new << self
-
-      add_debug("fold") {"Loaded #{graph.size} triples into default graph"}
-
-      fold(graph)
+    def fold_references(repository)
+      add_debug("expand") {"Repository has #{repository.size} statements"}
+      fold(repository)
     end
 
     def rule(name, &block)
@@ -233,65 +221,63 @@ module RDF::RDFa
 
     ##
     # Perform OWL entailment rules on repository
-    # @param [RDF::Repository] repo
+    # @param [RDF::Repository] repository
     # @return [RDF::Repository]
-    def entailment(repo)
+    def entailment(repository)
       old_count = 0
 
-      # Continue as long as new statements are added to repo
-      while old_count < (count = repo.count)
-        add_debug("entailment", "old: #{old_count} count: #{count}")
+      # Continue as long as new statements are added to repository
+      while old_count < (count = repository.count)
+        #add_debug("entailment") {"old: #{old_count} count: #{count}"}
         old_count = count
         to_add = []
 
         RULES.each do |rule|
-          rule.execute(repo) do |statement|
-            add_debug("entailment(#{rule.name})") {statement.inspect}
+          rule.execute(repository) do |statement|
+            #add_debug("entailment(#{rule.name})") {statement.inspect}
             to_add << statement
           end
         end
         
-        repo.insert(*to_add)
+        repository.insert(*to_add)
       end
 
       add_debug("entailment", "final count: #{count}")
-      repo
     end
 
     ##
     # Perform RDFa folding rules on repository
-    # @param [RDF::Graph] graph
-    # @return [RDF::Graph]
-    def fold(graph)
+    # @param [RDF::Repository] repository
+    def fold(repository)
       old_count = 0
 
-      # Continue as long as new statements are added to repo
-      while old_count < (count = graph.count)
-        add_debug("fold", "old: #{old_count} count: #{count}")
+      # Continue as long as new statements are added to repository
+      while old_count < (count = repository.count)
+        #add_debug("fold") {"old: #{old_count} count: #{count}"}
         old_count = count
         to_add = []
 
         FOLDING_RULES.each do |rule|
-          rule.execute(graph) do |statement|
-            add_debug("fold(#{rule.name})") {statement.inspect}
+          rule.execute(repository) do |statement|
+            #add_debug("fold(#{rule.name})") {statement.inspect}
             to_add << statement
           end
         end
         
-        graph.insert(*to_add)
+        repository.insert(*to_add)
       end
 
       # Remove statements matched by removal rules
       to_remove = []
       REMOVAL_RULES.each do |rule|
-        rule.execute(graph) do |statement|
-          add_debug("removal(#{rule.name})") {statement.inspect}
+        rule.execute(repository) do |statement|
+          #add_debug("removal(#{rule.name})") {statement.inspect}
           to_remove << statement
         end
       end
-      graph.delete(*to_remove)
+      repository.delete(*to_remove)
 
-      graph
+      add_debug("fold", "final count: #{count}")
     end
   end
 end
