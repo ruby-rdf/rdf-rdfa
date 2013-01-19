@@ -484,7 +484,7 @@ describe RDF::RDFa::Writer do
         RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
           context "Using #{name} template" do
             Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
-              specify "test #{t.name}: #{t.title}" do
+              specify "test #{t.num}: #{t.description}" do
                 begin
                   input = t.input("html5", "rdfa1.1")
                   @graph = RDF::Graph.load(t.input("html5", "rdfa1.1"))
