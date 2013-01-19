@@ -262,32 +262,32 @@ describe RDF::RDFa::Expansion do
     end
   end
   
-  describe :fold_references do
+  describe :copy_properties do
     {
       "simple" => {
         :default => %q(
-          <> rdfa:ref _:ref .
-          _:ref a rdfa:Prototype; rdf:value "Prototype" .
+          <> rdfa:copy _:ref .
+          _:ref a rdfa:Pattern; rdf:value "Pattern" .
         ),
-        :result => %q(<> rdf:value "Prototype" .)
+        :result => %q(<> rdf:value "Pattern" .)
       },
       "chaining ref" => {
         :default => %q(
-          <> rdfa:ref _:ref .
-          _:ref a rdfa:Prototype;
-            rdf:value "Prototype";
-            rdfa:ref _:ref2 .
-          _:ref2 a rdfa:Prototype;
-          rdf:value "Prototype2" .
+          <> rdfa:copy _:ref .
+          _:ref a rdfa:Pattern;
+            rdf:value "Pattern";
+            rdfa:copy _:ref2 .
+          _:ref2 a rdfa:Pattern;
+          rdf:value "Pattern2" .
         ),
-        :result => %q(<> rdf:value "Prototype", "Prototype2" .)
+        :result => %q(<> rdf:value "Pattern", "Pattern2" .)
       }
     }.each do |test, elements|
       it test do
         mt = ExpansionTester.new(test)
         result = mt.load(elements)
         vocab = RDF::URI("http://example.org/vocab#")
-        mt.fold_references(mt.repo)
+        mt.copy_properties(mt.repo)
         mt.graph.should be_equivalent_graph(result, mt)
       end
     end
@@ -364,16 +364,16 @@ describe RDF::RDFa::Expansion do
     end
   end
   
-  context "rdfa:Prototype" do
+  context "rdfa:Pattern" do
     {
       "to single id" =>
       [
         %q(
           <div>
             <div typeof="schema:Person">
-              <link property="rdfa:ref" resource="_:a"/>
+              <link property="rdfa:copy" resource="_:a"/>
             </div>
-            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
+            <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name">Amanda</span></p>
           </div>
         ),
         %q(
@@ -387,9 +387,9 @@ describe RDF::RDFa::Expansion do
         <div>
           <div typeof="schema:Person">
             <p>My name is <span property="schema:name">Gregg</span></p>
-            <link property="rdfa:ref" resource="_:surname"/>
+            <link property="rdfa:copy" resource="_:surname"/>
           </div>
-          <p resource="_:surname" typeof="rdfa:Prototype">My name is <span property="schema:name">Kellogg</span></p>
+          <p resource="_:surname" typeof="rdfa:Pattern">My name is <span property="schema:name">Kellogg</span></p>
         </div>
         ),
         %q(
@@ -402,12 +402,12 @@ describe RDF::RDFa::Expansion do
         %q(
           <div>
             <div typeof="schema:Person">
-              <link property="rdfa:ref" resource="_:a"/>
+              <link property="rdfa:copy" resource="_:a"/>
             </div>
             <div typeof="foaf:Person">
-              <link property="rdfa:ref" resource="_:a"/>
+              <link property="rdfa:copy" resource="_:a"/>
             </div>
-            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name foaf:name">Amanda</span></p>
+            <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name foaf:name">Amanda</span></p>
           </div>
         ),
         %q(
@@ -422,11 +422,11 @@ describe RDF::RDFa::Expansion do
         %q(
           <div>
             <div typeof="schema:Person">
-              <link property="rdfa:ref" resource="_:a"/>
-              <link property="rdfa:ref" resource="_:b"/>
+              <link property="rdfa:copy" resource="_:a"/>
+              <link property="rdfa:copy" resource="_:b"/>
             </div>
-            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
-            <p resource="_:b" typeof="rdfa:Prototype"><span property="schema:band">Jazz Band</span></p>
+            <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name">Amanda</span></p>
+            <p resource="_:b" typeof="rdfa:Pattern"><span property="schema:band">Jazz Band</span></p>
           </div>
         ),
         %q(
@@ -442,16 +442,16 @@ describe RDF::RDFa::Expansion do
         %q(
           <div>
             <div typeof="schema:Person">
-              <link property="rdfa:ref" resource="_:a"/>
-              <link property="rdfa:ref" resource="_:b"/>
+              <link property="rdfa:copy" resource="_:a"/>
+              <link property="rdfa:copy" resource="_:b"/>
             </div>
-            <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
-            <div resource="_:b" typeof="rdfa:Prototype">
+            <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name">Amanda</span></p>
+            <div resource="_:b" typeof="rdfa:Pattern">
               <div property="schema:band" typeof=" schema:MusicGroup">
-                <link property="rdfa:ref" resource="_:c"/>
+                <link property="rdfa:copy" resource="_:c"/>
               </div>
             </div>
-            <div resource="_:c" typeof="rdfa:Prototype">
+            <div resource="_:c" typeof="rdfa:Pattern">
              <p>Band: <span property="schema:name">Jazz Band</span></p>
              <p>Size: <span property="schema:size">12</span> players</p>
             </div>
@@ -473,9 +473,9 @@ describe RDF::RDFa::Expansion do
       [
         %q(
           <div>
-            <div typeof=""><link property="rdfa:ref" resource="_:a"/></div>
-            <div typeof=""><link property="rdfa:ref" resource="_:a"/></div>
-            <div resource="_:a" typeof="rdfa:Prototype">
+            <div typeof=""><link property="rdfa:copy" resource="_:a"/></div>
+            <div typeof=""><link property="rdfa:copy" resource="_:a"/></div>
+            <div resource="_:a" typeof="rdfa:Pattern">
               <div property="schema:refers-to" typeof="">
                 <span property="schema:name">Amanda</span>
               </div>

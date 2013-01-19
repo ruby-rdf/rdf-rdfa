@@ -255,7 +255,7 @@ module RDF::RDFa
     # @option options [Boolean]  :vocab_expansion (false)
     #   whether to perform OWL2 expansion on the resulting graph
     # @option options [Boolean]  :reference_folding (true)
-    #   whether to perform RDFa reference folding on the resulting graph
+    #   whether to perform RDFa property copying on the resulting graph
     # @option options [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg] :host_language (:html5)
     #   Host Language
     # @option options [:"rdfa1.0", :"rdfa1.1"] :version (:"rdfa1.1")
@@ -409,8 +409,8 @@ module RDF::RDFa
           end
         end
 
-        # Perform reference folding
-        fold_references(@repository) if @options[:reference_folding]
+        # Perform property copying
+        copy_properties(@repository) if @options[:reference_folding]
 
         # Perform vocabulary expansion
         expand(@repository) if @options[:vocab_expansion]

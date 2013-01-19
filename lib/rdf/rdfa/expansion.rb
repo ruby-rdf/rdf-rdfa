@@ -68,15 +68,15 @@ module RDF::RDFa
     end
 
     ##
-    # Perform reference folding on the resulting default graph.
+    # Perform property copying on the resulting default graph.
     #
-    # For all objects of type rdfa:Prototype that are the target of an rdfa:ref property, load the IRI into a repository.
+    # For all objects of type rdfa:Pattern that are the target of an rdfa:copy property, load the IRI into a repository.
     #
-    # Subsequently, remove reference rdfa:Prototype objects.
+    # Subsequently, remove reference rdfa:Pattern objects.
     #
     # @param [RDF::Repository] repository
     # @see [HTML+RDFa](http://www.w3.org/TR/rdfa-in-html/#rdfa-reference-folding)
-    def fold_references(repository)
+    def copy_properties(repository)
       add_debug("expand") {"Repository has #{repository.size} statements"}
       fold(repository)
     end
@@ -201,8 +201,8 @@ module RDF::RDFa
 
     FOLDING_RULES = [
       Rule.new("rdfa-ref") do
-        antecedent :x, RDF::RDFA.ref, :PR
-        antecedent :PR, RDF.type, RDF::RDFA.Prototype
+        antecedent :x, RDF::RDFA.copy, :PR
+        antecedent :PR, RDF.type, RDF::RDFA.Pattern
         antecedent :PR, :p, :y
         consequent :x, :p, :y
       end,
@@ -210,11 +210,11 @@ module RDF::RDFa
 
     REMOVAL_RULES = [
       Rule.new("rdfa-ref-remove") do
-        antecedent :x, RDF::RDFA.ref, :PR
-        antecedent :PR, RDF.type, RDF::RDFA.Prototype
+        antecedent :x, RDF::RDFA.copy, :PR
+        antecedent :PR, RDF.type, RDF::RDFA.Pattern
         antecedent :PR, :p, :y
-        consequent :x, RDF::RDFA.ref, :PR
-        consequent :x, RDF.type, RDF::RDFA.Prototype
+        consequent :x, RDF::RDFA.copy, :PR
+        consequent :x, RDF.type, RDF::RDFA.Pattern
         consequent :PR, :p, :y
       end,
     ]

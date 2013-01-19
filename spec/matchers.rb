@@ -66,7 +66,7 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     else
       Info.new(expected.is_a?(RDF::Graph) ? expected.context : info, "0000", info.to_s)
     end
-    @info.format ||= :ntriples
+    @info.format ||= :ttl
     @expected = normalize(expected)
     @actual = normalize(actual)
     @actual.isomorphic_with?(@expected) rescue false
@@ -81,7 +81,7 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     else
       "Graph differs"
     end +
-    "\n#{info + "\n" unless info.empty?}" +
+    "\n#{info + "\n" unless info.to_s.empty?}" +
     (@info.inputDocument ? "Input file: #{@info.inputDocument}\n" : "") +
     (@info.outputDocument ? "Output file: #{@info.outputDocument}\n" : "") +
     "Expected:\n#{@expected.dump(@info.format, :standard_prefixes => true)}" +

@@ -36,21 +36,21 @@ to the output graph.
 
 {RDF::RDFa::Reader} implements this using the `#expand` method, which looks for `rdfa:usesVocabulary` properties within the output graph and performs such expansion. See an example in the usage section.
 
-#### Experimental support for rdf:ref template expansion
+#### Experimental support for rdfa:copy template expansion
 RDFa 1.1 is just about an exact super-set of microdata, except for microdata's
-`@itemref` feature. Experimental support is added for `rdf:ref` and `rdf:Prototype` to get a similar effect using expansion. To use this,
-reference another resource using `rdfa:ref`. If that resource has the type
-`rdfa:Prototype`, the properties defined there will be added to the resource
-containing the `rdfa:ref`, and the prototype and `rdfa:ref` will be removed
+`@itemref` feature. Experimental support is added for `rdfa:copy` and `rdfa:Pattern` to get a similar effect using expansion. To use this,
+reference another resource using `rdfa:copy`. If that resource has the type
+`rdfa:Pattern`, the properties defined there will be added to the resource
+containing the `rdfa:copy`, and the pattern and `rdfa:copy` will be removed
 from the output.
 
 For example, consider the following:
 
     <div>
       <div typeof="schema:Person">
-        <link property="rdfa:ref" resource="_:a"/>
+        <link property="rdfa:copy" resource="_:a"/>
       </div>
-      <p resource="_:a" typeof="rdfa:Prototype">Name: <span property="schema:name">Amanda</span></p>
+      <p resource="_:a" typeof="rdfa:Pattern">Name: <span property="schema:name">Amanda</span></p>
     </div>
 
 if run with vocabulary expansion, this will result in the following Turtle:
@@ -391,11 +391,11 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
-* [Ruby](http://ruby-lang.org/) (>= 1.9) or (>= 1.8.1 with [Backports][])
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 0.3.11)
+* [Ruby](http://ruby-lang.org/) (>= 1.9) or (>= 1.8.7 with [Backports][])
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.0)
 * [Haml](https://rubygems.org/gems/haml) (>= 3.1.7)
 * [HTMLEntities](https://rubygems.org/gems/htmlentities) ('>= 4.3.1')
-* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.5.5)
+* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.5.0)
 
 ## Documentation
 Full documentation available on [Rubydoc.info][RDFa doc]

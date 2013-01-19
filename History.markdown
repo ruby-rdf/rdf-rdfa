@@ -1,3 +1,5 @@
+### 0.3.20
+* Change rdfa:Prototype/rdfa:ref to rdfa:Pattern/rdfa:copy. Feature now called Property Copying instead of Reference Folding.
 ### 0.3.19
 * Generate UnresolvedTerm and UnresolvedCURIE as indicated. UnresolvedCURIE only generated for SafeCURIEs.
 * Perform basic sanity checking before emitting triples. Validation is too strict for most usage.
@@ -6,7 +8,7 @@
 
 ### 0.3.18
 * Fixed additional incomplete-triples bug with typed resource
-* Added experimental support for rdf:ref
+* Added experimental support for rdfa:copy
 
 ### 0.3.17
 * Added rdfa:PrefixReDefinition warning.
