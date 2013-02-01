@@ -1131,20 +1131,6 @@ module RDF::RDFa
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
-            when element.name == 'time'
-              # HTML5 support
-              # Lexically scan value and assign appropriate type, otherwise, leave untyped
-              v = (attrs[:datetime] || element.inner_text).to_s
-              datatype = %w(Date Time DateTime Year YearMonth Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
-                v.match(dt::GRAMMAR)
-              end || RDF::Literal
-              add_debug(element) {"[Step 11] <time> literal: #{datatype} #{v.inspect}"}
-              datatype.new(v, :language => language)
-            when element.name.to_s == 'data' && attrs[:value]
-              # HTML5 support
-              # plain literal
-              add_debug(element, "[Step 11] plain literal (value)")
-              RDF::Literal.new(attrs[:value],  :language => language, :validate => validate?, :canonicalize => canonicalize?)
             when attrs[:datatype]
               # otherwise, as a plain literal if @datatype is present but has an empty value.
               # The actual literal is either the value of @content (if present) or a string created by
@@ -1156,6 +1142,15 @@ module RDF::RDFa
               # plain literal
               add_debug(element, "[Step 11] plain literal (content)")
               RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            when element.name == 'time'
+              # HTML5 support
+              # Lexically scan value and assign appropriate type, otherwise, leave untyped
+              v = (attrs[:datetime] || element.inner_text).to_s
+              datatype = %w(Date Time DateTime Year YearMonth Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
+                v.match(dt::GRAMMAR)
+              end || RDF::Literal
+              add_debug(element) {"[Step 11] <time> literal: #{datatype} #{v.inspect}"}
+              datatype.new(v, :language => language)
             when (attrs[:resource] || attrs[:href] || attrs[:src]) &&
                  !(attrs[:rel] || attrs[:rev]) &&
                  @version != :"rdfa1.0"

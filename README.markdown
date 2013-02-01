@@ -149,12 +149,6 @@ this results in
       ].
 
 
-#### Support for HTML5 `data` element
-This is an alternate way of adding data using the `@value` property. Similar to `meta`
-
-The `data` element is described in the WHATWG version of the [HTML5 spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/text-level-semantics.html#the-data-element).
-This is related to [RDFa ISSUE-113](http://www.w3.org/2010/02/rdfa/track/issues/113)
-
 ### Support for embedded RDF/XML
 If the document includes embedded RDF/XML, as is the case with many SVG documents, and the RDF::RDFXML gem is installed, the reader will add extracted triples to the default graph.
 

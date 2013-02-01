@@ -1049,62 +1049,14 @@ describe "RDF::RDFa::Reader" do
             "with @datetime and @content" => [
               %q(
                 <div about="">
-                  <time property="rdf:value" datetime="2012-03-18" content="not this">18 March 2012</time>
+                  <time property="rdf:value" datetime="2012-03-18" content="this">18 March 2012</time>
                 </div>
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
           
-                <> rdf:value "2012-03-18"^^xsd:date .
-              )
-            ],
-            "with <data> @value=plain" => [
-              %q(
-                <div about="">
-                  <data property="rdf:value" value="foo">Foo</data>
-                </div>
-              ),
-              %q(
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
-                <> rdf:value "foo" .
-              )
-            ],
-            "with <data> @value=plain and @lang=en" => [
-              %q(
-                <div about="">
-                  <data property="rdf:value" value="foo" lang="en">Foo</data>
-                </div>
-              ),
-              %q(
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
-                <> rdf:value "foo"@en .
-              )
-            ],
-            "with <data> @value and @content" => [
-              %q(
-                <div about="">
-                  <data property="rdf:value" value="veni, vidi, vici" content="I came, I saw, I conquered">Foo</data>
-                </div>
-              ),
-              %q(
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
-                <> rdf:value "veni, vidi, vici" .
-              )
-            ],
-            "with <data> @value, @lang and @content" => [
-              %q(
-                <div about="">
-                  <data property="rdf:value" lang="lat" value="veni, vidi, vici" content="I came, I saw, I conquered">Foo</data>
-                </div>
-              ),
-              %q(
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
-                <> rdf:value "veni, vidi, vici"@lat .
+                <> rdf:value "this" .
               )
             ],
             "with @resource" => [

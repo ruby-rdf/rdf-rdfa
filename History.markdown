@@ -1,3 +1,11 @@
+### 1.0.1
+* LC version of HTML+RDFa
+  * Remove support for @value
+  * Prefer @content to @datetime
+
+### 1.0.0
+* 1.0 release!
+
 ### 0.3.20
 * Change rdfa:Prototype/rdfa:ref to rdfa:Pattern/rdfa:copy. Feature now called Property Copying instead of Reference Folding.
 ### 0.3.19
