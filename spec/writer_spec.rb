@@ -496,14 +496,16 @@ describe RDF::RDFa::Writer do
                   #puts graph2.dump(:ttl)
                   graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
                 rescue RSpec::Expectations::ExpectationNotMetError => e
-                  if %w(0198).include?(t.name) || t.title =~ /XMLLiteral/
+                  if %w(0198).include?(t.num) || t.description =~ /XMLLiteral/
                     pending("XMLLiteral aren't serialized canonically")
-                  elsif %w(0225).include?(t.name)
+                  elsif %w(0225).include?(t.num)
                     pending("Serializing multiple lists")
-                  elsif %w(0284).include?(t.name)
+                  elsif %w(0284).include?(t.num)
                     pending("Minor change in time element")
-                  elsif %w(0295).include?(t.name)
+                  elsif %w(0295).include?(t.num)
                     pending("Benchmark entry count")
+                  elsif %w(0319).include?(t.num)
+                    pending("Relative IRIs")
                   else
                     raise
                   end

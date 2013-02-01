@@ -320,7 +320,7 @@ module RDF::RDFa
           list.each_statement {|st| subject_done(st.subject)}
 
           add_debug {"list: #{list.inspect} #{list.to_a}"}
-          render_property(predicate, list.to_a, options.merge(:inlist => ""), &block)
+          render_property(predicate, list.to_a, options.merge(:inlist => "true"), &block)
         end.join(" ")
       end
 
