@@ -12,5 +12,5 @@ gem "rdf-xsd",        :git => "git://github.com/ruby-rdf/rdf-xsd.git"
 group :debug do
   gem "wirble"
   gem "syntax"
-  gem "debugger"
+  gem "debugger" if RUBY_VERSION == "1.9.3"
 end
