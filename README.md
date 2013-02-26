@@ -424,7 +424,7 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [RDF.rb][RDF.rb]
 * [Distiller](http://rdf.greggkellogg.net/distiller)
 * [Documentation][RDFa doc]
-* [History](file:History.markdown)
+* [History](file:History.md)
 * [RDFa 1.1 Core][RDFa 1.1 Core]
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
 * [RDFa-test-suite](http://rdfa.info/test-suite/              "RDFa test suite")
