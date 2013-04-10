@@ -1443,6 +1443,8 @@ module RDF::RDFa
       value.canonicalize! if canonicalize?
       value = RDF::URI.intern(value) if intern?
       value
+    rescue ArgumentError => e
+      raise RDF::ReaderError, e.message
     end
   end
 end

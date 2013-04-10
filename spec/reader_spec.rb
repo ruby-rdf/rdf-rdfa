@@ -172,7 +172,7 @@ describe "RDF::RDFa::Reader" do
             <photo1.jpg> dc:creator "Mark Birbeck" .
           )
 
-          parse(html, :validate => true).should be_equivalent_graph(expected, :trace => @debug)
+          parse(html).should be_equivalent_graph(expected, :trace => @debug)
         end
       end
 
@@ -252,7 +252,7 @@ describe "RDF::RDFa::Reader" do
              ] .
           )
 
-          parse(html, :validate => true).should be_equivalent_graph(expected, :trace => @debug)
+          parse(html).should be_equivalent_graph(expected, :trace => @debug)
         end
 
         describe "@about" do
@@ -408,7 +408,7 @@ describe "RDF::RDFa::Reader" do
                  foaf:name "John Doe" .
             )
 
-            parse(html, :validate => true).should be_equivalent_graph(expected, :trace => @debug)
+            parse(html).should be_equivalent_graph(expected, :trace => @debug)
           end
           
           it "empty @typeof on root" do
