@@ -711,7 +711,6 @@ module RDF::RDFa
         role
         src
         typeof
-        value
         vocab
       ).each do |a|
         attrs[a.to_sym] = element.attributes[a].to_s.strip if element.attributes[a]
@@ -1091,7 +1090,7 @@ module RDF::RDFa
           when datatype && ![RDF.XMLLiteral, RDF.HTML].include?(datatype)
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
-            RDF::Literal.new(attrs[:datetime] || attrs[:value] || attrs[:content] || element.inner_text.to_s, :datatype => datatype, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+            RDF::Literal.new(attrs[:datetime] || attrs[:content] || element.inner_text.to_s, :datatype => datatype, :validate => validate?, :canonicalize => canonicalize?)
           when @version == :"rdfa1.1"
             case
             when datatype == RDF.XMLLiteral

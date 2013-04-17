@@ -184,14 +184,14 @@ describe "RDF::RDFa::Reader" do
               <html xmlns="http://www.w3.org/1999/xhtml">
                 <head><base href=""/></head>
                 <body>
-                  <div about="http://example.com/">
+                  <div about="http://example/">
                     <h2 property="dc:title" datatype="rdf:XMLLiteral">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
                 </div>
                 </body>
               </html>
               )
             expected = %q(
-              @base <http://example.com/> .
+              @base <http://example/> .
               @prefix dc: <http://purl.org/dc/terms/> .
               @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -208,14 +208,14 @@ describe "RDF::RDFa::Reader" do
               <html>
                 <head><base href=""/></head>
                 <body>
-                  <div about="http://example.com/">
+                  <div about="http://example/">
                     <h2 property="dc:title" datatype="rdf:HTML">E = mc<sup>2</sup>: The Most Urgent Problem of Our Time</h2>
                 </div>
                 </body>
               </html>
               )
             expected = %q(
-              @base <http://example.com/> .
+              @base <http://example/> .
               @prefix dc: <http://purl.org/dc/terms/> .
               @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -244,7 +244,7 @@ describe "RDF::RDFa::Reader" do
             </html>
             )
           expected = %q(
-            @base <http://example.com> .
+            @base <http://example> .
             @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
              [ foaf:name "Manu Sporny";
@@ -394,7 +394,7 @@ describe "RDF::RDFa::Reader" do
                   <title>Test 0049</title>
                 </head>
                 <body>
-                  <div about="http://www.example.org/#me" typeof="foaf:Person">
+                  <div about="http://example/#me" typeof="foaf:Person">
                     <p property="foaf:name">John Doe</p>
                   </div>
                 </body>
@@ -404,7 +404,7 @@ describe "RDF::RDFa::Reader" do
               @prefix foaf: <http://xmlns.com/foaf/0.1/> .
               @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-              <http://www.example.org/#me> a foaf:Person;
+              <http://example/#me> a foaf:Person;
                  foaf:name "John Doe" .
             )
 
@@ -425,7 +425,7 @@ describe "RDF::RDFa::Reader" do
             <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
                 xmlns:dc="http://purl.org/dc/elements/1.1/">
              <head>
-                <base href="http://www.example.org/"></base>
+                <base href="http://example/"></base>
                 <title>Test 0072</title>
              </head>
              <body>
@@ -439,7 +439,7 @@ describe "RDF::RDFa::Reader" do
           expected = %q(
             @prefix dc: <http://purl.org/dc/elements/1.1/> .
 
-            <http://www.example.org/faq> dc:title "Example FAQ" .
+            <http://example/faq> dc:title "Example FAQ" .
           )
 
           parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
@@ -456,46 +456,46 @@ describe "RDF::RDFa::Reader" do
           }.each do |hl, does|
             context "#{hl}" do
               it %(#{does ? "uses" : "does not use"} xml:base in root) do
-                html = %(<div xml:base="http://example.com/">
+                html = %(<div xml:base="http://example/">
                     <span property="rdf:value">Value</span>
                   </div>
                 )
                 expected_true = %(
                   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-                  <http://example.com/> rdf:value "Value" .
+                  <http://example/> rdf:value "Value" .
                 )
                 expected_false = %(
                   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-                  <http://example.org/doc_base> rdf:value "Value" .
+                  <http://example/doc_base> rdf:value "Value" .
                 )
                 expected = does ? expected_true : expected_false
 
-                parse(html, :base_uri => "http://example.org/doc_base",
+                parse(html, :base_uri => "http://example/doc_base",
                   :version => :"rdfa1.1",
                   :host_language => hl
                 ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
               end
               
               it %(#{does ? "uses" : "does not use"} xml:base in non-root) do
-                html = %(<div xml:base="http://example.com/">
-                    <a xml:base="http://example.org/" property="rdf:value" href="">Value</a>
+                html = %(<div xml:base="http://example/">
+                    <a xml:base="http://example/" property="rdf:value" href="">Value</a>
                   </div>
                 )
                 expected_true = %(
                   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-                  <http://example.com/> rdf:value <http://example.org/> .
+                  <http://example/> rdf:value <http://example/> .
                 )
                 expected_false = %(
                   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-                  <http://example.org/doc_base> rdf:value <http://example.org/doc_base> .
+                  <http://example/doc_base> rdf:value <http://example/doc_base> .
                 )
                 expected = does ? expected_true : expected_false
 
-                parse(html, :base_uri => "http://example.org/doc_base",
+                parse(html, :base_uri => "http://example/doc_base",
                   :version => :"rdfa1.1",
                   :host_language => hl
                 ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
@@ -581,13 +581,13 @@ describe "RDF::RDFa::Reader" do
         context "CURIEs" do
           it "accepts a CURIE with a local part having a ':'" do
             html = %(
-              <html prefix="foo: http://example.com/">
+              <html prefix="foo: http://example/">
                 <div property="foo:due:to:facebook:interpretation:of:CURIE">Value</div>
               </html>
             )
             expected = RDF::Graph.new << RDF::Statement.new(
               RDF::URI(""),
-              RDF::URI("http://example.com/due:to:facebook:interpretation:of:CURIE"),
+              RDF::URI("http://example/due:to:facebook:interpretation:of:CURIE"),
               "Value"
             )
             parse(html).should be_equivalent_graph(expected, :trace => @debug)
@@ -599,7 +599,7 @@ describe "RDF::RDFa::Reader" do
             @sampledoc = %q(
             <html>
               <head>
-                <base href="http://example.org/"/>
+                <base href="http://example/"/>
               </head>
               <body>
                 <div about ="#me" vocab="http://xmlns.com/foaf/0.1/" typeof="Person" >
@@ -613,7 +613,7 @@ describe "RDF::RDFa::Reader" do
           it "uses vocabulary when creating property IRI" do
             query = %q(
               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-              ASK WHERE { <http://example.org/#me> a foaf:Person }
+              ASK WHERE { <http://example/#me> a foaf:Person }
             )
             parse(@sampledoc).should pass_query(query, @debug)
           end
@@ -621,7 +621,7 @@ describe "RDF::RDFa::Reader" do
           it "uses vocabulary when creating type IRI" do
             query = %q(
               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-              ASK WHERE { <http://example.org/#me> foaf:name "Gregg Kellogg" }
+              ASK WHERE { <http://example/#me> foaf:name "Gregg Kellogg" }
             )
             parse(@sampledoc).should pass_query(query, @debug)
           end
@@ -630,7 +630,7 @@ describe "RDF::RDFa::Reader" do
             query = %q(
               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
               PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
-              ASK WHERE { <http://example.org/> rdfa:usesVocabulary foaf: }
+              ASK WHERE { <http://example/> rdfa:usesVocabulary foaf: }
             )
             parse(@sampledoc).should pass_query(query, @debug)
           end
@@ -646,10 +646,10 @@ describe "RDF::RDFa::Reader" do
             ].each do |term|
               it "accepts #{term.inspect}" do
                 input = %(
-                  <span vocab="http://example.com/" property="#{term}">Foo</span>
+                  <span vocab="http://example/" property="#{term}">Foo</span>
                 )
                 query = %(
-                  ASK WHERE { <> <http://example.com/#{term}> "Foo" }
+                  ASK WHERE { <> <http://example/#{term}> "Foo" }
                 )
                 parse(input).should pass_query(query, @debug)
               end
@@ -665,10 +665,10 @@ describe "RDF::RDFa::Reader" do
             ].each do |term|
               it "rejects #{term.inspect}" do
                 input = %(
-                  <span vocab="http://example.com/" property="#{term}">Foo</span>
+                  <span vocab="http://example/" property="#{term}">Foo</span>
                 )
                 query = %(
-                  ASK WHERE { <> <http://example.com/#{term}> "Foo" }
+                  ASK WHERE { <> <http://example/#{term}> "Foo" }
                 )
                 begin
                   parse(input).should_not pass_query(query, @debug)
@@ -1129,26 +1129,26 @@ describe "RDF::RDFa::Reader" do
             ],
             "@property with @href in a list" => [
               %q(
-                <div about="http://www.example.org">
-                  <a inlist="" property="rdf:value" href="http://www.example.org#foo"></a>
-                  <a inlist="" property="rdf:value" href="http://www.example.org#bar"></a>
+                <div about="http://example">
+                  <a inlist="" property="rdf:value" href="http://example#foo"></a>
+                  <a inlist="" property="rdf:value" href="http://example#bar"></a>
                 </div>
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                <http://www.example.org> rdf:value ( <http://www.example.org#foo> <http://www.example.org#bar> ).
+                <http://example> rdf:value ( <http://example#foo> <http://example#bar> ).
               )
             ],
             "@property and @rel with @href in a list" => [
               %q(
-                <div about="http://www.example.org">
-                  <a inlist="" property="rdf:value" href="http://www.example.org#foo"></a>
-                  <a inlist="" rel="rdf:value" href="http://www.example.org#bar"></a>
+                <div about="http://example">
+                  <a inlist="" property="rdf:value" href="http://example#foo"></a>
+                  <a inlist="" rel="rdf:value" href="http://example#bar"></a>
                 </div>
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                <http://www.example.org> rdf:value ( <http://www.example.org#foo> <http://www.example.org#bar> ).
+                <http://example> rdf:value ( <http://example#foo> <http://example#bar> ).
               )
             ],
             #"@property and @typeof and incomplete triples" => [
@@ -1179,11 +1179,35 @@ describe "RDF::RDFa::Reader" do
             #],
             "@property, @href and @datatype" => [
               %q(
-                <a href="http://example.org/" property="rdf:value" datatype="">value</a>
+                <a href="http://example/" property="rdf:value" datatype="">value</a>
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                <http://example.org/> rdf:value "value" .
+                <http://example/> rdf:value "value" .
+              )
+            ],
+            "@property, @datatype and @language" => [
+              %q(
+                <div about="http://example/">
+                  <span property="rdf:value" lang="en" datatype="xsd:date">value</span>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                <http://example/> rdf:value "value"^^xsd:date .
+              )
+            ],
+            "@property, @content, @datatype and @language" => [
+              %q(
+                <div about="http://example/">
+                  <span property="rdf:value" lang="en" datatype="xsd:date" content="value">not this</span>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                <http://example/> rdf:value "value"^^xsd:date .
               )
             ],
           }.each do |test, (input, expected)|
@@ -1196,19 +1220,19 @@ describe "RDF::RDFa::Reader" do
         context "with @rel/@rev" do
           {
             "with CURIE" => [
-              %q(<a about="" property="rdf:value" rel="xhv:license" href="http://example.com/">Foo</a>),
-              %q(<> rdf:value "Foo"; xhv:license <http://example.com/> .),
-              %q(<> rdf:value "Foo"; xhv:license <http://example.com/> .)
+              %q(<a about="" property="rdf:value" rel="xhv:license" href="http://example/">Foo</a>),
+              %q(<> rdf:value "Foo"; xhv:license <http://example/> .),
+              %q(<> rdf:value "Foo"; xhv:license <http://example/> .)
             ],
             "with Term" => [
-              %q(<a about="" property="rdf:value" rel="license" href="http://example.com/">Foo</a>),
-              %q(<> rdf:value "Foo"; xhv:license <http://example.com/> .),
-              %q(<> rdf:value <http://example.com/> .)
+              %q(<a about="" property="rdf:value" rel="license" href="http://example/">Foo</a>),
+              %q(<> rdf:value "Foo"; xhv:license <http://example/> .),
+              %q(<> rdf:value <http://example/> .)
             ],
             "with Term and CURIE" => [
-              %q(<a about="" property="rdf:value" rel="license cc:license" href="http://example.com/">Foo</a>),
-              %q(<> rdf:value "Foo"; cc:license <http://example.com/>; xhv:license <http://example.com/> .),
-              %q(<> rdf:value "Foo"; cc:license <http://example.com/> .),
+              %q(<a about="" property="rdf:value" rel="license cc:license" href="http://example/">Foo</a>),
+              %q(<> rdf:value "Foo"; cc:license <http://example/>; xhv:license <http://example/> .),
+              %q(<> rdf:value "Foo"; cc:license <http://example/> .),
             ],
           }.each do |test, (input, expected1, expected5)|
             context test do
@@ -1259,18 +1283,18 @@ describe "RDF::RDFa::Reader" do
             ],
             "@id and IRI object" => [
               %(
-                <div id="therole" role="http://www.example.com/roles/somerole">
+                <div id="therole" role="http://example/roles/somerole">
                   <p>Some contents that are a header</p>
                 </div>
               ),
               %(
                 @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
-                <#therole> xhv:role <http://www.example.com/roles/somerole>.
+                <#therole> xhv:role <http://example/roles/somerole>.
               )
             ],
             "@id and CURIE object" => [
               %(
-                <div prefix="ex: http://www.example.com/roles/"
+                <div prefix="ex: http://example/roles/"
                      id="therole"
                      role="ex:somerole">
                   <p>Some contents that are a header</p>
@@ -1278,22 +1302,22 @@ describe "RDF::RDFa::Reader" do
               ),
               %(
                 @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
-                <#therole> xhv:role <http://www.example.com/roles/somerole>.
+                <#therole> xhv:role <http://example/roles/somerole>.
               )
             ],
             "multiple values" => [
               %(
-                <div prefix="ex: http://www.example.com/roles/"
+                <div prefix="ex: http://example/roles/"
                      id="therole"
-                     role="ex:somerole someOtherRole http://www.example.com/alternate/role noprefix:final">
+                     role="ex:somerole someOtherRole http://example/alternate/role noprefix:final">
                   <p>Some contents that are a header</p>
                 </div>
               ),
               %(
                 @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
-                <#therole> xhv:role <http://www.example.com/roles/somerole>,
+                <#therole> xhv:role <http://example/roles/somerole>,
                   xhv:someOtherRole,
-                  <http://www.example.com/alternate/role>,
+                  <http://example/alternate/role>,
                   <noprefix:final>.
               )
             ],
@@ -1395,12 +1419,12 @@ describe "RDF::RDFa::Reader" do
           ],
           "bbc programs @rel=role with rfds:label" => [
             %q(
-              <dt rel="po:role" class="role" prefix="po: http://example.org/">
+              <dt rel="po:role" class="role" prefix="po: http://example/">
                 <span typeof="po:Role" property="rdfs:label">Director</span>
               </dt>
             ),
             %q(
-              @prefix po: <http://example.org/> .
+              @prefix po: <http://example/> .
               @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
               <> po:role [ rdfs:label [ a po:Role ] ] .
@@ -1508,32 +1532,32 @@ describe "RDF::RDFa::Reader" do
           "text/turtle with @id" => [
             %q(
               <script type="text/turtle" id="graph1"><![CDATA[
-                 @prefix foo:  <http://www.example.com/xyz#> .
+                 @prefix foo:  <http://example/xyz#> .
                  @prefix gr:   <http://purl.org/goodrelations/v1#> .
                  @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
                  @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
                  foo:myCompany
                    a gr:BusinessEntity ;
-                   rdfs:seeAlso <http://www.example.com/xyz> ;
+                   rdfs:seeAlso <http://example/xyz> ;
                    gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
               ]]></script>
             ),
             %q(
-              @prefix foo:  <http://www.example.com/xyz#> .
+              @prefix foo:  <http://example/xyz#> .
               @prefix gr:   <http://purl.org/goodrelations/v1#> .
               @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
               @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
               foo:myCompany
                 a gr:BusinessEntity ;
-                rdfs:seeAlso <http://www.example.com/xyz> ;
+                rdfs:seeAlso <http://example/xyz> ;
                 gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
             )
           ]
         }.each do |title, (input,result)|
           it title do
-            parse(input).should be_equivalent_graph(result, :base_uri => "http://example.com/", :trace => @debug)
+            parse(input).should be_equivalent_graph(result, :base_uri => "http://example/", :trace => @debug)
           end
         end
       end
@@ -1607,7 +1631,7 @@ describe "RDF::RDFa::Reader" do
         ).each do |prefix|
           it "generates rdfa:UnresolvedCURIE on malformed CURIE prefix #{prefix.inspect}" do
             html = %(<!DOCTYPE html>
-              <div prefix="#{prefix}: http://example.com/"
+              <div prefix="#{prefix}: http://example/"
                    property="rdf:value"
                    resource="[#{prefix}:malformed]">
                 Malformed Prefix
