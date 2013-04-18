@@ -1,7 +1,9 @@
 # RDF::RDFa reader/writer
-[![Build Status](https://secure.travis-ci.org/ruby-rdf/rdf-rdfa.png?branch=master)](http://travis-ci.org/ruby-rdf/rdf-rdfa)
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
+
+[![Gem Version](https://badge.fury.io/rb/rdf-rdfa.png)][gem]
+[![Build Status](https://travis-ci.org/ruby-rdf/rdf-rdfa.png?branch=master)](http://travis-ci.org/ruby-rdf/rdf-rdfa)
 
 ## DESCRIPTION
 RDF::RDFa is an RDFa reader and writer for Ruby using the [RDF.rb][RDF.rb] library suite.
