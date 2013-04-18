@@ -2,7 +2,7 @@
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
 
-[![Gem Version](https://badge.fury.io/rb/rdf-rdfa.png)][gem]
+[![Gem Version](https://badge.fury.io/rb/rdf-rdfa.png)](http://badge.fury.io/rb/rdf-rdfa)
 [![Build Status](https://travis-ci.org/ruby-rdf/rdf-rdfa.png?branch=master)](http://travis-ci.org/ruby-rdf/rdf-rdfa)
 
 ## DESCRIPTION
