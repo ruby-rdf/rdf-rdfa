@@ -1365,9 +1365,9 @@ module RDF::RDFa
                 add_warning(element, "Malformed IRI #{uri.inspect}")
               end
             else
-              uri = uri(base, Addressable::URI.parse(value))
+              uri = uri(base, value)
             end
-          rescue Addressable::URI::InvalidURIError => e
+          rescue ArgumentError => e
             add_warning(element, "Malformed IRI #{value}")
           rescue RDF::ReaderError => e
             add_debug(element, e.message)
