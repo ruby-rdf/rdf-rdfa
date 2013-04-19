@@ -574,6 +574,14 @@ module RDF::RDFa
             add_info(root, "load_initial_contexts: load #{uri.to_base}")
             RDF::RDFa.debug = false
             context = Context.find(uri)
+
+            # Add URI Mappings to prefixes
+            context.prefixes.each_pair do |prefix, value|
+              prefix(prefix, value)
+            end
+            yield :uri_mappings, context.prefixes unless context.prefixes.empty?
+            yield :term_mappings, context.terms unless context.terms.empty?
+            yield :default_vocabulary, context.vocabulary if context.vocabulary
           rescue Exception => e
             RDF::RDFa.debug = old_debug
             add_error(root, e.message)
@@ -581,14 +589,6 @@ module RDF::RDFa
           ensure
             RDF::RDFa.debug = old_debug
           end
-
-          # Add URI Mappings to prefixes
-          context.prefixes.each_pair do |prefix, value|
-            prefix(prefix, value)
-          end
-          yield :uri_mappings, context.prefixes unless context.prefixes.empty?
-          yield :term_mappings, context.terms unless context.terms.empty?
-          yield :default_vocabulary, context.vocabulary if context.vocabulary
         end
     end
 
