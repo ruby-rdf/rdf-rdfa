@@ -149,7 +149,6 @@ describe "RDF::RDFa::Reader" do
 
   [:nokogiri, :rexml].each do |library|
     context library.to_s, :library => library do
-      next if library == :nokogiri && RUBY_PLATFORM == 'java'
       before(:all) {@library = library}
       
       context "sanity checking" do
