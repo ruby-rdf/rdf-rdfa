@@ -1,5 +1,6 @@
 $:.unshift "."
 require 'spec_helper'
+require 'rdf/xsd'
 require 'rdf/spec/writer'
 require 'rspec/matchers'
 
@@ -275,7 +276,7 @@ describe RDF::RDFa::Writer do
 
         {
           "//xhtml:span[@property]/@property" => "ex:b",
-          "//xhtml:span[@property]/@datatype" => "xsd:string",
+          "//xhtml:span[@property]/@datatype" => false, # xsd:string implied in RDF 1.1
           "//xhtml:span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
