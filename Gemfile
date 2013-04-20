@@ -16,5 +16,5 @@ gem 'sparql',         :git => "git://github.com/ruby-rdf/sparql.git"
 group :debug do
   gem "wirble"
   gem "syntax"
-  gem "debugger" if RUBY_VERSION == "1.9.3"
+  gem "debugger", :platform => "mri_19"
 end
