@@ -1561,7 +1561,7 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
-      it "extracts microdata" do
+      it "extracts microdata", :pending => ("Not for REXML" if library == :rexml) do
         html = %(
           <html>
             <head>
