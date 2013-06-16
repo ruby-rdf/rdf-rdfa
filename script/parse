@@ -2,9 +2,13 @@
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
 require 'rdf/rdfa'
-require 'linkeddata' rescue nil
-require 'rdf/turtle' rescue nil
-require 'json/ld' rescue nil
+%w(linkeddata rdf/turtle json/ld).each do
+  begin
+    require 'linkeddata'
+  rescue LoadError => e
+  end
+end
+
 require 'getoptlong'
 require 'open-uri'
 
