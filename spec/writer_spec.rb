@@ -7,7 +7,7 @@ class EX < RDF::Vocabulary("http://example/"); end
 
 describe RDF::RDFa::Writer do
   before(:each) do
-    @graph = RDF::Graph.new
+    @graph = RDF::Repository.new
     @writer = RDF::RDFa::Writer.new(StringIO.new)
   end
   
@@ -487,7 +487,7 @@ describe RDF::RDFa::Writer do
               specify "test #{t.num}: #{t.description}" do
                 begin
                   input = t.input("html5", "rdfa1.1")
-                  @graph = RDF::Graph.load(t.input("html5", "rdfa1.1"))
+                  @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"))
                   result = serialize(:haml => template, :haml_options => {:ugly => false})
                   graph2 = parse(result, :format => :rdfa)
                   # Need to put this in to avoid problems with added markup
@@ -525,7 +525,7 @@ describe RDF::RDFa::Writer do
     reader_class = RDF::Reader.for(options[:format]) if options[:format]
     reader_class ||= options.fetch(:reader, RDF::Reader.for(detect_format(input)))
   
-    graph = RDF::Graph.new
+    graph = RDF::Repository.new
     reader_class.new(input, options).each do |statement|
       graph << statement
     end

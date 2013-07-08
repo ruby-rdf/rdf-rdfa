@@ -507,7 +507,7 @@ module RDF::RDFa
       # or any type of this subject
       tmpl = find_template(subject)
 
-      typeof = [properties.delete(RDF.type.to_s)].flatten.compact.map {|r| get_curie(r)}.join(" ")
+      typeof = Array(properties.delete(RDF.type.to_s)).map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
 
       # Nodes without a curie need a blank @typeof to generate a subject
