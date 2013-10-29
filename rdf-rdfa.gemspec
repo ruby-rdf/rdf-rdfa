@@ -32,7 +32,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'equivalent-xml' , '>= 0.3.0'
   gem.add_development_dependency 'open-uri-cached', '>= 0.0.5'
   gem.add_development_dependency 'json-ld',         '>= 0.9.1'
-  gem.add_development_dependency 'rspec',           '>= 2.13.0'
+  gem.add_development_dependency 'rspec',           '>= 2.14.0'
   gem.add_development_dependency 'rdf-microdata'
   gem.add_development_dependency 'rdf-spec',        '>= 1.1'
   gem.add_development_dependency 'rdf-turtle'

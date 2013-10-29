@@ -52,7 +52,7 @@ describe "RDF::RDFa::Reader" do
     end
 
     it "should yield reader" do
-      inner = mock("inner")
+      inner = double("inner")
       inner.should_receive(:called).with(RDF::RDFa::Reader)
       RDF::RDFa::Reader.new(@sampledoc) do |reader|
         inner.called(reader.class)
@@ -64,7 +64,7 @@ describe "RDF::RDFa::Reader" do
     end
 
     it "should yield statements" do
-      inner = mock("inner")
+      inner = double("inner")
       inner.should_receive(:called).with(RDF::Statement)
       RDF::RDFa::Reader.new(@sampledoc).each_statement do |statement|
         inner.called(statement.class)
@@ -72,7 +72,7 @@ describe "RDF::RDFa::Reader" do
     end
 
     it "should yield triples" do
-      inner = mock("inner")
+      inner = double("inner")
       inner.should_receive(:called).with(RDF::URI, RDF::URI, RDF::Literal)
       RDF::RDFa::Reader.new(@sampledoc).each_triple do |subject, predicate, object|
         inner.called(subject.class, predicate.class, object.class)
@@ -80,7 +80,7 @@ describe "RDF::RDFa::Reader" do
     end
     
     it "should call Proc with processor statements for :processor_callback" do
-      lam = mock("lambda")
+      lam = double("lambda")
       lam.should_receive(:call).at_least(1).times.with(kind_of(RDF::Statement))
       RDF::RDFa::Reader.new(@sampledoc, :processor_callback => lam).each_triple {}
     end
@@ -569,7 +569,7 @@ describe "RDF::RDFa::Reader" do
                   end
             
                   it "does not create triple when validating" do
-                    lambda {parse(@rdfa, :validate => true)}.should raise_error(RDF::ReaderError)
+                    expect {parse(@rdfa, :validate => true)}.to raise_error(RDF::ReaderError)
                   end
                 end
               end
