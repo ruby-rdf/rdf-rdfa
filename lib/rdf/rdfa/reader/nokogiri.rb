@@ -171,6 +171,7 @@ module RDF::RDFa
           
           # Otherwise, default is utf-8
           options[:encoding] ||= 'utf-8'
+          options[:encoding] = options[:encoding].to_s if options[:encoding]
 
           case @host_language
           when :html4, :html5
