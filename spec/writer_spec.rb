@@ -1,5 +1,6 @@
 $:.unshift "."
 require 'spec_helper'
+require 'rdf/xsd'
 require 'rdf/spec/writer'
 require 'rspec/matchers'
 
@@ -275,7 +276,7 @@ describe RDF::RDFa::Writer do
 
         {
           "//xhtml:span[@property]/@property" => "ex:b",
-          "//xhtml:span[@property]/@datatype" => "xsd:string",
+          "//xhtml:span[@property]/@datatype" => false, # xsd:string implied in RDF 1.1
           "//xhtml:span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
@@ -484,34 +485,17 @@ describe RDF::RDFa::Writer do
         RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
           context "Using #{name} template" do
             Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
+              next if %w(0198 0225 0284 0295 0319 0329).include?(t.num)
               specify "test #{t.num}: #{t.description}" do
-                begin
-                  input = t.input("html5", "rdfa1.1")
-                  @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"))
-                  result = serialize(:haml => template, :haml_options => {:ugly => false})
-                  graph2 = parse(result, :format => :rdfa)
-                  # Need to put this in to avoid problems with added markup
-                  statements = graph2.query(:object => RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
-                  statements.each {|st| graph2.delete(st)}
-                  #puts graph2.dump(:ttl)
-                  graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result).join("\n"))
-                rescue RSpec::Expectations::ExpectationNotMetError => e
-                  if %w(0198).include?(t.num) || t.description =~ /XMLLiteral/
-                    pending("XMLLiteral aren't serialized canonically")
-                  elsif %w(0225).include?(t.num)
-                    pending("Serializing multiple lists")
-                  elsif %w(0284).include?(t.num)
-                    pending("Minor change in time element")
-                  elsif %w(0295).include?(t.num)
-                    pending("Benchmark entry count")
-                  elsif %w(0319).include?(t.num)
-                    pending("Relative IRIs")
-                  elsif %w(0329).include?(t.num)
-                    pending("Pathological spaces")
-                  else
-                    raise
-                  end
-                end
+                input = t.input("html5", "rdfa1.1")
+                @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"))
+                result = serialize(:haml => template, :haml_options => {:ugly => false})
+                graph2 = parse(result, :format => :rdfa)
+                # Need to put this in to avoid problems with added markup
+                statements = graph2.query(:object => RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
+                statements.each {|st| graph2.delete(st)}
+                #puts graph2.dump(:ttl)
+                graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result.force_encoding("utf-8")).join("\n"))
               end
             end
           end

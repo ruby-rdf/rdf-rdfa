@@ -1,5 +1,4 @@
 begin
-  raise LoadError, "not with java" if RUBY_PLATFORM == "java"
   require 'nokogiri'
 rescue LoadError => e
   :rexml
@@ -290,7 +289,7 @@ module RDF::RDFa
         @library = case options[:library]
           when nil
             # Use Nokogiri when available, and REXML otherwise:
-            (defined?(::Nokogiri) && RUBY_PLATFORM != 'java') ? :nokogiri : :rexml
+            defined?(::Nokogiri) ? :nokogiri : :rexml
           when :nokogiri, :rexml
             options[:library]
           else
@@ -404,7 +403,7 @@ module RDF::RDFa
             require 'rdf/microdata'
             add_debug(@doc, "process microdata")
             @repository << RDF::Microdata::Reader.new(@doc, options)
-          rescue
+          rescue LoadError
             add_debug(@doc, "microdata detected, not processed")
           end
         end
@@ -566,15 +565,23 @@ module RDF::RDFa
         each do |uri|
           # Don't try to open ourselves!
           if base_uri == uri
-            add_debug(root) {"load_initial_contexts: skip recursive context <#{uri}>"}
+            add_debug(root) {"load_initial_contexts: skip recursive context #{uri.to_base}"}
             next
           end
 
           old_debug = RDF::RDFa.debug?
           begin
-            add_info(root, "load_initial_contexts: load <#{uri}>")
+            add_info(root, "load_initial_contexts: load #{uri.to_base}")
             RDF::RDFa.debug = false
             context = Context.find(uri)
+
+            # Add URI Mappings to prefixes
+            context.prefixes.each_pair do |prefix, value|
+              prefix(prefix, value)
+            end
+            yield :uri_mappings, context.prefixes unless context.prefixes.empty?
+            yield :term_mappings, context.terms unless context.terms.empty?
+            yield :default_vocabulary, context.vocabulary if context.vocabulary
           rescue Exception => e
             RDF::RDFa.debug = old_debug
             add_error(root, e.message)
@@ -582,14 +589,6 @@ module RDF::RDFa
           ensure
             RDF::RDFa.debug = old_debug
           end
-
-          # Add URI Mappings to prefixes
-          context.prefixes.each_pair do |prefix, value|
-            prefix(prefix, value)
-          end
-          yield :uri_mappings, context.prefixes unless context.prefixes.empty?
-          yield :term_mappings, context.terms unless context.terms.empty?
-          yield :default_vocabulary, context.vocabulary if context.vocabulary
         end
     end
 
@@ -644,7 +643,7 @@ module RDF::RDFa
       mappings = element.attribute("prefix").to_s.strip.split(/\s+/)
       while mappings.length > 0 do
         prefix, uri = mappings.shift.downcase, mappings.shift
-        #puts "uri_mappings prefix #{prefix} <#{uri}>"
+        #puts "uri_mappings prefix #{prefix} #{uri.to_base}"
         next unless prefix.match(/:$/)
         prefix.chop!
 
@@ -1334,7 +1333,7 @@ module RDF::RDFa
         # value must be ignored.
         uri = curie_to_resource_or_bnode(element, $1, options[:uri_mappings], evaluation_context.parent_subject, restrictions)
         if uri
-          add_debug(element) {"process_uri: #{value} => safeCURIE => <#{uri}>"}
+          add_debug(element) {"process_uri: #{value} => safeCURIE => #{uri.to_base}"}
         else
           add_warning(element, "#{value} not matched as a safeCURIE", RDF::RDFA.UnresolvedCURIE)
         end
@@ -1344,7 +1343,7 @@ module RDF::RDFa
         # If the value is an NCName, then it is evaluated as a term according to General Use of Terms in
         # Attributes. Note that this step may mean that the value is to be ignored.
         uri = process_term(element, value.to_s, options)
-        add_debug(element) {"process_uri: #{value} => term => <#{uri}>"}
+        add_debug(element) {"process_uri: #{value} => term => #{uri ? uri.to_base : 'nil'}"}
         uri
       else
         # SafeCURIEorCURIEorIRI or TERMorCURIEorAbsIRI
@@ -1352,34 +1351,32 @@ module RDF::RDFa
         # If it is a valid CURIE, the resulting URI is used; otherwise, the value will be processed as a URI.
         uri = curie_to_resource_or_bnode(element, value, options[:uri_mappings], evaluation_context.parent_subject, restrictions)
         if uri
-          add_debug(element) {"process_uri: #{value} => CURIE => <#{uri}>"}
+          add_debug(element) {"process_uri: #{value} => CURIE => #{uri.to_base}"}
         elsif @version == :"rdfa1.0" && value.to_s.match(/^xml/i)
           # Special case to not allow anything starting with XML to be treated as a URI
         elsif restrictions.include?(:absuri) || restrictions.include?(:uri)
-          begin
-            # AbsURI does not use xml:base
-            if restrictions.include?(:absuri)
-              uri = uri(value)
-              unless uri.absolute?
-                uri = nil
-                add_warning(element, "Malformed IRI #{uri.inspect}")
-              end
-            else
-              uri = uri(base, value)
+          # AbsURI does not use xml:base
+          if restrictions.include?(:absuri)
+            uri = uri(value)
+            unless uri.absolute?
+              uri = nil
+              add_warning(element, "Malformed IRI #{uri.inspect}")
             end
-          rescue ArgumentError => e
-            add_warning(element, "Malformed IRI #{value}")
-          rescue RDF::ReaderError => e
-            add_debug(element, e.message)
-            if value.to_s =~ /^\(^\w\):/
-              add_warning(element, "Undefined prefix #{$1}")
-            else
-              add_warning(element, "Relative URI #{value}")
-            end
+          else
+            uri = uri(base, value)
           end
-          add_debug(element) {"process_uri: #{value} => URI => <#{uri}>"}
+          add_debug(element) {"process_uri: #{value} => URI => #{uri ? uri.to_base : nil}"}
         end
         uri
+      end
+    rescue ArgumentError => e
+      add_warning(element, "Malformed IRI #{value}")
+    rescue RDF::ReaderError => e
+      add_debug(element, e.message)
+      if value.to_s =~ /^\(^\w\):/
+        add_warning(element, "Undefined prefix #{$1}")
+      else
+        add_warning(element, "Relative URI #{value}")
       end
     end
     
@@ -1409,9 +1406,10 @@ module RDF::RDFa
       prefix, reference = curie.to_s.split(":", 2)
 
       # consider the bnode situation
-      if prefix == "_" && restrictions.include?(:bnode)
+      if prefix == "_"
         # we force a non-nil name, otherwise it generates a new name
         # As a special case, _: is also a valid reference for one specific bnode.
+        raise ArgumentError, "BNode not allowed in this position" unless restrictions.include?(:bnode)
         bnode(reference)
       elsif curie.to_s.match(/^:/)
         # Default prefix

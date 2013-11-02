@@ -149,7 +149,6 @@ describe "RDF::RDFa::Reader" do
 
   [:nokogiri, :rexml].each do |library|
     context library.to_s, :library => library do
-      next if library == :nokogiri && RUBY_PLATFORM == 'java'
       before(:all) {@library = library}
       
       context "sanity checking" do
@@ -1562,7 +1561,7 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
-      it "extracts microdata" do
+      it "extracts microdata", :pending => ("Not for REXML" if library == :rexml) do
         html = %(
           <html>
             <head>
