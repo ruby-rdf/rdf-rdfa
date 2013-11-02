@@ -756,7 +756,7 @@ module RDF::RDFa
       message = message + yield if block_given?
       msg = "#{'  ' * @depth}#{message}"
       STDERR.puts msg if ::RDF::RDFa.debug?
-      @debug << msg if @debug.is_a?(Array)
+      @debug << msg.force_encoding("utf-8") if @debug.is_a?(Array)
     end
   end
 end
