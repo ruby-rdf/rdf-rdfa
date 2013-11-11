@@ -1,3 +1,4 @@
+This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange development and release activity. All submissions _must_ be on a feature branch based on the _develop_ branch to ease staging and integration.
 # RDF::RDFa reader/writer
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
@@ -438,6 +439,7 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [Nicholas Humfrey](http://github.com/njh) - <http://njh.me/>
 
 ## Contributing
+This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange development and release activity. All submissions _must_ be on a feature branch based on the _develop_ branch to ease staging and integration.
 
 * Do your best to adhere to the existing coding conventions and idioms.
 * Don't use hard tabs, and don't leave trailing whitespace on any line.
