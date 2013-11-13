@@ -613,13 +613,14 @@ module RDF::RDFa
           next unless attr =~ /^xmlns(?:\:(.+))?/
           prefix = $1
           add_debug("extract_mappings") { "ns(attr): #{prefix}: #{href}"}
-          ns_defs[prefix] = href.to_s
+          ns_defs[prefix] = href
         end
       end
 
       ns_defs.each do |prefix, href|
         # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
         next if prefix == "_"
+        href = uri(base_uri, href).to_s
 
         # Downcase prefix for RDFa 1.1
         pfx_lc = (@version == :"rdfa1.0" || prefix.nil?) ? prefix : prefix.downcase
@@ -647,13 +648,14 @@ module RDF::RDFa
         next unless prefix.match(/:$/)
         prefix.chop!
 
-        unless prefix.match(NC_REGEXP)
+        unless prefix.empty? || prefix.match(NC_REGEXP)
           add_error(element, "extract_mappings: Prefix #{prefix.inspect} does not match NCName production")
           next
         end
 
         # A Conforming RDFa Processor must ignore any definition of a mapping for the '_' prefix.
         next if prefix == "_"
+        uri = uri(base_uri, uri).to_s
 
         pfx_index = prefix.to_s.empty? ? nil : prefix.to_s.to_sym
         if uri_mappings.fetch(pfx_index, uri) != uri
@@ -1089,7 +1091,7 @@ module RDF::RDFa
           when datatype && ![RDF.XMLLiteral, RDF.HTML].include?(datatype)
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
-            RDF::Literal.new(attrs[:datetime] || attrs[:content] || element.inner_text.to_s, :datatype => datatype, :validate => validate?, :canonicalize => canonicalize?)
+            RDF::Literal.new(attrs[:content] || attrs[:datetime] || element.inner_text.to_s, :datatype => datatype, :validate => validate?, :canonicalize => canonicalize?)
           when @version == :"rdfa1.1"
             case
             when datatype == RDF.XMLLiteral
@@ -1143,7 +1145,7 @@ module RDF::RDFa
             when element.name == 'time'
               # HTML5 support
               # Lexically scan value and assign appropriate type, otherwise, leave untyped
-              v = (attrs[:datetime] || element.inner_text).to_s
+              v = (attrs[:content] || attrs[:datetime] || element.inner_text).to_s
               datatype = %w(Date Time DateTime Year YearMonth Duration).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
                 v.match(dt::GRAMMAR)
               end || RDF::Literal

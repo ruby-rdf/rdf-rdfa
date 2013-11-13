@@ -658,7 +658,8 @@ module RDF::RDFa
       #add_debug {"get_curie(#{resource}) => #{curie}"}
 
       @uri_to_term_or_curie[uri] = curie
-    rescue Argument => e
+    rescue ArgumentError => e
+      breakpoint
       raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
     end
     private

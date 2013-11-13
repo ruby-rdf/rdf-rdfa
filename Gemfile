@@ -18,5 +18,5 @@ end
 group :debug do
   gem "wirble"
   gem "syntax"
-  gem "debugger", :platform => "mri_19"
+  gem "debugger", :platforms => [:mri_19, :mri_20]
 end

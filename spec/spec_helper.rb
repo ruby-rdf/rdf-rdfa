@@ -29,6 +29,14 @@ OpenURI::Cache.class_eval { @cache_path = URI_CACHE }
   c.include(RDF::Spec::Matchers)
 end
 
+# For testing, modify RDF::Util::File.open_file to use Kernel.open, so we can just use open-uri-cached
+module RDF::Util::File
+  def self.open_file(filename_or_url, options = {}, &block)
+    options = options[:headers] || {} if filename_or_url.start_with?('http')
+    Kernel.open(filename_or_url, options, &block)
+  end
+end
+
 TMP_DIR = File.join(File.expand_path(File.dirname(__FILE__)), "tmp")
 
 # Heuristically detect the input stream
