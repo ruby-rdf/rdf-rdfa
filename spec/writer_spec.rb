@@ -444,6 +444,23 @@ describe RDF::RDFa::Writer do
             "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[2][@inlist][@property='rdf:value']/text()" => 'Bar',
           }
         ],
+        "issue 14" => [
+          %q(
+            @base <http://example/> .
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+            <> rdf:value (<needs/one> <needs/two> <needs/three>) .
+            <needs/one> rdfs:label "one" .
+            <needs/three> rdfs:label "three" .
+            <needs/two> rdfs:label "two" .
+          ),
+          {
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[1][@inlist][@rel='rdf:value']/text()" => 'one',
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[2][@inlist][@rel='rdf:value']/text()" => 'two',
+            "//xhtml:div[@class='property']/xhtml:ul/xhtml:li[3][@inlist][@rel='rdf:value']/text()" => 'three',
+          }
+        ]
       }.each do |test, (input, result)|
         it test do
           pending("Serializing multiple lists") if test == "multiple collections"
