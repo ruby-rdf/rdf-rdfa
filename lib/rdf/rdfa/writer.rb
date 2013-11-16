@@ -659,7 +659,6 @@ module RDF::RDFa
 
       @uri_to_term_or_curie[uri] = curie
     rescue ArgumentError => e
-      breakpoint
       raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
     end
     private
