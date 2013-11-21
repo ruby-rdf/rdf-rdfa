@@ -18,7 +18,7 @@ describe RDF::RDFa::Format do
       {:content_type   => 'text/html'},
     ].each do |arg|
       it "discovers with #{arg.inspect}" do
-        RDF::Format.for(arg).should == @format_class
+        expect(RDF::Format.for(arg)).to eq @format_class
       end
     end
 
@@ -26,13 +26,12 @@ describe RDF::RDFa::Format do
       :rdfa   => '<div about="foo"></div>',
     }.each do |sym, str|
       it "detects #{sym}" do
-        @format_class.for {str}.should == @format_class
+        expect(@format_class.for {str}).to eq @format_class
       end
     end
 
-    it "should discover 'html'" do
-      RDF::Format.for(:html).reader.should == RDF::RDFa::Reader
-      RDF::Format.for(:html).writer.should == RDF::RDFa::Writer
+    it "uses text/html as first content type" do
+      expect(RDF::Format.for(:rdfa).content_type.first).to eq "text/html"
     end
 
     describe RDF::RDFa::XHTML do
@@ -44,13 +43,17 @@ describe RDF::RDFa::Format do
         {:content_type   => 'application/xhtml+xml'},
       ].each do |arg|
         it "discovers with #{arg.inspect}" do
-          RDF::Format.for(arg).should == RDF::RDFa::XHTML
+          expect(RDF::Format.for(arg)).to eq RDF::RDFa::XHTML
         end
       end
 
       it "should discover 'xhtml'" do
-        RDF::Format.for(:xhtml).reader.should == RDF::RDFa::Reader
-        RDF::Format.for(:xhtml).writer.should == RDF::RDFa::Writer
+        expect(RDF::Format.for(:xhtml).reader).to eq RDF::RDFa::Reader
+        expect(RDF::Format.for(:xhtml).writer).to eq RDF::RDFa::Writer
+      end
+
+      it "uses application/xhtml+xml as first content type" do
+        expect(RDF::Format.for(:xhtml).content_type.first).to eq "application/xhtml+xml"
       end
     end
 
@@ -59,13 +62,17 @@ describe RDF::RDFa::Format do
         :html
       ].each do |arg|
         it "discovers with #{arg.inspect}" do
-          RDF::Format.for(arg).should == RDF::RDFa::HTML
+          expect(RDF::Format.for(arg)).to eq RDF::RDFa::HTML
         end
       end
 
       it "should discover 'html'" do
-        RDF::Format.for(:html).reader.should == RDF::RDFa::Reader
-        RDF::Format.for(:html).writer.should == RDF::RDFa::Writer
+        expect(RDF::Format.for(:html).reader).to eq RDF::RDFa::Reader
+        expect(RDF::Format.for(:html).writer).to eq RDF::RDFa::Writer
+      end
+
+      it "uses text/html as first content type" do
+        expect(RDF::Format.for(:html).content_type.first).to eq "text/html"
       end
     end
 
@@ -74,13 +81,17 @@ describe RDF::RDFa::Format do
         :lite
       ].each do |arg|
         it "discovers with #{arg.inspect}" do
-          RDF::Format.for(arg).should == RDF::RDFa::Lite
+          expect(RDF::Format.for(arg)).to eq RDF::RDFa::Lite
         end
       end
 
       it "should discover 'lite'" do
-        RDF::Format.for(:lite).reader.should == RDF::RDFa::Reader
-        RDF::Format.for(:lite).writer.should == RDF::RDFa::Writer
+        expect(RDF::Format.for(:lite).reader).to eq RDF::RDFa::Reader
+        expect(RDF::Format.for(:lite).writer).to eq RDF::RDFa::Writer
+      end
+
+      it "uses text/html as first content type" do
+        expect(RDF::Format.for(:lite).content_type.first).to eq "text/html"
       end
     end
 
@@ -93,13 +104,17 @@ describe RDF::RDFa::Format do
         {:content_type   => 'image/svg+xml'},
       ].each do |arg|
         it "discovers with #{arg.inspect}" do
-          RDF::Format.for(arg).should == RDF::RDFa::SVG
+          expect(RDF::Format.for(arg)).to eq RDF::RDFa::SVG
         end
       end
 
       it "should discover 'svg'" do
-        RDF::Format.for(:svg).reader.should == RDF::RDFa::Reader
-        RDF::Format.for(:svg).writer.should == RDF::RDFa::Writer
+        expect(RDF::Format.for(:svg).reader).to eq RDF::RDFa::Reader
+        expect(RDF::Format.for(:svg).writer).to eq RDF::RDFa::Writer
+      end
+
+      it "uses image/svg+xml as first content type" do
+        expect(RDF::Format.for(:svg).content_type.first).to eq "image/svg+xml"
       end
     end
   end
@@ -118,7 +133,7 @@ describe RDF::RDFa::Format do
       :property => '<div property="foo"></div>',
     }.each do |sym, str|
       it "detects #{sym}" do
-        @format_class.detect(str).should be_true
+        expect(@format_class.detect(str)).to be_true
       end
     end
 
@@ -141,7 +156,7 @@ describe RDF::RDFa::Format do
       :STRING_LITERAL_LONG2 => %(<a> <b> """\nliteral\n""" .),
     }.each do |sym, str|
       it "does not detect #{sym}" do
-        @format_class.detect(str).should be_false
+        expect(@format_class.detect(str)).to be_false
       end
     end
   end
