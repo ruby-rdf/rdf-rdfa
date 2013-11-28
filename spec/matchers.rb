@@ -2,7 +2,6 @@ require 'rspec/matchers'
 require 'nokogiri'
 
 RSpec::Matchers.define :have_xpath do |xpath, value, trace|
-  xpath = xpath.gsub("xhtml:", "") # Using HTML parser, no namespaces needed
   match do |actual|
     @doc = Nokogiri::HTML.parse(actual)
     @doc.should be_a(Nokogiri::HTML::Document)

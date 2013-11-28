@@ -293,15 +293,16 @@ module RDF::RDFa
     # @option options [String] haml (haml_template[:property_value], haml_template[:property_values])
     #   Haml template to render. Otherwise, uses `haml_template[:property_value] or haml_template[:property_values]`
     #   depending on the cardinality of objects.
-    # @yield [object]
-    #   Yields object.
+    # @yield object, inlist
+    #   Yields object and if it is contained in a list.
     # @yieldparam [RDF::Resource] object
+    # @yieldparam [Boolean] inlist
     # @yieldreturn [String, nil]
     #   The block should only return a string for recursive object definitions.
     # @return String
     #   The rendered document is returned as a string
     def render_property(predicate, objects, options = {}, &block)
-      add_debug {"render_property(#{predicate}): #{objects.inspect}"}
+      add_debug {"render_property(#{predicate}): #{objects.inspect}, #{options.inspect}"}
       # If there are multiple objects, and no :property_values is defined, call recursively with
       # each object
 
@@ -320,7 +321,9 @@ module RDF::RDFa
           list.each_statement {|st| subject_done(st.subject)}
 
           add_debug {"list: #{list.inspect} #{list.to_a}"}
-          render_property(predicate, list.to_a, options.merge(:inlist => "true"), &block)
+          render_property(predicate, list.to_a, options.merge(:inlist => "true")) do |object|
+            yield(object, true) if block_given?
+          end
         end.join(" ")
       end
 
@@ -345,9 +348,7 @@ module RDF::RDFa
           :rel        => get_curie(predicate),
           :inlist     => nil,
         }.merge(options)
-        hamlify(template, options) do |object|
-          yield(object) if block_given?
-        end
+        hamlify(template, options, &block)
       end
     end
 
@@ -547,10 +548,10 @@ module RDF::RDFa
       return if objects.to_a.empty?
 
       add_debug {"predicate: #{get_curie(predicate)}"}
-      render_property(predicate, objects) do |o|
+      render_property(predicate, objects) do |o, inlist=nil|
         # Yields each object, for potential recursive definition.
         # If nil is returned, a leaf is produced
-        depth {subject(o, :rel => get_curie(predicate), :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
+        depth {subject(o, :rel => get_curie(predicate), :inlist => inlist, :element => (:li if objects.length > 1 || inlist))} if !is_done?(o) && @subjects.include?(o)
       end
     end
 
