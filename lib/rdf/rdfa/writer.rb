@@ -84,6 +84,8 @@ module RDF::RDFa
     #   the prefix mappings to use
     # @option options [#to_s]    :base_uri     (nil)
     #   the base URI to use when constructing relative URIs, set as html>head>base.href
+    # @option options [Boolean]  :validate (false)
+    #   whether to validate terms when serializing
     # @option options [#to_s]   :lang   (nil)
     #   Output as root @lang attribute, and avoid generation _@lang_ where possible
     # @option options [Boolean]  :standard_prefixes   (false)
@@ -135,7 +137,9 @@ module RDF::RDFa
     # Addes a statement to be serialized
     # @param  [RDF::Statement] statement
     # @return [void]
+    # @raise [RDF::WriterError] if validating and attempting to write an invalid {RDF::Term}.
     def write_statement(statement)
+      raise RDF::WriterError, "Statement #{statement.inspect} is invalid" if validate? && statement.invalid?
       @graph.insert(statement)
     end
 
@@ -147,8 +151,9 @@ module RDF::RDFa
     # @return [void]
     # @raise  [NotImplementedError] unless implemented in subclass
     # @abstract
+    # @raise [RDF::WriterError] if validating and attempting to write an invalid {RDF::Term}.
     def write_triple(subject, predicate, object)
-      @graph.insert(Statement.new(subject, predicate, object))
+      write_statement Statement.new(subject, predicate, object)
     end
 
     ##
@@ -290,7 +295,7 @@ module RDF::RDFa
     # @param [Array<RDF::Resource>] objects
     #   List of objects to render. If the list contains only a single element, the :property_value template will be used. Otherwise, the :property_values template is used.
     # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
-    # @option options [String] haml (haml_template[:property_value], haml_template[:property_values])
+    # @option options [String] :haml (haml_template[:property_value], haml_template[:property_values])
     #   Haml template to render. Otherwise, uses `haml_template[:property_value] or haml_template[:property_values]`
     #   depending on the cardinality of objects.
     # @yield object, inlist
@@ -310,27 +315,32 @@ module RDF::RDFa
       template ||= objects.length > 1 ? haml_template[:property_values] : haml_template[:property_value]
 
       # Separate out the objects which are lists and render separately
-      list_objects = objects.select {|o| o != RDF.nil && RDF::List.new(o, @graph).valid?}
+      list_objects = objects.reject do |o|
+        o == RDF.nil ||
+        (l = RDF::List.new(o, @graph)).invalid?
+      end
       unless list_objects.empty?
         # Render non-list objects
-        add_debug {"properties with lists: non-lists: #{objects - list_objects} lists: #{list_objects}"}
-        nl = render_property(predicate, objects - list_objects, options, &block) unless objects == list_objects
+        add_debug {"properties with lists: #{list_objects} non-lists: #{objects - list_objects}"}
+        nl = depth {render_property(predicate, objects - list_objects, options, &block)} unless objects == list_objects
         return nl.to_s + list_objects.map do |object|
           # Render each list as multiple properties and set :inlist to true
           list = RDF::List.new(object, @graph)
           list.each_statement {|st| subject_done(st.subject)}
 
           add_debug {"list: #{list.inspect} #{list.to_a}"}
-          render_property(predicate, list.to_a, options.merge(:inlist => "true")) do |object|
-            yield(object, true) if block_given?
+          depth do
+            render_property(predicate, list.to_a, options.merge(:inlist => "true")) do |object|
+              yield(object, true) if block_given?
+            end
           end
         end.join(" ")
       end
 
       if objects.length > 1 && template.nil?
-        # Uf there is no property_values template, render each property using property_value template
+        # If there is no property_values template, render each property using property_value template
         objects.map do |object|
-          render_property(predicate, [object], options, &block)
+          depth {render_property(predicate, [object], options, &block)}
         end.join(" ")
       else
         raise RDF::WriterError, "Missing property template" if template.nil?
@@ -361,7 +371,7 @@ module RDF::RDFa
       [XML_RDFA_CONTEXT, HTML_RDFA_CONTEXT].each do |uri|
         ctx = Context.find(uri)
         ctx.prefixes.each_pair do |k, v|
-          @uri_to_prefix[v] = k
+          @uri_to_prefix[v] = k unless k.to_s == "dcterms"
         end
 
         ctx.terms.each_pair do |k, v|
@@ -521,7 +531,7 @@ module RDF::RDFa
       # Render this subject
       # If :rel is specified and :typeof is nil, use @resource instead of @about.
       # Pass other options from calling context
-      render_opts = {:typeof => typeof}.merge(options)
+      render_opts = {:typeof => typeof, :property_values => properties}.merge(options)
       with_template(tmpl) do
         render_subject(subject, prop_list, render_opts) do |pred|
           depth do
@@ -568,11 +578,11 @@ module RDF::RDFa
     # Haml rendering helper. Return language for plain literal, if there is no language, or it is the same as the document, return nil
     #
     # @param [RDF::Literal] literal
-    # @return [String, nil]
+    # @return [Symbol, nil]
     # @raise [RDF::WriterError]
     def get_lang(literal)
       raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
-      literal.language if literal.literal? && literal.language && literal.language != @lang
+      literal.language if literal.literal? && literal.language && literal.language.to_s != @lang.to_s
     end
 
     # Haml rendering helper. Data to be added to a @content value
