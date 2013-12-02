@@ -493,50 +493,76 @@ module RDF::RDFa
     #   Serialize using &lt;li&gt; rather than template default element
     # @option options [RDF::Resource] :rel (nil)
     #   Optional @rel property
-    # @return [Nokogiri::XML::Element, {Namespace}]
+    # @return [String]
     def subject(subject, options = {})
       return if is_done?(subject)
 
       subject_done(subject)
 
-      properties = {}
-      @graph.query(:subject => subject) do |st|
-        properties[st.predicate.to_s] ||= []
-        properties[st.predicate.to_s] << st.object
-      end
+      properties = properties_for_subject(subject)
+      typeof = type_of(properties.delete(RDF.type.to_s), subject)
       prop_list = order_properties(properties)
 
+      add_debug {"props: #{prop_list.inspect}"}
+
+      render_opts = {:typeof => typeof, :property_values => properties}.merge(options)
+
+      render_subject_template(subject, prop_list, render_opts)
+    end
+
+    # @param [RDF::Resource] subject
+    # @return [Hash{String => Object}]
+    def properties_for_subject(subject)
+      properties = {}
+      @graph.query(:subject => subject) do |st|
+        key = st.predicate.to_s.freeze
+        properties[key] ||= []
+        properties[key] << st.object
+      end
+      properties
+    end
+
+    # @param [Array,NilClass] type
+    # @param [RDF::Resource] subject
+    # @return [String] string representation of the specific RDF.type uri
+    def type_of(type, subject)
       # Find appropriate template
-      curie ||= case
+      curie = case
       when subject.node?
         subject.to_s if ref_count(subject) >= (@depth == 0 ? 0 : 1)
       else
         get_curie(subject)
       end
 
-      # See if there's a template based on the sorted concatenation of all types of this subject
-      # or any type of this subject
-      tmpl = find_template(subject)
-
-      typeof = Array(properties.delete(RDF.type.to_s)).map {|r| get_curie(r)}.join(" ")
+      typeof = Array(type).map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
 
       # Nodes without a curie need a blank @typeof to generate a subject
       typeof ||= "" unless curie
-      prop_list -= [RDF.type.to_s]
 
+      add_debug {"subject: #{curie.inspect}, typeof: #{typeof.inspect}" }
+
+      typeof.freeze
+    end
+
+    # @param [RDF::Resource] subject
+    # @param [Array] prop_list
+    # @param [Hash] render_opts
+    # @return [String]
+    def render_subject_template(subject, prop_list, render_opts)
+      # See if there's a template based on the sorted concatenation of all types of this subject
+      # or any type of this subject
+      tmpl = find_template(subject)
       add_debug {"subject: found template #{tmpl[:identifier] || tmpl.inspect}"} if tmpl
-      add_debug {"subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"}
 
       # Render this subject
       # If :rel is specified and :typeof is nil, use @resource instead of @about.
       # Pass other options from calling context
-      render_opts = {:typeof => typeof, :property_values => properties}.merge(options)
       with_template(tmpl) do
         render_subject(subject, prop_list, render_opts) do |pred|
           depth do
             pred = RDF::URI(pred) if pred.is_a?(String)
-            values = properties[pred.to_s]
+            values = render_opts[:property_values][pred.to_s]
             add_debug {"subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"}
             predicate(pred, values)
           end
