@@ -455,8 +455,8 @@ module RDF::RDFa
     # @return [ignored]
     def preprocess_statement(statement)
       #add_debug {"preprocess: #{statement.inspect}"}
-      references = ref_count(statement.object) + 1
-      @references[statement.object] = references
+      bump_reference(statement.subject)
+      bump_reference(statement.object)
       @subjects[statement.subject] = true
       get_curie(statement.subject)
       get_curie(statement.predicate)
@@ -529,7 +529,7 @@ module RDF::RDFa
       # Find appropriate template
       curie = case
       when subject.node?
-        subject.to_s if ref_count(subject) >= (@depth == 0 ? 0 : 1)
+        subject.to_s if ref_count(subject) > 1
       else
         get_curie(subject)
       end
@@ -713,6 +713,10 @@ module RDF::RDFa
     end
 
     # Increase depth around a method invocation
+    # @yield
+    #   Yields with no arguments
+    # @yieldreturn [Object] returns the result of yielding
+    # @return [Object]
     def depth
       @depth += 1
       ret = yield
@@ -721,6 +725,11 @@ module RDF::RDFa
     end
 
     # Set the template to use within block
+    # @params [Hash{Symbol => String}] a template to use; merged in with the existing template.
+    # @yield
+    #   Yields with no arguments
+    # @yieldreturn [Object] returns the result of yielding
+    # @return [Object]
     def with_template(templ)
       if templ
         new_template = @options[:haml].
@@ -771,15 +780,29 @@ module RDF::RDFa
     def find_template(subject); end
 
     # Mark a subject as done.
+    # @param [RDF::Resource] subject
+    # @return [Boolean]
     def subject_done(subject)
       @serialized[subject] = true
     end
 
+    # Determine if the subject has been completed
+    # @param [RDF::Resource] subject
+    # @return [Boolean]
     def is_done?(subject)
       @serialized.include?(subject)
     end
 
+    # Increase the reference count of this resource
+    # @param [RDF::Resource] resource
+    # @return [Integer] resulting reference count
+    def bump_reference(resource)
+      @references[resource] = ref_count(resource) + 1
+    end
+
     # Return the number of times this node has been referenced in the object position
+    # @param [RDF::Node] node
+    # @return [Boolean]
     def ref_count(node)
       @references.fetch(node, 0)
     end
