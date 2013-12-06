@@ -725,7 +725,7 @@ module RDF::RDFa
     end
 
     # Set the template to use within block
-    # @params [Hash{Symbol => String}] a template to use; merged in with the existing template.
+    # @param [Hash{Symbol => String}] templ template to use for block evaluation; merged in with the existing template.
     # @yield
     #   Yields with no arguments
     # @yieldreturn [Object] returns the result of yielding

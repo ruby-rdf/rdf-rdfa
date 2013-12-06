@@ -415,7 +415,6 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 ### Additional vocabularies
 * {RDF::PTR}
 * {RDF::RDFA}
-* {RDF::XHV}
 * {RDF::XML}
 * {RDF::XSI}
 
