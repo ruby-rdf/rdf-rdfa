@@ -84,6 +84,8 @@ module RDF::RDFa
     #   the prefix mappings to use
     # @option options [#to_s]    :base_uri     (nil)
     #   the base URI to use when constructing relative URIs, set as html>head>base.href
+    # @option options [Boolean]  :validate (false)
+    #   whether to validate terms when serializing
     # @option options [#to_s]   :lang   (nil)
     #   Output as root @lang attribute, and avoid generation _@lang_ where possible
     # @option options [Boolean]  :standard_prefixes   (false)
@@ -135,7 +137,9 @@ module RDF::RDFa
     # Addes a statement to be serialized
     # @param  [RDF::Statement] statement
     # @return [void]
+    # @raise [RDF::WriterError] if validating and attempting to write an invalid {RDF::Term}.
     def write_statement(statement)
+      raise RDF::WriterError, "Statement #{statement.inspect} is invalid" if validate? && statement.invalid?
       @graph.insert(statement)
     end
 
@@ -147,8 +151,9 @@ module RDF::RDFa
     # @return [void]
     # @raise  [NotImplementedError] unless implemented in subclass
     # @abstract
+    # @raise [RDF::WriterError] if validating and attempting to write an invalid {RDF::Term}.
     def write_triple(subject, predicate, object)
-      @graph.insert(Statement.new(subject, predicate, object))
+      write_statement Statement.new(subject, predicate, object)
     end
 
     ##
@@ -290,18 +295,19 @@ module RDF::RDFa
     # @param [Array<RDF::Resource>] objects
     #   List of objects to render. If the list contains only a single element, the :property_value template will be used. Otherwise, the :property_values template is used.
     # @param [Hash{Symbol => Object}] options Rendering options passed to Haml render.
-    # @option options [String] haml (haml_template[:property_value], haml_template[:property_values])
+    # @option options [String] :haml (haml_template[:property_value], haml_template[:property_values])
     #   Haml template to render. Otherwise, uses `haml_template[:property_value] or haml_template[:property_values]`
     #   depending on the cardinality of objects.
-    # @yield [object]
-    #   Yields object.
+    # @yield object, inlist
+    #   Yields object and if it is contained in a list.
     # @yieldparam [RDF::Resource] object
+    # @yieldparam [Boolean] inlist
     # @yieldreturn [String, nil]
     #   The block should only return a string for recursive object definitions.
     # @return String
     #   The rendered document is returned as a string
     def render_property(predicate, objects, options = {}, &block)
-      add_debug {"render_property(#{predicate}): #{objects.inspect}"}
+      add_debug {"render_property(#{predicate}): #{objects.inspect}, #{options.inspect}"}
       # If there are multiple objects, and no :property_values is defined, call recursively with
       # each object
 
@@ -309,25 +315,32 @@ module RDF::RDFa
       template ||= objects.length > 1 ? haml_template[:property_values] : haml_template[:property_value]
 
       # Separate out the objects which are lists and render separately
-      list_objects = objects.select {|o| o != RDF.nil && RDF::List.new(o, @graph).valid?}
+      list_objects = objects.reject do |o|
+        o == RDF.nil ||
+        (l = RDF::List.new(o, @graph)).invalid?
+      end
       unless list_objects.empty?
         # Render non-list objects
-        add_debug {"properties with lists: non-lists: #{objects - list_objects} lists: #{list_objects}"}
-        nl = render_property(predicate, objects - list_objects, options, &block) unless objects == list_objects
+        add_debug {"properties with lists: #{list_objects} non-lists: #{objects - list_objects}"}
+        nl = depth {render_property(predicate, objects - list_objects, options, &block)} unless objects == list_objects
         return nl.to_s + list_objects.map do |object|
           # Render each list as multiple properties and set :inlist to true
           list = RDF::List.new(object, @graph)
           list.each_statement {|st| subject_done(st.subject)}
 
           add_debug {"list: #{list.inspect} #{list.to_a}"}
-          render_property(predicate, list.to_a, options.merge(:inlist => "true"), &block)
+          depth do
+            render_property(predicate, list.to_a, options.merge(:inlist => "true")) do |object|
+              yield(object, true) if block_given?
+            end
+          end
         end.join(" ")
       end
 
       if objects.length > 1 && template.nil?
-        # Uf there is no property_values template, render each property using property_value template
+        # If there is no property_values template, render each property using property_value template
         objects.map do |object|
-          render_property(predicate, [object], options, &block)
+          depth {render_property(predicate, [object], options, &block)}
         end.join(" ")
       else
         raise RDF::WriterError, "Missing property template" if template.nil?
@@ -345,9 +358,7 @@ module RDF::RDFa
           :rel        => get_curie(predicate),
           :inlist     => nil,
         }.merge(options)
-        hamlify(template, options) do |object|
-          yield(object) if block_given?
-        end
+        hamlify(template, options, &block)
       end
     end
 
@@ -360,7 +371,7 @@ module RDF::RDFa
       [XML_RDFA_CONTEXT, HTML_RDFA_CONTEXT].each do |uri|
         ctx = Context.find(uri)
         ctx.prefixes.each_pair do |k, v|
-          @uri_to_prefix[v] = k
+          @uri_to_prefix[v] = k unless k.to_s == "dcterms"
         end
 
         ctx.terms.each_pair do |k, v|
@@ -444,8 +455,8 @@ module RDF::RDFa
     # @return [ignored]
     def preprocess_statement(statement)
       #add_debug {"preprocess: #{statement.inspect}"}
-      references = ref_count(statement.object) + 1
-      @references[statement.object] = references
+      bump_reference(statement.subject)
+      bump_reference(statement.object)
       @subjects[statement.subject] = true
       get_curie(statement.subject)
       get_curie(statement.predicate)
@@ -482,50 +493,76 @@ module RDF::RDFa
     #   Serialize using &lt;li&gt; rather than template default element
     # @option options [RDF::Resource] :rel (nil)
     #   Optional @rel property
-    # @return [Nokogiri::XML::Element, {Namespace}]
+    # @return [String]
     def subject(subject, options = {})
       return if is_done?(subject)
 
       subject_done(subject)
 
-      properties = {}
-      @graph.query(:subject => subject) do |st|
-        properties[st.predicate.to_s] ||= []
-        properties[st.predicate.to_s] << st.object
-      end
+      properties = properties_for_subject(subject)
+      typeof = type_of(properties.delete(RDF.type.to_s), subject)
       prop_list = order_properties(properties)
 
+      add_debug {"props: #{prop_list.inspect}"}
+
+      render_opts = {:typeof => typeof, :property_values => properties}.merge(options)
+
+      render_subject_template(subject, prop_list, render_opts)
+    end
+
+    # @param [RDF::Resource] subject
+    # @return [Hash{String => Object}]
+    def properties_for_subject(subject)
+      properties = {}
+      @graph.query(:subject => subject) do |st|
+        key = st.predicate.to_s.freeze
+        properties[key] ||= []
+        properties[key] << st.object
+      end
+      properties
+    end
+
+    # @param [Array,NilClass] type
+    # @param [RDF::Resource] subject
+    # @return [String] string representation of the specific RDF.type uri
+    def type_of(type, subject)
       # Find appropriate template
-      curie ||= case
+      curie = case
       when subject.node?
-        subject.to_s if ref_count(subject) >= (@depth == 0 ? 0 : 1)
+        subject.to_s if ref_count(subject) > 1
       else
         get_curie(subject)
       end
 
-      # See if there's a template based on the sorted concatenation of all types of this subject
-      # or any type of this subject
-      tmpl = find_template(subject)
-
-      typeof = Array(properties.delete(RDF.type.to_s)).map {|r| get_curie(r)}.join(" ")
+      typeof = Array(type).map {|r| get_curie(r)}.join(" ")
       typeof = nil if typeof.empty?
 
       # Nodes without a curie need a blank @typeof to generate a subject
       typeof ||= "" unless curie
-      prop_list -= [RDF.type.to_s]
 
+      add_debug {"subject: #{curie.inspect}, typeof: #{typeof.inspect}" }
+
+      typeof.freeze
+    end
+
+    # @param [RDF::Resource] subject
+    # @param [Array] prop_list
+    # @param [Hash] render_opts
+    # @return [String]
+    def render_subject_template(subject, prop_list, render_opts)
+      # See if there's a template based on the sorted concatenation of all types of this subject
+      # or any type of this subject
+      tmpl = find_template(subject)
       add_debug {"subject: found template #{tmpl[:identifier] || tmpl.inspect}"} if tmpl
-      add_debug {"subject: #{curie.inspect}, typeof: #{typeof.inspect}, props: #{prop_list.inspect}"}
 
       # Render this subject
       # If :rel is specified and :typeof is nil, use @resource instead of @about.
       # Pass other options from calling context
-      render_opts = {:typeof => typeof}.merge(options)
       with_template(tmpl) do
         render_subject(subject, prop_list, render_opts) do |pred|
           depth do
             pred = RDF::URI(pred) if pred.is_a?(String)
-            values = properties[pred.to_s]
+            values = render_opts[:property_values][pred.to_s]
             add_debug {"subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"}
             predicate(pred, values)
           end
@@ -547,10 +584,10 @@ module RDF::RDFa
       return if objects.to_a.empty?
 
       add_debug {"predicate: #{get_curie(predicate)}"}
-      render_property(predicate, objects) do |o|
+      render_property(predicate, objects) do |o, inlist=nil|
         # Yields each object, for potential recursive definition.
         # If nil is returned, a leaf is produced
-        depth {subject(o, :rel => get_curie(predicate), :element => (:li if objects.length > 1))} if !is_done?(o) && @subjects.include?(o)
+        depth {subject(o, :rel => get_curie(predicate), :inlist => inlist, :element => (:li if objects.length > 1 || inlist))} if !is_done?(o) && @subjects.include?(o)
       end
     end
 
@@ -567,11 +604,11 @@ module RDF::RDFa
     # Haml rendering helper. Return language for plain literal, if there is no language, or it is the same as the document, return nil
     #
     # @param [RDF::Literal] literal
-    # @return [String, nil]
+    # @return [Symbol, nil]
     # @raise [RDF::WriterError]
     def get_lang(literal)
       raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
-      literal.language if literal.literal? && literal.language && literal.language != @lang
+      literal.language if literal.literal? && literal.language && literal.language.to_s != @lang.to_s
     end
 
     # Haml rendering helper. Data to be added to a @content value
@@ -658,7 +695,7 @@ module RDF::RDFa
       #add_debug {"get_curie(#{resource}) => #{curie}"}
 
       @uri_to_term_or_curie[uri] = curie
-    rescue Argument => e
+    rescue ArgumentError => e
       raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
     end
     private
@@ -676,6 +713,10 @@ module RDF::RDFa
     end
 
     # Increase depth around a method invocation
+    # @yield
+    #   Yields with no arguments
+    # @yieldreturn [Object] returns the result of yielding
+    # @return [Object]
     def depth
       @depth += 1
       ret = yield
@@ -684,6 +725,11 @@ module RDF::RDFa
     end
 
     # Set the template to use within block
+    # @param [Hash{Symbol => String}] templ template to use for block evaluation; merged in with the existing template.
+    # @yield
+    #   Yields with no arguments
+    # @yieldreturn [Object] returns the result of yielding
+    # @return [Object]
     def with_template(templ)
       if templ
         new_template = @options[:haml].
@@ -734,15 +780,29 @@ module RDF::RDFa
     def find_template(subject); end
 
     # Mark a subject as done.
+    # @param [RDF::Resource] subject
+    # @return [Boolean]
     def subject_done(subject)
       @serialized[subject] = true
     end
 
+    # Determine if the subject has been completed
+    # @param [RDF::Resource] subject
+    # @return [Boolean]
     def is_done?(subject)
       @serialized.include?(subject)
     end
 
+    # Increase the reference count of this resource
+    # @param [RDF::Resource] resource
+    # @return [Integer] resulting reference count
+    def bump_reference(resource)
+      @references[resource] = ref_count(resource) + 1
+    end
+
     # Return the number of times this node has been referenced in the object position
+    # @param [RDF::Node] node
+    # @return [Boolean]
     def ref_count(node)
       @references.fetch(node, 0)
     end
@@ -756,7 +816,7 @@ module RDF::RDFa
       message = message + yield if block_given?
       msg = "#{'  ' * @depth}#{message}"
       STDERR.puts msg if ::RDF::RDFa.debug?
-      @debug << msg if @debug.is_a?(Array)
+      @debug << msg.force_encoding("utf-8") if @debug.is_a?(Array)
     end
   end
 end

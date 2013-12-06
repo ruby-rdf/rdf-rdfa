@@ -92,7 +92,7 @@ module RDF::RDFa
         context.parse(repository.query(:context => uri))
       end
     rescue Exception => e
-      raise ContextError, "Context #{uri}: #{e.message}"
+      raise ContextError, "Context #{uri}: #{e.message}", e.backtrace
     end
 
     # Load context into repository

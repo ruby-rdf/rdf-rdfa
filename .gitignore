@@ -4,3 +4,4 @@
 /.yardoc/
 /*.lock
 /.rbx/
+/.bundle

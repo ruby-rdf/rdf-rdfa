@@ -1,3 +1,4 @@
+This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange development and release activity. All submissions _must_ be on a feature branch based on the _develop_ branch to ease staging and integration.
 # RDF::RDFa reader/writer
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
@@ -387,8 +388,8 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
-* [Ruby](http://ruby-lang.org/) (>= 1.9) or (>= 1.8.7 with [Backports][])
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.0)
+* [Ruby](http://ruby-lang.org/) (>= 1.9.3)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.1)
 * [Haml](https://rubygems.org/gems/haml) (>= 4.0)
 * [HTMLEntities](https://rubygems.org/gems/htmlentities) ('>= 4.3.1')
 * Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.5.9)
@@ -414,7 +415,6 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 ### Additional vocabularies
 * {RDF::PTR}
 * {RDF::RDFA}
-* {RDF::XHV}
 * {RDF::XML}
 * {RDF::XSI}
 
@@ -438,6 +438,7 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [Nicholas Humfrey](http://github.com/njh) - <http://njh.me/>
 
 ## Contributing
+This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange development and release activity. All submissions _must_ be on a feature branch based on the _develop_ branch to ease staging and integration.
 
 * Do your best to adhere to the existing coding conventions and idioms.
 * Don't use hard tabs, and don't leave trailing whitespace on any line.
@@ -458,7 +459,7 @@ see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
 
 ## FEEDBACK
 
-* gregg@kellogg-assoc.com
+* gregg@greggkellogg.net
 * <http://rubygems.org/rdf-rdfa>
 * <http://github.com/ruby-rdf/rdf-rdfa>
 * <http://lists.w3.org/Archives/Public/public-rdf-ruby/>

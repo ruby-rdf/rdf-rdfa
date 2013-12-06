@@ -65,6 +65,6 @@ module Fixtures
     end
   end
 
-  manifest = RDF::URI(RDFA_INFO.join("manifest.json"))
-  TestCase.from_jsonld(JSON.load(Kernel.open(manifest).read))
+  manifest = RDFA_INFO.join("manifest.json")
+  TestCase.from_jsonld(RDF::Util::File.open_file(manifest) {|f| JSON.load(f.read)})
 end

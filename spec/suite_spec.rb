@@ -28,23 +28,29 @@ unless ENV['CI']  # Skip for continuous integration
                       opt, arg = t.queryParam.split('=').map(&:to_sym)
                       options[opt] = arg
                     end
-                    reader = RDF::Reader.open(t.input(host_language, version), options)
-                    reader.should be_a RDF::RDFa::Reader
 
-                    # Make sure auto-detect works
-                    unless host_language =~ /svg/ || t.num == "0216" # due to http-equiv
-                      reader.host_language.should produce(host_language.to_sym, t.debug)
-                      reader.version.should produce(version.sub(/-.*$/, '').to_sym, t.debug)
+                    validate = %w(0239 0279 0295 0284).none? {|n| t.input(host_language, version).to_s.include?(n)}
+                    graph = RDF::Repository.new
+                    RDF::Reader.open(t.input(host_language, version), options.merge(:validate => validate)) do |reader|
+                      expect(reader).to be_a RDF::RDFa::Reader
+
+                      # Make sure auto-detect works
+                      unless host_language =~ /svg/ || t.num == "0216" # due to http-equiv
+                        reader.host_language.should produce(host_language.to_sym, t.debug)
+                        reader.version.should produce(version.sub(/-.*$/, '').to_sym, t.debug)
+                      end
+
+                      graph << reader
                     end
 
-                    graph = RDF::Repository.new << reader
-                    query = Kernel.open(t.results(host_language, version))
-                    graph.should pass_query(query, t)
+                    RDF::Util::File.open_file(t.results(host_language, version)) do |query|
+                      expect(graph).to pass_query(query, t)
+                    end
                   rescue RSpec::Expectations::ExpectationNotMetError => e
                     if classification != "required"
                       pending("#{classification} test") {  raise }
-                    elsif t.num == "0319"
-                      pending("It actually returns a relative result") { raise}
+                    #elsif t.num == "0319"
+                    #  pending("It actually returns a relative result") { raise}
                     else
                       raise
                     end
