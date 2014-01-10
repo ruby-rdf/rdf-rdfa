@@ -148,7 +148,7 @@ describe "RDF::RDFa::Reader" do
   end
 
   [:nokogiri, :rexml].each do |library|
-    context library.to_s, :library => library do
+    context library.to_s, :library => library, :pending => ("Nokogiri not loaded" if library == :nokogiri && !defined?(::Nokogiri)) do
       before(:all) {@library = library}
       
       context "sanity checking" do
