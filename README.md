@@ -15,10 +15,14 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 * Fully compliant RDFa 1.1 parser.
 * Template-based Writer to generate XHTML+RDFa.
   * Writer uses user-replacable [Haml][Haml]-based templates to generate RDFa.
-* If available, Uses Nokogiri for parsing HTML/SVG, falls back to REXML otherwise (and for JRuby)
-* [RDFa tests][RDFa-test-suite] use SPARQL for most tests due to Rasqal limitations. Other tests compare directly against N-triples.
+* If available, Uses Nokogiri for parsing HTML/SVG, falls back to REXML otherwise
 
 Install with 'gem install rdf-rdfa'
+
+### Pure Ruby
+In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri][]
+and falls back to using REXML. As REXML is not really an HTML parsing library, the results will only be useful if the HTML is well-formed.
+For best performance, install the Nokogiri gem as well.
 
 ### Important changes from previous versions
 RDFa is an evolving standard, undergoing some substantial recent changes partly due to perceived competition
@@ -392,7 +396,7 @@ The template hash defines four Haml templates:
 * [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.1)
 * [Haml](https://rubygems.org/gems/haml) (>= 4.0)
 * [HTMLEntities](https://rubygems.org/gems/htmlentities) ('>= 4.3.1')
-* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.5.9)
+* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.6.1)
 
 ## Documentation
 Full documentation available on [Rubydoc.info][RDFa doc]
