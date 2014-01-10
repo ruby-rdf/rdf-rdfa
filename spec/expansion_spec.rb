@@ -486,7 +486,7 @@ describe RDF::RDFa::Expansion do
           @prefix schema: <http://schema.org/> .
           [ schema:refers-to _:a ] .
           [ schema:refers-to _:a ] .
-          _:a schema:name "Amanda"
+          _:a schema:name "Amanda" .
         )
           
       ],
