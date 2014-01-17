@@ -5,7 +5,6 @@ require 'rdf/rdfa/expansion'
 module RDF::RDFa::Expansion
   [
     RDF::Statement.new(RDF::URI('http://xmlns.com/foaf/0.1/Person'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://xmlns.com/foaf/0.1/Agent'), :context => RDF::URI('http://xmlns.com/foaf/0.1/')),
-    RDF::Statement.new(RDF::URI('http://xmlns.com/foaf/0.1/Person'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://www.w3.org/2000/10/swap/pim/contact#Person'), :context => RDF::URI('http://xmlns.com/foaf/0.1/')),
     RDF::Statement.new(RDF::URI('http://xmlns.com/foaf/0.1/Person'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing'), :context => RDF::URI('http://xmlns.com/foaf/0.1/')),
     RDF::Statement.new(RDF::URI('http://xmlns.com/foaf/0.1/Organization'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://xmlns.com/foaf/0.1/Agent'), :context => RDF::URI('http://xmlns.com/foaf/0.1/')),
     RDF::Statement.new(RDF::URI('http://xmlns.com/foaf/0.1/Group'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://xmlns.com/foaf/0.1/Agent'), :context => RDF::URI('http://xmlns.com/foaf/0.1/')),
