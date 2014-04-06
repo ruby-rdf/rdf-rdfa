@@ -3,7 +3,7 @@ require 'rdf'
 
 module RDF
   ##
-  # **`RDF::RDFa`** is an RDFa plugin for RDF.rb.
+  # **`RDF::RDFa`** is an RDFa extension for RDF.rb.
   #
   # @example Requiring the `RDF::RDFa` module
   #   require 'rdf/rdfa'
