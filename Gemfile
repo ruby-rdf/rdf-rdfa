@@ -12,7 +12,6 @@ group :test do
   gem "rdf-microdata",  :git => "git://github.com/ruby-rdf/rdf-microdata.git", :branch => "develop" unless ENV["WITH_NOKOGIRI"] == "false"
   gem 'rdf-turtle',     :git => "git://github.com/ruby-rdf/rdf-turtle.git", :branch => "develop"
   gem 'rdf-isomorphic', :git => "git://github.com/ruby-rdf/rdf-isomorphic.git", :branch => "develop"
-  gem 'rdf-microdata',  :git => "git://github.com/ruby-rdf/rdf-microdata.git", :branch => "develop"
   gem 'rdf-rdfxml',     :git => "git://github.com/ruby-rdf/rdf-rdfxml.git", :branch => "develop"
   gem 'json-ld',        :git => "git://github.com/ruby-rdf/json-ld.git", :branch => "develop"
   gem 'sparql',         :git => "git://github.com/ruby-rdf/sparql.git", :branch => "develop"
