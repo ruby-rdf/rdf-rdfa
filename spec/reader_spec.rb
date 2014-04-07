@@ -1474,8 +1474,7 @@ describe "RDF::RDFa::Reader" do
         {
           "text/turtle" => [
             %q(
-              <script type="text/turtle">
-              # <![CDATA[
+              <script type="text/turtle"><![CDATA[
               @prefix dc: <http://purl.org/dc/terms/> .
               @prefix frbr: <http://purl.org/vocab/frbr/core#> .
 
@@ -1490,8 +1489,7 @@ describe "RDF::RDFa::Reader" do
 
               <http://books.example.com/products/9780596802189.EBOOK> a frbr:Expression ;
                    dc:type <http://books.example.com/product-types/EBOOK> .
-              # ]]>
-              </script>
+              ]]></script>
             ),
             %q(
               @prefix dc: <http://purl.org/dc/terms/> .
@@ -1510,16 +1508,13 @@ describe "RDF::RDFa::Reader" do
                    dc:type <http://books.example.com/product-types/EBOOK> .
             )
           ],
-          "text/ntriples" => [
+          "application/n-triples" => [
             %q(
-              <script type="text/turtle">
-              # <![CDATA[
-              <http://one.example/subject1> <http://one.example/predicate1> <http://one.example/object1> . # comments here
-              # or on a line by themselves
+              <script type="application/n-triples"><![CDATA[
+              <http://one.example/subject1> <http://one.example/predicate1> <http://one.example/object1> .
               _:subject1 <http://an.example/predicate1> "object1" .
               _:subject2 <http://an.example/predicate2> "object2" .
-              # ]]>
-              </script>
+              ]]></script>
             ),
             %q(
               <http://one.example/subject1> <http://one.example/predicate1> <http://one.example/object1> . # comments here
@@ -1540,6 +1535,65 @@ describe "RDF::RDFa::Reader" do
                    a gr:BusinessEntity ;
                    rdfs:seeAlso <http://example/xyz> ;
                    gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+              ]]></script>
+            ),
+            %q(
+              @prefix foo:  <http://example/xyz#> .
+              @prefix gr:   <http://purl.org/goodrelations/v1#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              foo:myCompany
+                a gr:BusinessEntity ;
+                rdfs:seeAlso <http://example/xyz> ;
+                gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+            )
+          ],
+          "application/ld+json" => [
+            %q(
+              <script type="application/ld+json"><![CDATA[
+                {
+                  "@context": {
+                    "foo": "http://example/xyz#",
+                    "gr": "http://purl.org/goodrelations/v1#",
+                    "xsd": "http://www.w3.org/2001/XMLSchema#",
+                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+                  },
+                  "@id": "foo:myCompany",
+                  "@type": "gr:BusinessEntity",
+                  "rdfs:seeAlso": {"@id": "http://example/xyz"},
+                  "gr:hasLegalName": "Hepp Industries Ltd."
+                }
+              ]]></script>
+            ),
+            %q(
+              @prefix foo:  <http://example/xyz#> .
+              @prefix gr:   <http://purl.org/goodrelations/v1#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              foo:myCompany
+                a gr:BusinessEntity ;
+                rdfs:seeAlso <http://example/xyz> ;
+                gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+            )
+          ],
+          "application/ld+json with junk" => [
+            %q(
+              <script type="application/ld+json"><![CDATA[
+                // This is a comment
+                {
+                  "@context": {
+                    "foo": "http://example/xyz#",
+                    "gr": "http://purl.org/goodrelations/v1#",
+                    "xsd": "http://www.w3.org/2001/XMLSchema#",
+                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+                  },
+                  "@id": "foo:myCompany",
+                  "@type": "gr:BusinessEntity",
+                  "rdfs:seeAlso": {"@id": "http://example/xyz"},
+                  "gr:hasLegalName": "Hepp Industries Ltd."
+                }
               ]]></script>
             ),
             %q(

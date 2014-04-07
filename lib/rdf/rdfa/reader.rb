@@ -367,10 +367,11 @@ module RDF::RDFa
           add_debug(el, "script element of type #{type}")
           begin
             # Formats don't exist unless they've been required
-            case type
+            case type.to_s
             when 'application/rdf+xml' then require 'rdf/rdfxml'
-            when 'text/ntriples' then require 'rdf/ntriples'
-            when 'text/turtle' then require 'text/turtle'
+            when 'text/ntriples'       then require 'rdf/ntriples'
+            when 'text/turtle'         then require 'rdf/turtle'
+            when 'application/ld+json' then require 'json/ld'
             end
           rescue
           end
@@ -378,6 +379,8 @@ module RDF::RDFa
           if reader = RDF::Reader.for(:content_type => type)
             add_debug(el, "=> reader #{reader.to_sym}")
             reader.new(input, options).each(&block)
+          else
+            add_debug(el, "=> no reader found")
           end
         end
         
@@ -391,8 +394,10 @@ module RDF::RDFa
         # Look for Embedded scripts
         @root.css("script[type]").each do |el|
           type = el.attribute("type")
-          
-          extract_script(el, el.inner_text, type, @options) do |statement|
+
+          text = el.inner_html.sub(%r(\A\s*\<!\[CDATA\[)m, '').sub(%r(\]\]>\s*\Z)m, '')
+
+          extract_script(el, text, type, @options) do |statement|
             @repository << statement
           end
         end
