@@ -23,22 +23,22 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9.3'
   gem.requirements          = []
 
-  gem.add_runtime_dependency     'rdf',             '>= 1.1.0'
-  gem.add_runtime_dependency     'haml',            '>= 4.0'
-  gem.add_runtime_dependency     'rdf-xsd',         '>= 1.1'
-  gem.add_runtime_dependency     'htmlentities',    '>= 4.3.1'
+  gem.add_runtime_dependency     'rdf',             '~> 1.1'
+  gem.add_runtime_dependency     'haml',            '~> 4.0'
+  gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1'
+  gem.add_runtime_dependency     'htmlentities',    '~> 4.3'
   
   #gem.add_development_dependency 'nokogiri' ,       '>= 1.6.1' # conditionally done in Gemfile
-  gem.add_development_dependency 'equivalent-xml' , '>= 0.3.0'
-  gem.add_development_dependency 'open-uri-cached', '>= 0.0.5'
-  gem.add_development_dependency 'json-ld',         '>= 1.1'
-  gem.add_development_dependency 'rspec',           '>= 2.14.0'
-  gem.add_development_dependency 'rdf-spec',        '>= 1.1'
-  gem.add_development_dependency 'rdf-turtle',      '>= 1.1'
-  gem.add_development_dependency 'rdf-rdfxml',      '>= 1.1'
-  gem.add_development_dependency 'rdf-isomorphic',  '>= 1.1'
-  gem.add_development_dependency 'sparql',          '>= 1.1'
-  gem.add_development_dependency 'yard' ,           '>= 0.8.5'
+  gem.add_development_dependency 'equivalent-xml' , '~> 0.4'
+  gem.add_development_dependency 'open-uri-cached', '~> 0.0', '>= 0.0.5'
+  gem.add_development_dependency 'json-ld',         '~> 1.1'
+  gem.add_development_dependency 'rspec',           '~> 2.14'
+  gem.add_development_dependency 'rdf-spec',        '~> 1.1'
+  gem.add_development_dependency 'rdf-turtle',      '~> 1.1'
+  gem.add_development_dependency 'rdf-rdfxml',      '~> 1.1'
+  gem.add_development_dependency 'rdf-isomorphic',  '~> 1.1'
+  gem.add_development_dependency 'sparql',          '~> 1.1'
+  gem.add_development_dependency 'yard' ,           '~> 0.8'
 
   gem.post_install_message  = nil
 end
