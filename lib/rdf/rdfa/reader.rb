@@ -354,85 +354,88 @@ module RDF::RDFa
     # @yieldparam [RDF::Statement] statement
     # @return [void]
     def each_statement(&block)
-      unless @processed || @root.nil?
-        # Add prefix definitions from host defaults
-        @host_defaults[:uri_mappings].each_pair do |prefix, value|
-          prefix(prefix, value)
-        end
+      if block_given?
+        unless @processed || @root.nil?
+          # Add prefix definitions from host defaults
+          @host_defaults[:uri_mappings].each_pair do |prefix, value|
+            prefix(prefix, value)
+          end
 
-        # parse
-        parse_whole_document(@doc, RDF::URI(base_uri))
+          # parse
+          parse_whole_document(@doc, RDF::URI(base_uri))
 
-        def extract_script(el, input, type, options, &block)
-          add_debug(el, "script element of type #{type}")
-          begin
-            # Formats don't exist unless they've been required
-            case type.to_s
-            when 'application/rdf+xml' then require 'rdf/rdfxml'
-            when 'text/ntriples'       then require 'rdf/ntriples'
-            when 'text/turtle'         then require 'rdf/turtle'
-            when 'application/ld+json' then require 'json/ld'
+          def extract_script(el, input, type, options, &block)
+            add_debug(el, "script element of type #{type}")
+            begin
+              # Formats don't exist unless they've been required
+              case type.to_s
+              when 'application/rdf+xml' then require 'rdf/rdfxml'
+              when 'text/ntriples'       then require 'rdf/ntriples'
+              when 'text/turtle'         then require 'rdf/turtle'
+              when 'application/ld+json' then require 'json/ld'
+              end
+            rescue
             end
-          rescue
-          end
 
-          if reader = RDF::Reader.for(:content_type => type)
-            add_debug(el, "=> reader #{reader.to_sym}")
-            reader.new(input, options).each(&block)
-          else
-            add_debug(el, "=> no reader found")
+            if reader = RDF::Reader.for(:content_type => type)
+              add_debug(el, "=> reader #{reader.to_sym}")
+              reader.new(input, options).each(&block)
+            else
+              add_debug(el, "=> no reader found")
+            end
           end
-        end
         
-        # Look for Embedded Turtle and RDF/XML
-        unless @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
-          extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
-            @repository << statement
+          # Look for Embedded Turtle and RDF/XML
+          unless @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
+            extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
+              @repository << statement
+            end
           end
-        end
 
-        # Look for Embedded scripts
-        @root.css("script[type]").each do |el|
-          type = el.attribute("type")
+          # Look for Embedded scripts
+          @root.css("script[type]").each do |el|
+            type = el.attribute("type")
 
-          text = el.inner_html.sub(%r(\A\s*\<!\[CDATA\[)m, '').sub(%r(\]\]>\s*\Z)m, '')
+            text = el.inner_html.sub(%r(\A\s*\<!\[CDATA\[)m, '').sub(%r(\]\]>\s*\Z)m, '')
 
-          extract_script(el, text, type, @options) do |statement|
-            @repository << statement
+            extract_script(el, text, type, @options) do |statement|
+              @repository << statement
+            end
           end
-        end
         
-        # Look for Embedded microdata
-        unless @root.xpath("//@itemscope").empty?
-          begin
-            require 'rdf/microdata'
-            add_debug(@doc, "process microdata")
-            @repository << RDF::Microdata::Reader.new(@doc, options)
-          rescue LoadError
-            add_debug(@doc, "microdata detected, not processed")
+          # Look for Embedded microdata
+          unless @root.xpath("//@itemscope").empty?
+            begin
+              require 'rdf/microdata'
+              add_debug(@doc, "process microdata")
+              @repository << RDF::Microdata::Reader.new(@doc, options)
+            rescue LoadError
+              add_debug(@doc, "microdata detected, not processed")
+            end
           end
+
+          # Perform property copying
+          copy_properties(@repository) if @options[:reference_folding]
+
+          # Perform vocabulary expansion
+          expand(@repository) if @options[:vocab_expansion]
+        
+          @processed = true
         end
 
-        # Perform property copying
-        copy_properties(@repository) if @options[:reference_folding]
-
-        # Perform vocabulary expansion
-        expand(@repository) if @options[:vocab_expansion]
-        
-        @processed = true
+        # Return statements in the default graph for
+        # statements in the associated named or default graph from the
+        # processed repository
+        @repository.each do |statement|
+          case statement.context
+          when nil
+            yield statement if @options[:rdfagraph].include?(:output)
+          when RDF::RDFA.ProcessorGraph
+            yield RDF::Statement.new(*statement.to_triple) if @options[:rdfagraph].include?(:processor)
+          end
+        end
       end
-
-      # Return statements in the default graph for
-      # statements in the associated named or default graph from the
-      # processed repository
-      @repository.each do |statement|
-        case statement.context
-        when nil
-          yield statement if @options[:rdfagraph].include?(:output)
-        when RDF::RDFA.ProcessorGraph
-          yield RDF::Statement.new(*statement.to_triple) if @options[:rdfagraph].include?(:processor)
-        end
-      end
+      enum_for(:each_statement)
     end
 
     ##
@@ -444,9 +447,12 @@ module RDF::RDFa
     # @yieldparam [RDF::Value]    object
     # @return [void]
     def each_triple(&block)
-      each_statement do |statement|
-        block.call(*statement.to_triple)
+      if block_given?
+        each_statement do |statement|
+          block.call(*statement.to_triple)
+        end
       end
+      enum_for(:each_triple)
     end
     
     private
