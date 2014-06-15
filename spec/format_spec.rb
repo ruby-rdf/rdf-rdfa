@@ -120,7 +120,7 @@ describe RDF::RDFa::Format do
   end
 
   describe "#to_sym" do
-    specify {@format_class.to_sym.should == :rdfa}
+    specify {expect(@format_class.to_sym).to eq :rdfa}
   end
 
   describe ".detect" do
@@ -133,7 +133,7 @@ describe RDF::RDFa::Format do
       :property => '<div property="foo"></div>',
     }.each do |sym, str|
       it "detects #{sym}" do
-        expect(@format_class.detect(str)).to be_true
+        expect(@format_class.detect(str)).to be_truthy
       end
     end
 
@@ -156,7 +156,7 @@ describe RDF::RDFa::Format do
       :STRING_LITERAL_LONG2 => %(<a> <b> """\nliteral\n""" .),
     }.each do |sym, str|
       it "does not detect #{sym}" do
-        expect(@format_class.detect(str)).to be_false
+        expect(@format_class.detect(str)).to be_falsey
       end
     end
   end

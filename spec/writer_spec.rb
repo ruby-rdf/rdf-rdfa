@@ -35,18 +35,11 @@ describe RDF::RDFa::Writer do
       {:content_type   => 'image/svg+xml'},
     ].each do |arg|
       it "discovers with #{arg.inspect}" do
-        RDF::Writer.for(arg).should == RDF::RDFa::Writer
+        expect(RDF::Writer.for(arg)).to eq RDF::RDFa::Writer
       end
     end
   end
 
-  context "generic" do
-    before(:each) do
-      @writer = RDF::RDFa::Writer.new(StringIO.new)
-    end
-    #it_should_behave_like RDF_Writer   # This seems to have broken sometime before 2011-07-07
-  end
-  
   describe "#buffer" do
     context "prefix definitions" do
       subject do
@@ -54,9 +47,9 @@ describe RDF::RDFa::Writer do
         serialize(:prefixes => {:dc => "http://purl.org/dc/terms/"})
       end
 
-      specify { subject.should have_xpath("/html/@prefix", %r(dc: http://purl.org/dc/terms/), @debug)}
-      specify { subject.should have_xpath("/html/@prefix", %r(ex: http://example/), @debug)}
-      specify { subject.should have_xpath("/html/@prefix", %r(ex:), @debug)}
+      specify { expect(subject).to have_xpath("/html/@prefix", %r(dc: http://purl.org/dc/terms/), @debug)}
+      specify { expect(subject).to have_xpath("/html/@prefix", %r(ex: http://example/), @debug)}
+      specify { expect(subject).to have_xpath("/html/@prefix", %r(ex:), @debug)}
     end
 
     context "plain literal" do
@@ -71,7 +64,7 @@ describe RDF::RDFa::Writer do
         "//div[@class='property']/span[@property]/text()" => "foo",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, @debug)
         end
       end
     end
@@ -89,7 +82,7 @@ describe RDF::RDFa::Writer do
         "/html/body/div/h1/text()" => "foo",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, @debug)
         end
       end
     end
@@ -106,7 +99,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/@typeof" => "ex:Type",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -123,7 +116,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/@typeof" => "ex:t1 ex:t2",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -141,7 +134,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/h1/@lang" => "en",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -157,7 +150,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/h1/@lang" => false,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -173,7 +166,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/h1/@lang" => "en",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -190,7 +183,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/div/ul/li/a[@property='rdf:value']/@href" => EX.b.to_s,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -210,7 +203,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]/text()" => "Friday, 18 March 2011",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -228,7 +221,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]/text()" => /12:34:56/,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -246,7 +239,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]/text()" => /12:34:56 \w+ on Friday, 18 March 2011/,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -263,7 +256,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]" => %r(<span [^>]+>E = mc<sup>2</sup>: The Most Urgent Problem of Our Time<\/span>),
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -280,7 +273,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -297,7 +290,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            subject.should have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -315,7 +308,7 @@ describe RDF::RDFa::Writer do
         "//ul/li[2][@property='ex:b']/text()" => "d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, @debug)
         end
       end
     end
@@ -332,7 +325,7 @@ describe RDF::RDFa::Writer do
         "//a/@href" => EX.c.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, @debug)
         end
       end
     end
@@ -350,7 +343,7 @@ describe RDF::RDFa::Writer do
         "//ul/li[2]/a[@property='ex:b']/@href" => EX.d.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, @debug)
         end
       end
     end
@@ -467,7 +460,7 @@ describe RDF::RDFa::Writer do
           @graph = parse(input, :format => :ttl)
           html = serialize(:haml_options => {:ugly => false})
           result.each do |path, value|
-            html.should have_xpath(path, value, @debug)
+            expect(html).to have_xpath(path, value, @debug)
           end
         end
       end
@@ -488,7 +481,7 @@ describe RDF::RDFa::Writer do
         "//div[@rel]/div[@class='property']/a/@property" => "ex:d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          subject.should have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, @debug)
         end
       end
     end
@@ -512,7 +505,7 @@ describe RDF::RDFa::Writer do
                 statements = graph2.query(:object => RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
                 statements.each {|st| graph2.delete(st)}
                 #puts graph2.dump(:ttl)
-                graph2.should be_equivalent_graph(@graph, :trace => @debug.unshift(result.force_encoding("utf-8")).join("\n"))
+                expect(graph2).to be_equivalent_graph(@graph, :trace => @debug.unshift(result.force_encoding("utf-8")).join("\n"))
               end
             end
           end

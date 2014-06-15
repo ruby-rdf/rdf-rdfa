@@ -36,14 +36,14 @@ describe "RDF::RDFa::Reader" do
       {:content_type   => 'image/svg+xml'},
     ].each do |arg|
       it "discovers with #{arg.inspect}" do
-        RDF::Reader.for(arg).should == RDF::RDFa::Reader
+        expect(RDF::Reader.for(arg)).to eq RDF::RDFa::Reader
       end
     end
   end
 
   context :interface do
-    before(:each) do
-      @sampledoc = %(<?xml version="1.0" encoding="UTF-8"?>
+    subject {
+      %(<?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml"
               xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -55,40 +55,40 @@ describe "RDF::RDFa::Reader" do
         </body>
         </html>
         )
-    end
+      }
 
-    it "should yield reader" do
+    it "yields reader" do
       inner = double("inner")
-      inner.should_receive(:called).with(RDF::RDFa::Reader)
-      RDF::RDFa::Reader.new(@sampledoc) do |reader|
+      expect(inner).to receive(:called).with(RDF::RDFa::Reader)
+      RDF::RDFa::Reader.new(subject) do |reader|
         inner.called(reader.class)
       end
     end
 
-    it "should return reader" do
-      RDF::RDFa::Reader.new(@sampledoc).should be_a(RDF::RDFa::Reader)
+    it "returns reader" do
+      expect(RDF::RDFa::Reader.new(subject)).to be_a(RDF::RDFa::Reader)
     end
 
-    it "should yield statements" do
+    it "yiels statements" do
       inner = double("inner")
-      inner.should_receive(:called).with(RDF::Statement)
-      RDF::RDFa::Reader.new(@sampledoc).each_statement do |statement|
+      expect(inner).to receive(:called).with(RDF::Statement)
+      RDF::RDFa::Reader.new(subject).each_statement do |statement|
         inner.called(statement.class)
       end
     end
 
-    it "should yield triples" do
+    it "yelds triples" do
       inner = double("inner")
-      inner.should_receive(:called).with(RDF::URI, RDF::URI, RDF::Literal)
-      RDF::RDFa::Reader.new(@sampledoc).each_triple do |subject, predicate, object|
+      expect(inner).to receive(:called).with(RDF::URI, RDF::URI, RDF::Literal)
+      RDF::RDFa::Reader.new(subject).each_triple do |subject, predicate, object|
         inner.called(subject.class, predicate.class, object.class)
       end
     end
     
-    it "should call Proc with processor statements for :processor_callback" do
+    it "calls Proc with processor statements for :processor_callback" do
       lam = double("lambda")
-      lam.should_receive(:call).at_least(1).times.with(kind_of(RDF::Statement))
-      RDF::RDFa::Reader.new(@sampledoc, :processor_callback => lam).each_triple {}
+      expect(lam).to receive(:call).at_least(1) {|s| expect(s).to be_statement}
+      RDF::RDFa::Reader.new(subject, :processor_callback => lam).each_triple {}
     end
     
     context "rdfagraph option" do
@@ -120,35 +120,35 @@ describe "RDF::RDFa::Reader" do
       end
 
       it "generates output graph by default" do
-        parse(source).should pass_query(output, :trace => @debug)
+        expect(parse(source)).to pass_query(output, :trace => @debug)
       end
 
       it "generates output graph with rdfagraph=output" do
-        parse(source, :rdfagraph => :output).should pass_query(output, :trace => @debug)
-        parse(source, :rdfagraph => :output).should_not pass_query(processor, :trace => @debug)
+        expect(parse(source, :rdfagraph => :output)).to pass_query(output, :trace => @debug)
+        expect(parse(source, :rdfagraph => :output)).not_to pass_query(processor, :trace => @debug)
       end
 
       it "generates output graph with rdfagraph=[output]" do
-        parse(source, :rdfagraph => [:output]).should pass_query(output, :trace => @debug)
+        expect(parse(source, :rdfagraph => [:output])).to pass_query(output, :trace => @debug)
       end
 
       it "generates output graph with rdfagraph=foo" do
-        parse(source, :rdfagraph => :foo).should pass_query(output, :trace => @debug)
+        expect(parse(source, :rdfagraph => :foo)).to pass_query(output, :trace => @debug)
       end
 
       it "generates processor graph with rdfagraph=processor" do
-        parse(source, :rdfagraph => :processor).should pass_query(processor, :trace => @debug)
-        parse(source, :rdfagraph => :processor).should_not pass_query(output, :trace => @debug)
+        expect(parse(source, :rdfagraph => :processor)).to pass_query(processor, :trace => @debug)
+        expect(parse(source, :rdfagraph => :processor)).not_to pass_query(output, :trace => @debug)
       end
 
       it "generates both output and processor graphs with rdfagraph=[output,processor]" do
-        parse(source, :rdfagraph => [:output, :processor]).should pass_query(output, :trace => @debug)
-        parse(source, :rdfagraph => [:output, :processor]).should pass_query(processor, :trace => @debug)
+        expect(parse(source, :rdfagraph => [:output, :processor])).to pass_query(output, :trace => @debug)
+        expect(parse(source, :rdfagraph => [:output, :processor])).to pass_query(processor, :trace => @debug)
       end
 
       it "generates both output and processor graphs with rdfagraph=output,processor" do
-        parse(source, :rdfagraph => "output, processor").should pass_query(output, :trace => @debug)
-        parse(source, :rdfagraph => "output, processor").should pass_query(processor, :trace => @debug)
+        expect(parse(source, :rdfagraph => "output, processor")).to pass_query(output, :trace => @debug)
+        expect(parse(source, :rdfagraph => "output, processor")).to pass_query(processor, :trace => @debug)
       end
     end
   end
@@ -177,7 +177,7 @@ describe "RDF::RDFa::Reader" do
             <photo1.jpg> dc:creator "Mark Birbeck" .
           )
 
-          parse(html).should be_equivalent_graph(expected, :trace => @debug)
+          expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug)
         end
       end
 
@@ -203,7 +203,7 @@ describe "RDF::RDFa::Reader" do
               <> dc:title "E = mc<sup xmlns=\"http://www.w3.org/1999/xhtml\">2</sup>: The Most Urgent Problem of Our Time"^^rdf:XMLLiteral .
             )
 
-            parse(html).should be_equivalent_graph(expected, :trace => @debug)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug)
           end
         end
 
@@ -227,7 +227,7 @@ describe "RDF::RDFa::Reader" do
               <> dc:title "E = mc<sup>2</sup>: The Most Urgent Problem of Our Time"^^rdf:HTML .
             )
 
-            parse(html).should be_equivalent_graph(expected, :trace => @debug)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug)
           end
         end
 
@@ -257,7 +257,7 @@ describe "RDF::RDFa::Reader" do
              ] .
           )
 
-          parse(html).should be_equivalent_graph(expected, :trace => @debug)
+          expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug)
         end
 
         describe "@about" do
@@ -270,7 +270,7 @@ describe "RDF::RDFa::Reader" do
 
               <foo> dc:title "Title" .
             )
-            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
           
           it "creates a typed subject with @typeof" do
@@ -283,7 +283,7 @@ describe "RDF::RDFa::Reader" do
 
               <foo> a rdfs:Resource; dc:title "Title" .
             )
-            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
         end
 
@@ -296,7 +296,7 @@ describe "RDF::RDFa::Reader" do
               @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
               <foo> rdf:value <bar> .
             )
-            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
 
           it "creates a type on object with @typeof" do
@@ -309,7 +309,7 @@ describe "RDF::RDFa::Reader" do
               <foo> rdf:value <bar> .
               <bar> a rdfs:Resource .
             )
-            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
 
           it "uses @resource as subject of child elements" do
@@ -317,7 +317,7 @@ describe "RDF::RDFa::Reader" do
               <div resource="foo"><span property="dc:title">Title</span></div>
             )
             expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF::DC.title, "Title")
-            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
 
           context :SafeCURIEorCURIEorIRI do
@@ -348,7 +348,7 @@ describe "RDF::RDFa::Reader" do
               ],
             }.each do |test, (input, expected)|
               it "expands #{test}" do
-                parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+                expect(parse(input)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
               end
             end
           end
@@ -360,7 +360,7 @@ describe "RDF::RDFa::Reader" do
               <div about="foo"><a href="bar" rel="rdf:value"></a></div>
             )
             expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar"))
-            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
         end
 
@@ -375,7 +375,7 @@ describe "RDF::RDFa::Reader" do
           context "RDFa 1.0" do
             it "creates a statement with subject from @src" do
               expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("bar"), RDF::DC.title, "Title")
-              parse(subject, :version => "rdfa1.0").should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse(subject, :version => "rdfa1.0")).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
       
@@ -384,7 +384,7 @@ describe "RDF::RDFa::Reader" do
               expected = RDF::Graph.new <<
                 RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar")) <<
                 RDF::Statement.new(RDF::URI("foo"), RDF::DC.title, "Title")
-              parse(subject).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse(subject)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
         end
@@ -413,14 +413,14 @@ describe "RDF::RDFa::Reader" do
                  foaf:name "John Doe" .
             )
 
-            parse(html).should be_equivalent_graph(expected, :trace => @debug)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug)
           end
           
           it "empty @typeof on root" do
             html = %(<html typeof=""><span property="dc:title">Title</span></html>)
             expected = RDF::Graph.new << RDF::Statement.new(RDF::URI(""), RDF::DC.title, "Title")
 
-            parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
           end
         end
 
@@ -447,7 +447,7 @@ describe "RDF::RDFa::Reader" do
             <http://example/faq> dc:title "Example FAQ" .
           )
 
-          parse(html).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+          expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
         end
 
         describe "xml:base" do
@@ -477,10 +477,10 @@ describe "RDF::RDFa::Reader" do
                 )
                 expected = does ? expected_true : expected_false
 
-                parse(html, :base_uri => "http://example/doc_base",
+                expect(parse(html, :base_uri => "http://example/doc_base",
                   :version => :"rdfa1.1",
                   :host_language => hl
-                ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+                )).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
               end
               
               it %(#{does ? "uses" : "does not use"} xml:base in non-root) do
@@ -500,10 +500,10 @@ describe "RDF::RDFa::Reader" do
                 )
                 expected = does ? expected_true : expected_false
 
-                parse(html, :base_uri => "http://example/doc_base",
+                expect(parse(html, :base_uri => "http://example/doc_base",
                   :version => :"rdfa1.1",
                   :host_language => hl
-                ).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+                )).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
               end
             end
           end
@@ -546,7 +546,7 @@ describe "RDF::RDFa::Reader" do
             ],
           }.each do |name, (html,expected)|
             it name do
-              parse("<html>#{html}</html>", :version => :"rdfa1.1").should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse("<html>#{html}</html>", :version => :"rdfa1.1")).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
         end
@@ -571,7 +571,7 @@ describe "RDF::RDFa::Reader" do
 
                 context "with #{value}" do
                   it "creates triple with invalid literal" do
-                    parse(@rdfa, :validate => false).should be_equivalent_graph(@expected, :trace => @debug)
+                    expect(parse(@rdfa, :validate => false)).to be_equivalent_graph(@expected, :trace => @debug)
                   end
             
                   it "does not create triple when validating" do
@@ -595,13 +595,12 @@ describe "RDF::RDFa::Reader" do
               RDF::URI("http://example/due:to:facebook:interpretation:of:CURIE"),
               "Value"
             )
-            parse(html).should be_equivalent_graph(expected, :trace => @debug)
+            expect(parse(html)).to be_equivalent_graph(expected, :trace => @debug)
           end
         end
 
         context "@vocab" do
-          before(:all) do
-            @sampledoc = %q(
+          subject {%q(
             <html>
               <head>
                 <base href="http://example/"/>
@@ -612,15 +611,14 @@ describe "RDF::RDFa::Reader" do
                 </div>
               </body>
             </html>
-            )
-          end
+          )}
       
           it "uses vocabulary when creating property IRI" do
             query = %q(
               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
               ASK WHERE { <http://example/#me> a foaf:Person }
             )
-            parse(@sampledoc).should pass_query(query, @debug)
+            expect(parse(subject)).to pass_query(query, @debug)
           end
 
           it "uses vocabulary when creating type IRI" do
@@ -628,7 +626,7 @@ describe "RDF::RDFa::Reader" do
               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
               ASK WHERE { <http://example/#me> foaf:name "Gregg Kellogg" }
             )
-            parse(@sampledoc).should pass_query(query, @debug)
+            expect(parse(subject)).to pass_query(query, @debug)
           end
 
           it "adds rdfa:hasProperty triple" do
@@ -637,7 +635,7 @@ describe "RDF::RDFa::Reader" do
               PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
               ASK WHERE { <http://example/> rdfa:usesVocabulary foaf: }
             )
-            parse(@sampledoc).should pass_query(query, @debug)
+            expect(parse(subject)).to pass_query(query, @debug)
           end
           
           context "with terms" do
@@ -656,7 +654,7 @@ describe "RDF::RDFa::Reader" do
                 query = %(
                   ASK WHERE { <> <http://example/#{term}> "Foo" }
                 )
-                parse(input).should pass_query(query, @debug)
+                expect(parse(input)).to pass_query(query, @debug)
               end
             end
 
@@ -665,7 +663,6 @@ describe "RDF::RDFa::Reader" do
               %q(a b),
               %q(/path),
               %q(1leading_numeric),
-              %q(_leading_underscore),
               %q(\u0301foo),
             ].each do |term|
               it "rejects #{term.inspect}" do
@@ -676,7 +673,7 @@ describe "RDF::RDFa::Reader" do
                   ASK WHERE { <> <http://example/#{term}> "Foo" }
                 )
                 begin
-                  parse(input).should_not pass_query(query, @debug)
+                  expect(parse(input)).to_not pass_query(query, @debug)
                 rescue
                   # It's okay for SPARQL to throw an error
                 end
@@ -839,7 +836,7 @@ describe "RDF::RDFa::Reader" do
             ],
           }.each do |test, (input, expected)|
             it test do
-              parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse(input)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
         end
@@ -1217,7 +1214,7 @@ describe "RDF::RDFa::Reader" do
             ],
           }.each do |test, (input, expected)|
             it test do
-              parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse(input)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
         end
@@ -1247,7 +1244,7 @@ describe "RDF::RDFa::Reader" do
                   @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
                   @prefix cc: <http://creativecommons.org/ns#> .
                 ) + expected1
-                parse(input, :host_language => :xhtml1).should be_equivalent_graph(expected1, :trace => @debug, :format => :ttl)
+                expect(parse(input, :host_language => :xhtml1)).to be_equivalent_graph(expected1, :trace => @debug, :format => :ttl)
               end
             
               it "xhtml5" do
@@ -1256,7 +1253,7 @@ describe "RDF::RDFa::Reader" do
                   @prefix xhv: <http://www.w3.org/1999/xhtml/vocab#> .
                   @prefix cc: <http://creativecommons.org/ns#> .
                 ) + expected5
-                parse(input, :host_language => :xhtml5).should be_equivalent_graph(expected5, :trace => @debug, :format => :ttl)
+                expect(parse(input, :host_language => :xhtml5)).to be_equivalent_graph(expected5, :trace => @debug, :format => :ttl)
               end
             end
           end
@@ -1328,7 +1325,7 @@ describe "RDF::RDFa::Reader" do
             ],
           }.each do |title, (input, expected)|
             it title do
-              parse(input).should be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse(input)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
         end
@@ -1438,7 +1435,7 @@ describe "RDF::RDFa::Reader" do
         }.each do |title, (html, ttl)|
           it "parses #{title}" do
             g_ttl = RDF::Graph.new << RDF::Turtle::Reader.new(ttl)
-            parse(html, :validate => false).should be_equivalent_graph(g_ttl, :trace => @debug, :format => :ttl)
+            expect(parse(html, :validate => false)).to be_equivalent_graph(g_ttl, :trace => @debug, :format => :ttl)
           end
         end
       end
@@ -1472,7 +1469,7 @@ describe "RDF::RDFa::Reader" do
             	<http://example.net/> <http://purl.org/dc/terms/description> "A yellow rectangle with sharp corners." .
             }
           )
-          parse(svg).should pass_query(query, :trace => @debug)
+          expect(parse(svg)).to pass_query(query, :trace => @debug)
         end
       end
       
@@ -1616,7 +1613,7 @@ describe "RDF::RDFa::Reader" do
           ]
         }.each do |title, (input,result)|
           it title do
-            parse(input).should be_equivalent_graph(result, :base_uri => "http://example/", :trace => @debug)
+            expect(parse(input)).to be_equivalent_graph(result, :base_uri => "http://example/", :trace => @debug)
           end
         end
       end
@@ -1643,7 +1640,7 @@ describe "RDF::RDFa::Reader" do
           <> md:item ([ a schema:Person; schema:name "Gregg Kellogg"]);
              rdfa:usesVocabulary schema: .
         )
-        parse(html).should be_equivalent_graph(ttl, :trace => @debug)
+        expect(parse(html)).to be_equivalent_graph(ttl, :trace => @debug)
       end
 
       context :rdfagraph do
@@ -1662,7 +1659,7 @@ describe "RDF::RDFa::Reader" do
               FILTER (datatype(?date) = xsd:date)
             }
           )
-          parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
+          expect(parse(html, :rdfagraph => :processor)).to pass_query(query, :trace => @debug)
         end
         
         it "generates rdfa:UnresolvedCURIE on missing CURIE definition" do
@@ -1680,7 +1677,7 @@ describe "RDF::RDFa::Reader" do
               FILTER (datatype(?date) = xsd:date)
             }
           )
-          parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
+          expect(parse(html, :rdfagraph => :processor)).to pass_query(query, :trace => @debug)
         end
         
         %w(
@@ -1707,7 +1704,7 @@ describe "RDF::RDFa::Reader" do
                 FILTER (datatype(?date) = xsd:date)
               }
             )
-            parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
+            expect(parse(html, :rdfagraph => :processor)).to pass_query(query, :trace => @debug)
           end
         end
         
@@ -1726,7 +1723,7 @@ describe "RDF::RDFa::Reader" do
               FILTER (datatype(?date) = xsd:date)
             }
           )
-          parse(html, :rdfagraph => :processor).should pass_query(query, :trace => @debug)
+          expect(parse(html, :rdfagraph => :processor)).to pass_query(query, :trace => @debug)
         end
       end
 

@@ -36,8 +36,8 @@ unless ENV['CI']  # Skip for continuous integration
 
                       # Make sure auto-detect works
                       unless host_language =~ /svg/ || t.num == "0216" # due to http-equiv
-                        reader.host_language.should produce(host_language.to_sym, t.debug)
-                        reader.version.should produce(version.sub(/-.*$/, '').to_sym, t.debug)
+                        expect(reader.host_language).to produce(host_language.to_sym, t.debug)
+                        expect(reader.version).to produce(version.sub(/-.*$/, '').to_sym, t.debug)
                       end
 
                       graph << reader
