@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 module RDF
   class PTR < Vocabulary("http://www.w3.org/2009/pointers#")
     # Class definitions

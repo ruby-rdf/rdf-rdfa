@@ -280,7 +280,7 @@ module RDF::RDFa
       # Document errors
       def doc_errors
         # FIXME: Nokogiri version 1.5.5 things <time> is invalid
-        @doc.errors.reject {|e| e.to_s =~ /Tag time invalid/}
+        @doc.errors.reject {|e| e.to_s =~ /(Tag time invalid|Missing attribute name)/}
       end
       
       ##
