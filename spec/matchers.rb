@@ -39,12 +39,12 @@ def normalize(graph)
   case graph
   when RDF::Queryable then graph
   when IO, StringIO
-    RDF::Graph.new.load(graph, :base_uri => @info.about)
+    RDF::Graph.new.load(graph, base_uri: @info.about)
   else
     # Figure out which parser to use
-    g = RDF::Graph.new
+    g = RDF::Repository.new
     reader_class = detect_format(graph)
-    reader_class.new(graph, :base_uri => @info.about).each {|s| g << s}
+    reader_class.new(graph, base_uri: @info.about).each {|s| g << s}
     g
   end
 end
@@ -73,7 +73,7 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
   
   failure_message do |actual|
     info = @info.respond_to?(:about) ? @info.about : @info.inspect
-    if @expected.is_a?(RDF::Graph) && @actual.size != @expected.size
+    if @expected.is_a?(RDF::Enumerable) && @actual.size != @expected.size
       "Graph entry count differs:\nexpected: #{@expected.size}\nactual:   #{@actual.size}"
     elsif @expected.is_a?(Array) && @actual.size != @expected.length
       "Graph entry count differs:\nexpected: #{@expected.length}\nactual:   #{@actual.size}"
@@ -83,8 +83,8 @@ RSpec::Matchers.define :be_equivalent_graph do |expected, info|
     "\n#{info + "\n" unless info.to_s.empty?}" +
     (@info.inputDocument ? "Input file: #{@info.inputDocument}\n" : "") +
     (@info.outputDocument ? "Output file: #{@info.outputDocument}\n" : "") +
-    "Expected:\n#{@expected.dump(@info.format, :standard_prefixes => true)}" +
-    "Results:\n#{@actual.dump(@info.format, :standard_prefixes => true)}" +
+    "Expected:\n#{@expected.dump(@info.format, standard_prefixes: true)}" +
+    "Results:\n#{@actual.dump(@info.format, standard_prefixes: true)}" +
     (@info.trace ? "\nDebug:\n#{@info.trace}" : "")
   end  
 end
@@ -131,7 +131,7 @@ RSpec::Matchers.define :pass_query do |expected, info|
       "Query returned true (expected #{@info.expectedResults})"
     end +
     "\n#{@expected}" +
-    "\nResults:\n#{@actual.dump(:ttl, :standard_prefixes => true)}" +
+    "\nResults:\n#{@actual.dump(:ttl, standard_prefixes: true)}" +
     "\nDebug:\n#{@info.trace}"
   end  
 
@@ -148,7 +148,7 @@ RSpec::Matchers.define :pass_query do |expected, info|
       "Query returned true (expected #{@info.expectedResults})"
     end +
     "\n#{@expected}" +
-    "\nResults:\n#{@actual.dump(:ttl, :standard_prefixes => true)}" +
+    "\nResults:\n#{@actual.dump(:ttl, standard_prefixes: true)}" +
     "\nDebug:\n#{@info.trace}"
   end  
 end
