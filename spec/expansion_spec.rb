@@ -157,7 +157,7 @@ describe RDF::RDFa::Expansion do
         result = mt.load(elements)
         mt.add_vocabs_to_repo(mt.repo)
         mt.send(:entailment, mt.repo)
-        mt.graph.should be_equivalent_graph(result, mt)
+        expect(mt.graph).to be_equivalent_graph(result, mt)
       end
     end
   end
@@ -257,7 +257,7 @@ describe RDF::RDFa::Expansion do
         mt = ExpansionTester.new(test)
         result = mt.load(elements)
         mt.expand(mt.repo)
-        mt.graph.should be_equivalent_graph(result, mt)
+        expect(mt.graph).to be_equivalent_graph(result, mt)
       end
     end
   end
@@ -288,7 +288,7 @@ describe RDF::RDFa::Expansion do
         result = mt.load(elements)
         vocab = RDF::URI("http://example.org/vocab#")
         mt.copy_properties(mt.repo)
-        mt.graph.should be_equivalent_graph(result, mt)
+        expect(mt.graph).to be_equivalent_graph(result, mt)
       end
     end
   end
@@ -296,7 +296,7 @@ describe RDF::RDFa::Expansion do
   context "with empty graph" do
     it "returns an empty graph" do
       rdfa = %q(<http></http>)
-      parse(rdfa).should be_equivalent_graph("", :trace => @debug)
+      expect(parse(rdfa)).to be_equivalent_graph("", :trace => @debug)
     end
   end
   
@@ -325,7 +325,7 @@ describe RDF::RDFa::Expansion do
           doap:name "RDF::RDFa";
           dc:creator <http://greggkellogg.net/foaf#me> .
       )
-      parse(rdfa).should be_equivalent_graph(ttl, :trace => @debug)
+      expect(parse(rdfa)).to be_equivalent_graph(ttl, :trace => @debug)
     end
   end
   
@@ -360,7 +360,7 @@ describe RDF::RDFa::Expansion do
           rdfs:label "RDF::RDFa";
           dc:creator <http://greggkellogg.net/foaf#me> .
       )
-      parse(rdfa).should be_equivalent_graph(ttl, :trace => @debug)
+      expect(parse(rdfa)).to be_equivalent_graph(ttl, :trace => @debug)
     end
   end
   
@@ -492,7 +492,7 @@ describe RDF::RDFa::Expansion do
       ],
     }.each do |title, (input, result)|
       it title do
-        parse(input).should be_equivalent_graph(result,
+        expect(parse(input)).to be_equivalent_graph(result,
           :base_uri => "http://example.com/",
           :format => :ttl,
           :trace => @debug)

@@ -9,7 +9,7 @@ describe "JRuby" do
   describe Nokogiri::XML do
     describe "parse" do
       it "parses namespaced elements without a namespace" do
-        Nokogiri::XML.parse("<dc:sup>bar</dc:sup>").root.should_not be_nil
+        expect(Nokogiri::XML.parse("<dc:sup>bar</dc:sup>").root).not_to be_nil
       end
     end
   end
@@ -18,8 +18,8 @@ describe "JRuby" do
     describe "xmlns" do
       it "shows namespace definitions" do
         doc = Nokogiri::HTML.parse(%q(<html xmlns:dc="http://purl.org/dc/elements/1.1/"></html>))
-        doc.root.namespace_definitions.should be_empty
-        doc.root.attributes.should_not be_empty
+        expect(doc.root.namespace_definitions).to be_empty
+        expect(doc.root.attributes).not_to be_empty
       end
     end
   end
