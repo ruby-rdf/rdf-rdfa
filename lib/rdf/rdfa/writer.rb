@@ -317,7 +317,6 @@ module RDF::RDFa
       # Separate out the objects which are lists and render separately
       list_objects = objects.reject do |o|
         o == RDF.nil ||
-        !o.node? ||
         (l = RDF::List.new(o, @graph)).invalid?
       end
       unless list_objects.empty?
