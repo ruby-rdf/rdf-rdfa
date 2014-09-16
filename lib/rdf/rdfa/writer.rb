@@ -1,5 +1,6 @@
 require 'haml'
 require 'cgi'
+require 'rdf/xsd'
 
 module RDF::RDFa
   ##
@@ -611,7 +612,7 @@ module RDF::RDFa
       literal.language if literal.literal? && literal.language && literal.language.to_s != @lang.to_s
     end
 
-    # Haml rendering helper. Data to be added to a @content value
+    # Haml rendering helper. Data to be added to a @content value, for specific datatypes
     #
     # @param [RDF::Literal] literal
     # @return [String, nil]
@@ -619,30 +620,19 @@ module RDF::RDFa
     def get_content(literal)
       raise RDF::WriterError, "Getting content for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
       case literal
-      when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime
+      when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime, RDF::Literal::Duration
         literal.to_s
       end
     end
 
-    # Haml rendering helper. Display value for object, may be non-canonical if get_content returns a non-nil value
+    # Haml rendering helper. Display value for object, may be humanized into a non-canonical form 
     #
     # @param [RDF::Literal] literal
     # @return [String]
     # @raise [RDF::WriterError]
     def get_value(literal)
       raise RDF::WriterError, "Getting value for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
-      case literal
-      when RDF::Literal::Date
-        literal.object.strftime("%A, %d %B %Y")
-      when RDF::Literal::Time
-        literal.object.strftime("%H:%M:%S %Z").sub(/\+00:00/, "UTC")
-      when RDF::Literal::DateTime
-        literal.object.strftime("%H:%M:%S %Z on %A, %d %B %Y").sub(/\+00:00/, "UTC")
-      else
-        literal.to_s
-      end
-    rescue
-      literal.to_s  # When all else fails ...
+      literal.humanize
     end
 
     # Haml rendering helper. Return an appropriate label for a resource.
