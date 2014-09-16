@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9.3'
   gem.requirements          = []
 
-  gem.add_runtime_dependency     'rdf',             '~> 1.1'
+  gem.add_runtime_dependency     'rdf',             '~> 1.1', '>= 1.1.6'
   gem.add_runtime_dependency     'haml',            '~> 4.0'
   gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1'
   gem.add_runtime_dependency     'htmlentities',    '~> 4.3'
