@@ -191,55 +191,106 @@ describe RDF::RDFa::Writer do
 
     context "typed literals" do
       describe "xsd:date" do
-        subject do
-          @graph << [EX.a, EX.b, RDF::Literal::Date.new("2011-03-18")]
-          serialize(:haml_options => {:ugly => false})
-        end
-
         {
-          "//span[@property]/@property" => "ex:b",
-          "//span[@property]/@datatype" => "xsd:date",
-          "//span[@property]/@content" => "2011-03-18",
-          "//span[@property]/text()" => "Friday, 18 March 2011",
-        }.each do |path, value|
-          it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+          "2011-03-18" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:date",
+            "//span[@property]/@content" => "2011-03-18",
+            "//span[@property]/text()" => "Friday, 18 March 2011",
+          },
+          "2011-03-18Z" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:date",
+            "//span[@property]/@content" => "2011-03-18Z",
+            "//span[@property]/text()" => "Friday, 18 March 2011 UTC",
+          },
+          "2011-03-18-08:00" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:date",
+            "//span[@property]/@content" => "2011-03-18-08:00",
+            "//span[@property]/text()" => "Friday, 18 March 2011 -08:00",
+          },
+        }.each do |v, matches|
+          context v do
+            subject {
+              @graph << [EX.a, EX.b, RDF::Literal::Date.new(v)]
+              serialize(:haml_options => {:ugly => false})
+            }
+            matches.each do |path, value|
+              it "returns #{value.inspect} for xpath #{path}" do
+                expect(subject).to have_xpath(path, value, @debug)
+              end
+            end
           end
         end
       end
 
       context "xsd:time" do
-        subject do
-          @graph << [EX.a, EX.b, RDF::Literal::Time.new("12:34:56")]
-          serialize(:haml_options => {:ugly => false})
-        end
-
         {
-          "//span[@property]/@property" => "ex:b",
-          "//span[@property]/@datatype" => "xsd:time",
-          "//span[@property]/@content" => "12:34:56",
-          "//span[@property]/text()" => /12:34:56/,
-        }.each do |path, value|
-          it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+          "12:34:56" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:time",
+            "//span[@property]/@content" => "12:34:56",
+            "//span[@property]/text()" => "12:34:56 PM",
+          },
+          "12:34:56Z" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:time",
+            "//span[@property]/@content" => "12:34:56Z",
+            "//span[@property]/text()" => "12:34:56 PM UTC",
+          },
+          "12:34:56-08:00" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:time",
+            "//span[@property]/@content" => "12:34:56-08:00",
+            "//span[@property]/text()" => "12:34:56 PM -08:00",
+          },
+        }.each do |v, matches|
+          context v do
+            subject {
+              @graph << [EX.a, EX.b, RDF::Literal::Time.new(v)]
+              serialize(:haml_options => {:ugly => false})
+            }
+            matches.each do |path, value|
+              it "returns #{value.inspect} for xpath #{path}" do
+                expect(subject).to have_xpath(path, value, @debug)
+              end
+            end
           end
         end
       end
 
       context "xsd:dateTime" do
-        subject do
-          @graph << [EX.a, EX.b, RDF::Literal::DateTime.new("2011-03-18T12:34:56")]
-          serialize(:haml_options => {:ugly => false})
-        end
-
         {
-          "//span[@property]/@property" => "ex:b",
-          "//span[@property]/@datatype" => "xsd:dateTime",
-          "//span[@property]/@content" => "2011-03-18T12:34:56",
-          "//span[@property]/text()" => /12:34:56 \w+ on Friday, 18 March 2011/,
-        }.each do |path, value|
-          it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+          "2011-03-18T12:34:56" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:dateTime",
+            "//span[@property]/@content" => "2011-03-18T12:34:56",
+            "//span[@property]/text()" => "12:34:56 PM on Friday, 18 March 2011",
+          },
+          "2011-03-18T12:34:56Z" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:dateTime",
+            "//span[@property]/@content" => "2011-03-18T12:34:56Z",
+            "//span[@property]/text()" => "12:34:56 PM UTC on Friday, 18 March 2011",
+          },
+          "2011-03-18T12:34:56-08:00" => {
+            "//span[@property]/@property" => "ex:b",
+            "//span[@property]/@datatype" => "xsd:dateTime",
+            "//span[@property]/@content" => "2011-03-18T12:34:56-08:00",
+            "//span[@property]/text()" => "12:34:56 PM -08:00 on Friday, 18 March 2011",
+          },
+        }.each do |v, matches|
+          context v do
+            subject {
+              @graph << [EX.a, EX.b, RDF::Literal::DateTime.new(v)]
+              serialize(:haml_options => {:ugly => false})
+            }
+            matches.each do |path, value|
+              it "returns #{value.inspect} for xpath #{path}" do
+                expect(subject).to have_xpath(path, value, @debug)
+              end
+            end
           end
         end
       end
