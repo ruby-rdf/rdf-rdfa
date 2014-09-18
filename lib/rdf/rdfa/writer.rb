@@ -456,7 +456,6 @@ module RDF::RDFa
     # @return [ignored]
     def preprocess_statement(statement)
       #add_debug {"preprocess: #{statement.inspect}"}
-      bump_reference(statement.subject)
       bump_reference(statement.object)
       @subjects[statement.subject] = true
       get_curie(statement.subject)
