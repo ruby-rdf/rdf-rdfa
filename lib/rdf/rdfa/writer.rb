@@ -376,7 +376,7 @@ module RDF::RDFa
         end
 
         ctx.terms.each_pair do |k, v|
-          @uri_to_term_or_curie[v] = k
+          @uri_to_term_or_curie[v] = k.to_s
         end
 
         @vocabulary = ctx.vocabulary.to_s if ctx.vocabulary
