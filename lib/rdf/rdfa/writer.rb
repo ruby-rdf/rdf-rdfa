@@ -376,7 +376,7 @@ module RDF::RDFa
         end
 
         ctx.terms.each_pair do |k, v|
-          @uri_to_term_or_curie[v] = k
+          @uri_to_term_or_curie[v] = k.to_s
         end
 
         @vocabulary = ctx.vocabulary.to_s if ctx.vocabulary
@@ -456,7 +456,6 @@ module RDF::RDFa
     # @return [ignored]
     def preprocess_statement(statement)
       #add_debug {"preprocess: #{statement.inspect}"}
-      bump_reference(statement.subject)
       bump_reference(statement.object)
       @subjects[statement.subject] = true
       get_curie(statement.subject)
