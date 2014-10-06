@@ -120,27 +120,39 @@ module RDF::RDFa
           @node.children.map(&:to_s).join
         end
 
+        def attribute_nodes
+          attrs = @node.attributes.dup.keep_if do |name, attr|
+            !name.start_with?('xmlns')
+          end
+          @attribute_nodes ||= (attrs.empty? ? attrs : NodeSetProxy.new(attrs, self))
+        end
+
         ##
         # Node type accessors
         #
         # @return [Boolean]
+        def text?
+          @node.is_a?(::REXML::Text)
+        end
+
         def element?
           @node.is_a?(::REXML::Element)
         end
 
-        def attribute_nodes
-          @attribute_nodes ||= NodeSetProxy.new(@node.children.select {|n| n.is_a?(::REXML::Attribute)}, self)
+        def blank?
+          @node.is_a?(::REXML::Text) && @node.empty?
         end
 
+        def to_s; @node.to_s; end
+
         def xpath(*args)
-          #NodeSetProxy.new(::REXML::XPath.match(@node, path, namespaces), self)
           ::REXML::XPath.match(@node, *args).map do |n|
-            # Get node ancestors
-            parent = n.ancestors.reverse.inject(nil) do |p,node|
-              NodeProxy.new(node, p)
-            end rescue nil
             NodeProxy.new(n, parent)
           end
+        end
+
+        def at_xpath(*args)
+          xpath(*args).first
         end
 
         # Simple case for &lt;script&gt;

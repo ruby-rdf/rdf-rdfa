@@ -28,7 +28,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1'
   gem.add_runtime_dependency     'htmlentities',    '~> 4.3'
 
-  gem.add_development_dependency 'equivalent-xml' , '~> 0.4'
   gem.add_development_dependency 'open-uri-cached', '~> 0.0', '>= 0.0.5'
   gem.add_development_dependency 'json-ld',         '~> 1.1'
   gem.add_development_dependency 'rspec',           '~> 3.0'

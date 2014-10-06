@@ -13,7 +13,6 @@ unless ENV['CI']  # Skip for continuous integration
           %w(required optional buggy).each do |classification|
             describe "that are #{classification}" do
               Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
-                #next unless t.num == "0231"
                 specify "test #{t.num}: #{t.description}#{",  (negative test)" if t.expectedResults.false?}" do
                   begin
                     t.debug = []
@@ -33,6 +32,11 @@ unless ENV['CI']  # Skip for continuous integration
                     graph = RDF::Repository.new
                     RDF::Reader.open(t.input(host_language, version), options.merge(:validate => validate)) do |reader|
                       expect(reader).to be_a RDF::RDFa::Reader
+
+                      # Some allowances for REXML
+                      if reader.instance_variable_get(:@library) == :rexml && %w(0198 0212 0256).any? {|n| t.num == n}
+                        pending "REXML issues"
+                      end
 
                       # Make sure auto-detect works
                       unless host_language =~ /svg/ || t.num == "0216" # due to http-equiv

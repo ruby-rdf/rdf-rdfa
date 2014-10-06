@@ -386,7 +386,7 @@ module RDF::RDFa
           end
         
           # Look for Embedded Turtle and RDF/XML
-          unless @root.xpath("//rdf:RDF", "xmlns:rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
+          unless @root.xpath("//rdf:RDF", "rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
             extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
               @repository << statement
             end
