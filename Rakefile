@@ -30,7 +30,7 @@ task :update_vocabularies do
     :doap   => "http://usefulinc.com/ns/doap#",
     :foaf => ['http://xmlns.com/foaf/0.1/', 'http://xmlns.com/foaf/0.1/index.rdf'],
     :gr     => "http://purl.org/goodrelations/v1#",
-    :schema => ['http://schema.org/', 'http://schema.rdfs.org/all.ttl'],
+    :schema => ['http://schema.org/', 'http://schema.org/docs/schema_org_rdfa.html'],
     :sioc   => "http://rdfs.org/sioc/ns#",
     :skos   => "http://www.w3.org/2004/02/skos/core#",
     :skosxl => "http://www.w3.org/2008/05/skos-xl#",
