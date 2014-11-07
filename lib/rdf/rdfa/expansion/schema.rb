@@ -4,6 +4,7 @@ require 'rdf/rdfa/expansion'
 
 module RDF::RDFa::Expansion
   [
+    RDF::Statement.new(RDF::URI('http://schema.org/additionalType'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subPropertyOf'), RDF::URI('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'), :context => RDF::URI('http://schema.org/')),
     RDF::Statement.new(RDF::URI('http://schema.org/CreativeWork'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://schema.org/Thing'), :context => RDF::URI('http://schema.org/')),
     RDF::Statement.new(RDF::URI('http://schema.org/WebPage'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://schema.org/CreativeWork'), :context => RDF::URI('http://schema.org/')),
     RDF::Statement.new(RDF::URI('http://schema.org/AboutPage'), RDF::URI('http://www.w3.org/2000/01/rdf-schema#subClassOf'), RDF::URI('http://schema.org/WebPage'), :context => RDF::URI('http://schema.org/')),
