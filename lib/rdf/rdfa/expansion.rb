@@ -1,38 +1,15 @@
+require 'rdf/reasoner'
+
 module RDF::RDFa
   ##
   # The Expansion module performs a subset of OWL entailment rules on the base class,
   # which implementes RDF::Readable.
   module Expansion
-    ##
-    # Pre-processed vocabularies used to simplify loading of common vocabularies
-    COOKED_VOCAB_STATEMENTS = []
 
     ##
     # Perform vocabulary expansion on the resulting default graph.
     #
-    #   Vocabulary expansion relies on a sub-set of OWL entailment to add
-    #   triples to the default graph based on rules and property/class relationships
-    #   described in referenced vocabularies.
-    #
-    # For all objects that are the target of an rdfa:usesVocabulary property, load the IRI into
-    # a repository.
-    #
-    # Subsequently, perform OWL expansion using rules prp-spo1, prp-eqp1,
-    # prp-eqp2, cax-sco, cax-eqc1, and cax-eqc2 placing resulting triples into the default
-    # graph. Iterate on this step until no more triples are added.
-    #
-    # @example
-    #    scm-spo
-    #    {pq rdfs:subPropertyOf pw . pw rdfs:subPropertyOf p3} => {p1 rdfs:subPropertyOf p3}
-    #
-    #    rdprp-spo1fs7
-    #    {p1 rdfs:subPropertyOf p2 . x p1 y} => {x p2 y}
-    #
-    #    cax-sco
-    #    {c1 rdfs:subClassOf c2 . x rdf:type c1} => {x rdf:type c2}
-    #
-    #    scm-sco
-    #    {c1 rdfs:subClassOf c2 . c2 rdfs:subClassOf c3} => {c1 rdfs:subClassOf c3}
+    #   Vocabulary expansion uses the built-in reasoner using included vocabularies from RDF.rb.
     #
     # @param [RDF::Repository] repository
     # @see [OWL2 PROFILES](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules)
@@ -40,31 +17,10 @@ module RDF::RDFa
       count = repository.count
       add_debug("expand") {"Repository has #{repository.size} statements"}
       
-      # Vocabularies managed in vocab_repo, and copied to repo for processing.
-      # This allows for persistent storage of vocabularies
-      @@vocab_repo = @options[:vocab_repository] if @options.has_key?(:vocab_repository)
-      @@vocab_repo ||= RDF::Repository.new.insert(*COOKED_VOCAB_STATEMENTS)
-      
-      vocabs = repository.query(:predicate => RDF::RDFA.usesVocabulary).to_a.map(&:object)
-      vocabs.each do |vocab|
-        begin
-          unless @@vocab_repo.has_context?(vocab)
-            add_debug("expand", "Load #{vocab}")
-            @@vocab_repo.load(vocab, :context => vocab)
-          end
-        rescue Exception => e
-          # indicate the warning if the vocabulary fails to laod
-          add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresolvedVocabulary)
-        end
-      end
-      
-      @@vocab_repo.each do |statement|
-        if vocabs.include?(statement.context)
-          repository << statement
-        end
-      end
+      RDF::Reasoner.apply(:rdfs, :owl)
+      repository.entail!
+      add_debug("expand") {"Repository now has #{repository.size} statements"}
 
-      entailment(repository)
     end
 
     ##
@@ -166,39 +122,6 @@ module RDF::RDFa
 
   private
 
-    RULES = [
-      Rule.new("prp-spo1") do
-        antecedent :p1, RDF::RDFS.subPropertyOf, :p2
-        antecedent :x, :p1, :y
-        consequent :x, :p2, :y
-      end,
-      Rule.new("prp-eqp1") do
-        antecedent :p1, RDF::OWL.equivalentProperty, :p2
-        antecedent :x, :p1, :y
-        consequent :x, :p2, :y
-      end,
-      Rule.new("prp-eqp2") do
-        antecedent :p1, RDF::OWL.equivalentProperty, :p2
-        antecedent :x, :p2, :y
-        consequent :x, :p1, :y
-      end,
-      Rule.new("cax-sco") do
-        antecedent :c1, RDF::RDFS.subClassOf, :c2
-        antecedent :x, RDF.type, :c1
-        consequent :x, RDF.type, :c2
-      end,
-      Rule.new("cax-eqc1") do
-        antecedent :c1, RDF::OWL.equivalentClass, :c2
-        antecedent :x, RDF.type, :c1
-        consequent :x, RDF.type, :c2
-      end,
-      Rule.new("cax-eqc2") do
-        antecedent :c1, RDF::OWL.equivalentClass, :c2
-        antecedent :x, RDF.type, :c2
-        consequent :x, RDF.type, :c1
-      end,
-    ]
-
     FOLDING_RULES = [
       Rule.new("rdfa-ref") do
         antecedent :x, RDF::RDFA.copy, :PR
@@ -218,32 +141,6 @@ module RDF::RDFa
         consequent :PR, :p, :y
       end,
     ]
-
-    ##
-    # Perform OWL entailment rules on repository
-    # @param [RDF::Repository] repository
-    # @return [RDF::Repository]
-    def entailment(repository)
-      old_count = 0
-
-      # Continue as long as new statements are added to repository
-      while old_count < (count = repository.count)
-        #add_debug("entailment") {"old: #{old_count} count: #{count}"}
-        old_count = count
-        to_add = []
-
-        RULES.each do |rule|
-          rule.execute(repository) do |statement|
-            #add_debug("entailment(#{rule.name})") {statement.inspect}
-            to_add << statement
-          end
-        end
-        
-        repository.insert(*to_add)
-      end
-
-      add_debug("entailment", "final count: #{count}")
-    end
 
     ##
     # Perform RDFa folding rules on repository
@@ -281,6 +178,3 @@ module RDF::RDFa
     end
   end
 end
-
-# Load cooked vocabularies
-Dir.glob(File.join(File.expand_path(File.dirname(__FILE__)), 'expansion', '*')).each {|f| load f}

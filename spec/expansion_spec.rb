@@ -1,6 +1,15 @@
 $:.unshift "."
 require 'spec_helper'
 
+class EX < RDF::Vocabulary("http://example.org/vocab#")
+  property :name, subPropertyOf: "foaf:name", type: "rdf:Property"
+  property :namee, "owl:equivalentProperty" => "foaf:name", type: "rdf:Property"
+  term     :Person, subClassOf: "foaf:Agent", type: "rdfs:Class"
+  term     :Persone, "owl:equivalentProperty" => "foaf:Agent", type: "rdfs:Class"
+
+
+end
+
 # Class for abstract testing of module
 class ExpansionTester
   include RDF::RDFa::Expansion
@@ -38,11 +47,10 @@ class ExpansionTester
     #STDERR.puts "#{node}: #{message}"
   end
   
-  def trace; @trace.join("\n"); end
+  def trace; Array(@trace).join("\n"); end
   
   def load(elements)
-    @@vocab_repo = RDF::Repository.new
-    @options = {:vocab_repository => @@vocab_repo}
+    @options = {}
     result = nil
     elements.each do |context, ttl|
       case context
@@ -52,40 +60,28 @@ class ExpansionTester
       when :result
         @outputDocument = ttl
         result = parse(ttl)
-      else
-        parse(ttl).each do |st|
-          st.context = RDF::URI(context.to_s)
-          @@vocab_repo << st
-        end
       end
     end
     
     result
   end
   
-  def add_vocabs_to_repo(repo)
-    repo.insert(@@vocab_repo)
-  end
-  
   def parse(ttl)
-    RDF::Graph.new << RDF::Turtle::Reader.new(ttl, :prefixes => {
-      :foaf => RDF::FOAF.to_uri,
-      :owl  => RDF::OWL.to_uri,
-      :rdf  => RDF.to_uri,
-      :rdfa => RDF::RDFA.to_uri,
-      :rdfs => RDF::RDFS.to_uri,
-      :xsd  => RDF::XSD.to_uri,
-      :ex   => RDF::URI("http://example.org/vocab#"),
-      nil   => "http://example.org/",
+    RDF::Graph.new << RDF::Turtle::Reader.new(ttl, prefixes: {
+      dc:   RDF::DC.to_uri,
+      foaf: RDF::FOAF.to_uri,
+      owl:  RDF::OWL.to_uri,
+      rdf:  RDF.to_uri,
+      rdfa: RDF::RDFA.to_uri,
+      rdfs: RDF::RDFS.to_uri,
+      xsd:  RDF::XSD.to_uri,
+      ex:   RDF::URI("http://example.org/vocab#"),
+      nil   => "http://example.org/vocab#",
     })
   end
 end
 
 describe RDF::RDFa::Expansion do
-  
-  before(:each) do
-    RDF::RDFa::Reader.send(:class_variable_set, :@@vocab_repo, nil)
-  end
 
   describe :entailment do
     {
@@ -95,68 +91,60 @@ describe RDF::RDFa::Expansion do
       },
       "simple"   => {
         :default => %q(:a a rdfs:Class .),
-        :result => %q(:a a rdfs:Class .)
+        :result => %q(
+          :a a rdfs:Class, rdfs:Resource .
+          rdfs:Class a rdfs:Class .
+        )
       },
       "prp-spo1"   => {
         :default => %q(<#me> :name "Gregg Kellogg" .),
-        :rules => %q(
-          :name rdfs:subPropertyOf foaf:name .
-        ),
         :result => %q(
-          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+          <#me> :name "Gregg Kellogg";
+            rdfs:label "Gregg Kellogg";
+            foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp1"   => {
-        :default => %q(<#me> :name "Gregg Kellogg" .),
-        :rules => %q(
-          :name owl:equivalentProperty foaf:name .
-        ),
+        :default => %q(<#me> :namee "Gregg Kellogg" .),
         :result => %q(
-          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+          <#me> :namee "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp2"   => {
         :default => %q(<#me> foaf:name "Gregg Kellogg" .),
-        :rules => %q(
-          :name owl:equivalentProperty foaf:name .
-        ),
         :result => %q(
-          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+          <#me> a owl:Thing;
+          :namee "Gregg Kellogg";
+          rdfs:label "Gregg Kellogg";
+          foaf:name "Gregg Kellogg" .
         )
       },
       "cax-sco"   => {
-        :default => %q(<#me> a foaf:Person .),
-        :rules => %q(
-          foaf:Person rdfs:subClassOf foaf:Agent .
-        ),
+        :default => %q(<#me> a :Person .),
         :result => %q(
-          <#me> a foaf:Person, foaf:Agent .
+          <#me> a :Person, foaf:Agent, rdfs:Resource .
+          :Person a rdfs:Class .
         )
       },
       "cax-eqc1"   => {
-        :default => %q(<#me> a foaf:Person .),
-        :rules => %q(
-          foaf:Person owl:equivalentClass foaf:Agent .
-        ),
+        :default => %q(<#me> a :Person .),
         :result => %q(
-          <#me> a foaf:Person, foaf:Agent .
+          <#me> a :Person, foaf:Agent, rdfs:Resource .
+          ex:Person a rdfs:Class .
         )
       },
       "cax-eqc2"   => {
         :default => %q(<#me> a foaf:Agent .),
-        :rules => %q(
-          foaf:Person owl:equivalentClass foaf:Agent .
-        ),
         :result => %q(
-          <#me> a foaf:Person, foaf:Agent .
+          <#me> a foaf:Agent, rdfs:Resource, dc:Agent .
+          foaf:Agent a rdfs:Class .
         )
       },
     }.each do |test, elements|
       it test do
         mt = ExpansionTester.new(test)
         result = mt.load(elements)
-        mt.add_vocabs_to_repo(mt.repo)
-        mt.send(:entailment, mt.repo)
+        mt.send(:expand, mt.repo)
         expect(mt.graph).to be_equivalent_graph(result, mt)
       end
     end
