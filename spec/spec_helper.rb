@@ -13,7 +13,6 @@ require 'yaml'
 require 'open-uri/cached'
 require 'matchers'
 require 'rdf/turtle'
-require 'rdfa_test_vocab'
 
 # Create and maintain a cache of downloaded URIs
 URI_CACHE = File.expand_path(File.join(File.dirname(__FILE__), "uri-cache"))

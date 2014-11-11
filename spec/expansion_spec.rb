@@ -355,6 +355,23 @@ describe RDF::RDFa::Expansion do
       )
       expect(parse(rdfa)).to pass_query(query, :trace => @debug)
     end
+
+    context "http://rdfa.info/vocabs/rdfa-test#" do
+      it "is not a default vocabulary" do
+        expect(RDF::Vocabulary.find("http://rdfa.info/vocabs/rdfa-test#")).to be_nil
+      end
+
+      it "loads vocabulary when expanding" do
+        parse %(
+          <body prefix="rdfatest: http://rdfa.info/vocabs/rdfa-test#" vocab="http://rdfa.info/vocabs/rdfa-test#">
+            Using the property <code property="subProp" resource="rdfatest:subProp">subProp</code>
+            should cause a triple with <code>baseProp</code> to be added.
+          </body>
+        )
+        v = RDF::Vocabulary.find("http://rdfa.info/vocabs/rdfa-test#")
+        expect(v).not_to be_nil
+      end
+    end
   end
   
   context "rdfa:Pattern" do

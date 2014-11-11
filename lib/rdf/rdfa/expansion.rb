@@ -16,7 +16,19 @@ module RDF::RDFa
     def expand(repository)
       old_count, count = 0, repository.count
       add_debug("expand") {"Repository has #{count} statements"}
-      
+
+      # Load missing vocabularies
+      vocabs = repository.query(:predicate => RDF::RDFA.usesVocabulary).to_a.map(&:object)
+      vocabs.each do |vocab|
+        begin
+          # Create the name with a predictable name so that it is enumerated and can be found
+          RDF::Vocabulary.load(vocab, class_name: "D#{Digest::MD5.hexdigest vocab}") unless RDF::Vocabulary.find(vocab)
+        rescue Exception => e
+          # indicate the warning if the vocabulary fails to laod
+          add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresolvedVocabulary)
+        end
+      end
+
       RDF::Reasoner.apply(:rdfs, :owl)
 
       # Continue as long as new statements are added to repository
