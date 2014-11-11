@@ -1,4 +1,4 @@
-require 'rdf/reasoner'
+require 'rdf/aggregate_repo'
 
 module RDF::RDFa
   ##
@@ -14,29 +14,24 @@ module RDF::RDFa
     # @param [RDF::Repository] repository
     # @see [OWL2 PROFILES](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules)
     def expand(repository)
-      old_count, count = 0, repository.count
-      add_debug("expand") {"Repository has #{count} statements"}
+      add_debug("expand") {"Repository has #{repository.count} statements"}
 
       # Load missing vocabularies
       vocabs = repository.query(:predicate => RDF::RDFA.usesVocabulary).to_a.map(&:object)
-      vocabs.each do |vocab|
+      vocabs.map! do |vocab|
         begin
           # Create the name with a predictable name so that it is enumerated and can be found
-          RDF::Vocabulary.load(vocab, class_name: "D#{Digest::MD5.hexdigest vocab}") unless RDF::Vocabulary.find(vocab)
+          v = RDF::Vocabulary.find(vocab) ||
+              RDF::Vocabulary.load(vocab, class_name: "D#{Digest::MD5.hexdigest vocab}")
         rescue Exception => e
           # indicate the warning if the vocabulary fails to laod
           add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresolvedVocabulary)
+          nil
         end
-      end
+      end.compact
 
-      RDF::Reasoner.apply(:rdfs, :owl)
-
-      # Continue as long as new statements are added to repository
-      while old_count < (count = repository.count)
-        old_count = count
-        repository.entail!
-      end
-      add_debug("expand") {"Repository now has #{count} statements"}
+      entailment(repository, vocabs)
+      add_debug("expand") {"Repository now has #{repository.count} statements"}
 
     end
 
@@ -139,6 +134,39 @@ module RDF::RDFa
 
   private
 
+    RULES = [
+      Rule.new("prp-spo1") do
+        antecedent :p1, RDF::RDFS.subPropertyOf, :p2
+        antecedent :x, :p1, :y
+        consequent :x, :p2, :y
+      end,
+      Rule.new("prp-eqp1") do
+        antecedent :p1, RDF::OWL.equivalentProperty, :p2
+        antecedent :x, :p1, :y
+        consequent :x, :p2, :y
+      end,
+      Rule.new("prp-eqp2") do
+        antecedent :p1, RDF::OWL.equivalentProperty, :p2
+        antecedent :x, :p2, :y
+        consequent :x, :p1, :y
+      end,
+      Rule.new("cax-sco") do
+        antecedent :c1, RDF::RDFS.subClassOf, :c2
+        antecedent :x, RDF.type, :c1
+        consequent :x, RDF.type, :c2
+      end,
+      Rule.new("cax-eqc1") do
+        antecedent :c1, RDF::OWL.equivalentClass, :c2
+        antecedent :x, RDF.type, :c1
+        consequent :x, RDF.type, :c2
+      end,
+      Rule.new("cax-eqc2") do
+        antecedent :c1, RDF::OWL.equivalentClass, :c2
+        antecedent :x, RDF.type, :c2
+        consequent :x, RDF.type, :c1
+      end,
+    ]
+
     FOLDING_RULES = [
       Rule.new("rdfa-ref") do
         antecedent :x, RDF::RDFA.copy, :PR
@@ -158,6 +186,49 @@ module RDF::RDFa
         consequent :PR, :p, :y
       end,
     ]
+
+    ##
+    # Perform OWL entailment rules on repository
+    # @param [RDF::Repository] repository
+    # @return [RDF::Repository]
+    def entailment(repository, vocabs)
+      old_count = 0
+
+      # Create an aggregate repo containing base repository and relevant entailment rules from the included vocabularies
+      v_repo = RDF::Repository.new do |r|
+        vocabs.each do |v|
+          v.each_statement do |statement|
+            r << statement if [
+              RDF::OWL.equivalentProperty,
+              RDF::OWL.equivalentClass,
+              RDF::RDFS.subPropertyOf,
+              RDF::RDFS.subClassOf
+            ].include?(statement.predicate)
+          end
+        end
+      end
+
+      ag_repo = RDF::MergeGraph.new do
+        source repository, false
+        source v_repo, false
+      end
+
+      # Continue as long as new statements are added to repository
+      while old_count < (count = repository.count)
+        #add_debug("entailment") {"old: #{old_count} count: #{count}"}
+        old_count = count
+        to_add = []
+
+        RULES.each do |rule|
+          rule.execute(ag_repo) do |statement|
+            #add_debug("entailment(#{rule.name})") {statement.inspect}
+            to_add << statement
+          end
+        end
+        
+        repository.insert(*to_add)
+      end
+    end
 
     ##
     # Perform RDFa folding rules on repository

@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'rdf',             '~> 1.1', '>= 1.1.6'
   gem.add_runtime_dependency     'haml',            '~> 4.0'
   gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1'
-  gem.add_runtime_dependency     'rdf-reasoner'
+  gem.add_runtime_dependency     'rdf-aggregate-repo'
   gem.add_runtime_dependency     'htmlentities',    '~> 4.3'
 
   gem.add_development_dependency 'open-uri-cached', '~> 0.0', '>= 0.0.5'

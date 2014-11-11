@@ -103,7 +103,7 @@ describe RDF::RDFa::Expansion do
       "simple"   => {
         default: %q(:a a rdfs:Class .),
         query: %q(
-          :a a rdfs:Class, rdfs:Resource .
+          :a a rdfs:Class .
         )
       },
       "prp-spo1"   => {
@@ -146,7 +146,7 @@ describe RDF::RDFa::Expansion do
       it test do
         mt = ExpansionTester.new(test)
         query = mt.load(elements)
-        mt.send(:expand, mt.repo)
+        mt.send(:entailment, mt.repo, [EXP])
         expect(mt.graph).to pass_query(query, mt)
       end
     end
