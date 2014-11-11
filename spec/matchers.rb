@@ -122,7 +122,7 @@ RSpec::Matchers.define :pass_query do |expected, info|
 
   failure_message do |actual|
     "#{@info.inspect + "\n"}" +
-    "#{@info.num + "\n" if @info.num}" +
+    "#{@info.num + "\n" if @info.respond_to?(:num) && @info.num}" +
     if @results.nil?
       "Query failed to return results"
     elsif !@results.is_a?(RDF::Literal::Boolean)

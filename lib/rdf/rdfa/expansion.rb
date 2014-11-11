@@ -14,12 +14,17 @@ module RDF::RDFa
     # @param [RDF::Repository] repository
     # @see [OWL2 PROFILES](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules)
     def expand(repository)
-      count = repository.count
-      add_debug("expand") {"Repository has #{repository.size} statements"}
+      old_count, count = 0, repository.count
+      add_debug("expand") {"Repository has #{count} statements"}
       
       RDF::Reasoner.apply(:rdfs, :owl)
-      repository.entail!
-      add_debug("expand") {"Repository now has #{repository.size} statements"}
+
+      # Continue as long as new statements are added to repository
+      while old_count < (count = repository.count)
+        old_count = count
+        repository.entail!
+      end
+      add_debug("expand") {"Repository now has #{count} statements"}
 
     end
 
