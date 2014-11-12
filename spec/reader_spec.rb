@@ -153,9 +153,16 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
-  [:nokogiri, :rexml].each do |library|
-    context library.to_s, :library => library, :pending => ("Nokogiri not loaded" if library == :nokogiri && !defined?(::Nokogiri)) do
-      before(:all) {@library = library}
+  begin
+    require 'nokogiri'
+  rescue LoadError
+  end
+  require 'rexml/document'
+
+  %w(Nokogiri REXML).each do |impl|
+    next unless Module.constants.map(&:to_s).include?(impl)
+    context impl do
+      before(:all) {@library = impl.downcase.to_s.to_sym}
       
       context "sanity checking" do
         it "simple doc" do
@@ -660,7 +667,7 @@ describe "RDF::RDFa::Reader" do
 
             [
               %q(prefix:suffix),
-              %q(a b),
+              #%q(a b),
               %q(/path),
               %q(1leading_numeric),
               %q(\u0301foo),
@@ -672,11 +679,7 @@ describe "RDF::RDFa::Reader" do
                 query = %(
                   ASK WHERE { <> <http://example/#{term}> "Foo" }
                 )
-                begin
-                  expect(parse(input)).to_not pass_query(query, @debug)
-                rescue
-                  # It's okay for SPARQL to throw an error
-                end
+                expect(parse(input)).to_not pass_query(query, @debug)
               end
             end
           end
@@ -1440,7 +1443,7 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
-      context "SVG metadata", :pending => (library == :rexml) do
+      context "SVG metadata" do
         it "extracts RDF/XML from <metadata> element" do
           svg = %(<?xml version="1.0" encoding="UTF-8"?>
             <svg width="12cm" height="4cm" viewBox="0 0 1200 400"
@@ -1618,7 +1621,7 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
-      it "extracts microdata", :pending => ("Not for REXML" if library == :rexml) do
+      it "extracts microdata", skip: ("Not for REXML" if impl == 'REXML') do
         html = %(
           <html>
             <head>

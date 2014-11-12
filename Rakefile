@@ -22,32 +22,6 @@ RSpec::Core::RakeTask.new("spec:rcov") do |spec|
   spec.rcov_opts =  %q[--exclude "spec"]
 end
 
-desc "Update Cached expansion vocabularies"
-task :update_vocabularies do
-  {
-    :cc     => "http://creativecommons.org/ns#",
-    :dc     => "http://purl.org/dc/terms/",
-    :doap   => "http://usefulinc.com/ns/doap#",
-    :foaf => ['http://xmlns.com/foaf/0.1/', 'http://xmlns.com/foaf/0.1/index.rdf'],
-    :gr     => "http://purl.org/goodrelations/v1#",
-    :schema => ['http://schema.org/', 'http://schema.rdfs.org/all.ttl'],
-    :sioc   => "http://rdfs.org/sioc/ns#",
-    :skos   => "http://www.w3.org/2004/02/skos/core#",
-    :skosxl => "http://www.w3.org/2008/05/skos-xl#",
-    :v      => "http://rdf.data-vocabulary.org/#",
-  }.each do |v, loc|
-    if loc.is_a?(Array)
-      uri, loc = loc
-    else
-      uri = loc
-    end
-    puts "Build #{uri} from #{loc}"
-    vocab = File.expand_path(File.join(File.dirname(__FILE__), "lib", "rdf", "rdfa", "expansion", "#{v}.rb"))
-    FileUtils.rm_rf(vocab)
-    `./script/intern_vocabulary -o #{vocab} --uri #{uri} #{loc}`
-  end
-end
-
 desc "Update RDFa Contexts"
 task :update_contexts do
   {

@@ -1,6 +1,13 @@
 $:.unshift "."
 require 'spec_helper'
 
+class EXP < RDF::Vocabulary("http://example.org/vocab#")
+  property :name, subPropertyOf: "foaf:name", type: "rdf:Property"
+  property :namee, "owl:equivalentProperty" => "foaf:name", type: "rdf:Property"
+  term     :Person, subClassOf: "foaf:Person", type: "rdfs:Class"
+  term     :Persone, "owl:equivalentClass" => "foaf:Person", type: "rdfs:Class"
+end
+
 # Class for abstract testing of module
 class ExpansionTester
   include RDF::RDFa::Expansion
@@ -24,6 +31,8 @@ class ExpansionTester
 
   def each_statement(&block); @repo.each_statement(&block); end
 
+  def expectedResults; RDF::Literal::Boolean.new(true); end
+
   def add_debug(node, message = "")
     message = message + yield if block_given?
     @trace ||= []
@@ -38,126 +47,107 @@ class ExpansionTester
     #STDERR.puts "#{node}: #{message}"
   end
   
-  def trace; @trace.join("\n"); end
+  def trace; Array(@trace).join("\n"); end
   
   def load(elements)
-    @@vocab_repo = RDF::Repository.new
-    @options = {:vocab_repository => @@vocab_repo}
+    @options = {}
     result = nil
-    elements.each do |context, ttl|
+    elements.each do |context, value|
       case context
       when :default
-        @inputDocument = ttl
-        @repo << parse(ttl)
-      when :result
-        @outputDocument = ttl
-        result = parse(ttl)
-      else
-        parse(ttl).each do |st|
-          st.context = RDF::URI(context.to_s)
-          @@vocab_repo << st
-        end
+        @inputDocument = value
+        @repo << parse(value)
+      when :query
+        @outputDocument = value
+        result = %(
+          PREFIX dc:  <#{RDF::DC.to_uri}>
+          PREFIX foaf:<#{RDF::FOAF.to_uri}>
+          PREFIX owl: <#{RDF::OWL.to_uri}>
+          PREFIX rdf: <#{RDF.to_uri}>
+          PREFIX rdfa:<#{RDF::RDFA.to_uri}>
+          PREFIX rdfs:<#{RDF::RDFS.to_uri}>
+          PREFIX xsd: <#{RDF::XSD.to_uri}>
+          PREFIX exp: <#{EXP.to_uri}>
+          PREFIX :    <#{EXP.to_uri}>
+          ASK WHERE {#{value}}
+        )
       end
     end
     
     result
   end
   
-  def add_vocabs_to_repo(repo)
-    repo.insert(@@vocab_repo)
-  end
-  
   def parse(ttl)
-    RDF::Graph.new << RDF::Turtle::Reader.new(ttl, :prefixes => {
-      :foaf => RDF::FOAF.to_uri,
-      :owl  => RDF::OWL.to_uri,
-      :rdf  => RDF.to_uri,
-      :rdfa => RDF::RDFA.to_uri,
-      :rdfs => RDF::RDFS.to_uri,
-      :xsd  => RDF::XSD.to_uri,
-      :ex   => RDF::URI("http://example.org/vocab#"),
-      nil   => "http://example.org/",
+    RDF::Graph.new << RDF::Turtle::Reader.new(ttl, prefixes: {
+      dc:   RDF::DC.to_uri,
+      foaf: RDF::FOAF.to_uri,
+      owl:  RDF::OWL.to_uri,
+      rdf:  RDF.to_uri,
+      rdfa: RDF::RDFA.to_uri,
+      rdfs: RDF::RDFS.to_uri,
+      xsd:  RDF::XSD.to_uri,
+      exp:  EXP.to_uri,
+      nil   => EXP.to_uri,
     })
   end
 end
 
 describe RDF::RDFa::Expansion do
-  
-  before(:each) do
-    RDF::RDFa::Reader.send(:class_variable_set, :@@vocab_repo, nil)
-  end
 
   describe :entailment do
     {
       "empty"   => {
-        :default => %q(),
-        :result => %q()
+        default: %q(),
+        query: %q()
       },
       "simple"   => {
-        :default => %q(:a a rdfs:Class .),
-        :result => %q(:a a rdfs:Class .)
+        default: %q(:a a rdfs:Class .),
+        query: %q(
+          :a a rdfs:Class .
+        )
       },
       "prp-spo1"   => {
-        :default => %q(<#me> :name "Gregg Kellogg" .),
-        :rules => %q(
-          :name rdfs:subPropertyOf foaf:name .
-        ),
-        :result => %q(
+        default: %q(<#me> :name "Gregg Kellogg" .),
+        query: %q(
           <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp1"   => {
-        :default => %q(<#me> :name "Gregg Kellogg" .),
-        :rules => %q(
-          :name owl:equivalentProperty foaf:name .
-        ),
-        :result => %q(
-          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+        default: %q(<#me> :namee "Gregg Kellogg" .),
+        query: %q(
+          <#me> :namee "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp2"   => {
-        :default => %q(<#me> foaf:name "Gregg Kellogg" .),
-        :rules => %q(
-          :name owl:equivalentProperty foaf:name .
-        ),
-        :result => %q(
-          <#me> :name "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
+        default: %q(<#me> foaf:name "Gregg Kellogg" .),
+        query: %q(
+          <#me> :namee "Gregg Kellogg"; foaf:name "Gregg Kellogg" .
         )
       },
       "cax-sco"   => {
-        :default => %q(<#me> a foaf:Person .),
-        :rules => %q(
-          foaf:Person rdfs:subClassOf foaf:Agent .
-        ),
-        :result => %q(
-          <#me> a foaf:Person, foaf:Agent .
+        default: %q(<#me> a :Person .),
+        query: %q(
+          <#me> a :Person, foaf:Person .
         )
       },
       "cax-eqc1"   => {
-        :default => %q(<#me> a foaf:Person .),
-        :rules => %q(
-          foaf:Person owl:equivalentClass foaf:Agent .
-        ),
-        :result => %q(
-          <#me> a foaf:Person, foaf:Agent .
+        default: %q(<#me> a :Persone .),
+        query: %q(
+          <#me> a :Persone, foaf:Person .
         )
       },
       "cax-eqc2"   => {
-        :default => %q(<#me> a foaf:Agent .),
-        :rules => %q(
-          foaf:Person owl:equivalentClass foaf:Agent .
-        ),
-        :result => %q(
-          <#me> a foaf:Person, foaf:Agent .
+        default: %q(<#me> a foaf:Person .),
+        query: %q(
+          <#me> a foaf:Person, :Persone .
         )
       },
     }.each do |test, elements|
       it test do
         mt = ExpansionTester.new(test)
-        result = mt.load(elements)
-        mt.add_vocabs_to_repo(mt.repo)
-        mt.send(:entailment, mt.repo)
-        expect(mt.graph).to be_equivalent_graph(result, mt)
+        query = mt.load(elements)
+        mt.send(:entailment, mt.repo, [EXP])
+        expect(mt.graph).to pass_query(query, mt)
       end
     end
   end
@@ -165,99 +155,99 @@ describe RDF::RDFa::Expansion do
   describe :expand do
     {
       "simple"   => {
-        :default => %q(<document> rdfa:usesVocabulary ex: .),
+        default: %q(<document> rdfa:usesVocabulary exp: .),
         "http://example.org/vocab#" => %q(
-          ex:Person owl:equivalentClass foaf:Person .
+          exp:Person owl:equivalentClass foaf:Person .
         ),
-        :result => %q(<document> rdfa:usesVocabulary ex: .)
+        query: %q(<document> rdfa:usesVocabulary exp: .)
       },
       "prp-spo1"   => {
-        :default => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> ex:name "Gregg Kellogg" .
+        default: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> exp:name "Gregg Kellogg" .
         ),
         "http://example.org/vocab#" => %q(
-          ex:name rdfs:subPropertyOf foaf:name .
+          exp:name rdfs:subPropertyOf foaf:name .
         ),
-        :result => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> ex:name "Gregg Kellogg";
+        query: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> exp:name "Gregg Kellogg";
             foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp1"   => {
-        :default => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> ex:name "Gregg Kellogg" .
+        default: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> exp:name "Gregg Kellogg" .
         ),
         "http://example.org/vocab#" => %q(
-          ex:name owl:equivalentProperty foaf:name .
+          exp:namee owl:equivalentProperty foaf:name .
         ),
-        :result => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> ex:name "Gregg Kellogg";
+        query: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> exp:namee "Gregg Kellogg";
             foaf:name "Gregg Kellogg" .
         )
       },
       "prp-eqp2"   => {
-        :default => %q(
-          <document> rdfa:usesVocabulary ex: .
+        default: %q(
+          <document> rdfa:usesVocabulary exp: .
           <#me> foaf:name "Gregg Kellogg" .
         ),
         "http://example.org/vocab#" => %q(
-          ex:name owl:equivalentProperty foaf:name .
+          exp:name owl:equivalentProperty foaf:name .
         ),
-        :result => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> ex:name "Gregg Kellogg";
+        query: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> exp:namee "Gregg Kellogg";
             foaf:name "Gregg Kellogg" .
         )
       },
       "cax-sco"   => {
-        :default => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> a ex:Person .
+        default: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> a exp:Person .
         ),
         "http://example.org/vocab#" => %q(
-          ex:Person rdfs:subClassOf foaf:Person .
+          exp:Person rdfs:subClassOf foaf:Person .
         ),
-        :result => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> a ex:Person, foaf:Person .
+        query: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> a exp:Person, foaf:Person .
         )
       },
       "cax-eqc1"   => {
-        :default => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> a ex:Person .
+        default: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> a exp:Persone .
         ),
         "http://example.org/vocab#" => %q(
-          ex:Person owl:equivalentClass foaf:Person .
+          exp:Person owl:equivalentClass foaf:Person .
         ),
-        :result => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> a ex:Person, foaf:Person .
+        query: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> a exp:Persone, foaf:Person .
         )
       },
       "cax-eqc2"   => {
-        :default => %q(
-          <document> rdfa:usesVocabulary ex: .
+        default: %q(
+          <document> rdfa:usesVocabulary exp: .
           <#me> a foaf:Person .
         ),
         "http://example.org/vocab#" => %q(
-          ex:Person owl:equivalentClass foaf:Person .
+          exp:Person owl:equivalentClass foaf:Person .
         ),
-        :result => %q(
-          <document> rdfa:usesVocabulary ex: .
-          <#me> a ex:Person, foaf:Person .
+        query: %q(
+          <document> rdfa:usesVocabulary exp: .
+          <#me> a exp:Persone, foaf:Person .
         )
       }
     }.each do |test, elements|
       it test do
         mt = ExpansionTester.new(test)
-        result = mt.load(elements)
+        query = mt.load(elements)
         mt.expand(mt.repo)
-        expect(mt.graph).to be_equivalent_graph(result, mt)
+        expect(mt.graph).to pass_query(query, mt)
       end
     end
   end
@@ -265,14 +255,14 @@ describe RDF::RDFa::Expansion do
   describe :copy_properties do
     {
       "simple" => {
-        :default => %q(
+        default: %q(
           <> rdfa:copy _:ref .
           _:ref a rdfa:Pattern; rdf:value "Pattern" .
         ),
-        :result => %q(<> rdf:value "Pattern" .)
+        query: %q(<> rdf:value "Pattern" .)
       },
       "chaining ref" => {
-        :default => %q(
+        default: %q(
           <> rdfa:copy _:ref .
           _:ref a rdfa:Pattern;
             rdf:value "Pattern";
@@ -280,15 +270,14 @@ describe RDF::RDFa::Expansion do
           _:ref2 a rdfa:Pattern;
           rdf:value "Pattern2" .
         ),
-        :result => %q(<> rdf:value "Pattern", "Pattern2" .)
+        query: %q(<> rdf:value "Pattern", "Pattern2" .)
       }
     }.each do |test, elements|
       it test do
         mt = ExpansionTester.new(test)
-        result = mt.load(elements)
-        vocab = RDF::URI("http://example.org/vocab#")
+        query = mt.load(elements)
         mt.copy_properties(mt.repo)
-        expect(mt.graph).to be_equivalent_graph(result, mt)
+        expect(mt.graph).to pass_query(query, mt)
       end
     end
   end
@@ -317,15 +306,17 @@ describe RDF::RDFa::Expansion do
           </body>
         </html>
       )
-      ttl = %(
-        @prefix doap: <http://usefulinc.com/ns/doap#> .
-        @prefix dc:   <http://purl.org/dc/terms/> .
+      query = %(
+        PREFIX doap: <http://usefulinc.com/ns/doap#>
+        PREFIX dc:   <http://purl.org/dc/terms/>
 
-        <> a doap:Project;
-          doap:name "RDF::RDFa";
-          dc:creator <http://greggkellogg.net/foaf#me> .
+        ASK WHERE {
+          <> a doap:Project;
+            doap:name "RDF::RDFa";
+            dc:creator <http://greggkellogg.net/foaf#me> .
+        }
       )
-      expect(parse(rdfa)).to be_equivalent_graph(ttl, :trace => @debug)
+      expect(parse(rdfa)).to pass_query(query, trace: @debug)
     end
   end
   
@@ -346,21 +337,40 @@ describe RDF::RDFa::Expansion do
           </body>
         </html>
       )
-      ttl = %(
-        @prefix doap: <http://usefulinc.com/ns/doap#> .
-        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-        @prefix wn:   <http://xmlns.com/wordnet/1.6/> .
-        @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-        @prefix rdfa: <http://www.w3.org/ns/rdfa#> .
-        @prefix dc:   <http://purl.org/dc/terms/> .
+      query = %(
+        PREFIX doap: <http://usefulinc.com/ns/doap#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX wn:   <http://xmlns.com/wordnet/1.6/>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
+        PREFIX dc:   <http://purl.org/dc/terms/>
 
-        <> a doap:Project, wn:Project, foaf:Project;
-          rdfa:usesVocabulary <http://usefulinc.com/ns/doap#>;
-          doap:name "RDF::RDFa";
-          rdfs:label "RDF::RDFa";
-          dc:creator <http://greggkellogg.net/foaf#me> .
+        ASK WHERE {
+          <> a doap:Project, wn:Project, foaf:Project;
+            rdfa:usesVocabulary <http://usefulinc.com/ns/doap#>;
+            doap:name "RDF::RDFa";
+            rdfs:label "RDF::RDFa";
+            dc:creator <http://greggkellogg.net/foaf#me> .
+        }
       )
-      expect(parse(rdfa)).to be_equivalent_graph(ttl, :trace => @debug)
+      expect(parse(rdfa)).to pass_query(query, :trace => @debug)
+    end
+
+    context "http://rdfa.info/vocabs/rdfa-test#" do
+      it "is not a default vocabulary" do
+        expect(RDF::Vocabulary.find("http://rdfa.info/vocabs/rdfa-test#")).to be_nil
+      end
+
+      it "loads vocabulary when expanding" do
+        parse %(
+          <body prefix="rdfatest: http://rdfa.info/vocabs/rdfa-test#" vocab="http://rdfa.info/vocabs/rdfa-test#">
+            Using the property <code property="subProp" resource="rdfatest:subProp">subProp</code>
+            should cause a triple with <code>baseProp</code> to be added.
+          </body>
+        )
+        v = RDF::Vocabulary.find("http://rdfa.info/vocabs/rdfa-test#")
+        expect(v).not_to be_nil
+      end
     end
   end
   
@@ -377,8 +387,8 @@ describe RDF::RDFa::Expansion do
           </div>
         ),
         %q(
-          @prefix schema: <http://schema.org/> .
-          [a schema:Person; schema:name "Amanda"] .
+          PREFIX schema: <http://schema.org/>
+          ASK WHERE {[a schema:Person; schema:name "Amanda"]}
         )
       ],
       "to generate listed property values" =>
@@ -393,8 +403,8 @@ describe RDF::RDFa::Expansion do
         </div>
         ),
         %q(
-          @prefix schema: <http://schema.org/> .
-          [ a schema:Person; schema:name "Gregg", "Kellogg"] .
+          PREFIX schema: <http://schema.org/>
+          ASK WHERE {[ a schema:Person; schema:name "Gregg", "Kellogg"]}
         )
       ],
       "to single id with different types" =>
@@ -411,10 +421,12 @@ describe RDF::RDFa::Expansion do
           </div>
         ),
         %q(
-          @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-          @prefix schema: <http://schema.org/> .
-          [ a schema:Person; schema:name "Amanda"; foaf:name "Amanda"] .
-          [ a foaf:Person; schema:name "Amanda"; foaf:name "Amanda"] .
+          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+          PREFIX schema: <http://schema.org/>
+          ASK WHERE{
+            [ a schema:Person; schema:name "Amanda"; foaf:name "Amanda"] .
+            [ a foaf:Person; schema:name "Amanda"; foaf:name "Amanda"] .
+          }
         )
       ],
       "to multiple prototypes" =>
@@ -430,11 +442,13 @@ describe RDF::RDFa::Expansion do
           </div>
         ),
         %q(
-          @prefix schema: <http://schema.org/> .
-          [ a schema:Person;
-            schema:name "Amanda";
-            schema:band "Jazz Band";
-          ] .
+          PREFIX schema: <http://schema.org/>
+          ASK WHERE{
+            [ a schema:Person;
+              schema:name "Amanda";
+              schema:band "Jazz Band";
+            ]
+          }
         )
       ],
       "with chaining" =>
@@ -458,15 +472,17 @@ describe RDF::RDFa::Expansion do
           </div>
         ),
         %q(
-          @prefix schema: <http://schema.org/> .
-          [ a schema:Person;
-            schema:name "Amanda" ;
-            schema:band [
-              a schema:MusicGroup;
-              schema:name "Jazz Band";
-              schema:size "12"
+          PREFIX schema: <http://schema.org/>
+          ASK WHERE{
+            [ a schema:Person;
+              schema:name "Amanda" ;
+              schema:band [
+                a schema:MusicGroup;
+                schema:name "Jazz Band";
+                schema:size "12"
+              ]
             ]
-          ] .
+          }
         )
       ],
       "shared" =>
@@ -483,19 +499,20 @@ describe RDF::RDFa::Expansion do
           </div>
         ),
         %q(
-          @prefix schema: <http://schema.org/> .
-          [ schema:refers-to _:a ] .
-          [ schema:refers-to _:a ] .
-          _:a schema:name "Amanda" .
+          PREFIX schema: <http://schema.org/>
+          ASK WHERE{
+            [ schema:refers-to ?a ] .
+            [ schema:refers-to ?a ] .
+            ?a schema:name "Amanda" .
+          }
         )
           
       ],
-    }.each do |title, (input, result)|
+    }.each do |title, (input, query)|
       it title do
-        expect(parse(input)).to be_equivalent_graph(result,
-          :base_uri => "http://example.com/",
-          :format => :ttl,
-          :trace => @debug)
+        expect(parse(input)).to pass_query(query,
+          base_uri: "http://example.com/",
+          trace: @debug)
       end
     end
   end
@@ -503,7 +520,7 @@ describe RDF::RDFa::Expansion do
   def parse(input, options = {})
     @debug = options[:debug] || []
     RDF::Graph.new << RDF::RDFa::Reader.new(input, options.merge(
-      :debug => @debug, :vocab_expansion => true, :vocab_repository => nil
+      debug: @debug, vocab_expansion: true
     ))
   end
 end

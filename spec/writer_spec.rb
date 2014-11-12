@@ -508,6 +508,7 @@ describe RDF::RDFa::Writer do
       }.each do |test, (input, result)|
         it test do
           pending("Serializing multiple lists") if test == "multiple collections"
+          skip "REXML" if test == 'issue 14' && !Module.constants.include?(:Nokogiri)
           @graph = parse(input, :format => :ttl)
           html = serialize(:haml_options => {:ugly => false})
           result.each do |path, value|
@@ -544,10 +545,16 @@ describe RDF::RDFa::Writer do
 
         # Generate with each template set
         RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
+          next if name == :distiller && !Module.constants.include?(:Nokogiri)
           context "Using #{name} template" do
             Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
               next if %w(0198 0225 0284 0295 0319 0329).include?(t.num)
               specify "test #{t.num}: #{t.description}" do
+                unless Module.constants.include?(:Nokogiri)
+                  if %w(0261).include?(t.num)
+                    pending "REXML"
+                  end
+                end
                 input = t.input("html5", "rdfa1.1")
                 @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"))
                 result = serialize(:haml => template, :haml_options => {:ugly => false})
