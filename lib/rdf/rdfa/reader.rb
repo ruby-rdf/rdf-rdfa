@@ -374,7 +374,7 @@ module RDF::RDFa
               when 'text/turtle'         then require 'rdf/turtle'
               when 'application/ld+json' then require 'json/ld'
               end
-            rescue
+            rescue LoadError
             end
 
             if reader = RDF::Reader.for(:content_type => type)
