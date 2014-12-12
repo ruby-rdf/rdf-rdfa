@@ -1636,12 +1636,9 @@ describe "RDF::RDFa::Reader" do
           </html>
         )
         ttl = %(
-          @prefix md: <http://www.w3.org/ns/md#> .
-          @prefix rdfa: <http://www.w3.org/ns/rdfa#> .
           @prefix schema: <http://schema.org/> .
 
-          <> md:item ([ a schema:Person; schema:name "Gregg Kellogg"]);
-             rdfa:usesVocabulary schema: .
+          [ a schema:Person; schema:name "Gregg Kellogg"] .
         )
         expect(parse(html)).to be_equivalent_graph(ttl, :trace => @debug)
       end
