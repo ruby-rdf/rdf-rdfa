@@ -20,7 +20,7 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 Install with `gem install rdf-rdfa`
 
 ### Pure Ruby
-In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri][]
+In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri](http://www.nokogiri.org)
 and falls back to using REXML. As REXML is not really an HTML parsing library, the results will only be useful if the HTML is well-formed.
 For best performance, install the Nokogiri gem as well.
 
