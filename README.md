@@ -210,6 +210,7 @@ If the document includes a `&lt;script&gt;` element having an `@type` attribute 
 
 generates the following Turtle:
 
+```
    @prefix foo:  <http://www.example.com/xyz#> .
    @prefix gr:   <http://purl.org/goodrelations/v1#> .
    @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
@@ -219,6 +220,7 @@ generates the following Turtle:
      a gr:BusinessEntity ;
      rdfs:seeAlso <http://www.example.com/xyz> ;
      gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+```
 
 ### Support for Role Attribute
 The processor will generate RDF triples consistent with the [Role Attr][] specification.
