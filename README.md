@@ -15,12 +15,12 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 * Fully compliant RDFa 1.1 parser.
 * Template-based Writer to generate XHTML+RDFa.
   * Writer uses user-replacable [Haml][Haml]-based templates to generate RDFa.
-* If available, Uses Nokogiri for parsing HTML/SVG, falls back to REXML otherwise
+* If available, uses Nokogiri for parsing HTML/SVG, falls back to REXML otherwise
 
-Install with 'gem install rdf-rdfa'
+Install with `gem install rdf-rdfa`
 
 ### Pure Ruby
-In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri][]
+In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri](http://www.nokogiri.org)
 and falls back to using REXML. As REXML is not really an HTML parsing library, the results will only be useful if the HTML is well-formed.
 For best performance, install the Nokogiri gem as well.
 
@@ -210,6 +210,7 @@ If the document includes a `&lt;script&gt;` element having an `@type` attribute 
 
 generates the following Turtle:
 
+```
    @prefix foo:  <http://www.example.com/xyz#> .
    @prefix gr:   <http://purl.org/goodrelations/v1#> .
    @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
@@ -219,6 +220,7 @@ generates the following Turtle:
      a gr:BusinessEntity ;
      rdfs:seeAlso <http://www.example.com/xyz> ;
      gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+```
 
 ### Support for Role Attribute
 The processor will generate RDF triples consistent with the [Role Attr][] specification.
@@ -395,7 +397,7 @@ The template hash defines four Haml templates:
 * [Ruby](http://ruby-lang.org/) (>= 1.9.3)
 * [RDF.rb](http://rubygems.org/gems/rdf) (>= 1.1)
 * [Haml](https://rubygems.org/gems/haml) (>= 4.0)
-* [HTMLEntities](https://rubygems.org/gems/htmlentities) ('>= 4.3.1')
+* [HTMLEntities](https://rubygems.org/gems/htmlentities) (>= 4.3.1)
 * Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.6.1)
 
 ## Documentation
@@ -459,7 +461,7 @@ This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange develo
 ## License
 
 This is free and unencumbered public domain software. For more information,
-see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
+see <http://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 
 ## FEEDBACK
 
