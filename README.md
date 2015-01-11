@@ -17,7 +17,7 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
   * Writer uses user-replacable [Haml][Haml]-based templates to generate RDFa.
 * If available, Uses Nokogiri for parsing HTML/SVG, falls back to REXML otherwise
 
-Install with 'gem install rdf-rdfa'
+Install with `gem install rdf-rdfa`
 
 ### Pure Ruby
 In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri][]
