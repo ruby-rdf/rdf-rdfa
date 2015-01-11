@@ -459,7 +459,7 @@ This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange develo
 ## License
 
 This is free and unencumbered public domain software. For more information,
-see <http://unlicense.org/> or the accompanying {file:UNLICENSE} file.
+see <http://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 
 ## FEEDBACK
 
