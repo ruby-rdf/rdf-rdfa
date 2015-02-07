@@ -17,7 +17,7 @@ module RDF::RDFa
                 %base{:href => base}
               - if title
                 %title= title
-          %body<
+          %body
             - subjects.map do |subject|
               != yield(subject)
       ),
@@ -110,7 +110,7 @@ module RDF::RDFa
           - if base
             %head
               %base{:href => base}
-          %body<
+          %body
             - subjects.each do |subject|
               != yield(subject)
       ),
@@ -166,7 +166,7 @@ module RDF::RDFa
               %link{:rel => "stylesheet", :href => "http://rdf.kellogg-assoc.com/css/distiller.css", :type => "text/css"}
               %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js", :type => "text/javascript"}
               %script{:src => "http://rdf.kellogg-assoc.com/js/distiller.js", :type => "text/javascript"}
-          %body<
+          %body
             - if base
               %p= "RDFa serialization URI base: &lt;#{base}&gt;"
             - subjects.each do |subject|
