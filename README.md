@@ -237,6 +237,8 @@ generates the following Turtle:
 ### Support for microdata
 The RDFa reader will call out to `RDF::Microdata::Reader`, if an `@itemscope` attribute is detected, and the microdata reader is loaded. This avoids a common problem when pages contain both microdata and RDFa, and only one processor is run.
 
+### Support for value property
+In an [RDFA+HTML Errata](https://www.w3.org/2001/sw/wiki/RDFa_1.1._Errata#Using_.3Cdata.3E.2C_.3Cinput.3E_and_.3Cli.3E_along_with_.40value), it was suggested that the `@value` attribute could be parsed to obtain a numeric literal; this is consistent with how it's treated in microdata+rdfa. This processor now parses the value of an `@value` property to determine if it is an `xsd:integer`, `xsd:float`, or `xsd:double`, and uses a plain literal otherwise. The datatype can be overriden using the `@datatype` attribute.
 ## Usage
 
 ### Reading RDF data in the RDFa format

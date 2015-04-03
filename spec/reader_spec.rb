@@ -1215,6 +1215,54 @@ describe "RDF::RDFa::Reader" do
                 <http://example/> rdf:value "value"^^xsd:date .
               )
             ],
+            "@property, and @value as integer" => [
+              %q(
+                <div about="http://example/">
+                  <data property="rdf:value" value="1"/>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                <http://example/> rdf:value 1 .
+              )
+            ],
+            "@property, and @value as float" => [
+              %q(
+                <div about="http://example/">
+                  <data property="rdf:value" value="1.1"/>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                <http://example/> rdf:value 1.1 .
+              )
+            ],
+            "@property, and @value as double" => [
+              %q(
+                <div about="http://example/">
+                  <data property="rdf:value" value="1.1e1"/>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                <http://example/> rdf:value 1.1e1 .
+              )
+            ],
+            "@property, and @value as integer with datatype" => [
+              %q(
+                <div about="http://example/">
+                  <data property="rdf:value" value="1" datatype="xsd:float"/>
+                </div>
+              ),
+              %q(
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                <http://example/> rdf:value "1"^^xsd:float .
+              )
+            ],
           }.each do |test, (input, expected)|
             it test do
               expect(parse(input)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
