@@ -18,7 +18,7 @@ module RDF::RDFa
               - if title
                 %title= title
           %body
-            - subjects.each do |subject|
+            - subjects.map do |subject|
               != yield(subject)
       ),
 

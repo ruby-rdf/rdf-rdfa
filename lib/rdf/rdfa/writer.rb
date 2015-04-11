@@ -233,7 +233,7 @@ module RDF::RDFa
       }.merge(options)
       hamlify(template, options) do |subject|
         yield(subject) if block_given?
-      end
+      end.gsub(/^\s+$/m, '')
     end
 
     # Render a subject using `haml_template[:subject]`.

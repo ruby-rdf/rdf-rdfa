@@ -374,7 +374,7 @@ module RDF::RDFa
               when 'text/turtle'         then require 'rdf/turtle'
               when 'application/ld+json' then require 'json/ld'
               end
-            rescue
+            rescue LoadError
             end
 
             if reader = RDF::Reader.for(:content_type => type)
@@ -723,6 +723,7 @@ module RDF::RDFa
         role
         src
         typeof
+        value
         vocab
       ).each do |a|
         attrs[a.to_sym] = element.attributes[a].to_s.strip if element.attributes[a]
@@ -1102,7 +1103,7 @@ module RDF::RDFa
           when datatype && ![RDF.XMLLiteral, RDF.HTML].include?(datatype)
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
-            RDF::Literal.new(attrs[:content] || attrs[:datetime] || element.inner_text.to_s, :datatype => datatype, :validate => validate?, :canonicalize => canonicalize?)
+            RDF::Literal.new(attrs[:content] || attrs[:datetime] || attrs[:value] || element.inner_text.to_s, :datatype => datatype, :validate => validate?, :canonicalize => canonicalize?)
           when @version == :"rdfa1.1"
             case
             when datatype == RDF.XMLLiteral
@@ -1142,12 +1143,22 @@ module RDF::RDFa
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
+            when attrs[:value]
+              # Lexically scan value and assign appropriate type, otherwise, leave untyped
+              # See https://www.w3.org/2001/sw/wiki/RDFa_1.1._Errata#Using_.3Cdata.3E.2C_.3Cinput.3E_and_.3Cli.3E_along_with_.40value
+              add_debug(element, "[Step 11] value literal (#{attrs[:value]})")
+              v = attrs[:value].to_s
+              # Figure it out by parsing
+              dt_lit = %w(Integer Float Double).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
+                v.match(dt::GRAMMAR)
+              end || RDF::Literal
+              dt_lit.new(v)
             when attrs[:datatype]
               # otherwise, as a plain literal if @datatype is present but has an empty value.
               # The actual literal is either the value of @content (if present) or a string created by
               # concatenating the value of all descendant text nodes, of the current element in turn.
               # typed literal
-              add_debug(element, "[Step 11] plain plain (#{datatype})")
+              add_debug(element, "[Step 11] datatyped literal (#{datatype})")
               RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
             when attrs[:content]
               # plain literal
