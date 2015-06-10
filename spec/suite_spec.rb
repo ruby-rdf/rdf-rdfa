@@ -14,6 +14,7 @@ unless ENV['CI']  # Skip for continuous integration
             describe "that are #{classification}" do
               Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
                 specify "test #{t.num}: #{t.description}#{",  (negative test)" if t.expectedResults.false?}" do
+                  pending "Invalid SPARQL query" if %w(0279 0284).include?(t.num)
                   begin
                     t.debug = []
                     t.debug << "source:"

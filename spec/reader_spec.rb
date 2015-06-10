@@ -659,9 +659,9 @@ describe "RDF::RDFa::Reader" do
                   <span vocab="http://example/" property="#{term}">Foo</span>
                 )
                 query = %(
-                  ASK WHERE { <> <http://example/#{term}> "Foo" }
+                  ASK WHERE { <http://example/> <http://example/#{term}> "Foo" }
                 )
-                expect(parse(input)).to pass_query(query, @debug)
+                expect(parse(input, validate: false, base_uri: "http://example/")).to pass_query(query, @debug)
               end
             end
 
@@ -677,9 +677,9 @@ describe "RDF::RDFa::Reader" do
                   <span vocab="http://example/" property="#{term}">Foo</span>
                 )
                 query = %(
-                  ASK WHERE { <> <http://example/#{term}> "Foo" }
+                  ASK WHERE { <http://example/> <http://example/#{term}> "Foo" }
                 )
-                expect(parse(input)).to_not pass_query(query, @debug)
+                expect(parse(input, base_uri: "http://example/")).to_not pass_query(query, @debug)
               end
             end
           end
@@ -697,7 +697,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value () .
+                <http://example/> rdf:value () .
               )
             ],
             "literal" => [
@@ -710,7 +710,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value ("Foo") .
+                <http://example/> rdf:value ("Foo") .
               )
             ],
             "IRI" => [
@@ -723,7 +723,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value (<foo>) .
+                <http://example/> rdf:value (<http://example/foo>) .
               )
             ],
             "implicit list with hetrogenious membership" => [
@@ -737,7 +737,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value ("Foo" <foo>) .
+                <http://example/> rdf:value ("Foo" <http://example/foo>) .
               )
             ],
             "implicit list at different levels" => [
@@ -751,7 +751,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value ("Foo" "Bar") .
+                <http://example/> rdf:value ("Foo" "Bar") .
               )
             ],
             "property with list and literal" => [
@@ -766,7 +766,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value ("Foo" "Bar"), "Baz" .
+                <http://example/> rdf:value ("Foo" "Bar"), "Baz" .
               )
             ],
             "multiple rel items" => [
@@ -782,7 +782,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value (<foo> <bar>) .
+                <http://example/> rdf:value (<http://example/foo> <http://example/bar>) .
               )
             ],
             "multiple collections" => [
@@ -800,7 +800,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <foo> rdf:value ("Foo"), ("Bar") .
+                <http://example/foo> rdf:value ("Foo"), ("Bar") .
               )
             ],
             "confusion between multiple implicit collections (resource)" => [
@@ -816,8 +816,8 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value ("Foo"); rdf:inlist <res> .
-                <res> rdf:value ("Bar") .
+                <http://example/> rdf:value ("Foo"); rdf:inlist <http://example/res> .
+                <http://example/res> rdf:value ("Bar") .
               )
             ],
             "confusion between multiple implicit collections (about)" => [
@@ -833,13 +833,13 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             
-                <> rdf:value ("Foo"); rdf:inlist <res> .
-                <res> rdf:value ("Bar") .
+                <http://example/> rdf:value ("Foo"); rdf:inlist <http://example/res> .
+                <http://example/res> rdf:value ("Bar") .
               )
             ],
           }.each do |test, (input, expected)|
             it test do
-              expect(parse(input)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse(input, base_uri: "http://example/")).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
             end
           end
         end
@@ -855,7 +855,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "Foo" .
+                <http://example/> rdf:value "Foo" .
               )
             ],
             "with @lang" => [
@@ -867,7 +867,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "Foo"@en .
+                <http://example/> rdf:value "Foo"@en .
               )
             ],
             "with @xml:lang" => [
@@ -879,7 +879,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "Foo"@en .
+                <http://example/> rdf:value "Foo"@en .
               )
             ],
             "with @content" => [
@@ -891,7 +891,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "Foo" .
+                <http://example/> rdf:value "Foo" .
               )
             ],
             "with @href" => [
@@ -903,7 +903,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value <#foo> .
+                <http://example/> rdf:value <http://example/#foo> .
               )
             ],
             "with @src" => [
@@ -915,7 +915,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value <#foo> .
+                <http://example/> rdf:value <http://example/#foo> .
               )
             ],
             "with <time>=xsd:time" => [
@@ -927,7 +927,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
+                <http://example/> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
               )
             ],
             "with @datetime=xsd:date" => [
@@ -939,7 +939,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "2011-06-28Z"^^<http://www.w3.org/2001/XMLSchema#date> .
+                <http://example/> rdf:value "2011-06-28Z"^^<http://www.w3.org/2001/XMLSchema#date> .
               )
             ],
             "with @datetime=xsd:time" => [
@@ -951,7 +951,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
+                <http://example/> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
               )
             ],
             "with @datetime=xsd:dateTime" => [
@@ -963,7 +963,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "2011-06-28T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+                <http://example/> rdf:value "2011-06-28T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
               )
             ],
             "with @datetime=xsd:dateTime with TZ offset" => [
@@ -975,7 +975,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "2011-06-28T00:00:00-08:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+                <http://example/> rdf:value "2011-06-28T00:00:00-08:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
               )
             ],
             "with @datetime=xsd:dateTime with @datatype" => [
@@ -988,7 +988,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
           
-                <> rdf:value "2012-03-18T00:00:00Z"^^xsd:string .
+                <http://example/> rdf:value "2012-03-18T00:00:00Z"^^xsd:string .
               )
             ],
             "with @datetime=xsd:gYear" => [
@@ -1000,7 +1000,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "2011"^^<http://www.w3.org/2001/XMLSchema#gYear> .
+                <http://example/> rdf:value "2011"^^<http://www.w3.org/2001/XMLSchema#gYear> .
               )
             ],
             "with @datetime=xsd:gYearMonth" => [
@@ -1012,7 +1012,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "2011-06"^^<http://www.w3.org/2001/XMLSchema#gYearMonth> .
+                <http://example/> rdf:value "2011-06"^^<http://www.w3.org/2001/XMLSchema#gYearMonth> .
               )
             ],
             "with @datetime=xsd:duration" => [
@@ -1024,7 +1024,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "P2011Y06M28DT00H00M00S"^^<http://www.w3.org/2001/XMLSchema#duration> .
+                <http://example/> rdf:value "P2011Y06M28DT00H00M00S"^^<http://www.w3.org/2001/XMLSchema#duration> .
               )
             ],
             "with @datetime=plain" => [
@@ -1036,7 +1036,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "foo" .
+                <http://example/> rdf:value "foo" .
               )
             ],
             "with @datetime=plain with @lang" => [
@@ -1048,7 +1048,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value "D-Day"@en .
+                <http://example/> rdf:value "D-Day"@en .
               )
             ],
             "with @datetime and @content" => [
@@ -1061,7 +1061,7 @@ describe "RDF::RDFa::Reader" do
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
           
-                <> rdf:value "this" .
+                <http://example/> rdf:value "this" .
               )
             ],
             "with @resource" => [
@@ -1073,7 +1073,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value <#foo> .
+                <http://example/> rdf:value <http://example/#foo> .
               )
             ],
             "with @typeof" => [
@@ -1085,7 +1085,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value [] .
+                <http://example/> rdf:value [] .
               )
             ],
             "with @about" => [
@@ -1097,7 +1097,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <#foo> rdf:value " Bar ", "Bar" .
+                <http://example/#foo> rdf:value " Bar ", "Bar" .
               )
             ],
             "@href and @property no-chaining" => [
@@ -1111,7 +1111,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
           
-                <> rdf:value <#foo>, "Bar" .
+                <http://example/> rdf:value <http://example/#foo>, "Bar" .
               )
             ],
             "@href, @typeof and @property chaining" => [
@@ -1265,7 +1265,7 @@ describe "RDF::RDFa::Reader" do
             ],
           }.each do |test, (input, expected)|
             it test do
-              expect(parse(input)).to be_equivalent_graph(expected, :trace => @debug, :format => :ttl)
+              expect(parse(input, base_uri: "http://example/")).to be_equivalent_graph(expected, trace: @debug, format: :ttl)
             end
           end
         end
