@@ -313,7 +313,7 @@ module RDF::RDFa
           add_error(nil, "Malformed document: #{$!.message}")
         end
         add_error(nil, "Empty document") if root.nil?
-        add_error(nil, "Syntax errors:\n#{doc_errors}") if !doc_errors.empty?
+        add_error(nil, doc_errors.map(&:message).uniq.join("\n")) if !doc_errors.empty?
 
         # Section 4.2 RDFa Host Language Conformance
         #
