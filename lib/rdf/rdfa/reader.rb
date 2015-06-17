@@ -369,17 +369,24 @@ module RDF::RDFa
             begin
               # Formats don't exist unless they've been required
               case type.to_s
-              when 'application/rdf+xml' then require 'rdf/rdfxml'
-              when 'text/ntriples'       then require 'rdf/ntriples'
-              when 'text/turtle'         then require 'rdf/turtle'
-              when 'application/ld+json' then require 'json/ld'
+              when 'application/csvm+json' then require 'rdf/tabular'
+              when 'application/ld+json'   then require 'json/ld'
+              when 'application/rdf+xml'   then require 'rdf/rdfxml'
+              when 'text/ntriples'         then require 'rdf/ntriples'
+              when 'text/turtle'           then require 'rdf/turtle'
               end
             rescue LoadError
             end
 
-            if reader = RDF::Reader.for(:content_type => type)
+            if reader = RDF::Reader.for(:content_type => type.to_s)
               add_debug(el, "=> reader #{reader.to_sym}")
-              reader.new(input, options).each(&block)
+              # Wrap input in a RemoteDocument with appropriate content-type
+              doc = if input.is_a?(String)
+                RDF::Util::File::RemoteDocument.new(input, options.merge(content_type: type.to_s))
+              else
+                input
+              end
+              reader.new(doc, options).each(&block)
             else
               add_debug(el, "=> no reader found")
             end
