@@ -7,13 +7,14 @@ require 'rspec/matchers'
 class EX < RDF::Vocabulary("http://example/"); end
 
 describe RDF::RDFa::Writer do
+  it_behaves_like 'an RDF::Writer' do
+    let(:writer) {RDF::RDFa::Writer.new}
+  end
+
   before(:each) do
     @graph = RDF::Repository.new
-    @writer = RDF::RDFa::Writer.new(StringIO.new)
   end
   
-  include RDF_Writer
-
   describe ".for" do
     formats = [
       :rdfa,

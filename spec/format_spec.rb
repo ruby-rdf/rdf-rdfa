@@ -3,11 +3,9 @@ require 'spec_helper'
 require 'rdf/spec/format'
 
 describe RDF::RDFa::Format do
-  before :each do
-    @format_class = RDF::RDFa::Format
+  it_behaves_like 'an RDF::Format' do
+    let(:format_class) {RDF::RDFa::Format}
   end
-
-  include RDF_Format
 
   describe ".for" do
     formats = [
@@ -18,7 +16,7 @@ describe RDF::RDFa::Format do
       {:content_type   => 'text/html'},
     ].each do |arg|
       it "discovers with #{arg.inspect}" do
-        expect(RDF::Format.for(arg)).to eq @format_class
+        expect(RDF::Format.for(arg)).to eq RDF::RDFa::Format
       end
     end
 
@@ -26,7 +24,7 @@ describe RDF::RDFa::Format do
       :rdfa   => '<div about="foo"></div>',
     }.each do |sym, str|
       it "detects #{sym}" do
-        expect(@format_class.for {str}).to eq @format_class
+        expect(RDF::RDFa::Format.for {str}).to eq RDF::RDFa::Format
       end
     end
 
@@ -120,7 +118,7 @@ describe RDF::RDFa::Format do
   end
 
   describe "#to_sym" do
-    specify {expect(@format_class.to_sym).to eq :rdfa}
+    specify {expect(RDF::RDFa::Format.to_sym).to eq :rdfa}
   end
 
   describe ".detect" do
@@ -133,7 +131,7 @@ describe RDF::RDFa::Format do
       :property => '<div property="foo"></div>',
     }.each do |sym, str|
       it "detects #{sym}" do
-        expect(@format_class.detect(str)).to be_truthy
+        expect(RDF::RDFa::Format.detect(str)).to be_truthy
       end
     end
 
@@ -156,7 +154,7 @@ describe RDF::RDFa::Format do
       :STRING_LITERAL_LONG2 => %(<a> <b> """\nliteral\n""" .),
     }.each do |sym, str|
       it "does not detect #{sym}" do
-        expect(@format_class.detect(str)).to be_falsey
+        expect(RDF::RDFa::Format.detect(str)).to be_falsey
       end
     end
   end

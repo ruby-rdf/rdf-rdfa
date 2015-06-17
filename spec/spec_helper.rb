@@ -4,15 +4,23 @@ $:.unshift File.dirname(__FILE__)
 require "bundler/setup"
 require 'rubygems'
 require 'rspec'
-require 'rdf/rdfa'
-#require 'rdf/rdfxml'
-require 'rdf/spec'
-require 'rdf/spec/matchers'
-require 'rdf/isomorphic'
 require 'yaml'
 require 'open-uri/cached'
 require 'matchers'
+require 'rdf/spec'
+require 'rdf/spec/matchers'
+require 'rdf/isomorphic'
 require 'rdf/turtle'
+require 'simplecov'
+require 'coveralls'
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
+SimpleCov.start do
+  add_filter "/spec/"
+end
+require 'rdf/rdfa'
 
 # Create and maintain a cache of downloaded URIs
 URI_CACHE = File.expand_path(File.join(File.dirname(__FILE__), "uri-cache"))
