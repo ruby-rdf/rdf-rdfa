@@ -11,14 +11,19 @@ require 'rdf/spec'
 require 'rdf/spec/matchers'
 require 'rdf/isomorphic'
 require 'rdf/turtle'
-require 'simplecov'
-require 'coveralls'
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  SimpleCov::Formatter::HTMLFormatter,
-  Coveralls::SimpleCov::Formatter
-]
-SimpleCov.start do
-  add_filter "/spec/"
+begin
+  require 'simplecov'
+  require 'coveralls'
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+    SimpleCov::Formatter::HTMLFormatter,
+    Coveralls::SimpleCov::Formatter
+  ]
+  SimpleCov.start do
+    add_filter "/spec/"
+    add_filter "/lib/rdf/rdfa/reader/rexml.rb"
+    add_filter "/lib/rdf/rdfa/context.rb"
+  end
+rescue LoadError
 end
 require 'rdf/rdfa'
 
