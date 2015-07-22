@@ -99,6 +99,16 @@ module RDF::RDFa
     # @return [Module]
     attr_reader :implementation
 
+    ##
+    # Warnings found during processing
+    # @return [Array<String>]
+    attr_reader :warnings
+
+    ##
+    # Accumulated errors found during processing
+    # @return [Array<String>]
+    attr_reader :errors
+
     # The Recursive Baggage
     # @private
     class EvaluationContext # :nodoc:
@@ -266,6 +276,10 @@ module RDF::RDFa
     #   Value is an array containing on or both of :output or :processor.
     # @option options [Repository] :vocab_repository (nil)
     #   Repository to save loaded vocabularies.
+    # @option options [Array] :errors
+    #   array for placing errors found when parsing
+    # @option options [Array] :warnings
+    #   array for placing warnings found when parsing
     # @option options [Array] :debug
     #   Array to place debug messages
     # @return [reader]
@@ -275,6 +289,8 @@ module RDF::RDFa
     # @raise [RDF::ReaderError] if _validate_
     def initialize(input = $stdin, options = {}, &block)
       super do
+        @errors = @options[:errors]
+        @warnings = @options[:warnings]
         @debug = options[:debug]
         @options = {:reference_folding => true}.merge(@options)
         @repository = RDF::Repository.new
@@ -392,7 +408,7 @@ module RDF::RDFa
             end
           end
         
-          # Look for Embedded Turtle and RDF/XML
+          # Look for Embedded RDF/XML
           unless @root.xpath("//rdf:RDF", "rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
             extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
               @repository << statement
@@ -491,10 +507,12 @@ module RDF::RDFa
     end
     
     def add_warning(node, message, process_class = RDF::RDFA.Warning)
+      @warnings << "#{node_path(node)}: #{message}" if @warnings
       add_processor_message(node, message, process_class)
     end
     
     def add_error(node, message, process_class = RDF::RDFA.Error)
+      @errors << "#{node_path(node)}: #{message}" if @errors
       add_processor_message(node, message, process_class)
       raise RDF::ReaderError, message if validate?
     end
