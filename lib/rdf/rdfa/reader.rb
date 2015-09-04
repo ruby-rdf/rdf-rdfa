@@ -291,7 +291,7 @@ module RDF::RDFa
       super do
         @errors = @options[:errors]
         @warnings = @options[:warnings]
-        @debug = options[:debug]
+        @debug = @options[:debug]
         @options = {:reference_folding => true}.merge(@options)
         @repository = RDF::Repository.new
 
@@ -1483,8 +1483,15 @@ module RDF::RDFa
     end
 
     def uri(value, append = nil)
-      value = RDF::URI.new(value)
-      value = value.join(append) if append
+      append = RDF::URI(append)
+      value = RDF::URI(value)
+      value = if append.absolute?
+        value = append
+      elsif append
+        value = value.join(append)
+      else
+        value
+      end
       value.validate! if validate?
       value.canonicalize! if canonicalize?
       value = RDF::URI.intern(value) if intern?
