@@ -279,8 +279,8 @@ module RDF::RDFa
       ##
       # Document errors
       def doc_errors
-        # FIXME: Nokogiri version 1.5.5 things <time> is invalid
-        @doc.errors.reject {|e| e.to_s =~ /(Tag time invalid|Missing attribute name)/}
+        # FIXME: Nokogiri version 1.5.5 thinks many HTML5 elements are invalid
+        @doc.errors.reject {|e| e.to_s =~ /(Tag (?:article|aside|audio|canvas|command|datalist|details|embed|figure|footer|header|hgroup|keygen|mark|meter|nav|output|progress|ruby|section|time|video|wbr) invalid|Missing attribute name)/}
       end
       
       ##

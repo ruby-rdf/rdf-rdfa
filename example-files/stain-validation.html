@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" prefix="ex: http://example.com/ ">
+<head>
+  <title>HTML5 + RDFa support ? #19</title>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+</head>
+<body>
+  <!-- Typical Bootstrap use of HTML5 tag <nav> -->
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+        </button>
+        Ontology
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#_classes">Classes</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+<!-- Bootstrap use of "container" div and role="main" -->
+<div class="container" role="main" style="margin-top: 3em">
+
+<!-- START RDFa bit -->
+  <div about="http://example.com/">
+    <div rev="skos:inScheme">
+      <section id="_classes">
+        <h2>Classes</h2>
+        <div id="Example" about="http://example.com/Example" typeof="owl:Class">
+          <h3 property="rdfs:label">Example label</h3>
+        </div>
+      </section>
+    </div>
+  </div>
+<!-- END RDFa bit -->
+
+</div>
+
+
+</body>
+</html>
