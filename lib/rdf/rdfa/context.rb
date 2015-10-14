@@ -63,7 +63,7 @@ module RDF::RDFa
     # @return [RDF::Repository]
     # @raise [RDF::RDFa::ContextError] if context does not support contexts
     def self.repository
-      @repository ||= RDF::Repository.new(:title => "RDFa Contexts")
+      @repository ||= RDF::Repository.new(title: "RDFa Contexts")
     end
     
     ##
@@ -89,7 +89,7 @@ module RDF::RDFa
       cache[uri] = new(uri) do |context|
         STDERR.puts("process_context: retrieve context <#{uri}>") if RDF::RDFa.debug?
         Context.load(uri)
-        context.parse(repository.query(:context => uri))
+        context.parse(repository.query(context: uri))
       end
     rescue Exception => e
       raise ContextError, "Context #{uri}: #{e.message}", e.backtrace
@@ -98,7 +98,7 @@ module RDF::RDFa
     # Load context into repository
     def self.load(uri)
       uri = RDF::URI.intern(uri)
-      repository.load(uri.to_s, :base_uri => uri, :context => uri) unless repository.has_context?(uri)
+      repository.load(uri.to_s, base_uri: uri, context: uri) unless repository.has_context?(uri)
     end
     
     # @return [RDF::Repository]

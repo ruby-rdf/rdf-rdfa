@@ -25,9 +25,9 @@ def run_tc(tc, options)
   begin
     puts "open #{input_uri}" if options[:verbose]
     options = {
-      :base_uri => input_uri,
-      :processor_graph => pg,
-      :format => :rdfa,
+      base_uri: input_uri,
+      processor_graph: pg,
+      format: :rdfa,
     }.merge(options)
 
     if tc.queryParam
@@ -67,14 +67,14 @@ def run_tc(tc, options)
 end
 
 options = {
-  :verbose         => false,
-  :quite           => false,
-  :validate        => false,
-  :format          => :ntriples,
-  :library         => nil,
-  :processor_graph => nil,
-  :host_language   => "xhtml1",
-  :version         => "rdfa1.1"
+  verbose:         false,
+  quite:           false,
+  validate:        false,
+  format:          :ntriples,
+  library:         nil,
+  processor_graph: nil,
+  host_language:   "xhtml1",
+  version:         "rdfa1.1"
 }
 
 opts = GetoptLong.new(

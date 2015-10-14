@@ -63,7 +63,7 @@ class RDF::RDFa::Context
       @_#{context_short}_prof ||= RDF::RDFa::Context.new(RDF::URI("#{file}"), {
 START
 
-    output.puts %{#{preceeding}:vocabulary => "#{context.vocabulary},"} if context.vocabulary
+    output.puts %{#{preceeding}vocabulary: "#{context.vocabulary},"} if context.vocabulary
     
     [:prefixes, :terms].each do |t|
       hash = context.send(t)

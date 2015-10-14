@@ -209,7 +209,7 @@ module RDF::RDFa
       #
       # A hash associating lists with properties.
       # @!attribute [rw] list_mapping
-      # @return [Hash{RDF::URI => Array<RDF::Resource>}]
+      # @return [Hash{RDF:URI: Array<RDF::Resource>}]
       attr_accessor :list_mapping
 
       # @param [RDF::URI] base
@@ -292,7 +292,7 @@ module RDF::RDFa
         @errors = @options[:errors]
         @warnings = @options[:warnings]
         @debug = @options[:debug]
-        @options = {:reference_folding => true}.merge(@options)
+        @options = {reference_folding: true}.merge(@options)
         @repository = RDF::Repository.new
 
         @options[:rdfagraph] = case @options[:rdfagraph]
@@ -335,9 +335,9 @@ module RDF::RDFa
         #
         # The Host Language may require the automatic inclusion of one or more Initial Contexts
         @host_defaults = {
-          :vocabulary       => nil,
-          :uri_mappings     => {},
-          :initial_contexts => [],
+          vocabulary:       nil,
+          uri_mappings:     {},
+          initial_contexts: [],
         }
 
         if @version == :"rdfa1.0"
@@ -345,7 +345,7 @@ module RDF::RDFa
           @host_defaults[:term_mappings] = %w(
             alternate appendix bookmark cite chapter contents copyright first glossary help icon index
             last license meta next p3pv1 prev role section stylesheet subsection start top up
-            ).inject({}) { |hash, term| hash[term] = RDF::XHV[term]; hash }
+            ).inject({}) { |hash, term| hash[term] = RDF::URI("http://www.w3.org/1999/xhtml/vocab#") + term; hash }
         end
 
         case @host_language
@@ -394,7 +394,7 @@ module RDF::RDFa
             rescue LoadError
             end
 
-            if reader = RDF::Reader.for(:content_type => type.to_s)
+            if reader = RDF::Reader.for(content_type: type.to_s)
               add_debug(el, "=> reader #{reader.to_sym}")
               # Wrap input in a RemoteDocument with appropriate content-type
               doc = if input.is_a?(String)
@@ -450,7 +450,7 @@ module RDF::RDFa
         # statements in the associated named or default graph from the
         # processed repository
         @repository.each do |statement|
-          case statement.context
+          case statement.graph_name
           when nil
             yield statement if @options[:rdfagraph].include?(:output)
           when RDF::RDFA.ProcessorGraph
@@ -523,17 +523,17 @@ module RDF::RDFa
       if @options[:processor_callback] || @options[:rdfagraph].include?(:processor)
         n = RDF::Node.new
         processor_statements = [
-          RDF::Statement.new(n, RDF["type"], process_class, :context => RDF::RDFA.ProcessorGraph),
-          RDF::Statement.new(n, RDF::DC.description, message, :context => RDF::RDFA.ProcessorGraph),
-          RDF::Statement.new(n, RDF::DC.date, RDF::Literal::Date.new(DateTime.now), :context => RDF::RDFA.ProcessorGraph)
+          RDF::Statement.new(n, RDF["type"], process_class, graph_name: RDF::RDFA.ProcessorGraph),
+          RDF::Statement.new(n, RDF::URI("http://purl.org/dc/terms/description"), message, graph_name: RDF::RDFA.ProcessorGraph),
+          RDF::Statement.new(n, RDF::URI("http://purl.org/dc/terms/date"), RDF::Literal::Date.new(DateTime.now), graph_name: RDF::RDFA.ProcessorGraph)
         ]
-        processor_statements << RDF::Statement.new(n, RDF::RDFA.context, base_uri, :context => RDF::RDFA.ProcessorGraph) if base_uri
+        processor_statements << RDF::Statement.new(n, RDF::RDFA.context, base_uri, graph_name: RDF::RDFA.ProcessorGraph) if base_uri
         if node.respond_to?(:path)
           nc = RDF::Node.new
           processor_statements += [
-            RDF::Statement.new(n, RDF::RDFA.context, nc, :context => RDF::RDFA.ProcessorGraph),
-            RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer, :context => RDF::RDFA.ProcessorGraph),
-            RDF::Statement.new(nc, RDF::PTR.expression, node.path, :context => RDF::RDFA.ProcessorGraph)
+            RDF::Statement.new(n, RDF::RDFA.context, nc, graph_name: RDF::RDFA.ProcessorGraph),
+            RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer, graph_name: RDF::RDFA.ProcessorGraph),
+            RDF::Statement.new(nc, RDF::PTR.expression, node.path, graph_name: RDF::RDFA.ProcessorGraph)
           ]
         end
         
@@ -552,9 +552,9 @@ module RDF::RDFa
     # @param [RDF::Resource] subject the subject of the statement
     # @param [RDF::URI] predicate the predicate of the statement
     # @param [RDF::Value] object the object of the statement
-    # @param [RDF::Value] context the context of the statement
+    # @param [RDF::Value] graph_name the graph name of the statement
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
-    def add_triple(node, subject, predicate, object, context = nil)
+    def add_triple(node, subject, predicate, object, graph_name = nil)
       statement = RDF::Statement.new(subject, predicate, object)
       add_error(node, "statement #{RDF::NTriples.serialize(statement)} is invalid") unless statement.valid?
       if subject && predicate && object # Basic sanity checking
@@ -819,15 +819,15 @@ module RDF::RDFa
 
       # rels and revs
       rels = process_uris(element, attrs[:rel], evaluation_context, base,
-                          :uri_mappings => uri_mappings,
-                          :term_mappings => term_mappings,
-                          :vocab => default_vocabulary,
-                          :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
+                          uri_mappings: uri_mappings,
+                          term_mappings: term_mappings,
+                          vocab: default_vocabulary,
+                          restrictions: TERMorCURIEorAbsIRI.fetch(@version, []))
       revs = process_uris(element, attrs[:rev], evaluation_context, base,
-                          :uri_mappings => uri_mappings,
-                          :term_mappings => term_mappings,
-                          :vocab => default_vocabulary,
-                          :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
+                          uri_mappings: uri_mappings,
+                          term_mappings: term_mappings,
+                          vocab: default_vocabulary,
+                          restrictions: TERMorCURIEorAbsIRI.fetch(@version, []))
     
       add_debug(element) do
         "rels: #{rels.join(" ")}, revs: #{revs.join(" ")}"
@@ -839,14 +839,14 @@ module RDF::RDFa
         if @version == :"rdfa1.0"
           new_subject = if attrs[:about]
             process_uri(element, attrs[:about], evaluation_context, base,
-                        :uri_mappings => uri_mappings,
-                        :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
+                        uri_mappings: uri_mappings,
+                        restrictions: SafeCURIEorCURIEorIRI.fetch(@version, []))
           elsif attrs[:resource]
             process_uri(element, attrs[:resource], evaluation_context, base,
-                        :uri_mappings => uri_mappings,
-                        :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
+                        uri_mappings: uri_mappings,
+                        restrictions: SafeCURIEorCURIEorIRI.fetch(@version, []))
           elsif attrs[:href] || attrs[:src]
-            process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
+            process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, restrictions: [:uri])
           end
 
           # If no URI is provided by a resource attribute, then the first match from the following rules
@@ -879,8 +879,8 @@ module RDF::RDFa
             new_subject ||= if attrs[:about]
               # by using the resource from @about, if present, obtained according to the section on CURIE and IRI Processing;
               process_uri(element, attrs[:about], evaluation_context, base,
-                          :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
+                          uri_mappings: uri_mappings,
+                          restrictions: SafeCURIEorCURIEorIRI.fetch(@version, []))
             elsif [:xhtml1, :xhtml5, :html4, :html5].include?(@host_language) && element.name =~ /^(head|body)$/
               # From XHTML+RDFa 1.1:
               # if no URI is provided, then first check to see if the element is the head or body element. If it is, then act as if the new subject is set to the parent object.
@@ -906,13 +906,13 @@ module RDF::RDFa
               typed_resource ||= if attrs[:resource]
                 # by using the resource from @resource, if present, obtained according to the section on CURIE and IRI Processing;
                 process_uri(element, attrs[:resource], evaluation_context, base,
-                            :uri_mappings => uri_mappings,
-                            :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
+                            uri_mappings: uri_mappings,
+                            restrictions: SafeCURIEorCURIEorIRI.fetch(@version, []))
               elsif attrs[:href] || attrs[:src]
                 # otherwise, by using the IRI from @href, if present, obtained according to the section on CURIE and IRI Processing;
                 # otherwise, by using the IRI from @src, if present, obtained according to the section on CURIE and IRI Processing;
                 process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base,
-                            :restrictions => [:uri])
+                            restrictions: [:uri])
               else
                 # otherwise, the value of typed resource is set to a newly created bnode.
                 RDF::Node.new
@@ -926,11 +926,11 @@ module RDF::RDFa
             new_subject =
               process_uri(element, (attrs[:about] || attrs[:resource]),
                           evaluation_context, base,
-                          :uri_mappings => uri_mappings,
-                          :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:about] ||attrs[:resource]
+                          uri_mappings: uri_mappings,
+                          restrictions: SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:about] ||attrs[:resource]
             new_subject ||=
               process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base,
-                          :restrictions => [:uri]) if attrs[:href] || attrs[:src]
+                          restrictions: [:uri]) if attrs[:href] || attrs[:src]
 
             # If no URI is provided by a resource attribute, then the first match from the following rules
             # will apply:
@@ -968,11 +968,11 @@ module RDF::RDFa
         # If the current element does contain a @rel or @rev attribute, then the next step is to
         # establish both a value for new subject and a value for current object resource:
         new_subject = process_uri(element, attrs[:about], evaluation_context, base,
-                                  :uri_mappings => uri_mappings,
-                                  :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, []))
+                                  uri_mappings: uri_mappings,
+                                  restrictions: SafeCURIEorCURIEorIRI.fetch(@version, []))
         new_subject ||= process_uri(element, attrs[:src], evaluation_context, base,
-                                  :uri_mappings => uri_mappings,
-                                  :restrictions => [:uri]) if @version == :"rdfa1.0"
+                                  uri_mappings: uri_mappings,
+                                  restrictions: [:uri]) if @version == :"rdfa1.0"
       
         # if the @typeof attribute is present, set typed resource to new subject
         typed_resource = new_subject if attrs[:typeof]
@@ -995,12 +995,12 @@ module RDF::RDFa
       
         # Then the current object resource is set to the URI obtained from the first match from the following rules:
         current_object_resource = process_uri(element, attrs[:resource], evaluation_context, base,
-                      :uri_mappings => uri_mappings,
-                      :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
+                      uri_mappings: uri_mappings,
+                      restrictions: SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
         current_object_resource ||= process_uri(element, attrs[:href], evaluation_context, base,
-                      :restrictions => [:uri]) if attrs[:href]
+                      restrictions: [:uri]) if attrs[:href]
         current_object_resource ||= process_uri(element, attrs[:src], evaluation_context, base,
-                      :restrictions => [:uri]) if attrs[:src] && @version != :"rdfa1.0"
+                      restrictions: [:uri]) if attrs[:src] && @version != :"rdfa1.0"
         current_object_resource ||= RDF::Node.new if attrs[:typeof] && !attrs[:about] && @version != :"rdfa1.0"
 
         # and also set the value typed resource to this bnode
@@ -1023,10 +1023,10 @@ module RDF::RDFa
       if typed_resource
         # Typeof is TERMorCURIEorAbsIRIs
         types = process_uris(element, attrs[:typeof], evaluation_context, base,
-                            :uri_mappings => uri_mappings,
-                            :term_mappings => term_mappings,
-                            :vocab => default_vocabulary,
-                            :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
+                            uri_mappings: uri_mappings,
+                            term_mappings: term_mappings,
+                            vocab: default_vocabulary,
+                            restrictions: TERMorCURIEorAbsIRI.fetch(@version, []))
         add_debug(element, "[Step 7] typeof: #{attrs[:typeof]}")
         types.each do |one_type|
           add_triple(element, typed_resource, RDF["type"], one_type)
@@ -1087,14 +1087,14 @@ module RDF::RDFa
               list_mapping[r] = RDF::List.new
               add_debug(element) {"[Step 10] list(#{r}): create #{list_mapping[r].inspect}"}
             end
-            incomplete_triples << {:list => list_mapping[r], :direction => :none}
+            incomplete_triples << {list: list_mapping[r], direction: :none}
           else
-            incomplete_triples << {:predicate => r, :direction => :forward}
+            incomplete_triples << {predicate: r, direction: :forward}
           end
         end
       
         revs.each do |r|
-          incomplete_triples << {:predicate => r, :direction => :reverse}
+          incomplete_triples << {predicate: r, direction: :reverse}
         end
       end
     
@@ -1104,10 +1104,10 @@ module RDF::RDFa
       # list associated with that property, creating a new list if necessary.
       if attrs[:property]
         properties = process_uris(element, attrs[:property], evaluation_context, base,
-                                  :uri_mappings => uri_mappings,
-                                  :term_mappings => term_mappings,
-                                  :vocab => default_vocabulary,
-                                  :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
+                                  uri_mappings: uri_mappings,
+                                  term_mappings: term_mappings,
+                                  vocab: default_vocabulary,
+                                  restrictions: TERMorCURIEorAbsIRI.fetch(@version, []))
 
         properties.reject! do |p|
           if p.is_a?(RDF::URI)
@@ -1119,16 +1119,16 @@ module RDF::RDFa
         end
 
         datatype = process_uri(element, attrs[:datatype], evaluation_context, base,
-                              :uri_mappings => uri_mappings,
-                              :term_mappings => term_mappings,
-                              :vocab => default_vocabulary,
-                              :restrictions => TERMorCURIEorAbsIRI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
+                              uri_mappings: uri_mappings,
+                              term_mappings: term_mappings,
+                              vocab: default_vocabulary,
+                              restrictions: TERMorCURIEorAbsIRI.fetch(@version, [])) unless attrs[:datatype].to_s.empty?
         begin
           current_property_value = case
           when datatype && ![RDF.XMLLiteral, RDF.HTML].include?(datatype)
             # typed literal
             add_debug(element, "[Step 11] typed literal (#{datatype})")
-            RDF::Literal.new(attrs[:content] || attrs[:datetime] || attrs[:value] || element.inner_text.to_s, :datatype => datatype, :validate => validate?, :canonicalize => canonicalize?)
+            RDF::Literal.new(attrs[:content] || attrs[:datetime] || attrs[:value] || element.inner_text.to_s, datatype: datatype, validate: validate?, canonicalize: canonicalize?)
           when @version == :"rdfa1.1"
             case
             when datatype == RDF.XMLLiteral
@@ -1143,14 +1143,14 @@ module RDF::RDFa
               # child node must take precedence over declarations that were active on the current node.
               begin
                 c14nxl = element.children.c14nxl(
-                  :library => @library,
-                  :language => language,
-                  :namespaces => {nil => XHTML}.merge(namespaces))
+                  library: @library,
+                  language: language,
+                  namespaces: {nil => XHTML}.merge(namespaces))
                 RDF::Literal.new(c14nxl,
-                  :library => @library,
-                  :datatype => RDF.XMLLiteral,
-                  :validate => validate?,
-                  :canonicalize => canonicalize?)
+                  library: @library,
+                  datatype: RDF.XMLLiteral,
+                  validate: validate?,
+                  canonicalize: canonicalize?)
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
@@ -1161,10 +1161,10 @@ module RDF::RDFa
               # Just like XMLLiteral, but without the c14nxl
               begin
                 RDF::Literal.new(element.children.to_html,
-                  :library => @library,
-                  :datatype => RDF.HTML,
-                  :validate => validate?,
-                  :canonicalize => canonicalize?)
+                  library: @library,
+                  datatype: RDF.HTML,
+                  validate: validate?,
+                  canonicalize: canonicalize?)
               rescue ArgumentError => e
                 add_error(element, e.message)
               end
@@ -1184,11 +1184,11 @@ module RDF::RDFa
               # concatenating the value of all descendant text nodes, of the current element in turn.
               # typed literal
               add_debug(element, "[Step 11] datatyped literal (#{datatype})")
-              RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+              RDF::Literal.new(attrs[:content] || element.inner_text.to_s, language: language, validate: validate?, canonicalize: canonicalize?)
             when attrs[:content]
               # plain literal
               add_debug(element, "[Step 11] plain literal (content)")
-              RDF::Literal.new(attrs[:content], :language => language, :validate => validate?, :canonicalize => canonicalize?)
+              RDF::Literal.new(attrs[:content], language: language, validate: validate?, canonicalize: canonicalize?)
             when element.name == 'time'
               # HTML5 support
               # Lexically scan value and assign appropriate type, otherwise, leave untyped
@@ -1197,41 +1197,41 @@ module RDF::RDFa
                 v.match(dt::GRAMMAR)
               end || RDF::Literal
               add_debug(element) {"[Step 11] <time> literal: #{datatype} #{v.inspect}"}
-              datatype.new(v, :language => language)
+              datatype.new(v, language: language)
             when (attrs[:resource] || attrs[:href] || attrs[:src]) &&
                  !(attrs[:rel] || attrs[:rev]) &&
                  @version != :"rdfa1.0"
               add_debug(element, "[Step 11] resource (resource|href|src)")
               res = process_uri(element, attrs[:resource], evaluation_context, base,
-                                :uri_mappings => uri_mappings,
-                                :restrictions => SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
-              res ||= process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, :restrictions => [:uri])
+                                uri_mappings: uri_mappings,
+                                restrictions: SafeCURIEorCURIEorIRI.fetch(@version, [])) if attrs[:resource]
+              res ||= process_uri(element, (attrs[:href] || attrs[:src]), evaluation_context, base, restrictions: [:uri])
             when typed_resource && !attrs[:about] && @version != :"rdfa1.0"
               add_debug(element, "[Step 11] typed_resource")
               typed_resource
             else
               # plain literal
               add_debug(element, "[Step 11] plain literal (inner text)")
-              RDF::Literal.new(element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+              RDF::Literal.new(element.inner_text.to_s, language: language, validate: validate?, canonicalize: canonicalize?)
             end
           else # rdfa1.0
             if element.text_content? || (element.children.length == 0) || attrs[:datatype] == ""
               # plain literal
               add_debug(element, "[Step 11 (1.0)] plain literal")
-              RDF::Literal.new(attrs[:content] || element.inner_text.to_s, :language => language, :validate => validate?, :canonicalize => canonicalize?)
+              RDF::Literal.new(attrs[:content] || element.inner_text.to_s, language: language, validate: validate?, canonicalize: canonicalize?)
             elsif !element.text_content? and (datatype == nil or datatype == RDF.XMLLiteral)
               # XML Literal
               add_debug(element) {"[Step 11 (1.0)] XML Literal: #{element.inner_html}"}
               recurse = false
               c14nxl = element.children.c14nxl(
-                :library => @library,
-                :language => language,
-                :namespaces => {nil => XHTML}.merge(namespaces))
+                library: @library,
+                language: language,
+                namespaces: {nil => XHTML}.merge(namespaces))
               RDF::Literal.new(c14nxl,
-                :library => @library,
-                :datatype => RDF.XMLLiteral,
-                :validate => validate?,
-                :canonicalize => canonicalize?)
+                library: @library,
+                datatype: RDF.XMLLiteral,
+                validate: validate?,
+                canonicalize: canonicalize?)
             end
           end
         rescue ArgumentError => e
@@ -1350,14 +1350,14 @@ module RDF::RDFa
         if attrs[:role]
           subject = attrs[:id] ? uri(base, "##{attrs[:id]}") : RDF::Node.new
           roles = process_uris(element, attrs[:role], evaluation_context, base,
-                                    :uri_mappings => uri_mappings,
-                                    :term_mappings => term_mappings,
-                                    :vocab => RDF::XHV.to_s,
-                                    :restrictions => TERMorCURIEorAbsIRI.fetch(@version, []))
+                                    uri_mappings: uri_mappings,
+                                    term_mappings: term_mappings,
+                                    vocab: "http://www.w3.org/1999/xhtml/vocab#",
+                                    restrictions: TERMorCURIEorAbsIRI.fetch(@version, []))
 
           add_debug(element) {"role: about: #{subject.to_ntriples}, roles: #{roles.map(&:to_ntriples).inspect}"}
           roles.each do |r|
-            add_triple(element, subject, RDF::XHV.role, r)
+            add_triple(element, subject, RDF::URI("http://www.w3.org/1999/xhtml/vocab#role"), r)
           end
         end
       end
@@ -1374,7 +1374,7 @@ module RDF::RDFa
       return if value.nil?
       restrictions = options[:restrictions]
       add_debug(element) {"process_uri: #{value}, restrictions = #{restrictions.inspect}"}
-      options = {:uri_mappings => {}}.merge(options)
+      options = {uri_mappings: {}}.merge(options)
       if !options[:term_mappings] && options[:uri_mappings] && restrictions.include?(:safe_curie) && value.to_s.match(/^\[(.*)\]$/)
         # SafeCURIEorCURIEorIRI
         # When the value is surrounded by square brackets, then the content within the brackets is
@@ -1462,7 +1462,7 @@ module RDF::RDFa
         bnode(reference)
       elsif curie.to_s.match(/^:/)
         # Default prefix
-        RDF::XHV[reference.to_s]
+        RDF::URI("http://www.w3.org/1999/xhtml/vocab#") + reference.to_s
       elsif !curie.to_s.match(/:/)
         # No prefix, undefined (in this context, it is evaluated as a term elsewhere)
         nil

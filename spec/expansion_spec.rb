@@ -25,7 +25,7 @@ class ExpansionTester
 
   def graph
     g = RDF::Graph.new
-    @repo.each {|st| g << st if st.context.nil? }
+    @repo.each {|st| g << st if st.graph_name.nil? }
     g
   end
 
@@ -60,8 +60,8 @@ class ExpansionTester
       when :query
         @outputDocument = value
         result = %(
-          PREFIX dc:  <#{RDF::DC.to_uri}>
-          PREFIX foaf:<#{RDF::FOAF.to_uri}>
+          PREFIX dc:  <#{RDF::Vocab::DC.to_uri}>
+          PREFIX foaf:<#{RDF::Vocab::FOAF.to_uri}>
           PREFIX owl: <#{RDF::OWL.to_uri}>
           PREFIX rdf: <#{RDF.to_uri}>
           PREFIX rdfa:<#{RDF::RDFA.to_uri}>
@@ -79,8 +79,8 @@ class ExpansionTester
   
   def parse(ttl)
     RDF::Graph.new << RDF::Turtle::Reader.new(ttl, prefixes: {
-      dc:   RDF::DC.to_uri,
-      foaf: RDF::FOAF.to_uri,
+      dc:   RDF::Vocab::DC.to_uri,
+      foaf: RDF::Vocab::FOAF.to_uri,
       owl:  RDF::OWL.to_uri,
       rdf:  RDF.to_uri,
       rdfa: RDF::RDFA.to_uri,
@@ -285,7 +285,7 @@ describe RDF::RDFa::Expansion do
   context "with empty graph" do
     it "returns an empty graph" do
       rdfa = %q(<http></http>)
-      expect(parse(rdfa)).to be_equivalent_graph("", :trace => @debug)
+      expect(parse(rdfa)).to be_equivalent_graph("", trace: @debug)
     end
   end
   
@@ -353,7 +353,7 @@ describe RDF::RDFa::Expansion do
             dc:creator <http://greggkellogg.net/foaf#me> .
         }
       )
-      expect(parse(rdfa)).to pass_query(query, :trace => @debug)
+      expect(parse(rdfa)).to pass_query(query, trace: @debug)
     end
 
     context "http://rdfa.info/vocabs/rdfa-test#" do

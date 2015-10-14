@@ -13,10 +13,10 @@ module RDF::RDFa
   # @example Obtaining a RDFa writer class
   #     RDF::Writer.for(:html)          => RDF::RDFa::Writer
   #     RDF::Writer.for("etc/test.html")
-  #     RDF::Writer.for(:file_name      => "etc/test.html")
-  #     RDF::Writer.for(:file_extension => "html")
-  #     RDF::Writer.for(:content_type   => "application/xhtml+xml")
-  #     RDF::Writer.for(:content_type   => "text/html")
+  #     RDF::Writer.for(file_name:      "etc/test.html")
+  #     RDF::Writer.for(file_extension: "html")
+  #     RDF::Writer.for(content_type:   "application/xhtml+xml")
+  #     RDF::Writer.for(content_type:   "text/html")
   #
   # @example Serializing RDF graph into an XHTML+RDFa file
   #     RDF::RDFa::Write.open("etc/test.html") do |writer|
@@ -38,8 +38,8 @@ module RDF::RDFa
   #     end
   #
   # @example Creating @base and @prefix definitions in output
-  #     RDF::RDFa::Writer.buffer(:base_uri => "http://example.com/", :prefixes => {
-  #         :foaf => "http://xmlns.com/foaf/0.1/"}
+  #     RDF::RDFa::Writer.buffer(base_uri: "http://example.com/", prefixes: {
+  #         foaf: "http://xmlns.com/foaf/0.1/"}
   #     ) do |writer|
   #       graph.each_statement do |statement|
   #         writer << statement
@@ -63,7 +63,7 @@ module RDF::RDFa
     attr :heading_predicates
 
     HAML_OPTIONS = {
-      :ugly => false, # to preserve whitespace without using entities
+      ugly: false, # to preserve whitespace without using entities
     }
 
     # @return [Graph] Graph of statements serialized
@@ -93,13 +93,13 @@ module RDF::RDFa
     #   Add standard prefixes to _prefixes_, if necessary.
     # @option options [Array<RDF::URI>] :top_classes ([RDF::RDFS.Class])
     #   Defines rdf:type of subjects to be emitted at the beginning of the document.
-    # @option options [Array<RDF::URI>] :predicate_order ([RDF.type, RDF::RDFS.label, RDF::DC.title])
+    # @option options [Array<RDF::URI>] :predicate_order ([RDF.type, RDF::RDFS.label, RDF::Vocab::DC.title])
     #   Defines order of predicates to to emit at begninning of a resource description..
-    # @option options [Array<RDF::URI>] :heading_predicates ([RDF::RDFS.label, RDF::DC.title])
+    # @option options [Array<RDF::URI>] :heading_predicates ([RDF::RDFS.label, RDF::Vocab::DC.title])
     #   Defines order of predicates to use in heading.
     # @option options [String, Symbol, Hash{Symbol => String}] :haml (DEFAULT_HAML) HAML templates used for generating code
     # @option options [Hash] :haml_options (HAML_OPTIONS)
-    #   Options to pass to Haml::Engine.new. Default options set `:ugly => false` to ensure that whitespace in literals with newlines is properly preserved.
+    #   Options to pass to Haml::Engine.new. Default options set `ugly: false` to ensure that whitespace in literals with newlines is properly preserved.
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
     def initialize(output = $stdout, options = {}, &block)
@@ -107,8 +107,8 @@ module RDF::RDFa
         @uri_to_term_or_curie = {}
         @uri_to_prefix = {}
         @top_classes = options[:top_classes] || [RDF::RDFS.Class]
-        @predicate_order = options[:predicate_order] || [RDF.type, RDF::RDFS.label, RDF::DC.title]
-        @heading_predicates = options[:heading_predicates] || [RDF::RDFS.label, RDF::DC.title]
+        @predicate_order = options[:predicate_order] || [RDF.type, RDF::RDFS.label, RDF::URI("http://purl.org/dc/terms/title")]
+        @heading_predicates = options[:heading_predicates] || [RDF::RDFS.label, RDF::URI("http://purl.org/dc/terms/title")]
         @graph = RDF::Graph.new
 
         block.call(self) if block_given?
@@ -181,7 +181,7 @@ module RDF::RDFa
       doc_title = nil
       titles = {}
       heading_predicates.each do |pred|
-        @graph.query(:predicate => pred) do |statement|
+        @graph.query(predicate: pred) do |statement|
           titles[statement.subject] ||= statement.object
         end
       end
@@ -190,10 +190,10 @@ module RDF::RDFa
 
       # Generate document
       doc = render_document(subjects,
-        :lang     => @lang,
-        :base     => base_uri,
-        :title    => doc_title,
-        :prefix   => prefix) do |s|
+        lang:     @lang,
+        base:     base_uri,
+        title:    doc_title,
+        prefix:   prefix) do |s|
         subject(s)
       end
       @output.write(doc)
@@ -227,9 +227,9 @@ module RDF::RDFa
     def render_document(subjects, options = {})
       template = options[:haml] || :doc
       options = {
-        :prefix => nil,
-        :subjects => subjects,
-        :title => nil,
+        prefix: nil,
+        subjects: subjects,
+        title: nil,
       }.merge(options)
       hamlify(template, options) do |subject|
         yield(subject) if block_given?
@@ -272,15 +272,15 @@ module RDF::RDFa
     def render_subject(subject, predicates, options = {})
       template = options[:haml] || :subject
       options = {
-        :about      => (get_curie(subject) unless options[:rel]),
-        :base       => base_uri,
-        :element    => nil,
-        :predicates => predicates,
-        :rel        => nil,
-        :inlist     => nil,
-        :resource   => (get_curie(subject) if options[:rel]),
-        :subject    => subject,
-        :typeof     => nil,
+        about:      (get_curie(subject) unless options[:rel]),
+        base:       base_uri,
+        element:    nil,
+        predicates: predicates,
+        rel:        nil,
+        inlist:     nil,
+        resource:   (get_curie(subject) if options[:rel]),
+        subject:    subject,
+        typeof:     nil,
       }.merge(options)
       hamlify(template, options) do |predicate|
         yield(predicate) if block_given?
@@ -331,7 +331,7 @@ module RDF::RDFa
 
           add_debug {"list: #{list.inspect} #{list.to_a}"}
           depth do
-            render_property(predicate, list.to_a, options.merge(:inlist => "true")) do |object|
+            render_property(predicate, list.to_a, options.merge(inlist: "true")) do |object|
               yield(object, true) if block_given?
             end
           end
@@ -352,12 +352,12 @@ module RDF::RDFa
             :property_values :
             :property_value)
         options = {
-          :objects    => objects,
-          :object     => objects.first,
-          :predicate  => predicate,
-          :property   => get_curie(predicate),
-          :rel        => get_curie(predicate),
-          :inlist     => nil,
+          objects:    objects,
+          object:     objects.first,
+          predicate:  predicate,
+          property:   get_curie(predicate),
+          rel:        get_curie(predicate),
+          inlist:     nil,
         }.merge(options)
         hamlify(template, options, &block)
       end
@@ -410,7 +410,7 @@ module RDF::RDFa
       top_classes.
       select {|s| !seen.include?(s)}.
       each do |class_uri|
-        graph.query(:predicate => RDF.type, :object => class_uri).map {|st| st.subject}.sort.uniq.each do |subject|
+        graph.query(predicate: RDF.type, object: class_uri).map {|st| st.subject}.sort.uniq.each do |subject|
           #add_debug {"order_subjects: #{subject.inspect}"}
           subjects << subject
           seen[subject] = true
@@ -505,7 +505,7 @@ module RDF::RDFa
 
       add_debug {"props: #{prop_list.inspect}"}
 
-      render_opts = {:typeof => typeof, :property_values => properties}.merge(options)
+      render_opts = {typeof: typeof, property_values: properties}.merge(options)
 
       render_subject_template(subject, prop_list, render_opts)
     end
@@ -514,7 +514,7 @@ module RDF::RDFa
     # @return [Hash{String => Object}]
     def properties_for_subject(subject)
       properties = {}
-      @graph.query(:subject => subject) do |st|
+      @graph.query(subject: subject) do |st|
         key = st.predicate.to_s.freeze
         properties[key] ||= []
         properties[key] << st.object
@@ -587,7 +587,7 @@ module RDF::RDFa
       render_property(predicate, objects) do |o, inlist=nil|
         # Yields each object, for potential recursive definition.
         # If nil is returned, a leaf is produced
-        depth {subject(o, :rel => get_curie(predicate), :inlist => inlist, :element => (:li if objects.length > 1 || inlist))} if !is_done?(o) && @subjects.include?(o)
+        depth {subject(o, rel: get_curie(predicate), inlist: inlist, element: (:li if objects.length > 1 || inlist))} if !is_done?(o) && @subjects.include?(o)
       end
     end
 

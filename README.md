@@ -244,11 +244,11 @@ In an [RDFA+HTML Errata](https://www.w3.org/2001/sw/wiki/RDFa_1.1._Errata#Using_
 
 ### Reading RDF data in the RDFa format
 
-    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa)
+    graph = RDF::Graph.load("etc/doap.html", format: :rdfa)
 
 ### Reading RDF data with vocabulary expansion
 
-    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa, :vocab_expansion => true)
+    graph = RDF::Graph.load("etc/doap.html", format: :rdfa, vocab_expansion: true)
 
 or
 
@@ -256,11 +256,11 @@ or
 
 ### Reading Processor Graph
 
-    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa, :rdfagraph => :processor)
+    graph = RDF::Graph.load("etc/doap.html", format: :rdfa, rdfagraph: :processor)
 
 ### Reading Both Processor and Output Graphs
 
-    graph = RDF::Graph.load("etc/doap.html", :format => :rdfa, :rdfagraph => [:output, :processor])
+    graph = RDF::Graph.load("etc/doap.html", format: :rdfa, rdfagraph: [:output, :processor])
 
 ### Writing RDF data using the XHTML+RDFa format
 
@@ -274,8 +274,8 @@ Note that prefixes may be chained between Reader and Writer, so that the Writer 
 use the same prefix definitions found during parsing:
 
     prefixes = {}
-    graph = RDF::Graph.load("etc/doap.html", :prefixes => prefixes)
-    puts graph.dump(:rdfa, :prefixes => prefixes)
+    graph = RDF::Graph.load("etc/doap.html", prefixes: prefixes)
+    puts graph.dump(:rdfa, prefixes: prefixes)
 
 ### Template-based Writer
 The RDFa writer uses [Haml][Haml] templates for code generation. This allows
@@ -288,7 +288,7 @@ To specify an alternative Haml template, consider the following:
 
     require 'rdf/rdfa'
     
-    RDF::RDFa::Writer.buffer(:haml => RDF::RDFa::Writer::MIN_HAML) << graph
+    RDF::RDFa::Writer.buffer(haml: RDF::RDFa::Writer::MIN_HAML) << graph
 
 The template hash defines four Haml templates:
 
@@ -385,12 +385,12 @@ The template hash defines four Haml templates:
   the associated Hash. For example:
   
     {
-      :document => "...",
-      :subject => "...",
+      document: "...",
+      subject: "...",
       :property\_value => "...",
       :property\_values => "...",
       RDF::URI("http://schema.org/Person") => {
-        :subject => "...",
+        subject: "...",
         :property\_value => "...",
         :property\_values => "...",
       }

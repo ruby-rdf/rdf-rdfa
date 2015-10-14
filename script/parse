@@ -54,15 +54,15 @@ rescue
 end
 
 options = {
-  :base_uri      => "http://example.com",
-  :host_language => nil,
-  :input_format  => :rdfa,
-  :output        => STDOUT,
-  :output_format => :ntriples,
-  :strict        => true,
-  :validate      => false,
-  :verbose       => false,
-  :version       => nil,
+  base_uri:      "http://example.com",
+  host_language: nil,
+  input_format:  :rdfa,
+  output:        STDOUT,
+  output_format: :ntriples,
+  strict:        true,
+  validate:      false,
+  verbose:       false,
+  version:       nil,
 }
 input = nil
 
