@@ -31,21 +31,21 @@ module RDF
   class Literal
     def dump
       "RDF::Literal('#{value}'" +
-        (", :datatype => #{datatype.dump}" if datatype).to_s +
-        (", :language => :#{language}" if language).to_s +
+        (", datatype: #{datatype.dump}" if datatype).to_s +
+        (", language: :#{language}" if language).to_s +
         ")"
     end
   end
   
   class Statement
     def dump
-      "RDF::Statement.new(#{subject.dump}, #{predicate.dump}, #{object.dump}, :context => #{context.dump})"
+      "RDF::Statement.new(#{subject.dump}, #{predicate.dump}, #{object.dump}, context: #{context.dump})"
     end
   end
   
   class RDFXML::Format
     # Add mime-type for text/xml
-    content_type     'text/xml', :extension => :xml
+    content_type     'text/xml', extension: :xml
   end
 end
 

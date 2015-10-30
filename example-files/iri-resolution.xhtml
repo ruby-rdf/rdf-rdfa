@@ -1,0 +1,373 @@
+<!DOCTYPE xhtml>
+<html><body>
+  <div xml:base="http://a/bb/ccc/d;p?q">
+    <!-- RFC3986 normal examples -->
+    <link about="urn:ex:s001" property="urn:ex:p" href="g:h"/>
+    <link about="urn:ex:s002" property="urn:ex:p" href="g"/>
+    <link about="urn:ex:s003" property="urn:ex:p" href="./g"/>
+    <link about="urn:ex:s004" property="urn:ex:p" href="g/"/>
+    <link about="urn:ex:s005" property="urn:ex:p" href="/g"/>
+    <link about="urn:ex:s006" property="urn:ex:p" href="//g"/>
+    <link about="urn:ex:s007" property="urn:ex:p" href="?y"/>
+    <link about="urn:ex:s008" property="urn:ex:p" href="g?y"/>
+    <link about="urn:ex:s009" property="urn:ex:p" href="#s"/>
+    <link about="urn:ex:s010" property="urn:ex:p" href="g#s"/>
+    <link about="urn:ex:s011" property="urn:ex:p" href="g?y#s"/>
+    <link about="urn:ex:s012" property="urn:ex:p" href=";x"/>
+    <link about="urn:ex:s013" property="urn:ex:p" href="g;x"/>
+    <link about="urn:ex:s014" property="urn:ex:p" href="g;x?y#s"/>
+    <link about="urn:ex:s015" property="urn:ex:p" href=""/>
+    <link about="urn:ex:s016" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s017" property="urn:ex:p" href="./"/>
+    <link about="urn:ex:s018" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s019" property="urn:ex:p" href="../"/>
+    <link about="urn:ex:s020" property="urn:ex:p" href="../g"/>
+    <link about="urn:ex:s021" property="urn:ex:p" href="../.."/>
+    <link about="urn:ex:s022" property="urn:ex:p" href="../../"/>
+    <link about="urn:ex:s023" property="urn:ex:p" href="../../g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/d;p?q">
+    <!-- RFC3986 abnormal examples -->
+    <link about="urn:ex:s024" property="urn:ex:p" href="../../../g"/>
+    <link about="urn:ex:s025" property="urn:ex:p" href="../../../../g"/>
+    <link about="urn:ex:s026" property="urn:ex:p" href="/./g"/>
+    <link about="urn:ex:s027" property="urn:ex:p" href="/../g"/>
+    <link about="urn:ex:s028" property="urn:ex:p" href="g."/>
+    <link about="urn:ex:s029" property="urn:ex:p" href=".g"/>
+    <link about="urn:ex:s030" property="urn:ex:p" href="g.."/>
+    <link about="urn:ex:s031" property="urn:ex:p" href="..g"/>
+    <link about="urn:ex:s032" property="urn:ex:p" href="./../g"/>
+    <link about="urn:ex:s033" property="urn:ex:p" href="./g/."/>
+    <link about="urn:ex:s034" property="urn:ex:p" href="g/./h"/>
+    <link about="urn:ex:s035" property="urn:ex:p" href="g/../h"/>
+    <link about="urn:ex:s036" property="urn:ex:p" href="g;x=1/./y"/>
+    <link about="urn:ex:s037" property="urn:ex:p" href="g;x=1/../y"/>
+    <link about="urn:ex:s038" property="urn:ex:p" href="g?y/./x"/>
+    <link about="urn:ex:s039" property="urn:ex:p" href="g?y/../x"/>
+    <link about="urn:ex:s040" property="urn:ex:p" href="g#s/./x"/>
+    <link about="urn:ex:s041" property="urn:ex:p" href="g#s/../x"/>
+    <link about="urn:ex:s042" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/d/">
+    <!-- RFC3986 normal examples with trailing slash in base IRI -->
+    <link about="urn:ex:s043" property="urn:ex:p" href="g:h"/>
+    <link about="urn:ex:s044" property="urn:ex:p" href="g"/>
+    <link about="urn:ex:s045" property="urn:ex:p" href="./g"/>
+    <link about="urn:ex:s046" property="urn:ex:p" href="g/"/>
+    <link about="urn:ex:s047" property="urn:ex:p" href="/g"/>
+    <link about="urn:ex:s048" property="urn:ex:p" href="//g"/>
+    <link about="urn:ex:s049" property="urn:ex:p" href="?y"/>
+    <link about="urn:ex:s050" property="urn:ex:p" href="g?y"/>
+    <link about="urn:ex:s051" property="urn:ex:p" href="#s"/>
+    <link about="urn:ex:s052" property="urn:ex:p" href="g#s"/>
+    <link about="urn:ex:s053" property="urn:ex:p" href="g?y#s"/>
+    <link about="urn:ex:s054" property="urn:ex:p" href=";x"/>
+    <link about="urn:ex:s055" property="urn:ex:p" href="g;x"/>
+    <link about="urn:ex:s056" property="urn:ex:p" href="g;x?y#s"/>
+    <link about="urn:ex:s057" property="urn:ex:p" href=""/>
+    <link about="urn:ex:s058" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s059" property="urn:ex:p" href="./"/>
+    <link about="urn:ex:s060" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s061" property="urn:ex:p" href="../"/>
+    <link about="urn:ex:s062" property="urn:ex:p" href="../g"/>
+    <link about="urn:ex:s063" property="urn:ex:p" href="../.."/>
+    <link about="urn:ex:s064" property="urn:ex:p" href="../../"/>
+    <link about="urn:ex:s065" property="urn:ex:p" href="../../g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/d/">
+    <!-- RFC3986 abnormal examples with trailing slash in base IRI -->
+    <link about="urn:ex:s066" property="urn:ex:p" href="../../../g"/>
+    <link about="urn:ex:s067" property="urn:ex:p" href="../../../../g"/>
+    <link about="urn:ex:s068" property="urn:ex:p" href="/./g"/>
+    <link about="urn:ex:s069" property="urn:ex:p" href="/../g"/>
+    <link about="urn:ex:s070" property="urn:ex:p" href="g."/>
+    <link about="urn:ex:s071" property="urn:ex:p" href=".g"/>
+    <link about="urn:ex:s072" property="urn:ex:p" href="g.."/>
+    <link about="urn:ex:s073" property="urn:ex:p" href="..g"/>
+    <link about="urn:ex:s074" property="urn:ex:p" href="./../g"/>
+    <link about="urn:ex:s075" property="urn:ex:p" href="./g/."/>
+    <link about="urn:ex:s076" property="urn:ex:p" href="g/./h"/>
+    <link about="urn:ex:s077" property="urn:ex:p" href="g/../h"/>
+    <link about="urn:ex:s078" property="urn:ex:p" href="g;x=1/./y"/>
+    <link about="urn:ex:s079" property="urn:ex:p" href="g;x=1/../y"/>
+    <link about="urn:ex:s080" property="urn:ex:p" href="g?y/./x"/>
+    <link about="urn:ex:s081" property="urn:ex:p" href="g?y/../x"/>
+    <link about="urn:ex:s082" property="urn:ex:p" href="g#s/./x"/>
+    <link about="urn:ex:s083" property="urn:ex:p" href="g#s/../x"/>
+    <link about="urn:ex:s084" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/./d;p?q">
+    <!-- RFC3986 normal examples0 with ./ in the base IRI -->
+    <link about="urn:ex:s085" property="urn:ex:p" href="g:h"/>
+    <link about="urn:ex:s086" property="urn:ex:p" href="g"/>
+    <link about="urn:ex:s087" property="urn:ex:p" href="./g"/>
+    <link about="urn:ex:s088" property="urn:ex:p" href="g/"/>
+    <link about="urn:ex:s089" property="urn:ex:p" href="/g"/>
+    <link about="urn:ex:s090" property="urn:ex:p" href="//g"/>
+    <link about="urn:ex:s091" property="urn:ex:p" href="?y"/>
+    <link about="urn:ex:s092" property="urn:ex:p" href="g?y"/>
+    <link about="urn:ex:s093" property="urn:ex:p" href="#s"/>
+    <link about="urn:ex:s094" property="urn:ex:p" href="g#s"/>
+    <link about="urn:ex:s095" property="urn:ex:p" href="g?y#s"/>
+    <link about="urn:ex:s096" property="urn:ex:p" href=";x"/>
+    <link about="urn:ex:s097" property="urn:ex:p" href="g;x"/>
+    <link about="urn:ex:s098" property="urn:ex:p" href="g;x?y#s"/>
+    <link about="urn:ex:s099" property="urn:ex:p" href=""/>
+    <link about="urn:ex:s100" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s101" property="urn:ex:p" href="./"/>
+    <link about="urn:ex:s102" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s103" property="urn:ex:p" href="../"/>
+    <link about="urn:ex:s104" property="urn:ex:p" href="../g"/>
+    <link about="urn:ex:s105" property="urn:ex:p" href="../.."/>
+    <link about="urn:ex:s106" property="urn:ex:p" href="../../"/>
+    <link about="urn:ex:s107" property="urn:ex:p" href="../../g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/./d;p?q">
+    <!-- RFC3986 abnormal examples with ./ in the base IRI -->
+    <link about="urn:ex:s108" property="urn:ex:p" href="../../../g"/>
+    <link about="urn:ex:s109" property="urn:ex:p" href="../../../../g"/>
+    <link about="urn:ex:s110" property="urn:ex:p" href="/./g"/>
+    <link about="urn:ex:s111" property="urn:ex:p" href="/../g"/>
+    <link about="urn:ex:s112" property="urn:ex:p" href="g."/>
+    <link about="urn:ex:s113" property="urn:ex:p" href=".g"/>
+    <link about="urn:ex:s114" property="urn:ex:p" href="g.."/>
+    <link about="urn:ex:s115" property="urn:ex:p" href="..g"/>
+    <link about="urn:ex:s116" property="urn:ex:p" href="./../g"/>
+    <link about="urn:ex:s117" property="urn:ex:p" href="./g/."/>
+    <link about="urn:ex:s118" property="urn:ex:p" href="g/./h"/>
+    <link about="urn:ex:s119" property="urn:ex:p" href="g/../h"/>
+    <link about="urn:ex:s120" property="urn:ex:p" href="g;x=1/./y"/>
+    <link about="urn:ex:s121" property="urn:ex:p" href="g;x=1/../y"/>
+    <link about="urn:ex:s122" property="urn:ex:p" href="g?y/./x"/>
+    <link about="urn:ex:s123" property="urn:ex:p" href="g?y/../x"/>
+    <link about="urn:ex:s124" property="urn:ex:p" href="g#s/./x"/>
+    <link about="urn:ex:s125" property="urn:ex:p" href="g#s/../x"/>
+    <link about="urn:ex:s126" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/../d;p?q">
+    <!-- RFC3986 normal examples with ../ in the base IRI -->
+    <link about="urn:ex:s127" property="urn:ex:p" href="g:h"/>
+    <link about="urn:ex:s128" property="urn:ex:p" href="g"/>
+    <link about="urn:ex:s129" property="urn:ex:p" href="./g"/>
+    <link about="urn:ex:s130" property="urn:ex:p" href="g/"/>
+    <link about="urn:ex:s131" property="urn:ex:p" href="/g"/>
+    <link about="urn:ex:s132" property="urn:ex:p" href="//g"/>
+    <link about="urn:ex:s133" property="urn:ex:p" href="?y"/>
+    <link about="urn:ex:s134" property="urn:ex:p" href="g?y"/>
+    <link about="urn:ex:s135" property="urn:ex:p" href="#s"/>
+    <link about="urn:ex:s136" property="urn:ex:p" href="g#s"/>
+    <link about="urn:ex:s137" property="urn:ex:p" href="g?y#s"/>
+    <link about="urn:ex:s138" property="urn:ex:p" href=";x"/>
+    <link about="urn:ex:s139" property="urn:ex:p" href="g;x"/>
+    <link about="urn:ex:s140" property="urn:ex:p" href="g;x?y#s"/>
+    <link about="urn:ex:s141" property="urn:ex:p" href=""/>
+    <link about="urn:ex:s142" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s143" property="urn:ex:p" href="./"/>
+    <link about="urn:ex:s144" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s145" property="urn:ex:p" href="../"/>
+    <link about="urn:ex:s146" property="urn:ex:p" href="../g"/>
+    <link about="urn:ex:s147" property="urn:ex:p" href="../.."/>
+    <link about="urn:ex:s148" property="urn:ex:p" href="../../"/>
+    <link about="urn:ex:s149" property="urn:ex:p" href="../../g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/../d;p?q">
+    <!-- RFC3986 abnormal examples with ../ in the base IRI -->
+    <link about="urn:ex:s150" property="urn:ex:p" href="../../../g"/>
+    <link about="urn:ex:s151" property="urn:ex:p" href="../../../../g"/>
+    <link about="urn:ex:s152" property="urn:ex:p" href="/./g"/>
+    <link about="urn:ex:s153" property="urn:ex:p" href="/../g"/>
+    <link about="urn:ex:s154" property="urn:ex:p" href="g."/>
+    <link about="urn:ex:s155" property="urn:ex:p" href=".g"/>
+    <link about="urn:ex:s156" property="urn:ex:p" href="g.."/>
+    <link about="urn:ex:s157" property="urn:ex:p" href="..g"/>
+    <link about="urn:ex:s158" property="urn:ex:p" href="./../g"/>
+    <link about="urn:ex:s159" property="urn:ex:p" href="./g/."/>
+    <link about="urn:ex:s160" property="urn:ex:p" href="g/./h"/>
+    <link about="urn:ex:s161" property="urn:ex:p" href="g/../h"/>
+    <link about="urn:ex:s162" property="urn:ex:p" href="g;x=1/./y"/>
+    <link about="urn:ex:s163" property="urn:ex:p" href="g;x=1/../y"/>
+    <link about="urn:ex:s164" property="urn:ex:p" href="g?y/./x"/>
+    <link about="urn:ex:s165" property="urn:ex:p" href="g?y/../x"/>
+    <link about="urn:ex:s166" property="urn:ex:p" href="g#s/./x"/>
+    <link about="urn:ex:s167" property="urn:ex:p" href="g#s/../x"/>
+    <link about="urn:ex:s168" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/.">
+    <!-- RFC3986 normal examples with trailing ./ in the base IRI -->
+    <link about="urn:ex:s169" property="urn:ex:p" href="g:h"/>
+    <link about="urn:ex:s170" property="urn:ex:p" href="g"/>
+    <link about="urn:ex:s171" property="urn:ex:p" href="./g"/>
+    <link about="urn:ex:s172" property="urn:ex:p" href="g/"/>
+    <link about="urn:ex:s173" property="urn:ex:p" href="/g"/>
+    <link about="urn:ex:s174" property="urn:ex:p" href="//g"/>
+    <link about="urn:ex:s175" property="urn:ex:p" href="?y"/>
+    <link about="urn:ex:s176" property="urn:ex:p" href="g?y"/>
+    <link about="urn:ex:s177" property="urn:ex:p" href="#s"/>
+    <link about="urn:ex:s178" property="urn:ex:p" href="g#s"/>
+    <link about="urn:ex:s179" property="urn:ex:p" href="g?y#s"/>
+    <link about="urn:ex:s180" property="urn:ex:p" href=";x"/>
+    <link about="urn:ex:s181" property="urn:ex:p" href="g;x"/>
+    <link about="urn:ex:s182" property="urn:ex:p" href="g;x?y#s"/>
+    <link about="urn:ex:s183" property="urn:ex:p" href=""/>
+    <link about="urn:ex:s184" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s185" property="urn:ex:p" href="./"/>
+    <link about="urn:ex:s186" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s187" property="urn:ex:p" href="../"/>
+    <link about="urn:ex:s188" property="urn:ex:p" href="../g"/>
+    <link about="urn:ex:s189" property="urn:ex:p" href="../.."/>
+    <link about="urn:ex:s190" property="urn:ex:p" href="../../"/>
+    <link about="urn:ex:s191" property="urn:ex:p" href="../../g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/.">
+    <!-- RFC3986 abnormal examples with trailing ./ in the base IRI -->
+    <link about="urn:ex:s192" property="urn:ex:p" href="../../../g"/>
+    <link about="urn:ex:s193" property="urn:ex:p" href="../../../../g"/>
+    <link about="urn:ex:s194" property="urn:ex:p" href="/./g"/>
+    <link about="urn:ex:s195" property="urn:ex:p" href="/../g"/>
+    <link about="urn:ex:s196" property="urn:ex:p" href="g."/>
+    <link about="urn:ex:s197" property="urn:ex:p" href=".g"/>
+    <link about="urn:ex:s198" property="urn:ex:p" href="g.."/>
+    <link about="urn:ex:s199" property="urn:ex:p" href="..g"/>
+    <link about="urn:ex:s200" property="urn:ex:p" href="./../g"/>
+    <link about="urn:ex:s201" property="urn:ex:p" href="./g/."/>
+    <link about="urn:ex:s202" property="urn:ex:p" href="g/./h"/>
+    <link about="urn:ex:s203" property="urn:ex:p" href="g/../h"/>
+    <link about="urn:ex:s204" property="urn:ex:p" href="g;x=1/./y"/>
+    <link about="urn:ex:s205" property="urn:ex:p" href="g;x=1/../y"/>
+    <link about="urn:ex:s206" property="urn:ex:p" href="g?y/./x"/>
+    <link about="urn:ex:s207" property="urn:ex:p" href="g?y/../x"/>
+    <link about="urn:ex:s208" property="urn:ex:p" href="g#s/./x"/>
+    <link about="urn:ex:s209" property="urn:ex:p" href="g#s/../x"/>
+    <link about="urn:ex:s210" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/..">
+    <!-- RFC3986 normal examples with trailing ../ in the base IRI -->
+    <link about="urn:ex:s211" property="urn:ex:p" href="g:h"/>
+    <link about="urn:ex:s212" property="urn:ex:p" href="g"/>
+    <link about="urn:ex:s213" property="urn:ex:p" href="./g"/>
+    <link about="urn:ex:s214" property="urn:ex:p" href="g/"/>
+    <link about="urn:ex:s215" property="urn:ex:p" href="/g"/>
+    <link about="urn:ex:s216" property="urn:ex:p" href="//g"/>
+    <link about="urn:ex:s217" property="urn:ex:p" href="?y"/>
+    <link about="urn:ex:s218" property="urn:ex:p" href="g?y"/>
+    <link about="urn:ex:s219" property="urn:ex:p" href="#s"/>
+    <link about="urn:ex:s220" property="urn:ex:p" href="g#s"/>
+    <link about="urn:ex:s221" property="urn:ex:p" href="g?y#s"/>
+    <link about="urn:ex:s222" property="urn:ex:p" href=";x"/>
+    <link about="urn:ex:s223" property="urn:ex:p" href="g;x"/>
+    <link about="urn:ex:s224" property="urn:ex:p" href="g;x?y#s"/>
+    <link about="urn:ex:s225" property="urn:ex:p" href=""/>
+    <link about="urn:ex:s226" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s227" property="urn:ex:p" href="./"/>
+    <link about="urn:ex:s228" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s229" property="urn:ex:p" href="../"/>
+    <link about="urn:ex:s230" property="urn:ex:p" href="../g"/>
+    <link about="urn:ex:s231" property="urn:ex:p" href="../.."/>
+    <link about="urn:ex:s232" property="urn:ex:p" href="../../"/>
+    <link about="urn:ex:s233" property="urn:ex:p" href="../../g"/>
+    <link about="urn:ex:s210" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <div xml:base="http://a/bb/ccc/..">
+    <!-- RFC3986 abnormal examples with trailing ../ in the base IRI -->
+    <link about="urn:ex:s234" property="urn:ex:p" href="../../../g"/>
+    <link about="urn:ex:s235" property="urn:ex:p" href="../../../../g"/>
+    <link about="urn:ex:s236" property="urn:ex:p" href="/./g"/>
+    <link about="urn:ex:s237" property="urn:ex:p" href="/../g"/>
+    <link about="urn:ex:s238" property="urn:ex:p" href="g."/>
+    <link about="urn:ex:s239" property="urn:ex:p" href=".g"/>
+    <link about="urn:ex:s240" property="urn:ex:p" href="g.."/>
+    <link about="urn:ex:s241" property="urn:ex:p" href="..g"/>
+    <link about="urn:ex:s242" property="urn:ex:p" href="./../g"/>
+    <link about="urn:ex:s243" property="urn:ex:p" href="./g/."/>
+    <link about="urn:ex:s244" property="urn:ex:p" href="g/./h"/>
+    <link about="urn:ex:s245" property="urn:ex:p" href="g/../h"/>
+    <link about="urn:ex:s246" property="urn:ex:p" href="g;x=1/./y"/>
+    <link about="urn:ex:s247" property="urn:ex:p" href="g;x=1/../y"/>
+    <link about="urn:ex:s248" property="urn:ex:p" href="g?y/./x"/>
+    <link about="urn:ex:s249" property="urn:ex:p" href="g?y/../x"/>
+    <link about="urn:ex:s250" property="urn:ex:p" href="g#s/./x"/>
+    <link about="urn:ex:s251" property="urn:ex:p" href="g#s/../x"/>
+    <link about="urn:ex:s252" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <div xml:base="file:///a/bb/ccc/d;p?q">
+    <!-- RFC3986 normal examples with file path -->
+    <link about="urn:ex:s253" property="urn:ex:p" href="g:h"/>
+    <link about="urn:ex:s254" property="urn:ex:p" href="g"/>
+    <link about="urn:ex:s255" property="urn:ex:p" href="./g"/>
+    <link about="urn:ex:s256" property="urn:ex:p" href="g/"/>
+    <link about="urn:ex:s257" property="urn:ex:p" href="/g"/>
+    <link about="urn:ex:s258" property="urn:ex:p" href="//g"/>
+    <link about="urn:ex:s259" property="urn:ex:p" href="?y"/>
+    <link about="urn:ex:s260" property="urn:ex:p" href="g?y"/>
+    <link about="urn:ex:s261" property="urn:ex:p" href="#s"/>
+    <link about="urn:ex:s262" property="urn:ex:p" href="g#s"/>
+    <link about="urn:ex:s263" property="urn:ex:p" href="g?y#s"/>
+    <link about="urn:ex:s264" property="urn:ex:p" href=";x"/>
+    <link about="urn:ex:s265" property="urn:ex:p" href="g;x"/>
+    <link about="urn:ex:s266" property="urn:ex:p" href="g;x?y#s"/>
+    <link about="urn:ex:s267" property="urn:ex:p" href=""/>
+    <link about="urn:ex:s268" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s269" property="urn:ex:p" href="./"/>
+    <link about="urn:ex:s270" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s271" property="urn:ex:p" href="../"/>
+    <link about="urn:ex:s272" property="urn:ex:p" href="../g"/>
+    <link about="urn:ex:s273" property="urn:ex:p" href="../.."/>
+    <link about="urn:ex:s274" property="urn:ex:p" href="../../"/>
+    <link about="urn:ex:s275" property="urn:ex:p" href="../../g"/>
+  </div>
+
+  <div xml:base="file:///a/bb/ccc/d;p?q">
+    <!-- RFC3986 abnormal examples with file path -->
+    <link about="urn:ex:s276" property="urn:ex:p" href="../../../g"/>
+    <link about="urn:ex:s277" property="urn:ex:p" href="../../../../g"/>
+    <link about="urn:ex:s278" property="urn:ex:p" href="/./g"/>
+    <link about="urn:ex:s279" property="urn:ex:p" href="/../g"/>
+    <link about="urn:ex:s280" property="urn:ex:p" href="g."/>
+    <link about="urn:ex:s281" property="urn:ex:p" href=".g"/>
+    <link about="urn:ex:s282" property="urn:ex:p" href="g.."/>
+    <link about="urn:ex:s283" property="urn:ex:p" href="..g"/>
+    <link about="urn:ex:s284" property="urn:ex:p" href="./../g"/>
+    <link about="urn:ex:s285" property="urn:ex:p" href="./g/."/>
+    <link about="urn:ex:s286" property="urn:ex:p" href="g/./h"/>
+    <link about="urn:ex:s287" property="urn:ex:p" href="g/../h"/>
+    <link about="urn:ex:s288" property="urn:ex:p" href="g;x=1/./y"/>
+    <link about="urn:ex:s289" property="urn:ex:p" href="g;x=1/../y"/>
+    <link about="urn:ex:s290" property="urn:ex:p" href="g?y/./x"/>
+    <link about="urn:ex:s291" property="urn:ex:p" href="g?y/../x"/>
+    <link about="urn:ex:s292" property="urn:ex:p" href="g#s/./x"/>
+    <link about="urn:ex:s293" property="urn:ex:p" href="g#s/../x"/>
+    <link about="urn:ex:s294" property="urn:ex:p" href="http:g"/>
+  </div>
+
+  <!-- additional cases -->
+  <div xml:base="http://abc/def/ghi">
+    <link about="urn:ex:s295" property="urn:ex:p" href="."/>
+    <link about="urn:ex:s296" property="urn:ex:p" href=".?a=b"/>
+    <link about="urn:ex:s297" property="urn:ex:p" href=".#a=b"/>
+    <link about="urn:ex:s298" property="urn:ex:p" href=".."/>
+    <link about="urn:ex:s299" property="urn:ex:p" href="..?a=b"/>
+    <link about="urn:ex:s300" property="urn:ex:p" href="..#a=b"/>
+  </div>
+  <div xml:base="http://ab//de//ghi">
+    <link about="urn:ex:s301" property="urn:ex:p" href="xyz"/>
+    <link about="urn:ex:s302" property="urn:ex:p" href="./xyz"/>
+    <link about="urn:ex:s303" property="urn:ex:p" href="../xyz"/>
+  </div>
+  <div xml:base="http://abc/d:f/ghi">
+    <link about="urn:ex:s304" property="urn:ex:p" href="xyz"/>
+    <link about="urn:ex:s305" property="urn:ex:p" href="./xyz"/>
+    <link about="urn:ex:s306" property="urn:ex:p" href="../xyz"/>
+  </div>
+</body></html>

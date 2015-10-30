@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
+require "bundler/setup"
 require 'rdf/rdfa'
 require 'sparql/grammar'
 require File.expand_path(File.join(File.dirname(__FILE__), "..", 'spec', 'spec_helper'))
@@ -10,6 +11,7 @@ require 'getoptlong'
 def run_tc(tc, options)
   input_uri = tc.input(options[:host_language], options[:version])
   results_uri = tc.results(options[:host_language], options[:version])
+  res = nil
 
   STDOUT.write "run #{tc.num}"
 
@@ -24,9 +26,9 @@ def run_tc(tc, options)
   begin
     puts "open #{input_uri}" if options[:verbose]
     options = {
-      :base_uri => input_uri,
-      :processor_graph => pg,
-      :format => :rdfa,
+      base_uri: input_uri,
+      processor_graph: pg,
+      format: :rdfa,
     }.merge(options)
 
     if tc.queryParam
@@ -38,6 +40,8 @@ def run_tc(tc, options)
 
     graph = RDF::Repository.new << reader
   rescue Exception => e
+    options[:result_count]["exception"] ||= 0
+    options[:result_count]["exception"] += 1
     puts "#{"exception:" unless options[:quiet]}: #{e}"
     if options[:quiet]
       return
@@ -51,11 +55,16 @@ def run_tc(tc, options)
   begin
     result = SPARQL::Grammar.parse(Kernel.open(results_uri)).execute(graph)
   rescue Exception => e
+    options[:result_count]["exception"] ||= 0
+    options[:result_count]["exception"] += 1
     puts "#{"exception:" unless options[:quiet]}: #{e}"
     return
   end
-  puts "#{"test result:" unless options[:quiet]} #{(result == (tc.expectedResults || true)) ? 'ok' : 'fail'}"
-  
+  res = (result == (tc.expectedResults || true)) ? 'pass' : 'fail'
+  puts "#{"test result:" unless options[:quiet]} #{res}"
+  options[:result_count][res] ||= 0
+  options[:result_count][res] += 1
+
   if pg && !options[:quiet]
     puts "\nProcessor Graph:\n"
     puts pg.inspect
@@ -66,14 +75,14 @@ def run_tc(tc, options)
 end
 
 options = {
-  :verbose         => false,
-  :quite           => false,
-  :validate        => false,
-  :format          => :ntriples,
-  :library         => nil,
-  :processor_graph => nil,
-  :host_language   => "xhtml1",
-  :version         => "rdfa1.1"
+  verbose:         false,
+  quite:           false,
+  validate:        false,
+  format:          :ntriples,
+  library:         nil,
+  processor_graph: nil,
+  host_language:   "xhtml1",
+  version:         "rdfa1.1"
 }
 
 opts = GetoptLong.new(
@@ -121,8 +130,14 @@ opts.each do |opt, arg|
   end
 end
 
+result_count = {}
+
 Fixtures::TestCase.for_specific(options[:host_language], options[:version]) do |tc|
   next unless ARGV.empty? || ARGV.any? {|n| tc.num.match(/#{n}/)}
   next if tc.classification.to_s =~ /deprecated/
-  run_tc(tc, options)
+  run_tc(tc, options.merge(result_count: result_count))
+end
+
+result_count.each do |result, count|
+  puts "#{result}: #{count}"
 end

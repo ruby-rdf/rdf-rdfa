@@ -8,15 +8,19 @@ gem "rdf-xsd",        git: "git://github.com/ruby-rdf/rdf-xsd.git", branch: "dev
 gem "nokogiri", '~> 1.6'
 gem 'equivalent-xml', '~> 0.5'
 
-group :test do
+group :development, :test do
   gem 'rdf-aggregate-repo', git: "git://github.com/ruby-rdf/rdf-aggregate-repo.git", branch: "develop"
   gem "rdf-microdata",  git: "git://github.com/ruby-rdf/rdf-microdata.git", branch: "develop"
   gem 'rdf-turtle',     git: "git://github.com/ruby-rdf/rdf-turtle.git", branch: "develop"
   gem 'rdf-isomorphic', git: "git://github.com/ruby-rdf/rdf-isomorphic.git", branch: "develop"
   gem 'rdf-rdfxml',     git: "git://github.com/ruby-rdf/rdf-rdfxml.git", branch: "develop"
+  gem 'rdf-vocab',     git: "git://github.com/ruby-rdf/rdf-vocab.git", branch: "develop"
   gem 'json-ld',        git: "git://github.com/ruby-rdf/json-ld.git", branch: "develop"
   gem 'sparql',         git: "git://github.com/ruby-rdf/sparql.git", branch: "develop"
   gem 'sparql-client',  git: "git://github.com/ruby-rdf/sparql-client.git", branch: "develop"
+  gem 'simplecov',      require: false
+  gem 'coveralls',      require: false
+  gem 'psych',          platforms: [:mri, :rbx]
 end
 
 # Bundle gems for the local environment. Make sure to

@@ -4,15 +4,29 @@ $:.unshift File.dirname(__FILE__)
 require "bundler/setup"
 require 'rubygems'
 require 'rspec'
-require 'rdf/rdfa'
-#require 'rdf/rdfxml'
-require 'rdf/spec'
-require 'rdf/spec/matchers'
-require 'rdf/isomorphic'
 require 'yaml'
 require 'open-uri/cached'
 require 'matchers'
+require 'rdf/isomorphic'
+require 'rdf/spec'
+require 'rdf/spec/matchers'
 require 'rdf/turtle'
+require 'rdf/vocab'
+begin
+  require 'simplecov'
+  require 'coveralls'
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+    SimpleCov::Formatter::HTMLFormatter,
+    Coveralls::SimpleCov::Formatter
+  ]
+  SimpleCov.start do
+    add_filter "/spec/"
+    add_filter "/lib/rdf/rdfa/reader/rexml.rb"
+    add_filter "/lib/rdf/rdfa/context.rb"
+  end
+rescue LoadError
+end
+require 'rdf/rdfa'
 
 # Create and maintain a cache of downloaded URIs
 URI_CACHE = File.expand_path(File.join(File.dirname(__FILE__), "uri-cache"))
@@ -20,11 +34,11 @@ Dir.mkdir(URI_CACHE) unless File.directory?(URI_CACHE)
 OpenURI::Cache.class_eval { @cache_path = URI_CACHE }
 
 ::RSpec.configure do |c|
-  c.filter_run :focus => true
+  c.filter_run focus: true
   c.run_all_when_everything_filtered = true
   c.exclusion_filter = {
-    :ruby     => lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version}/) },
-    :not_jruby => lambda { RUBY_PLATFORM.to_s != 'jruby'}
+    ruby:     lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version}/) },
+    not_jruby: lambda { RUBY_PLATFORM.to_s != 'jruby'}
   }
   c.include(RDF::Spec::Matchers)
 end

@@ -14,14 +14,15 @@ unless ENV['CI']  # Skip for continuous integration
             describe "that are #{classification}" do
               Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
                 specify "test #{t.num}: #{t.description}#{",  (negative test)" if t.expectedResults.false?}" do
+                  pending "Invalid SPARQL query" if %w(0279 0284).include?(t.num)
                   begin
                     t.debug = []
                     t.debug << "source:"
                     t.debug << RDF::Util::File.open_file(t.input(host_language, version)).read
                     options = {
-                      :base_uri => t.input(host_language, version),
-                      :debug => t.debug,
-                      :format => :rdfa
+                      base_uri: t.input(host_language, version),
+                      debug: t.debug,
+                      format: :rdfa
                     }
                     if t.queryParam
                       opt, arg = t.queryParam.split('=').map(&:to_sym)
@@ -30,7 +31,7 @@ unless ENV['CI']  # Skip for continuous integration
 
                     validate = %w(0239 0279 0295 0284).none? {|n| t.input(host_language, version).to_s.include?(n)}
                     graph = RDF::Repository.new
-                    RDF::Reader.open(t.input(host_language, version), options.merge(:validate => validate)) do |reader|
+                    RDF::Reader.open(t.input(host_language, version), options.merge(validate: validate)) do |reader|
                       expect(reader).to be_a RDF::RDFa::Reader
 
                       # Some allowances for REXML
@@ -70,7 +71,7 @@ unless ENV['CI']  # Skip for continuous integration
     def parse(input, options = {})
       @debug = options[:debug] || []
       graph = RDF::Graph.new
-      RDF::RDFa::Reader.new(input, options.merge(:debug => @debug)).each do |statement|
+      RDF::RDFa::Reader.new(input, options.merge(debug: @debug)).each do |statement|
         graph << statement
       end
       graph

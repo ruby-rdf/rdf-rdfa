@@ -5,21 +5,21 @@ module RDF::RDFa
   # @example Obtaining an RDFa format class
   #   RDF::Format.for(:rdfa)     #=> RDF::RDFa::Format
   #   RDF::Format.for("etc/doap.html")
-  #   RDF::Format.for(:file_name      => "etc/doap.html")
-  #   RDF::Format.for(:file_extension => "html")
-  #   RDF::Format.for(:content_type   => "text/html")
-  #   RDF::Format.for(:content_type   => "application/xhtml+xml")
+  #   RDF::Format.for(file_name:      "etc/doap.html")
+  #   RDF::Format.for(file_extension: "html")
+  #   RDF::Format.for(content_type:   "text/html")
+  #   RDF::Format.for(content_type:   "application/xhtml+xml")
   #
   # @example Obtaining serialization format MIME types
   #   RDF::Format.content_types      #=> {"text/html" => [RDF::RDFa::Format]}
   #
   # @example Obtaining serialization format file extension mappings
-  #   RDF::Format.file_extensions    #=> {:xhtml => "application/xhtml+xml"}
+  #   RDF::Format.file_extensions    #=> {xhtml: "application/xhtml+xml"}
   #
   # @see http://www.w3.org/TR/rdf-testcases/#ntriples
   class Format < RDF::Format
     content_encoding 'utf-8'
-    content_type     'text/html', :extension => :html
+    content_type     'text/html', extension: :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
 
@@ -49,7 +49,7 @@ module RDF::RDFa
   #   RDF::Format.for(:lite).writer  # RDF::RDFa::Writer
   class Lite < RDF::Format
     content_encoding 'utf-8'
-    content_type     'text/html', :extension => :html
+    content_type     'text/html', extension: :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
@@ -64,7 +64,7 @@ module RDF::RDFa
   #   RDF::Format.for(:html).writer  # RDF::RDFa::Writer
   class HTML < RDF::Format
     content_encoding 'utf-8'
-    content_type     'text/html', :extension => :html
+    content_type     'text/html', extension: :html
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
@@ -79,7 +79,7 @@ module RDF::RDFa
   #   RDF::Format.for(:xhtml).writer  # RDF::RDFa::Writer
   class XHTML < RDF::Format
     content_encoding 'utf-8'
-    content_type     'application/xhtml+xml', :extension => :xhtml
+    content_type     'application/xhtml+xml', extension: :xhtml
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end
@@ -94,7 +94,7 @@ module RDF::RDFa
   #   RDF::Format.for(:svg).writer  # RDF::RDFa::Writer
   class SVG < RDF::Format
     content_encoding 'utf-8'
-    content_type     'image/svg+xml', :extension => :svg
+    content_type     'image/svg+xml', extension: :svg
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
   end

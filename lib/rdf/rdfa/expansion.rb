@@ -17,7 +17,7 @@ module RDF::RDFa
       add_debug("expand") {"Repository has #{repository.count} statements"}
 
       # Load missing vocabularies
-      vocabs = repository.query(:predicate => RDF::RDFA.usesVocabulary).to_a.map(&:object)
+      vocabs = repository.query(predicate: RDF::RDFA.usesVocabulary).to_a.map(&:object)
       vocabs.map! do |vocab|
         begin
           # Create the name with a predictable name so that it is enumerated and can be found
@@ -99,12 +99,12 @@ module RDF::RDFa
         end
       end
 
-      def antecedent(subject, prediate, object, context = nil)
-        antecedents << RDF::Query::Pattern.new(subject, prediate, object, :context => context)
+      def antecedent(subject, prediate, object)
+        antecedents << RDF::Query::Pattern.new(subject, prediate, object)
       end
 
-      def consequent(subject, prediate, object, context = nil)
-        consequents << RDF::Query::Pattern.new(subject, prediate, object, :context => context)
+      def consequent(subject, prediate, object)
+        consequents << RDF::Query::Pattern.new(subject, prediate, object)
       end
       
       ##
@@ -118,7 +118,7 @@ module RDF::RDFa
           nodes = {}
           consequents.each do |consequent|
             terms = {}
-            [:subject, :predicate, :object, :context].each do |r|
+            [:subject, :predicate, :object].each do |r|
               terms[r] = case o = consequent.send(r)
               when RDF::Node            then nodes[o] ||= RDF::Node.new
               when RDF::Query::Variable then solution[o]

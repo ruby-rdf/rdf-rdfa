@@ -25,9 +25,9 @@ end
 desc "Update RDFa Contexts"
 task :update_contexts do
   {
-    :html => "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1",
-    :xhtml => "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1",
-    :xml => "http://www.w3.org/2011/rdfa-context/rdfa-1.1",
+    html: "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1",
+    xhtml: "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1",
+    xml: "http://www.w3.org/2011/rdfa-context/rdfa-1.1",
   }.each do |v, uri|
     puts "Build #{uri}"
     vocab = File.expand_path(File.join(File.dirname(__FILE__), "lib", "rdf", "rdfa", "context", "#{v}.rb"))
@@ -45,5 +45,5 @@ namespace :doc do
   end
 end
 
-task :default => :spec
-task :specs => :spec
+task default: :spec
+task specs: :spec
