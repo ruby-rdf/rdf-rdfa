@@ -30,8 +30,7 @@ RDFa is an evolving standard, undergoing some substantial recent changes partly 
 with Microdata. As a result, the RDF Webapps working group is currently looking at changes in the processing model for RDFa. These changes are now being tracked in {RDF::RDFa::Reader}:
 
 #### RDFa 1.1 Lite
-This version fully supports the limited syntax of [RDFa Lite 1.1][]. This includes the ability to use
-@property exclusively.
+This version fully supports the limited syntax of [RDFa Lite 1.1][]. This includes the ability to use `@property` exclusively.
 
 #### Vocabulary Expansion
 One of the issues with vocabularies was that they discourage re-use of existing vocabularies when terms from several vocabularies are used at the same time. As it is common (encouraged) for RDF vocabularies to form sub-class and/or sub-property relationships with well defined vocabularies, the RDFa vocabulary expansion mechanism takes advantage of this.
@@ -422,7 +421,6 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * {RDF::RDFa::Writer}
 
 ### Additional vocabularies
-* {RDF::PTR}
 * {RDF::RDFA}
 * {RDF::XML}
 * {RDF::XSI}
