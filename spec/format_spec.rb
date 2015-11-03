@@ -9,7 +9,7 @@ describe RDF::RDFa::Format do
 
   describe ".for" do
     formats = [
-      :rdfa,
+      :rdfa, :lite, :html, :xhtml, :svg,
       'etc/doap.html',
       {file_name:      'etc/doap.html'},
       {file_extension: 'html'},
@@ -30,90 +30,6 @@ describe RDF::RDFa::Format do
 
     it "uses text/html as first content type" do
       expect(RDF::Format.for(:rdfa).content_type.first).to eq "text/html"
-    end
-
-    describe RDF::RDFa::XHTML do
-      formats = [
-        :xhtml,
-        'etc/doap.xhtml',
-        {file_name:      'etc/doap.xhtml'},
-        {file_extension: 'xhtml'},
-        {content_type:   'application/xhtml+xml'},
-      ].each do |arg|
-        it "discovers with #{arg.inspect}" do
-          expect(RDF::Format.for(arg)).to eq RDF::RDFa::XHTML
-        end
-      end
-
-      it "should discover 'xhtml'" do
-        expect(RDF::Format.for(:xhtml).reader).to eq RDF::RDFa::Reader
-        expect(RDF::Format.for(:xhtml).writer).to eq RDF::RDFa::Writer
-      end
-
-      it "uses application/xhtml+xml as first content type" do
-        expect(RDF::Format.for(:xhtml).content_type.first).to eq "application/xhtml+xml"
-      end
-    end
-
-    describe RDF::RDFa::HTML do
-      formats = [
-        :html
-      ].each do |arg|
-        it "discovers with #{arg.inspect}" do
-          expect(RDF::Format.for(arg)).to eq RDF::RDFa::HTML
-        end
-      end
-
-      it "should discover 'html'" do
-        expect(RDF::Format.for(:html).reader).to eq RDF::RDFa::Reader
-        expect(RDF::Format.for(:html).writer).to eq RDF::RDFa::Writer
-      end
-
-      it "uses text/html as first content type" do
-        expect(RDF::Format.for(:html).content_type.first).to eq "text/html"
-      end
-    end
-
-    describe RDF::RDFa::Lite do
-      formats = [
-        :lite
-      ].each do |arg|
-        it "discovers with #{arg.inspect}" do
-          expect(RDF::Format.for(arg)).to eq RDF::RDFa::Lite
-        end
-      end
-
-      it "should discover 'lite'" do
-        expect(RDF::Format.for(:lite).reader).to eq RDF::RDFa::Reader
-        expect(RDF::Format.for(:lite).writer).to eq RDF::RDFa::Writer
-      end
-
-      it "uses text/html as first content type" do
-        expect(RDF::Format.for(:lite).content_type.first).to eq "text/html"
-      end
-    end
-
-    describe RDF::RDFa::SVG do
-      formats = [
-        :svg,
-        'etc/doap.svg',
-        {file_name:      'etc/doap.svg'},
-        {file_extension: 'svg'},
-        {content_type:   'image/svg+xml'},
-      ].each do |arg|
-        it "discovers with #{arg.inspect}" do
-          expect(RDF::Format.for(arg)).to eq RDF::RDFa::SVG
-        end
-      end
-
-      it "should discover 'svg'" do
-        expect(RDF::Format.for(:svg).reader).to eq RDF::RDFa::Reader
-        expect(RDF::Format.for(:svg).writer).to eq RDF::RDFa::Writer
-      end
-
-      it "uses image/svg+xml as first content type" do
-        expect(RDF::Format.for(:svg).content_type.first).to eq "image/svg+xml"
-      end
     end
   end
 
