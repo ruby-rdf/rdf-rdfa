@@ -54,7 +54,6 @@ rescue
 end
 
 options = {
-  base_uri:      "http://example.com",
   host_language: nil,
   input_format:  :rdfa,
   output:        STDOUT,
@@ -103,9 +102,14 @@ end
 
 if ARGV.empty?
   s = input ? input : $stdin.read
+  options[:base_uri] ||= "http://example.com/"
   run(StringIO.new(s), options)
 else
   ARGV.each do |test_file|
-    run(Kernel.open(test_file), options)
+    tf_opt = options.dup
+    uri = RDF::URI(test_file)
+    uri = RDF::URI("file://#{File.expand_path(test_file)}") if uri.relative?
+    tf_opt[:base_uri] ||= uri
+    run(Kernel.open(test_file), tf_opt)
   end
 end
