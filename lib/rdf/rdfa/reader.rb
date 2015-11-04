@@ -396,9 +396,13 @@ module RDF::RDFa
 
             if reader = RDF::Reader.for(content_type: type.to_s)
               add_debug(el, "=> reader #{reader.to_sym}")
-              # Wrap input in a RemoteDocument with appropriate content-type
+              # Wrap input in a RemoteDocument with appropriate content-type and base
               doc = if input.is_a?(String)
-                RDF::Util::File::RemoteDocument.new(input, options.merge(content_type: type.to_s))
+                RDF::Util::File::RemoteDocument.new(input,
+                                                    options.merge(
+                                                      content_type: type.to_s,
+                                                      base_uri: base_uri
+                                                    ))
               else
                 input
               end

@@ -1601,6 +1601,30 @@ describe "RDF::RDFa::Reader" do
                 gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
             )
           ],
+          "text/turtle with relatie IRIs" => [
+            %q(
+              <script type="text/turtle" id="graph1"><![CDATA[
+                 @prefix gr:   <http://purl.org/goodrelations/v1#> .
+                 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+                 <myCompany>
+                   a gr:BusinessEntity ;
+                   rdfs:seeAlso <xyz> ;
+                   gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+              ]]></script>
+            ),
+            %q(
+              @prefix gr:   <http://purl.org/goodrelations/v1#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              <http://example/myCompany>
+                a gr:BusinessEntity ;
+                rdfs:seeAlso <http://example/xyz> ;
+                gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+            )
+          ],
           "application/ld+json" => [
             %q(
               <script type="application/ld+json"><![CDATA[
@@ -1662,7 +1686,7 @@ describe "RDF::RDFa::Reader" do
           ]
         }.each do |title, (input,result)|
           it title do
-            expect(parse(input)).to be_equivalent_graph(result, base_uri: "http://example/", trace: @debug)
+            expect(parse(input, base_uri: "http://example/")).to be_equivalent_graph(result, trace: @debug)
           end
         end
       end
