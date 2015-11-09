@@ -31,7 +31,7 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'open-uri-cached', '~> 0.0', '>= 0.0.5'
   gem.add_development_dependency 'json-ld',         '~> 1.1', '< 1.99'
-  gem.add_development_dependency 'rspec',           '~> 3.0.0'
+  gem.add_development_dependency 'rspec',           '~> 3.0'
   gem.add_development_dependency 'rspec-its',       '~> 1.0'
   gem.add_development_dependency 'rdf-spec',        '~> 1.1', '< 1.99'
   gem.add_development_dependency 'rdf-microdata',   '~> 2.0.2'
