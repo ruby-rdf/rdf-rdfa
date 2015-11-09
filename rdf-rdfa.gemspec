@@ -23,21 +23,22 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9.3'
   gem.requirements          = []
 
-  gem.add_runtime_dependency     'rdf',             '~> 1.1', '>= 1.1.6'
+  gem.add_runtime_dependency     'rdf',             '~> 1.1', '>= 1.1.6', '< 1.99'
   gem.add_runtime_dependency     'haml',            '~> 4.0'
-  gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1'
-  gem.add_runtime_dependency     'rdf-aggregate-repo', '~> 1.1'
+  gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1', '< 1.99'
+  gem.add_runtime_dependency     'rdf-aggregate-repo', '~> 1.1', '< 1.99'
   gem.add_runtime_dependency     'htmlentities',    '~> 4.3'
 
   gem.add_development_dependency 'open-uri-cached', '~> 0.0', '>= 0.0.5'
-  gem.add_development_dependency 'json-ld',         '~> 1.1'
+  gem.add_development_dependency 'json-ld',         '~> 1.1', '< 1.99'
   gem.add_development_dependency 'rspec',           '~> 3.0.0'
   gem.add_development_dependency 'rspec-its',       '~> 1.0'
-  gem.add_development_dependency 'rdf-spec',        '~> 1.1'
-  gem.add_development_dependency 'rdf-turtle',      '~> 1.1'
-  gem.add_development_dependency 'rdf-rdfxml',      '~> 1.1'
-  gem.add_development_dependency 'rdf-isomorphic',  '~> 1.1'
-  gem.add_development_dependency 'sparql',          '~> 1.1'
+  gem.add_development_dependency 'rdf-spec',        '~> 1.1', '< 1.99'
+  gem.add_development_dependency 'rdf-microdata',   '~> 2.0.2'
+  gem.add_development_dependency 'rdf-turtle',      '~> 1.1', '< 1.99'
+  gem.add_development_dependency 'rdf-rdfxml',      '~> 1.1', '< 1.99'
+  gem.add_development_dependency 'rdf-isomorphic',  '~> 1.1', '< 1.99'
+  gem.add_development_dependency 'sparql',          '~> 1.1', '< 1.99'
   gem.add_development_dependency 'yard' ,           '~> 0.8'
 
   gem.post_install_message  = nil
