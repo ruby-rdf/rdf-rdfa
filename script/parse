@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
+require 'logger'
 require 'rdf/rdfa'
 %w(linkeddata rdf/turtle json/ld rdf/rdfxml).each do |f|
   begin
@@ -53,6 +54,10 @@ rescue
   raise
 end
 
+logger = Logger.new(STDERR)
+logger.level = Logger::WARN
+logger.formatter = lambda {|severity, datetime, progname, msg| "#{severity}: #{msg}\n"}
+
 options = {
   host_language: nil,
   input_format:  :rdfa,
@@ -62,6 +67,7 @@ options = {
   validate:      false,
   verbose:       false,
   version:       nil,
+  logger: logger
 }
 input = nil
 
@@ -83,14 +89,16 @@ opts = GetoptLong.new(
 )
 opts.each do |opt, arg|
   case opt
-  when '--dbg'            then ::RDF::RDFa::debug = true
+  when '--dbg'            then logger.level = Logger::DEBUG
   when '--execute'        then input = arg
   when '--expand'         then options[:vocab_expansion] = true
   when '--format'         then options[:output_format] = arg.to_sym
   when '--host-language'  then options[:host_language] = arg
   when '--input-format'   then options[:input_format] = arg.to_sym
   when '--output'         then options[:output] = File.open(arg, "w")
-  when '--quiet'          then options[:quiet] = true
+  when '--quiet'
+    options[:quiet] = true
+    logger.level = Logger::FATAL
   when '--rdfagraph'      then options[:rdfagraph] = arg.split(',').map(&:to_sym)
   when '--template'       then options[:haml] = arg.to_sym
   when '--uri'            then options[:base_uri] = arg

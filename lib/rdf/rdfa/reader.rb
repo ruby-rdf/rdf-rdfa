@@ -28,6 +28,7 @@ module RDF::RDFa
   class Reader < RDF::Reader
     format Format
     include Expansion
+    include RDF::Util::Logger
 
     XHTML = "http://www.w3.org/1999/xhtml"
     
@@ -500,30 +501,31 @@ module RDF::RDFa
     # @param [#display_path, #to_s] node XML Node or string for showing context
     # @param [String] message
     # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
-    def add_debug(node, message = "")
-      return unless ::RDF::RDFa.debug? || @debug
-      message = message + yield if block_given?
-      add_processor_message(node, message, RDF::RDFA.Info)
+    def add_debug(node, message = "", &block)
+      add_processor_message(node, message, nil, &block)
     end
 
-    def add_info(node, message, process_class = RDF::RDFA.Info)
-      add_processor_message(node, message, process_class)
+    def add_info(node, message, process_class = RDF::RDFA.Info, &block)
+      add_processor_message(node, message, process_class, &block)
     end
     
     def add_warning(node, message, process_class = RDF::RDFA.Warning)
-      @warnings << "#{node_path(node)}: #{message}" if @warnings
       add_processor_message(node, message, process_class)
     end
     
     def add_error(node, message, process_class = RDF::RDFA.Error)
-      @errors << "#{node_path(node)}: #{message}" if @errors
       add_processor_message(node, message, process_class)
       raise RDF::ReaderError, message if validate?
     end
     
-    def add_processor_message(node, message, process_class)
-      puts "#{node_path(node)}: #{message}" if ::RDF::RDFa.debug?
-      @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
+    def add_processor_message(node, message, process_class, &block)
+      case process_class
+      when RDF::RDFA.Error    then log_error("#{node_path(node)}: #{message}", message, &block)
+      when RDF::RDFA.Warning  then log_warn("#{node_path(node)}: #{message}", message, &block)
+      when RDF::RDFA.Info     then log_info("#{node_path(node)}: #{message}", message, &block)
+      else                         log_debug("#{node_path(node)}: #{message}", message, &block)
+      end
+      process_class ||= RDF::RDFA.Info
       if @options[:processor_callback] || @options[:rdfagraph].include?(:processor)
         n = RDF::Node.new
         processor_statements = [
@@ -609,10 +611,10 @@ module RDF::RDFa
             next
           end
 
-          old_debug = RDF::RDFa.debug?
+          old_logger = @options[:logger]
           begin
             add_info(root, "load_initial_contexts: load #{uri.to_base}")
-            RDF::RDFa.debug = false
+            @options[:logger] = false
             context = Context.find(uri)
 
             # Add URI Mappings to prefixes
@@ -623,11 +625,11 @@ module RDF::RDFa
             yield :term_mappings, context.terms unless context.terms.empty?
             yield :default_vocabulary, context.vocabulary if context.vocabulary
           rescue Exception => e
-            RDF::RDFa.debug = old_debug
+            options[:logger] = old_logger
             add_error(root, e.message)
             raise # In case we're not in strict mode, we need to be sure processing stops
           ensure
-            RDF::RDFa.debug = old_debug
+            @options[:logger] = old_logger
           end
         end
     end

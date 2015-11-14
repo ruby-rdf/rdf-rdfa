@@ -16,12 +16,12 @@ unless ENV['CI']  # Skip for continuous integration
                 specify "test #{t.num}: #{t.description}#{",  (negative test)" if t.expectedResults.false?}" do
                   pending "Invalid SPARQL query" if %w(0279 0284).include?(t.num)
                   begin
-                    t.debug = []
-                    t.debug << "source:"
-                    t.debug << RDF::Util::File.open_file(t.input(host_language, version)).read
+                    t.logger = RDF::Spec.logger
+                    t.logger.info t.inspect
+                    t.logger.info "source:\n#{RDF::Util::File.open_file(t.input(host_language, version)).read}"
                     options = {
                       base_uri: t.input(host_language, version),
-                      debug: t.debug,
+                      logger: t.logger,
                       format: :rdfa
                     }
                     if t.queryParam
@@ -67,15 +67,5 @@ unless ENV['CI']  # Skip for continuous integration
         end
       end
     end
-
-    def parse(input, options = {})
-      @debug = options[:debug] || []
-      graph = RDF::Graph.new
-      RDF::RDFa::Reader.new(input, options.merge(debug: @debug)).each do |statement|
-        graph << statement
-      end
-      graph
-    end
-
   end
 end

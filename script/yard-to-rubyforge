@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-rsync -azv doc/yard/ gkellogg@rubyforge.org:/var/www/gforge-projects/rdf/rdfa/

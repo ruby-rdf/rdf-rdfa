@@ -34,6 +34,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec',           '~> 3.2'
   gem.add_development_dependency 'rspec-its',       '~> 1.0'
   gem.add_development_dependency 'rdf-spec',        '~> 1.99'
+  gem.add_development_dependency 'rdf-tabular',     '~> 0.3'
   gem.add_development_dependency 'rdf-turtle',      '~> 1.1'
   gem.add_development_dependency 'rdf-rdfxml',      '~> 1.1'
   gem.add_development_dependency 'rdf-vocab',       '~> 0.8'

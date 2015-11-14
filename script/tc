@@ -74,6 +74,10 @@ def run_tc(tc, options)
   end
 end
 
+logger = Logger.new(STDERR)
+logger.level = Logger::WARN
+logger.formatter = lambda {|severity, datetime, progname, msg| "#{severity}: #{msg}\n"}
+
 options = {
   verbose:         false,
   quite:           false,
@@ -82,7 +86,8 @@ options = {
   library:         nil,
   processor_graph: nil,
   host_language:   "xhtml1",
-  version:         "rdfa1.1"
+  version:         "rdfa1.1",
+  logger:          logger
 }
 
 opts = GetoptLong.new(
@@ -102,7 +107,7 @@ def help(options)
   puts "Usage: #{$0} [options] [test-number ...]"
   puts "Options:"
   puts "      --dump:               Dump raw output, otherwise serialize to Ruby"
-  puts "      --debug:              Display detailed debug output"
+  puts "      --dbg:                Display detailed debug output"
   puts "      --expand              Expand graph with vocab_expansion option"
   puts "      --format:             Format for output, defaults to #{options[:format].inspect}"
   puts "      --host-language:      Run for specified host language, defaults to #{options[:host_language]}"
@@ -119,11 +124,13 @@ end
 opts.each do |opt, arg|
   case opt
   when '--help'             then help(options)
-  when '--dbg'              then ::RDF::RDFa::debug = true
+  when '--dbg'              then logger.level = Logger::DEBUG
   when '--format'           then options[:format] = arg.to_sym
   when '--host-language'    then options[:host_language] = arg
   when '--library'          then options[:library] = arg.to_sym
-  when '--quiet'            then options[:quiet] = true
+  when '--quiet'
+    options[:quiet] = true
+    logger.level = Logger::FATAL
   when '--validate'         then options[:validate] = true
   when '--verbose'          then options[:verbose] = true
   when '--version'          then options[:version] = arg

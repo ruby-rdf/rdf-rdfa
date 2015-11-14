@@ -8,6 +8,8 @@ module RDF::RDFa
   # The class may be backed by an RDF::Repository, which will be used to retrieve a context graph
   # or to load into, if no such graph exists
   class Context
+    include RDF::Util::Logger
+
     # Prefix mappings defined in this context
     # @!attribute [r] prefixes
     # @return  [Hash{Symbol => RDF::URI}]
@@ -43,6 +45,7 @@ module RDF::RDFa
       @prefixes = options.fetch(:prefixes, {})
       @terms = options.fetch(:terms, {})
       @vocabulary = options[:vocabulary]
+      @options = options.dup
       
       yield(self) if block_given?
       self
@@ -61,7 +64,6 @@ module RDF::RDFa
     ##
     # Repository used for saving contexts
     # @return [RDF::Repository]
-    # @raise [RDF::RDFa::ContextError] if context does not support contexts
     def self.repository
       @repository ||= RDF::Repository.new(title: "RDFa Contexts")
     end
@@ -71,7 +73,7 @@ module RDF::RDFa
     # @param [RDF::Repository] repo
     # @return [RDF::Repository]
     def self.repository=(repo)
-      raise ContextError, "Context Repository must support context" unless repo.supports?(:context)
+      log_fatal("Context Repository must support context", exception: ContextError) unless repo.supports?(:context)
       @repository = repo
     end
     
@@ -87,12 +89,12 @@ module RDF::RDFa
       cache[uri] = Struct.new(:prefixes, :terms, :vocabulary).new({}, {}, nil)
       # Now do the actual load
       cache[uri] = new(uri) do |context|
-        STDERR.puts("process_context: retrieve context <#{uri}>") if RDF::RDFa.debug?
+        log_debug("process_context: retrieve context <#{uri}>")
         Context.load(uri)
         context.parse(repository.query(context: uri))
       end
     rescue Exception => e
-      raise ContextError, "Context #{uri}: #{e.message}", e.backtrace
+      log_error("Context #{uri}: #{e.message}")
     end
 
     # Load context into repository
@@ -146,12 +148,12 @@ module RDF::RDFa
     # @param [RDF::Enumerable, Enumerator] enumerable
     # @return [void] ignored
     def parse(enumerable)
-      STDERR.puts("process_context: parse context <#{uri}>") if RDF::RDFa.debug?
+      log_debug("process_context: parse context <#{uri}>")
       resource_info = {}
       enumerable.each do |statement|
         res = resource_info[statement.subject] ||= {}
         next unless statement.object.is_a?(RDF::Literal)
-        STDERR.puts("process_context: statement=#{statement.inspect}") if RDF::RDFa.debug?
+        log_debug("process_context: statement=#{statement.inspect}")
         %w(uri term prefix vocabulary).each do |term|
           res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
         end
@@ -164,7 +166,7 @@ module RDF::RDFa
         term = res["term"]
         prefix = res["prefix"]
         vocab = res["vocabulary"]
-        STDERR.puts("process_context: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}") if RDF::RDFa.debug?
+        log_debug("process_context: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}")
 
         @vocabulary = vocab if vocab
         

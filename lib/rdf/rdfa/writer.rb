@@ -49,6 +49,7 @@ module RDF::RDFa
   # @author [Gregg Kellogg](http://kellogg-assoc.com/)
   class Writer < RDF::Writer
     format RDF::RDFa::Format
+    include RDF::Util::Logger
 
     # Defines rdf:type of subjects to be emitted at the beginning of the document.
     # @return [Array<URI>]
@@ -140,7 +141,7 @@ module RDF::RDFa
     # @return [void]
     # @raise [RDF::WriterError] if validating and attempting to write an invalid {RDF::Term}.
     def write_statement(statement)
-      raise RDF::WriterError, "Statement #{statement.inspect} is invalid" if validate? && statement.invalid?
+      log_error("Statement #{statement.inspect} is invalid") if statement.invalid?
       @graph.insert(statement)
     end
 
@@ -164,16 +165,15 @@ module RDF::RDFa
     def write_epilogue
       @base_uri = RDF::URI(@options[:base_uri]) if @options[:base_uri]
       @lang = @options[:lang]
-      @debug = @options[:debug]
       self.reset
 
-      add_debug {"\nserialize: graph size: #{@graph.size}"}
+      log_debug {"\nserialize: graph size: #{@graph.size}"}
 
       preprocess
 
       # Prefixes
       prefix = prefixes.keys.map {|pk| "#{pk}: #{prefixes[pk]}"}.sort.join(" ") unless prefixes.empty?
-      add_debug {"\nserialize: prefixes: #{prefix.inspect}"}
+      log_debug {"\nserialize: prefixes: #{prefix.inspect}"}
 
       subjects = order_subjects
 
@@ -197,6 +197,10 @@ module RDF::RDFa
         subject(s)
       end
       @output.write(doc)
+
+      if validate? && log_statistics[:error]
+        raise RDF::WriterError, "Errors found during processing"
+      end
     end
 
     protected
@@ -308,7 +312,7 @@ module RDF::RDFa
     # @return String
     #   The rendered document is returned as a string
     def render_property(predicate, objects, options = {}, &block)
-      add_debug {"render_property(#{predicate}): #{objects.inspect}, #{options.inspect}"}
+      log_debug {"render_property(#{predicate}): #{objects.inspect}, #{options.inspect}"}
       # If there are multiple objects, and no :property_values is defined, call recursively with
       # each object
 
@@ -322,15 +326,15 @@ module RDF::RDFa
       end
       unless list_objects.empty?
         # Render non-list objects
-        add_debug {"properties with lists: #{list_objects} non-lists: #{objects - list_objects}"}
-        nl = depth {render_property(predicate, objects - list_objects, options, &block)} unless objects == list_objects
+        log_debug {"properties with lists: #{list_objects} non-lists: #{objects - list_objects}"}
+        nl = log_depth {render_property(predicate, objects - list_objects, options, &block)} unless objects == list_objects
         return nl.to_s + list_objects.map do |object|
           # Render each list as multiple properties and set :inlist to true
           list = RDF::List.new(object, @graph)
           list.each_statement {|st| subject_done(st.subject)}
 
-          add_debug {"list: #{list.inspect} #{list.to_a}"}
-          depth do
+          log_debug {"list: #{list.inspect} #{list.to_a}"}
+          log_depth do
             render_property(predicate, list.to_a, options.merge(inlist: "true")) do |object|
               yield(object, true) if block_given?
             end
@@ -341,10 +345,10 @@ module RDF::RDFa
       if objects.length > 1 && template.nil?
         # If there is no property_values template, render each property using property_value template
         objects.map do |object|
-          depth {render_property(predicate, [object], options, &block)}
+          log_depth {render_property(predicate, [object], options, &block)}
         end.join(" ")
       else
-        raise RDF::WriterError, "Missing property template" if template.nil?
+        log_fatal("Missing property template", exception: RDF::WriterError) if template.nil?
 
         template = options[:haml] || (
           objects.to_a.length > 1 &&
@@ -411,7 +415,7 @@ module RDF::RDFa
       select {|s| !seen.include?(s)}.
       each do |class_uri|
         graph.query(predicate: RDF.type, object: class_uri).map {|st| st.subject}.sort.uniq.each do |subject|
-          #add_debug {"order_subjects: #{subject.inspect}"}
+          #log_debug {"order_subjects: #{subject.inspect}"}
           subjects << subject
           seen[subject] = true
         end
@@ -423,7 +427,7 @@ module RDF::RDFa
         map {|r| [r.is_a?(RDF::Node) ? 1 : 0, ref_count(r), r]}.
         sort
 
-      add_debug {"order_subjects: #{recursable.inspect}"}
+      log_debug {"order_subjects: #{recursable.inspect}"}
 
       subjects += recursable.map{|r| r.last}
     end
@@ -447,7 +451,7 @@ module RDF::RDFa
         prop_list << prop.to_s
       end
 
-      add_debug {"order_properties: #{prop_list.join(', ')}"}
+      log_debug {"order_properties: #{prop_list.join(', ')}"}
       prop_list
     end
 
@@ -455,7 +459,7 @@ module RDF::RDFa
     # @param [RDF::Statement] statement
     # @return [ignored]
     def preprocess_statement(statement)
-      #add_debug {"preprocess: #{statement.inspect}"}
+      #log_debug {"preprocess: #{statement.inspect}"}
       bump_reference(statement.object)
       @subjects[statement.subject] = true
       get_curie(statement.subject)
@@ -466,7 +470,7 @@ module RDF::RDFa
 
     # Reset parser to run again
     def reset
-      @depth = 0
+      @options[:log_depth] = 0
       prefixes = {}
       @references = {}
       @serialized = {}
@@ -503,7 +507,7 @@ module RDF::RDFa
       typeof = type_of(properties.delete(RDF.type.to_s), subject)
       prop_list = order_properties(properties)
 
-      add_debug {"props: #{prop_list.inspect}"}
+      log_debug {"props: #{prop_list.inspect}"}
 
       render_opts = {typeof: typeof, property_values: properties}.merge(options)
 
@@ -540,7 +544,7 @@ module RDF::RDFa
       # Nodes without a curie need a blank @typeof to generate a subject
       typeof ||= "" unless curie
 
-      add_debug {"subject: #{curie.inspect}, typeof: #{typeof.inspect}" }
+      log_debug {"subject: #{curie.inspect}, typeof: #{typeof.inspect}" }
 
       typeof.freeze
     end
@@ -553,17 +557,17 @@ module RDF::RDFa
       # See if there's a template based on the sorted concatenation of all types of this subject
       # or any type of this subject
       tmpl = find_template(subject)
-      add_debug {"subject: found template #{tmpl[:identifier] || tmpl.inspect}"} if tmpl
+      log_debug {"subject: found template #{tmpl[:identifier] || tmpl.inspect}"} if tmpl
 
       # Render this subject
       # If :rel is specified and :typeof is nil, use @resource instead of @about.
       # Pass other options from calling context
       with_template(tmpl) do
         render_subject(subject, prop_list, render_opts) do |pred|
-          depth do
+          log_depth do
             pred = RDF::URI(pred) if pred.is_a?(String)
             values = render_opts[:property_values][pred.to_s]
-            add_debug {"subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"}
+            log_debug {"subject: #{get_curie(subject)}, pred: #{get_curie(pred)}, values: #{values.inspect}"}
             predicate(pred, values)
           end
         end
@@ -579,15 +583,15 @@ module RDF::RDFa
     #   Objects to serialize
     # @return [String]
     def predicate(predicate, objects)
-      add_debug {"predicate: #{predicate.inspect}, objects: #{objects}"}
+      log_debug {"predicate: #{predicate.inspect}, objects: #{objects}"}
 
       return if objects.to_a.empty?
 
-      add_debug {"predicate: #{get_curie(predicate)}"}
+      log_debug {"predicate: #{get_curie(predicate)}"}
       render_property(predicate, objects) do |o, inlist=nil|
         # Yields each object, for potential recursive definition.
         # If nil is returned, a leaf is produced
-        depth {subject(o, rel: get_curie(predicate), inlist: inlist, element: (:li if objects.length > 1 || inlist))} if !is_done?(o) && @subjects.include?(o)
+        log_depth {subject(o, rel: get_curie(predicate), inlist: inlist, element: (:li if objects.length > 1 || inlist))} if !is_done?(o) && @subjects.include?(o)
       end
     end
 
@@ -597,8 +601,12 @@ module RDF::RDFa
     # @return [String, nil]
     # @raise [RDF::WriterError]
     def get_dt_curie(literal)
-      raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
-      get_curie(literal.datatype) if literal.literal? && literal.datatype?
+      if literal.is_a?(RDF::Literal)
+        get_curie(literal.datatype) if literal.literal? && literal.datatype?
+      else
+        log_error("Getting datatype CURIE for #{literal.inspect}, which must be a literal")
+        nil
+      end
     end
 
     # Haml rendering helper. Return language for plain literal, if there is no language, or it is the same as the document, return nil
@@ -607,8 +615,12 @@ module RDF::RDFa
     # @return [Symbol, nil]
     # @raise [RDF::WriterError]
     def get_lang(literal)
-      raise RDF::WriterError, "Getting datatype CURIE for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
-      literal.language if literal.literal? && literal.language && literal.language.to_s != @lang.to_s
+      if literal.is_a?(RDF::Literal)
+        literal.language if literal.literal? && literal.language && literal.language.to_s != @lang.to_s
+      else
+        log_error("Getting language for #{literal.inspect}, which must be a literal")
+        nil
+      end
     end
 
     # Haml rendering helper. Data to be added to a @content value, for specific datatypes
@@ -617,10 +629,13 @@ module RDF::RDFa
     # @return [String, nil]
     # @raise [RDF::WriterError]
     def get_content(literal)
-      raise RDF::WriterError, "Getting content for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
       case literal
       when RDF::Literal::Date, RDF::Literal::Time, RDF::Literal::DateTime, RDF::Literal::Duration
         literal.to_s
+      when RDF::Literal then nil
+      else
+        log_error("Getting content for #{literal.inspect}, which must be a literal")
+        nil
       end
     end
 
@@ -630,8 +645,12 @@ module RDF::RDFa
     # @return [String]
     # @raise [RDF::WriterError]
     def get_value(literal)
-      raise RDF::WriterError, "Getting value for #{literal.inspect}, which must be a literal" unless literal.is_a?(RDF::Literal)
-      literal.humanize
+      if literal.is_a?(RDF::Literal)
+        literal.humanize
+      else
+        log_error("Getting value for #{literal.inspect}, which must be a literal")
+        nil
+      end
     end
 
     # Haml rendering helper. Return an appropriate label for a resource.
@@ -640,8 +659,12 @@ module RDF::RDFa
     # @return [String]
     # @raise [RDF::WriterError]
     def get_predicate_name(resource)
-      raise RDF::WriterError, "Getting predicate name for #{resource.inspect}, which must be a resource" unless resource.is_a?(RDF::Resource)
-      get_curie(resource)
+      if resource.is_a?(RDF::URI)
+        get_curie(resource)
+      else
+        log_error("Getting predicate name for #{resource.inspect}, which must be a URI")
+        nil
+      end
     end
 
     # Haml rendering helper. Return appropriate, term, CURIE or URI for the given resource.
@@ -650,42 +673,49 @@ module RDF::RDFa
     # @return [String] value to use to identify URI
     # @raise [RDF::WriterError]
     def get_curie(resource)
-      raise RDF::WriterError, "Getting CURIE for #{resource.inspect}, which must be an RDF value" unless resource.is_a?(RDF::Value)
-      return resource.to_s unless resource.uri?
+      case resource
+      when RDF::URI
+        begin
+          uri = resource.to_s
 
-      uri = resource.to_s
+          curie = case
+          when @uri_to_term_or_curie.has_key?(uri)
+            log_debug {"get_curie(#{uri}): uri_to_term_or_curie #{@uri_to_term_or_curie[uri].inspect}"}
+            return @uri_to_term_or_curie[uri]
+          when base_uri && uri.index(base_uri.to_s) == 0
+            log_debug {"get_curie(#{uri}): base_uri (#{uri.sub(base_uri.to_s, "")})"}
+            uri.sub(base_uri.to_s, "")
+          when @vocabulary && uri.index(@vocabulary) == 0
+            log_debug {"get_curie(#{uri}): vocabulary"}
+            uri.sub(@vocabulary, "")
+          when u = @uri_to_prefix.keys.detect {|u| uri.index(u.to_s) == 0}
+            log_debug {"get_curie(#{uri}): uri_to_prefix"}
+            # Use a defined prefix
+            prefix = @uri_to_prefix[u]
+            prefix(prefix, u)  # Define for output
+            uri.sub(u.to_s, "#{prefix}:")
+          when @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri.index(v.to_uri.to_s) == 0}
+            log_debug {"get_curie(#{uri}): standard_prefixes"}
+            prefix = vocab.__name__.to_s.split('::').last.downcase
+            prefix(prefix, vocab.to_uri) # Define for output
+            uri.sub(vocab.to_uri.to_s, "#{prefix}:")
+          else
+            log_debug {"get_curie(#{uri}): none"}
+            uri
+          end
 
-      curie = case
-      when @uri_to_term_or_curie.has_key?(uri)
-        add_debug {"get_curie(#{uri}): uri_to_term_or_curie #{@uri_to_term_or_curie[uri].inspect}"}
-        return @uri_to_term_or_curie[uri]
-      when base_uri && uri.index(base_uri.to_s) == 0
-        add_debug {"get_curie(#{uri}): base_uri (#{uri.sub(base_uri.to_s, "")})"}
-        uri.sub(base_uri.to_s, "")
-      when @vocabulary && uri.index(@vocabulary) == 0
-        add_debug {"get_curie(#{uri}): vocabulary"}
-        uri.sub(@vocabulary, "")
-      when u = @uri_to_prefix.keys.detect {|u| uri.index(u.to_s) == 0}
-        add_debug {"get_curie(#{uri}): uri_to_prefix"}
-        # Use a defined prefix
-        prefix = @uri_to_prefix[u]
-        prefix(prefix, u)  # Define for output
-        uri.sub(u.to_s, "#{prefix}:")
-      when @options[:standard_prefixes] && vocab = RDF::Vocabulary.detect {|v| uri.index(v.to_uri.to_s) == 0}
-        add_debug {"get_curie(#{uri}): standard_prefixes"}
-        prefix = vocab.__name__.to_s.split('::').last.downcase
-        prefix(prefix, vocab.to_uri) # Define for output
-        uri.sub(vocab.to_uri.to_s, "#{prefix}:")
+          #log_debug {"get_curie(#{resource}) => #{curie}"}
+
+          @uri_to_term_or_curie[uri] = curie
+        rescue ArgumentError => e
+          log_error("Invalid URI #{uri.inspect}: #{e.message}")
+          nil
+        end
+      when RDF::Node then resource.to_s
       else
-        add_debug {"get_curie(#{uri}): none"}
-        uri
+        log_error("Getting CURIE for #{resource.inspect}, which must be a resource")
+        nil
       end
-
-      #add_debug {"get_curie(#{resource}) => #{curie}"}
-
-      @uri_to_term_or_curie[uri] = curie
-    rescue ArgumentError => e
-      raise RDF::WriterError, "Invalid URI #{uri.inspect}: #{e.message}"
     end
     private
 
@@ -699,18 +729,6 @@ module RDF::RDFa
     #   Entity-encoded string
     def escape_entities(str)
       CGI.escapeHTML(str).gsub(/[\n\r]/) {|c| '&#x' + c.unpack('h').first + ';'}
-    end
-
-    # Increase depth around a method invocation
-    # @yield
-    #   Yields with no arguments
-    # @yieldreturn [Object] returns the result of yielding
-    # @return [Object]
-    def depth
-      @depth += 1
-      ret = yield
-      @depth -= 1
-      ret
     end
 
     # Set the template to use within block
@@ -744,20 +762,22 @@ module RDF::RDFa
     # @return [String]
     # @raise [RDF::WriterError]
     def hamlify(template, locals = {})
-      add_debug {"hamlify template: #{template}"}
+      log_debug {"hamlify template: #{template}"}
       template = haml_template[template] if template.is_a?(Symbol)
 
       template = template.align_left
-      add_debug {"hamlify locals: #{locals.inspect}"}
+      log_debug {"hamlify locals: #{locals.inspect}"}
 
       Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(self, locals) do |*args|
         yield(*args) if block_given?
       end
     rescue Haml::Error => e
-      raise RDF::WriterError, "#{e.inspect}\n" +
+      log_fatal("#{e.inspect}\n" +
         "rendering #{template}\n" +
         "with options #{(@options[:haml_options] || HAML_OPTIONS).inspect}\n" +
-        "and locals #{locals.inspect}"
+        "and locals #{locals.inspect}",
+        exception: RDF::WriterError
+      )
     end
 
     ##
@@ -794,18 +814,6 @@ module RDF::RDFa
     # @return [Boolean]
     def ref_count(node)
       @references.fetch(node, 0)
-    end
-
-    # Add debug event to debug array, if specified
-    #
-    # @param [String] message
-    # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
-    def add_debug(message = "")
-      return unless ::RDF::RDFa.debug? || @debug
-      message = message + yield if block_given?
-      msg = "#{'  ' * @depth}#{message}"
-      STDERR.puts msg if ::RDF::RDFa.debug?
-      @debug << msg.force_encoding("utf-8") if @debug.is_a?(Array)
     end
   end
 end
