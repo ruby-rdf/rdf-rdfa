@@ -127,25 +127,6 @@ module RDF::RDFa
     end
 
     ##
-    # Write whole graph
-    #
-    # @param  [Graph] graph
-    # @return [void]
-    def write_graph(graph)
-      @graph = graph
-    end
-
-    ##
-    # Addes a statement to be serialized
-    # @param  [RDF::Statement] statement
-    # @return [void]
-    # @raise [RDF::WriterError] if validating and attempting to write an invalid {RDF::Term}.
-    def write_statement(statement)
-      log_error("Statement #{statement.inspect} is invalid") if statement.invalid?
-      @graph.insert(statement)
-    end
-
-    ##
     # Addes a triple to be serialized
     # @param  [RDF::Resource] subject
     # @param  [RDF::URI]      predicate
@@ -155,7 +136,7 @@ module RDF::RDFa
     # @abstract
     # @raise [RDF::WriterError] if validating and attempting to write an invalid {RDF::Term}.
     def write_triple(subject, predicate, object)
-      write_statement Statement.new(subject, predicate, object)
+      @graph.insert(RDF::Statement(subject, predicate, object))
     end
 
     ##
@@ -198,9 +179,7 @@ module RDF::RDFa
       end
       @output.write(doc)
 
-      if validate? && log_statistics[:error]
-        raise RDF::WriterError, "Errors found during processing"
-      end
+      super
     end
 
     protected
@@ -712,6 +691,7 @@ module RDF::RDFa
           nil
         end
       when RDF::Node then resource.to_s
+      when RDF::Literal then nil
       else
         log_error("Getting CURIE for #{resource.inspect}, which must be a resource")
         nil
