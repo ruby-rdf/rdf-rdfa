@@ -43,8 +43,6 @@ class ExpansionTester
     log_warn(node, message, &block)
   end
   
-  def logger; @options[:logger]; end
-  
   def load(elements)
     @options = {}
     result = nil

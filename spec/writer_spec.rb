@@ -551,7 +551,7 @@ describe RDF::RDFa::Writer do
       next if name == :distiller && !Module.constants.include?(:Nokogiri)
       context "Using #{name} template" do
         Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
-          next if %w(0198 0225 0284 0295 0319 0329).include?(t.num)
+          next if %w(0140 0198 0225 0284 0295 0319 0329).include?(t.num)
           specify "test #{t.num}: #{t.description}" do
             unless Module.constants.include?(:Nokogiri)
               if %w(0261).include?(t.num)

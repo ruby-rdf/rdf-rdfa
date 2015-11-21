@@ -515,15 +515,14 @@ module RDF::RDFa
     
     def add_error(node, message, process_class = RDF::RDFA.Error)
       add_processor_message(node, message, process_class)
-      raise RDF::ReaderError, message if validate?
     end
     
     def add_processor_message(node, message, process_class, &block)
       case process_class
-      when RDF::RDFA.Error    then log_error("#{node_path(node)}: #{message}", message, &block)
-      when RDF::RDFA.Warning  then log_warn("#{node_path(node)}: #{message}", message, &block)
-      when RDF::RDFA.Info     then log_info("#{node_path(node)}: #{message}", message, &block)
-      else                         log_debug("#{node_path(node)}: #{message}", message, &block)
+      when RDF::RDFA.Error    then log_error(node_path(node), message, &block)
+      when RDF::RDFA.Warning  then log_warn(node_path(node), message, &block)
+      when RDF::RDFA.Info     then log_info(node_path(node), message, &block)
+      else                         log_debug(node_path(node), message, &block)
       end
       process_class ||= RDF::RDFA.Info
       if @options[:processor_callback] || @options[:rdfagraph].include?(:processor)

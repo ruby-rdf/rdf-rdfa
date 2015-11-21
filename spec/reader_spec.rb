@@ -12,6 +12,7 @@ describe "RDF::RDFa::Reader" do
     let(:reader_input) {File.read(doap)}
     let(:reader) {RDF::RDFa::Reader.new(reader_input)}
     let(:reader_count) {File.open(doap_nt).each_line.to_a.length}
+    let(:reader_invalid_input) {""}
   end
 
   describe ".for" do
