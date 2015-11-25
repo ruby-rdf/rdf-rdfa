@@ -462,6 +462,10 @@ module RDF::RDFa
             yield RDF::Statement.new(*statement.to_triple) if @options[:rdfagraph].include?(:processor)
           end
         end
+
+        if validate? && log_statistics[:error]
+          raise RDF::ReaderError, "Errors found during processing"
+        end
       end
       enum_for(:each_statement)
     end
