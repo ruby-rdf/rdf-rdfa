@@ -20,14 +20,14 @@ Gem::Specification.new do |gem|
   gem.require_paths         = %w(lib)
   gem.has_rdoc              = false
 
-  gem.required_ruby_version = '>= 1.9.3'
+  gem.required_ruby_version = '>= 2.0'
   gem.requirements          = []
 
   gem.add_runtime_dependency     'rdf',             '~> 1.99'
   gem.add_runtime_dependency     'haml',            '~> 4.0'
   gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1'
   gem.add_runtime_dependency     'rdf-aggregate-repo', '~> 1.1'
-  gem.add_runtime_dependency     'htmlentities',    '~> 4.3'
+  gem.add_runtime_dependency     'htmlentities',    '~> 4.3', '>= 4.3.4'
 
   gem.add_development_dependency 'open-uri-cached', '~> 0.0', '>= 0.0.5'
   gem.add_development_dependency 'json-ld',         '~> 1.1'

@@ -323,7 +323,7 @@ describe "RDF::RDFa::Reader" do
             html = %(
               <div resource="foo"><span property="dc:title">Title</span></div>
             )
-            expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF::Vocab::DC.title, "Title")
+            expected = RDF::Graph.new << RDF::Statement(RDF::URI("foo"), RDF::Vocab::DC.title, "Title")
             expect(parse(html)).to be_equivalent_graph(expected, logger: logger, format: :ttl)
           end
 
@@ -366,7 +366,7 @@ describe "RDF::RDFa::Reader" do
             html = %(
               <div about="foo"><a href="bar" rel="rdf:value"></a></div>
             )
-            expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar"))
+            expected = RDF::Graph.new << RDF::Statement(RDF::URI("foo"), RDF.value, RDF::URI("bar"))
             expect(parse(html)).to be_equivalent_graph(expected, logger: logger, format: :ttl)
           end
         end
@@ -381,7 +381,7 @@ describe "RDF::RDFa::Reader" do
           }
           context "RDFa 1.0" do
             it "creates a statement with subject from @src" do
-              expected = RDF::Graph.new << RDF::Statement.new(RDF::URI("bar"), RDF::Vocab::DC.title, "Title")
+              expected = RDF::Graph.new << RDF::Statement(RDF::URI("bar"), RDF::Vocab::DC.title, "Title")
               expect(parse(subject, version: "rdfa1.0")).to be_equivalent_graph(expected, logger: logger, format: :ttl)
             end
           end
@@ -389,8 +389,8 @@ describe "RDF::RDFa::Reader" do
           context "RDFa 1.1" do
             it "creates a statement with object from @src" do
               expected = RDF::Graph.new <<
-                RDF::Statement.new(RDF::URI("foo"), RDF.value, RDF::URI("bar")) <<
-                RDF::Statement.new(RDF::URI("foo"), RDF::Vocab::DC.title, "Title")
+                RDF::Statement(RDF::URI("foo"), RDF.value, RDF::URI("bar")) <<
+                RDF::Statement(RDF::URI("foo"), RDF::Vocab::DC.title, "Title")
               expect(parse(subject)).to be_equivalent_graph(expected, logger: logger, format: :ttl)
             end
           end
@@ -425,7 +425,7 @@ describe "RDF::RDFa::Reader" do
           
           it "empty @typeof on root" do
             html = %(<html typeof=""><span property="dc:title">Title</span></html>)
-            expected = RDF::Graph.new << RDF::Statement.new(RDF::URI(""), RDF::Vocab::DC.title, "Title")
+            expected = RDF::Graph.new << RDF::Statement(RDF::URI(""), RDF::Vocab::DC.title, "Title")
 
             expect(parse(html)).to be_equivalent_graph(expected, logger: logger, format: :ttl)
           end
@@ -573,7 +573,7 @@ describe "RDF::RDFa::Reader" do
                 before(:all) do
                   @rdfa = %(<span about="" property="rdf:value" datatype="#{dt}" content="#{value}"/>)
                   dt_uri = RDF::XSD.send(dt.split(':').last)
-                  @expected = RDF::Graph.new << RDF::Statement.new(RDF::URI(""), RDF.value, RDF::Literal.new(value, datatype: dt_uri))
+                  @expected = RDF::Graph.new << RDF::Statement(RDF::URI(""), RDF.value, RDF::Literal.new(value, datatype: dt_uri))
                 end
 
                 context "with #{value}" do
@@ -597,7 +597,7 @@ describe "RDF::RDFa::Reader" do
                 <div property="foo:due:to:facebook:interpretation:of:CURIE">Value</div>
               </html>
             )
-            expected = RDF::Graph.new << RDF::Statement.new(
+            expected = RDF::Graph.new << RDF::Statement(
               RDF::URI(""),
               RDF::URI("http://example/due:to:facebook:interpretation:of:CURIE"),
               "Value"

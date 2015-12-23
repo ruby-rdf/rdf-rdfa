@@ -99,12 +99,12 @@ module RDF::RDFa
         end
       end
 
-      def antecedent(subject, prediate, object)
-        antecedents << RDF::Query::Pattern.new(subject, prediate, object)
+      def antecedent(subject, predicate, object)
+        antecedents << RDF::Query::Pattern.new(subject: subject, predicate: predicate, object: object)
       end
 
-      def consequent(subject, prediate, object)
-        consequents << RDF::Query::Pattern.new(subject, prediate, object)
+      def consequent(subject, predicate, object)
+        consequents << RDF::Query::Pattern.new(subject: subject, predicate: predicate, object: object)
       end
       
       ##
