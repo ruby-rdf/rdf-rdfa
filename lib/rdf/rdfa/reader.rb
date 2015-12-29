@@ -459,7 +459,7 @@ module RDF::RDFa
           when nil
             yield statement if @options[:rdfagraph].include?(:output)
           when RDF::RDFA.ProcessorGraph
-            yield RDF::Statement(*statement.to_triple) if @options[:rdfagraph].include?(:processor)
+            yield RDF::Statement.new(*statement.to_triple) if @options[:rdfagraph].include?(:processor)
           end
         end
 
@@ -532,17 +532,17 @@ module RDF::RDFa
       if @options[:processor_callback] || @options[:rdfagraph].include?(:processor)
         n = RDF::Node.new
         processor_statements = [
-          RDF::Statement(n, RDF["type"], process_class, graph_name: RDF::RDFA.ProcessorGraph),
-          RDF::Statement(n, RDF::URI("http://purl.org/dc/terms/description"), message, graph_name: RDF::RDFA.ProcessorGraph),
-          RDF::Statement(n, RDF::URI("http://purl.org/dc/terms/date"), RDF::Literal::Date.new(DateTime.now), graph_name: RDF::RDFA.ProcessorGraph)
+          RDF::Statement.new(n, RDF["type"], process_class, graph_name: RDF::RDFA.ProcessorGraph),
+          RDF::Statement.new(n, RDF::URI("http://purl.org/dc/terms/description"), message, graph_name: RDF::RDFA.ProcessorGraph),
+          RDF::Statement.new(n, RDF::URI("http://purl.org/dc/terms/date"), RDF::Literal::Date.new(DateTime.now), graph_name: RDF::RDFA.ProcessorGraph)
         ]
-        processor_statements << RDF::Statement(n, RDF::RDFA.context, base_uri, graph_name: RDF::RDFA.ProcessorGraph) if base_uri
+        processor_statements << RDF::Statement.new(n, RDF::RDFA.context, base_uri, graph_name: RDF::RDFA.ProcessorGraph) if base_uri
         if node.respond_to?(:path)
           nc = RDF::Node.new
           processor_statements += [
-            RDF::Statement(n, RDF::RDFA.context, nc, graph_name: RDF::RDFA.ProcessorGraph),
-            RDF::Statement(nc, RDF["type"], RDF::PTR.XPathPointer, graph_name: RDF::RDFA.ProcessorGraph),
-            RDF::Statement(nc, RDF::PTR.expression, node.path, graph_name: RDF::RDFA.ProcessorGraph)
+            RDF::Statement.new(n, RDF::RDFA.context, nc, graph_name: RDF::RDFA.ProcessorGraph),
+            RDF::Statement.new(nc, RDF["type"], RDF::PTR.XPathPointer, graph_name: RDF::RDFA.ProcessorGraph),
+            RDF::Statement.new(nc, RDF::PTR.expression, node.path, graph_name: RDF::RDFA.ProcessorGraph)
           ]
         end
         
@@ -564,7 +564,7 @@ module RDF::RDFa
     # @param [RDF::Value] graph_name the graph name of the statement
     # @raise [RDF::ReaderError] Checks parameter types and raises if they are incorrect if parsing mode is _validate_.
     def add_triple(node, subject, predicate, object, graph_name = nil)
-      statement = RDF::Statement.new(subject: subject, predicate: predicate, object: object)
+      statement = RDF::Statement.new(subject, predicate, object)
       add_error(node, "statement #{RDF::NTriples.serialize(statement)} is invalid") unless statement.valid?
       if subject && predicate && object # Basic sanity checking
         add_info(node, "statement: #{RDF::NTriples.serialize(statement)}")
