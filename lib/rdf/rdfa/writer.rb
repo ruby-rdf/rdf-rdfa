@@ -301,7 +301,7 @@ module RDF::RDFa
       # Separate out the objects which are lists and render separately
       list_objects = objects.reject do |o|
         o == RDF.nil ||
-        (l = RDF::List.new(o, @graph)).invalid?
+        (l = RDF::List.new(subject: o, graph: @graph)).invalid?
       end
       unless list_objects.empty?
         # Render non-list objects
@@ -309,7 +309,7 @@ module RDF::RDFa
         nl = log_depth {render_property(predicate, objects - list_objects, options, &block)} unless objects == list_objects
         return nl.to_s + list_objects.map do |object|
           # Render each list as multiple properties and set :inlist to true
-          list = RDF::List.new(object, @graph)
+          list = RDF::List.new(subject: object, graph: @graph)
           list.each_statement {|st| subject_done(st.subject)}
 
           log_debug {"list: #{list.inspect} #{list.to_a}"}
