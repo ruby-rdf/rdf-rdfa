@@ -74,6 +74,19 @@ module RDF::RDFa
     attr_accessor :base_uri
 
     ##
+    # RDFa Writer options
+    # @see http://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Writer#options-class_method
+    def self.options
+      super + [
+        RDF::CLI::Option.new(
+          symbol: :lang,
+          datatype: String,
+          on: ["--lang"],
+          description: "Output as root @lang attribute, and avoid generation _@lang_ where possible."),
+      ]
+    end
+
+    ##
     # Initializes the RDFa writer instance.
     #
     # @param  [IO, File] output

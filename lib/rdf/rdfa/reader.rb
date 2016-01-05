@@ -1,6 +1,6 @@
 begin
   require 'nokogiri'
-rescue LoadError => e
+rescue LoadError
   :rexml
 end
 require 'rdf/ntriples'
@@ -254,6 +254,31 @@ module RDF::RDFa
     end
 
     ##
+    # RDFa Reader options
+    # @see http://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Reader#options-class_method
+    def self.options
+      super + [
+        RDF::CLI::Option.new(
+          symbol: :vocab_expansion,
+          datatype: TrueClass,
+          on: ["--vocab-expansion"],
+          description: "Perform OWL2 expansion on the resulting graph.") {true},
+        RDF::CLI::Option.new(
+          symbol: :host_language,
+          datatype: Symbol,
+          on: ["--host-language HOSTLANG", %w(xml xhtml1 xhtml5 html4 svg)],
+          description: "Host Language. One of xml, xhtml1, xhtml5, html4, or svg") do |arg|
+            arg.to_sym
+        end,
+        RDF::CLI::Option.new(
+          symbol: :rdfagraph,
+          datatype: Symbol,
+          on: ["--rdfagraph RDFAGRAPH", %w(output processor both)],
+          description: "Used to indicate if either or both of the :output or :processor graphs are output.") {|arg| arg.to_sym},
+      ]
+    end
+
+    ##
     # Initializes the RDFa reader instance.
     #
     # @param  [IO, File, String] input
@@ -297,6 +322,7 @@ module RDF::RDFa
         @repository = RDF::Repository.new
 
         @options[:rdfagraph] = case @options[:rdfagraph]
+        when 'all' then [:output, :processor]
         when String, Symbol then @options[:rdfagraph].to_s.split(',').map(&:strip).map(&:to_sym)
         when Array then @options[:rdfagraph].map {|o| o.to_s.to_sym}
         else  []
