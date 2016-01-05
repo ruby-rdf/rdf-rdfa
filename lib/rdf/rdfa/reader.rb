@@ -255,14 +255,14 @@ module RDF::RDFa
           description: "Perform OWL2 expansion on the resulting graph.") {true},
         RDF::CLI::Option.new(
           symbol: :host_language,
-          datatype: Symbol,
+          datatype: %w(xml xhtml1 xhtml5 html4 svg),
           on: ["--host-language HOSTLANG", %w(xml xhtml1 xhtml5 html4 svg)],
           description: "Host Language. One of xml, xhtml1, xhtml5, html4, or svg") do |arg|
             arg.to_sym
         end,
         RDF::CLI::Option.new(
           symbol: :rdfagraph,
-          datatype: Symbol,
+          datatype: %w(output processor both),
           on: ["--rdfagraph RDFAGRAPH", %w(output processor both)],
           description: "Used to indicate if either or both of the :output or :processor graphs are output.") {|arg| arg.to_sym},
       ]
