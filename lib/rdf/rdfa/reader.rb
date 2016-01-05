@@ -100,16 +100,6 @@ module RDF::RDFa
     # @return [Module]
     attr_reader :implementation
 
-    ##
-    # Warnings found during processing
-    # @return [Array<String>]
-    attr_reader :warnings
-
-    ##
-    # Accumulated errors found during processing
-    # @return [Array<String>]
-    attr_reader :errors
-
     # The Recursive Baggage
     # @private
     class EvaluationContext # :nodoc:
@@ -302,12 +292,6 @@ module RDF::RDFa
     #   Value is an array containing on or both of :output or :processor.
     # @option options [Repository] :vocab_repository (nil)
     #   Repository to save loaded vocabularies.
-    # @option options [Array] :errors
-    #   array for placing errors found when parsing
-    # @option options [Array] :warnings
-    #   array for placing warnings found when parsing
-    # @option options [Array] :debug
-    #   Array to place debug messages
     # @return [reader]
     # @yield  [reader] `self`
     # @yieldparam  [RDF::Reader] reader
@@ -315,9 +299,6 @@ module RDF::RDFa
     # @raise [RDF::ReaderError] if _validate_
     def initialize(input = $stdin, options = {}, &block)
       super do
-        @errors = @options[:errors]
-        @warnings = @options[:warnings]
-        @debug = @options[:debug]
         @options = {reference_folding: true}.merge(@options)
         @repository = RDF::Repository.new
 
