@@ -13,6 +13,10 @@ require 'matchers'
 require 'rdf/turtle'
 require 'rdf/vocab'
 begin
+  require 'nokogiri'
+rescue LoadError
+end
+begin
   require 'simplecov'
   require 'coveralls'
   SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
@@ -38,15 +42,6 @@ OpenURI::Cache.class_eval { @cache_path = URI_CACHE }
   c.run_all_when_everything_filtered = true
   c.exclusion_filter = {
     ruby:     lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version}/) },
-    not_jruby: lambda { RUBY_PLATFORM.to_s != 'jruby'},
-    no_nokogiri: lambda {
-      begin
-        require 'nokogiri'
-        true
-      rescue LoadError
-        false
-      end
-    }
   }
   c.include(RDF::Spec::Matchers)
 end
