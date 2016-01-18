@@ -106,7 +106,7 @@ describe RDF::RDFa::Writer do
         end
       end
 
-      context "resource with two types" do
+      context "resource with two types", :no_nokogiri do
         subject do
           @graph << [EX.a, RDF.type, EX.t1]
           @graph << [EX.a, RDF.type, EX.t2]
@@ -350,7 +350,7 @@ describe RDF::RDFa::Writer do
       end
     end
     
-    context "multi-valued literals" do
+    context "multi-valued literals", :no_nokogiri do
       subject do
         @graph << [EX.a, EX.b, "c"]
         @graph << [EX.a, EX.b, "d"]
@@ -384,7 +384,7 @@ describe RDF::RDFa::Writer do
       end
     end
     
-    context "multi-valued resource objects" do
+    context "multi-valued resource objects", :no_nokogiri do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.a, EX.b, EX.d]

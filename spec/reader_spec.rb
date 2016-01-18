@@ -1693,7 +1693,7 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
-      it "extracts microdata", skip: ("Not for REXML" if impl == 'REXML') do
+      it "extracts microdata", :no_nokogiri do
         html = %(
           <html>
             <head>

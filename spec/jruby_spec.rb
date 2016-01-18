@@ -13,7 +13,7 @@ if RUBY_PLATFORM.to_s == 'jruby'
   end
 
   # Some specific issues that fail with jRuby to be resolved
-  describe "JRuby", skip: ("Nokogiri not loaded" unless have_nokogiri) do
+  describe "JRuby", :no_nokogiri do
     describe "Nokogiri::XML" do
       describe "parse" do
         it "parses namespaced elements without a namespace" do
@@ -22,7 +22,7 @@ if RUBY_PLATFORM.to_s == 'jruby'
       end
     end
 
-    describe "Nokogiri::HTML", skip: ("Nokogiri not loaded" unless have_nokogiri) do
+    describe "Nokogiri::HTML", :no_nokogiri do
       describe "xmlns" do
         it "shows namespace definitions" do
           doc = Nokogiri::HTML.parse(%q(<html xmlns:dc="http://purl.org/dc/elements/1.1/"></html>))
