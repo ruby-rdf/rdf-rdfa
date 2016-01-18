@@ -189,7 +189,7 @@ describe "RDF::RDFa::Reader" do
       end
 
       context :features do
-        describe "XML Literal", skip: ("Not for JRuby" if RUBY_ENGINE.to_s == 'jruby') do
+        describe "XML Literal", skip: "XMLLiteral matching becoming problematic" do
           it "rdf:XMLLiteral" do
             html = %(<?xml version="1.0" encoding="UTF-8"?>
               <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
@@ -1693,7 +1693,7 @@ describe "RDF::RDFa::Reader" do
         end
       end
 
-      it "extracts microdata", skip: (!defined?(Nokogiri) || RUBY_ENGINE == 'jruby') do
+      it "extracts microdata", skip: ("Not for REXML" if impl == 'REXML') do
         html = %(
           <html>
             <head>
