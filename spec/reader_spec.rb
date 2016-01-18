@@ -2534,8 +2534,8 @@ describe "RDF::RDFa::Reader" do
       <urn:ex:s306> <urn:ex:p> <http://abc/xyz>.
     }}
     it "produces equivalent triples" do
-      nt_str = RDF::NTriples::Reader.new(nt).dump(:ntriples)
-      html_str = RDF::RDFa::Reader.new(html, host_language: :xhtml5).dump(:ntriples)
+      nt_str = RDF::NTriples::Reader.new(nt).dump(:ntriples).split("\n").sort.join("\n")
+      html_str = RDF::RDFa::Reader.new(html, host_language: :xhtml5).dump(:ntriples).split("\n").sort.join("\n")
       expect(html_str).to eql(nt_str)
     end
   end
