@@ -1227,7 +1227,7 @@ describe "RDF::RDFa::Reader" do
                 <http://example/> rdf:value 1 .
               )
             ],
-            "@property, and @value as float" => [
+            "@property, and @value as decimal" => [
               %q(
                 <div about="http://example/">
                   <data property="rdf:value" value="1.1"/>

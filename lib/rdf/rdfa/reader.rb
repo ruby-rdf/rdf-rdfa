@@ -1190,7 +1190,7 @@ module RDF::RDFa
               add_debug(element, "[Step 11] value literal (#{attrs[:value]})")
               v = attrs[:value].to_s
               # Figure it out by parsing
-              dt_lit = %w(Integer Float Double).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
+              dt_lit = %w(Integer Decimal Double).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
                 v.match(dt::GRAMMAR)
               end || RDF::Literal
               dt_lit.new(v)
