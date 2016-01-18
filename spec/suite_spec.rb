@@ -15,6 +15,7 @@ unless ENV['CI']  # Skip for continuous integration
               Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
                 specify "test #{t.num}: #{t.description}#{",  (negative test)" if t.expectedResults.false?}" do
                   pending "Invalid SPARQL query" if %w(0279 0284).include?(t.num)
+                  skip "XMLLiteral" if %w(0198).include?(t.num)
                   begin
                     t.logger = RDF::Spec.logger
                     t.logger.info t.inspect
