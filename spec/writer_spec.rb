@@ -17,7 +17,7 @@ describe RDF::RDFa::Writer do
   end
   
   describe ".for" do
-    formats = [
+    [
       :rdfa,
       'etc/doap.html',
       {file_name:      'etc/doap.html'},
@@ -115,7 +115,8 @@ describe RDF::RDFa::Writer do
 
         {
           "/html/body/div/@resource" => "ex:a",
-          "/html/body/div/@typeof" => "ex:t1 ex:t2",
+          "/html/body/div/contains(@typeof, 'ex:t1')" => true,
+          "/html/body/div/contains(@typeof, 'ex:t2')" => true,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
             expect(subject).to have_xpath(path, value, logger)
@@ -392,8 +393,8 @@ describe RDF::RDFa::Writer do
 
       {
         "//div/@resource" => "ex:a",
-        "//ul/li[1]/a[@property='ex:b']/@href" => EX.c.to_s,
-        "//ul/li[2]/a[@property='ex:b']/@href" => EX.d.to_s,
+        "//ul/li/a[@property='ex:b']/contains(@href, '#{EX.c.to_s}')" => true,
+        "//ul/li/a[@property='ex:b']/contains(@href, '#{EX.d.to_s}')" => true,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           expect(subject).to have_xpath(path, value, logger)
