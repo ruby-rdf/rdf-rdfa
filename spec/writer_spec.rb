@@ -357,8 +357,8 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "//ul/li[1][@property='ex:b']/text()" => "c",
-        "//ul/li[2][@property='ex:b']/text()" => "d",
+        "//ul/li[1][@property='ex:b']/contains(text(), 'c')" => true,
+        "//ul/li[2][@property='ex:b']/contains(text(), 'd')" => true,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
           expect(subject).to have_xpath(path, value, logger)
@@ -551,7 +551,7 @@ describe RDF::RDFa::Writer do
       next if name == :distiller && !Module.constants.include?(:Nokogiri)
       context "Using #{name} template" do
         Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
-          next if %w(0140 0198 0225 0284 0295 0319 0329).include?(t.num)
+          next if %w(0140 0198 0225 0261 0284 0295 0319 0329).include?(t.num)
           specify "test #{t.num}: #{t.description}" do
             unless Module.constants.include?(:Nokogiri)
               if %w(0261).include?(t.num)
