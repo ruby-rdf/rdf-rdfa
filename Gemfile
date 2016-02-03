@@ -2,23 +2,25 @@ source "http://rubygems.org"
 
 gemspec
 
-gem "rdf",            git: "git://github.com/ruby-rdf/rdf.git", branch: "develop"
-gem "rdf-spec",       git: "git://github.com/ruby-rdf/rdf-spec.git", branch: "develop"
-gem "rdf-xsd",        git: "git://github.com/ruby-rdf/rdf-xsd.git", branch: "develop"
+gem "rdf",            github: "ruby-rdf/rdf",      branch: "develop"
+gem "rdf-spec",       github: "ruby-rdf/rdf-spec", branch: "develop"
+gem "rdf-xsd",        github: "ruby-rdf/rdf-xsd",  branch: "develop"
 gem "nokogiri", '~> 1.6'
 gem 'equivalent-xml', '~> 0.5'
 
 group :development, :test do
-  gem 'rdf-aggregate-repo', git: "git://github.com/ruby-rdf/rdf-aggregate-repo.git", branch: "develop"
-  gem "rdf-microdata",  git: "git://github.com/ruby-rdf/rdf-microdata.git", branch: "develop"
-  gem 'rdf-turtle',     git: "git://github.com/ruby-rdf/rdf-turtle.git", branch: "develop"
-  gem 'rdf-tabular',    git: "git://github.com/ruby-rdf/rdf-tabular.git", branch: "develop"
-  gem 'rdf-isomorphic', git: "git://github.com/ruby-rdf/rdf-isomorphic.git", branch: "develop"
-  gem 'rdf-rdfxml',     git: "git://github.com/ruby-rdf/rdf-rdfxml.git", branch: "develop"
-  gem 'rdf-vocab',      git: "git://github.com/ruby-rdf/rdf-vocab.git", branch: "develop"
-  gem 'json-ld',        git: "git://github.com/ruby-rdf/json-ld.git", branch: "develop"
-  gem 'sparql',         git: "git://github.com/ruby-rdf/sparql.git", branch: "develop"
-  gem 'sparql-client',  git: "git://github.com/ruby-rdf/sparql-client.git", branch: "develop"
+  gem 'ebnf',               github: "gkellogg/ebnf",                branch: "develop"
+  gem 'json-ld',            github: "ruby-rdf/json-ld",             branch: "develop"
+  gem 'rdf-aggregate-repo', github: "ruby-rdf/rdf-aggregate-repo",  branch: "develop"
+  gem "rdf-microdata",      github: "ruby-rdf/rdf-microdata",       branch: "develop"
+  gem 'rdf-turtle',         github: "ruby-rdf/rdf-turtle",          branch: "develop"
+  gem 'rdf-tabular',        github: "ruby-rdf/rdf-tabular",         branch: "develop"
+  gem 'rdf-isomorphic',     github: "ruby-rdf/rdf-isomorphic",      branch: "develop"
+  gem 'rdf-rdfxml',         github: "ruby-rdf/rdf-rdfxml",          branch: "develop"
+  gem 'rdf-vocab',          github: "ruby-rdf/rdf-vocab",           branch: "develop"
+  gem 'sparql',             github: "ruby-rdf/sparql",              branch: "develop"
+  gem 'sparql-client',      github: "ruby-rdf/sparql-client",       branch: "develop"
+  gem 'sxp',                github: "gkellogg/sxp-ruby"
 end
 
 group :test do
