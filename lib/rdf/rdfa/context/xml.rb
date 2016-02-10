@@ -7,6 +7,7 @@ class RDF::RDFa::Context
       @_rdfa_1_1_prof ||= RDF::RDFa::Context.new(RDF::URI("http://www.w3.org/2011/rdfa-context/rdfa-1.1"), {
         prefixes: {
           cc:      "http://creativecommons.org/ns#",
+          csvw:    "http://www.w3.org/ns/csvw#",
           ctag:    "http://commontag.org/ns#",
           dc:      "http://purl.org/dc/terms/",
           dc11:    "http://purl.org/dc/elements/1.1/",
