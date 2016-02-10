@@ -12,11 +12,11 @@ group :development, :test do
   gem 'ebnf',               github: "gkellogg/ebnf",                branch: "develop"
   gem 'json-ld',            github: "ruby-rdf/json-ld",             branch: "develop"
   gem 'rdf-aggregate-repo', github: "ruby-rdf/rdf-aggregate-repo",  branch: "develop"
-  gem "rdf-microdata",      github: "ruby-rdf/rdf-microdata",       branch: "develop"
-  gem 'rdf-turtle',         github: "ruby-rdf/rdf-turtle",          branch: "develop"
-  gem 'rdf-tabular',        github: "ruby-rdf/rdf-tabular",         branch: "develop"
   gem 'rdf-isomorphic',     github: "ruby-rdf/rdf-isomorphic",      branch: "develop"
+  gem "rdf-microdata",      github: "ruby-rdf/rdf-microdata",       branch: "develop"
   gem 'rdf-rdfxml',         github: "ruby-rdf/rdf-rdfxml",          branch: "develop"
+  gem 'rdf-tabular',        github: "ruby-rdf/rdf-tabular",         branch: "develop"
+  gem 'rdf-turtle',         github: "ruby-rdf/rdf-turtle",          branch: "develop"
   gem 'rdf-vocab',          github: "ruby-rdf/rdf-vocab",           branch: "develop"
   gem 'sparql',             github: "ruby-rdf/sparql",              branch: "develop"
   gem 'sparql-client',      github: "ruby-rdf/sparql-client",       branch: "develop"
@@ -37,6 +37,7 @@ group :debug do
   gem "syntax"
   gem "byebug", platforms: :mri
   gem "ruby-debug", platforms: :jruby
+  gem "rake"
 end
 
 platforms :rbx do

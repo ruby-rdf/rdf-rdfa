@@ -73,7 +73,13 @@ module RDF::RDFa
     # @param [RDF::Repository] repo
     # @return [RDF::Repository]
     def self.repository=(repo)
-      log_fatal("Context Repository must support context", exception: ContextError) unless repo.supports?(:context)
+      unless repo.supports?(:graph_name)
+        if respond_to?(:log_fatal)
+          log_fatal("Context Repository must support graph_name", exception: ContextError)
+        else
+          abort("Context Repository must support graph_name")
+        end
+      end
       @repository = repo
     end
     
@@ -89,18 +95,22 @@ module RDF::RDFa
       cache[uri] = Struct.new(:prefixes, :terms, :vocabulary).new({}, {}, nil)
       # Now do the actual load
       cache[uri] = new(uri) do |context|
-        log_debug("process_context: retrieve context <#{uri}>")
+        log_debug("process_context: retrieve context <#{uri}>") if respond_to?(:log_debug)
         Context.load(uri)
-        context.parse(repository.query(context: uri))
+        context.parse(repository.query(graph_name: uri))
       end
     rescue Exception => e
-      log_error("Context #{uri}: #{e.message}")
+      if respond_to?(:log_fatal)
+        log_error("Context #{uri}: #{e.message}")
+      else
+        abort("Context #{uri}: #{e.message}")
+      end
     end
 
     # Load context into repository
     def self.load(uri)
       uri = RDF::URI.intern(uri)
-      repository.load(uri.to_s, base_uri: uri, context: uri) unless repository.has_context?(uri)
+      repository.load(uri.to_s, base_uri: uri, graph_name: uri) unless repository.has_graph?(uri)
     end
     
     # @return [RDF::Repository]
@@ -148,12 +158,12 @@ module RDF::RDFa
     # @param [RDF::Enumerable, Enumerator] enumerable
     # @return [void] ignored
     def parse(enumerable)
-      log_debug("process_context: parse context <#{uri}>")
+      log_debug("process_context: parse context <#{uri}>") if respond_to?(:log_debug)
       resource_info = {}
       enumerable.each do |statement|
         res = resource_info[statement.subject] ||= {}
         next unless statement.object.is_a?(RDF::Literal)
-        log_debug("process_context: statement=#{statement.inspect}")
+        log_debug("process_context: statement=#{statement.inspect}") if respond_to?(:log_debug)
         %w(uri term prefix vocabulary).each do |term|
           res[term] ||= statement.object.value if statement.predicate == RDF::RDFA[term]
         end
@@ -166,7 +176,7 @@ module RDF::RDFa
         term = res["term"]
         prefix = res["prefix"]
         vocab = res["vocabulary"]
-        log_debug("process_context: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}")
+        log_debug("process_context: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}") if respond_to?(:log_debug)
 
         @vocabulary = vocab if vocab
         
