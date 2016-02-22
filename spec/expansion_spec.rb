@@ -12,13 +12,15 @@ end
 class ExpansionTester
   include RDF::RDFa::Expansion
   include RDF::Enumerable
+  include RDF::Util::Logger
 
-  attr_reader :about, :information, :repo, :inputDocument, :outputDocument, :options, :repo
+  attr_reader :id, :repo, :inputDocument, :outputDocument, :options
   attr_accessor :format
 
   def initialize(name)
-    @about = @information = name
+    @id = name
     @repo = RDF::Repository.new
+    @options = {logger: RDF::Spec.logger}
 
     super()
   end
@@ -33,21 +35,13 @@ class ExpansionTester
 
   def expectedResults; RDF::Literal::Boolean.new(true); end
 
-  def add_debug(node, message = "")
-    message = message + yield if block_given?
-    @trace ||= []
-    @trace << "#{node}: #{message}"
-    #STDERR.puts "#{node}: #{message}"
+  def add_debug(node, message = "", &block)
+    log_debug(node, message, &block)
   end
   
   def add_warning(node, message, process_class = RDF::RDFA.Warning)
-    message = message + yield if block_given?
-    @trace ||= []
-    @trace << "#{node}(#{process_class}): #{message}"
-    #STDERR.puts "#{node}: #{message}"
+    log_warn(node, message, &block)
   end
-  
-  def trace; Array(@trace).join("\n"); end
   
   def load(elements)
     @options = {}
@@ -93,6 +87,7 @@ class ExpansionTester
 end
 
 describe RDF::RDFa::Expansion do
+  let(:logger) {RDF::Spec.logger}
 
   describe :entailment do
     {
@@ -285,7 +280,7 @@ describe RDF::RDFa::Expansion do
   context "with empty graph" do
     it "returns an empty graph" do
       rdfa = %q(<http></http>)
-      expect(parse(rdfa)).to be_equivalent_graph("", trace: @debug)
+      expect(parse(rdfa)).to be_equivalent_graph("", logger: logger)
     end
   end
   
@@ -316,7 +311,7 @@ describe RDF::RDFa::Expansion do
             dc:creator <http://greggkellogg.net/foaf#me> .
         }
       )
-      expect(parse(rdfa)).to pass_query(query, trace: @debug)
+      expect(parse(rdfa)).to pass_query(query, logger: logger)
     end
   end
   
@@ -353,7 +348,7 @@ describe RDF::RDFa::Expansion do
             dc:creator <http://greggkellogg.net/foaf#me> .
         }
       )
-      expect(parse(rdfa)).to pass_query(query, trace: @debug)
+      expect(parse(rdfa)).to pass_query(query, logger: logger)
     end
 
     context "http://rdfa.info/vocabs/rdfa-test#" do
@@ -512,15 +507,14 @@ describe RDF::RDFa::Expansion do
       it title do
         expect(parse(input)).to pass_query(query,
           base_uri: "http://example.com/",
-          trace: @debug)
+          logger: logger)
       end
     end
   end
 
   def parse(input, options = {})
-    @debug = options[:debug] || []
     RDF::Graph.new << RDF::RDFa::Reader.new(input, options.merge(
-      debug: @debug, vocab_expansion: true
+      logger: logger, vocab_expansion: true
     ))
   end
 end

@@ -3,7 +3,9 @@
 # Generate a Ruby version of an RDFa vocabulary to be directly accessible from RDF::RDFa::Context
 require 'rubygems'
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", 'lib')))
-require 'linkeddata'
+require 'rdf/turtle'
+require 'rdf/rdfa'
+require 'rdf/rdfxml'
 require 'getoptlong'
 require 'open-uri'
 
@@ -69,10 +71,10 @@ START
       hash = context.send(t)
       key_width = hash.keys.inject(0) {|width, k| k.inspect.length > width ? k.inspect.length : width}
       unless hash.empty?
-        output.puts %(#{preceeding}:#{t} => {)
+        output.puts %(#{preceeding}#{t}: {)
           hash.keys.map(&:to_s).sort.each do |k|
             v = hash[k.to_sym]
-            output.printf(%(#{preceeding}  %*s => %s,\n), -key_width, k.to_sym.inspect, v.inspect)
+            output.printf(%(#{preceeding}  %s:%*s%s,\n), k, -key_width + k.length, "", v.inspect)
           end
         output.puts %(#{preceeding}},)
       end

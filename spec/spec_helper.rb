@@ -6,19 +6,23 @@ require 'rubygems'
 require 'rspec'
 require 'yaml'
 require 'open-uri/cached'
-require 'matchers'
 require 'rdf/isomorphic'
 require 'rdf/spec'
 require 'rdf/spec/matchers'
+require 'matchers'
 require 'rdf/turtle'
 require 'rdf/vocab'
 begin
+  require 'nokogiri'
+rescue LoadError
+end
+begin
   require 'simplecov'
   require 'coveralls'
-  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
     SimpleCov::Formatter::HTMLFormatter,
     Coveralls::SimpleCov::Formatter
-  ]
+  ])
   SimpleCov.start do
     add_filter "/spec/"
     add_filter "/lib/rdf/rdfa/reader/rexml.rb"
@@ -38,7 +42,6 @@ OpenURI::Cache.class_eval { @cache_path = URI_CACHE }
   c.run_all_when_everything_filtered = true
   c.exclusion_filter = {
     ruby:     lambda { |version| !(RUBY_VERSION.to_s =~ /^#{version}/) },
-    not_jruby: lambda { RUBY_PLATFORM.to_s != 'jruby'}
   }
   c.include(RDF::Spec::Matchers)
 end

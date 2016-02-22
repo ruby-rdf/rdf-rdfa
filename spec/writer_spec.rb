@@ -7,8 +7,9 @@ require 'rspec/matchers'
 class EX < RDF::Vocabulary("http://example/"); end
 
 describe RDF::RDFa::Writer do
+  let(:logger) {RDF::Spec.logger}
   it_behaves_like 'an RDF::Writer' do
-    let(:writer) {RDF::RDFa::Writer.new}
+    let(:writer) {RDF::RDFa::Writer.new(StringIO.new)}
   end
 
   before(:each) do
@@ -16,7 +17,7 @@ describe RDF::RDFa::Writer do
   end
   
   describe ".for" do
-    formats = [
+    [
       :rdfa,
       'etc/doap.html',
       {file_name:      'etc/doap.html'},
@@ -48,9 +49,9 @@ describe RDF::RDFa::Writer do
         serialize(prefixes: {dc: "http://purl.org/dc/terms/"})
       end
 
-      specify { expect(subject).to have_xpath("/html/@prefix", %r(dc: http://purl.org/dc/terms/), @debug)}
-      specify { expect(subject).to have_xpath("/html/@prefix", %r(ex: http://example/), @debug)}
-      specify { expect(subject).to have_xpath("/html/@prefix", %r(ex:), @debug)}
+      specify { expect(subject).to have_xpath("/html/@prefix", %r(dc: http://purl.org/dc/terms/), logger)}
+      specify { expect(subject).to have_xpath("/html/@prefix", %r(ex: http://example/), logger)}
+      specify { expect(subject).to have_xpath("/html/@prefix", %r(ex:), logger)}
     end
 
     context "plain literal" do
@@ -65,7 +66,7 @@ describe RDF::RDFa::Writer do
         "//div[@class='property']/span[@property]/text()" => "foo",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          expect(subject).to have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, logger)
         end
       end
     end
@@ -83,7 +84,7 @@ describe RDF::RDFa::Writer do
         "/html/body/div/h1/text()" => "foo",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          expect(subject).to have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, logger)
         end
       end
     end
@@ -100,12 +101,12 @@ describe RDF::RDFa::Writer do
           "/html/body/div/@typeof" => "ex:Type",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
 
-      context "resource with two types" do
+      context "resource with two types", skip: ("Not unless Nokogiri loaded" if !defined?(Nokogiri)) do
         subject do
           @graph << [EX.a, RDF.type, EX.t1]
           @graph << [EX.a, RDF.type, EX.t2]
@@ -114,10 +115,11 @@ describe RDF::RDFa::Writer do
 
         {
           "/html/body/div/@resource" => "ex:a",
-          "/html/body/div/@typeof" => "ex:t1 ex:t2",
+          "/html/body/div/contains(@typeof, 'ex:t1')" => true,
+          "/html/body/div/contains(@typeof, 'ex:t2')" => true,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
@@ -135,7 +137,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/h1/@lang" => "en",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
@@ -151,7 +153,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/h1/@lang" => false,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
@@ -167,7 +169,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/h1/@lang" => "en",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
@@ -184,7 +186,7 @@ describe RDF::RDFa::Writer do
           "/html/body/div/div/ul/li/a[@property='rdf:value']/@href" => EX.b.to_s,
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
@@ -219,7 +221,7 @@ describe RDF::RDFa::Writer do
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
-                expect(subject).to have_xpath(path, value, @debug)
+                expect(subject).to have_xpath(path, value, logger)
               end
             end
           end
@@ -254,7 +256,7 @@ describe RDF::RDFa::Writer do
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
-                expect(subject).to have_xpath(path, value, @debug)
+                expect(subject).to have_xpath(path, value, logger)
               end
             end
           end
@@ -289,7 +291,7 @@ describe RDF::RDFa::Writer do
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
-                expect(subject).to have_xpath(path, value, @debug)
+                expect(subject).to have_xpath(path, value, logger)
               end
             end
           end
@@ -308,7 +310,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]" => %r(<span [^>]+>E = mc<sup>2</sup>: The Most Urgent Problem of Our Time<\/span>),
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
@@ -325,7 +327,7 @@ describe RDF::RDFa::Writer do
           "//span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
@@ -342,13 +344,13 @@ describe RDF::RDFa::Writer do
           "//span[@property]/text()" => "Albert Einstein",
         }.each do |path, value|
           it "returns #{value.inspect} for xpath #{path}" do
-            expect(subject).to have_xpath(path, value, @debug)
+            expect(subject).to have_xpath(path, value, logger)
           end
         end
       end
     end
     
-    context "multi-valued literals" do
+    context "multi-valued literals", skip: ("Not unless Nokogiri loaded" if !defined?(Nokogiri)) do
       subject do
         @graph << [EX.a, EX.b, "c"]
         @graph << [EX.a, EX.b, "d"]
@@ -356,11 +358,11 @@ describe RDF::RDFa::Writer do
       end
 
       {
-        "//ul/li[1][@property='ex:b']/text()" => "c",
-        "//ul/li[2][@property='ex:b']/text()" => "d",
+        "//ul/li[1][@property='ex:b']/contains(text(), 'c')" => true,
+        "//ul/li[2][@property='ex:b']/contains(text(), 'd')" => true,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          expect(subject).to have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, logger)
         end
       end
     end
@@ -377,12 +379,12 @@ describe RDF::RDFa::Writer do
         "//a/@href" => EX.c.to_s,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          expect(subject).to have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, logger)
         end
       end
     end
     
-    context "multi-valued resource objects" do
+    context "multi-valued resource objects", skip: ("Not unless Nokogiri loaded" if !defined?(Nokogiri)) do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.a, EX.b, EX.d]
@@ -391,11 +393,11 @@ describe RDF::RDFa::Writer do
 
       {
         "//div/@resource" => "ex:a",
-        "//ul/li[1]/a[@property='ex:b']/@href" => EX.c.to_s,
-        "//ul/li[2]/a[@property='ex:b']/@href" => EX.d.to_s,
+        "//ul/li/a[@property='ex:b']/contains(@href, '#{EX.c.to_s}')" => true,
+        "//ul/li/a[@property='ex:b']/contains(@href, '#{EX.d.to_s}')" => true,
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          expect(subject).to have_xpath(path, value, @debug)
+          expect(subject).to have_xpath(path, value, logger)
         end
       end
     end
@@ -513,7 +515,7 @@ describe RDF::RDFa::Writer do
           @graph = parse(input, format: :ttl)
           html = serialize(haml_options: {ugly: false})
           result.each do |path, value|
-            expect(html).to have_xpath(path, value, @debug)
+            expect(html).to have_xpath(path, value, logger)
           end
         end
       end
@@ -534,44 +536,44 @@ describe RDF::RDFa::Writer do
         "//div[@rel]/div[@class='property']/a/@property" => "ex:d",
       }.each do |path, value|
         it "returns #{value.inspect} for xpath #{path}" do
-          expect(subject).to have_xpath(path, value, @debug)
-        end
-      end
-    end
-
-    unless ENV['CI'] # Not for continuous integration
-      # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
-      describe "w3c xhtml testcases" do
-        require 'suite_helper'
-
-        # Generate with each template set
-        RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
-          next if name == :distiller && !Module.constants.include?(:Nokogiri)
-          context "Using #{name} template" do
-            Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
-              next if %w(0198 0225 0284 0295 0319 0329).include?(t.num)
-              specify "test #{t.num}: #{t.description}" do
-                unless Module.constants.include?(:Nokogiri)
-                  if %w(0261).include?(t.num)
-                    pending "REXML"
-                  end
-                end
-                input = t.input("html5", "rdfa1.1")
-                @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"))
-                result = serialize(haml: template, haml_options: {ugly: false})
-                graph2 = parse(result, format: :rdfa)
-                # Need to put this in to avoid problems with added markup
-                statements = graph2.query(object: RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
-                statements.each {|st| graph2.delete(st)}
-                #puts graph2.dump(:ttl)
-                expect(graph2).to be_equivalent_graph(@graph, trace: @debug.unshift(result.force_encoding("utf-8")).join("\n"))
-              end
-            end
-          end
+          expect(subject).to have_xpath(path, value, logger)
         end
       end
     end
   end
+
+
+  # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
+  describe "w3c xhtml testcases" do
+    require 'suite_helper'
+
+    # Generate with each template set
+    RDF::RDFa::Writer::HAML_TEMPLATES.each do |name, template|
+      next if name == :distiller && !Module.constants.include?(:Nokogiri)
+      context "Using #{name} template" do
+        Fixtures::TestCase.for_specific("html5", "rdfa1.1", Fixtures::TestCase::Test.required) do |t|
+          next if %w(0140 0198 0225 0261 0284 0295 0319 0329).include?(t.num)
+          specify "test #{t.num}: #{t.description}" do
+            unless Module.constants.include?(:Nokogiri)
+              if %w(0261).include?(t.num)
+                pending "REXML"
+              end
+            end
+            input = t.input("html5", "rdfa1.1")
+            @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"), logger: false)
+            result = serialize(haml: template, haml_options: {ugly: false})
+            logger.info result.force_encoding("utf-8")
+            graph2 = parse(result, format: :rdfa, logger: false)
+            # Need to put this in to avoid problems with added markup
+            statements = graph2.query(object: RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
+            statements.each {|st| graph2.delete(st)}
+            #puts graph2.dump(:ttl)
+            expect(graph2).to be_equivalent_graph(@graph, logger: logger)
+          end
+        end
+      end
+    end
+  end unless ENV['CI'] # Not for continuous integration
 
   require 'rdf/turtle'
   def parse(input, options = {})
@@ -587,12 +589,11 @@ describe RDF::RDFa::Writer do
 
   # Serialize  @graph to a string and compare against regexps
   def serialize(options = {})
-    @debug = []
-    result = RDF::RDFa::Writer.buffer({debug: @debug, standard_prefixes: true}.merge(options)) do |writer|
+    result = RDF::RDFa::Writer.buffer({logger: logger, standard_prefixes: true}.merge(options)) do |writer|
       writer << @graph
     end
     require 'cgi'
-    puts CGI.escapeHTML(result) if $verbose
+    #puts CGI.escapeHTML(result) if $verbose
     result
   end
 end

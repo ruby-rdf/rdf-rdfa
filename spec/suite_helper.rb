@@ -22,7 +22,7 @@ module Fixtures
 
     class Test < RDF::Vocabulary("http://www.w3.org/2006/03/test-description#"); end
 
-    attr_accessor :debug
+    attr_accessor :logger
 
     # @param [Hash] json framed JSON-LD`
     # @return [Array<TestCase>]
@@ -37,8 +37,6 @@ module Fixtures
                      (classification.nil? || tc.classification == classification)
       end
     end
-
-    def about; id; end
 
     def expectedResults
       RDF::Literal::Boolean.new(property('expectedResults'))
@@ -58,10 +56,6 @@ module Fixtures
     def results(host_language, version)
       RDF::URI(self.property('results').to_s.
         sub('test-cases/', "test-cases/#{version}/#{host_language}/"))
-    end
-
-    def trace
-      @debug.to_a.join("\n")
     end
   end
 

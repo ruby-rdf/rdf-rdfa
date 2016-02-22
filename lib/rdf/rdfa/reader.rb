@@ -1,6 +1,6 @@
 begin
   require 'nokogiri'
-rescue LoadError => e
+rescue LoadError
   :rexml
 end
 require 'rdf/ntriples'
@@ -28,6 +28,7 @@ module RDF::RDFa
   class Reader < RDF::Reader
     format Format
     include Expansion
+    include RDF::Util::Logger
 
     XHTML = "http://www.w3.org/1999/xhtml"
     
@@ -98,16 +99,6 @@ module RDF::RDFa
     # @!attribute [rw] implementation
     # @return [Module]
     attr_reader :implementation
-
-    ##
-    # Warnings found during processing
-    # @return [Array<String>]
-    attr_reader :warnings
-
-    ##
-    # Accumulated errors found during processing
-    # @return [Array<String>]
-    attr_reader :errors
 
     # The Recursive Baggage
     # @private
@@ -253,6 +244,31 @@ module RDF::RDFa
     end
 
     ##
+    # RDFa Reader options
+    # @see http://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Reader#options-class_method
+    def self.options
+      super + [
+        RDF::CLI::Option.new(
+          symbol: :vocab_expansion,
+          datatype: TrueClass,
+          on: ["--vocab-expansion"],
+          description: "Perform OWL2 expansion on the resulting graph.") {true},
+        RDF::CLI::Option.new(
+          symbol: :host_language,
+          datatype: %w(xml xhtml1 xhtml5 html4 svg),
+          on: ["--host-language HOSTLANG", %w(xml xhtml1 xhtml5 html4 svg)],
+          description: "Host Language. One of xml, xhtml1, xhtml5, html4, or svg") do |arg|
+            arg.to_sym
+        end,
+        RDF::CLI::Option.new(
+          symbol: :rdfagraph,
+          datatype: %w(output processor both),
+          on: ["--rdfagraph RDFAGRAPH", %w(output processor both)],
+          description: "Used to indicate if either or both of the :output or :processor graphs are output.") {|arg| arg.to_sym},
+      ]
+    end
+
+    ##
     # Initializes the RDFa reader instance.
     #
     # @param  [IO, File, String] input
@@ -276,12 +292,6 @@ module RDF::RDFa
     #   Value is an array containing on or both of :output or :processor.
     # @option options [Repository] :vocab_repository (nil)
     #   Repository to save loaded vocabularies.
-    # @option options [Array] :errors
-    #   array for placing errors found when parsing
-    # @option options [Array] :warnings
-    #   array for placing warnings found when parsing
-    # @option options [Array] :debug
-    #   Array to place debug messages
     # @return [reader]
     # @yield  [reader] `self`
     # @yieldparam  [RDF::Reader] reader
@@ -289,13 +299,11 @@ module RDF::RDFa
     # @raise [RDF::ReaderError] if _validate_
     def initialize(input = $stdin, options = {}, &block)
       super do
-        @errors = @options[:errors]
-        @warnings = @options[:warnings]
-        @debug = @options[:debug]
         @options = {reference_folding: true}.merge(@options)
         @repository = RDF::Repository.new
 
         @options[:rdfagraph] = case @options[:rdfagraph]
+        when 'all' then [:output, :processor]
         when String, Symbol then @options[:rdfagraph].to_s.split(',').map(&:strip).map(&:to_sym)
         when Array then @options[:rdfagraph].map {|o| o.to_s.to_sym}
         else  []
@@ -396,9 +404,13 @@ module RDF::RDFa
 
             if reader = RDF::Reader.for(content_type: type.to_s)
               add_debug(el, "=> reader #{reader.to_sym}")
-              # Wrap input in a RemoteDocument with appropriate content-type
+              # Wrap input in a RemoteDocument with appropriate content-type and base
               doc = if input.is_a?(String)
-                RDF::Util::File::RemoteDocument.new(input, options.merge(content_type: type.to_s))
+                RDF::Util::File::RemoteDocument.new(input,
+                                                    options.merge(
+                                                      content_type: type.to_s,
+                                                      base_uri: base_uri
+                                                    ))
               else
                 input
               end
@@ -457,6 +469,10 @@ module RDF::RDFa
             yield RDF::Statement.new(*statement.to_triple) if @options[:rdfagraph].include?(:processor)
           end
         end
+
+        if validate? && log_statistics[:error]
+          raise RDF::ReaderError, "Errors found during processing"
+        end
       end
       enum_for(:each_statement)
     end
@@ -496,30 +512,30 @@ module RDF::RDFa
     # @param [#display_path, #to_s] node XML Node or string for showing context
     # @param [String] message
     # @yieldreturn [String] appended to message, to allow for lazy-evaulation of message
-    def add_debug(node, message = "")
-      return unless ::RDF::RDFa.debug? || @debug
-      message = message + yield if block_given?
-      add_processor_message(node, message, RDF::RDFA.Info)
+    def add_debug(node, message = "", &block)
+      add_processor_message(node, message, nil, &block)
     end
 
-    def add_info(node, message, process_class = RDF::RDFA.Info)
-      add_processor_message(node, message, process_class)
+    def add_info(node, message, process_class = RDF::RDFA.Info, &block)
+      add_processor_message(node, message, process_class, &block)
     end
     
     def add_warning(node, message, process_class = RDF::RDFA.Warning)
-      @warnings << "#{node_path(node)}: #{message}" if @warnings
       add_processor_message(node, message, process_class)
     end
     
     def add_error(node, message, process_class = RDF::RDFA.Error)
-      @errors << "#{node_path(node)}: #{message}" if @errors
       add_processor_message(node, message, process_class)
-      raise RDF::ReaderError, message if validate?
     end
     
-    def add_processor_message(node, message, process_class)
-      puts "#{node_path(node)}: #{message}" if ::RDF::RDFa.debug?
-      @debug << "#{node_path(node)}: #{message}" if @debug.is_a?(Array)
+    def add_processor_message(node, message, process_class, &block)
+      case process_class
+      when RDF::RDFA.Error    then log_error(node_path(node), message, &block)
+      when RDF::RDFA.Warning  then log_warn(node_path(node), message, &block)
+      when RDF::RDFA.Info     then log_info(node_path(node), message, &block)
+      else                         log_debug(node_path(node), message, &block)
+      end
+      process_class ||= RDF::RDFA.Info
       if @options[:processor_callback] || @options[:rdfagraph].include?(:processor)
         n = RDF::Node.new
         processor_statements = [
@@ -605,10 +621,10 @@ module RDF::RDFa
             next
           end
 
-          old_debug = RDF::RDFa.debug?
+          old_logger = @options[:logger]
           begin
             add_info(root, "load_initial_contexts: load #{uri.to_base}")
-            RDF::RDFa.debug = false
+            @options[:logger] = false
             context = Context.find(uri)
 
             # Add URI Mappings to prefixes
@@ -619,11 +635,11 @@ module RDF::RDFa
             yield :term_mappings, context.terms unless context.terms.empty?
             yield :default_vocabulary, context.vocabulary if context.vocabulary
           rescue Exception => e
-            RDF::RDFa.debug = old_debug
+            options[:logger] = old_logger
             add_error(root, e.message)
             raise # In case we're not in strict mode, we need to be sure processing stops
           ensure
-            RDF::RDFa.debug = old_debug
+            @options[:logger] = old_logger
           end
         end
     end
@@ -1174,7 +1190,7 @@ module RDF::RDFa
               add_debug(element, "[Step 11] value literal (#{attrs[:value]})")
               v = attrs[:value].to_s
               # Figure it out by parsing
-              dt_lit = %w(Integer Float Double).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
+              dt_lit = %w(Integer Decimal Double).map {|t| RDF::Literal.const_get(t)}.detect do |dt|
                 v.match(dt::GRAMMAR)
               end || RDF::Literal
               dt_lit.new(v)
