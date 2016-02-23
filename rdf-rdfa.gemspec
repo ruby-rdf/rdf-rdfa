@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
 
   gem.name                  = %q{rdf-rdfa}
   gem.homepage              = "http://ruby-rdf.github.com/rdf-rdfa"
-  gem.license               = 'Public Domain' if gem.respond_to?(:license=)
+  gem.license               = 'Unlicense'
   gem.summary               = "RDFa reader/writer for RDF.rb."
   gem.description           = "RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite."
   gem.rubyforge_project     = 'rdf-rdfa'
@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.email                 = 'public-rdf-ruby@w3.org'
 
   gem.platform              = Gem::Platform::RUBY
-  gem.files                 = %w(AUTHORS README UNLICENSE VERSION) + Dir.glob('lib/**/*.rb')
+  gem.files                 = %w(AUTHORS README.md UNLICENSE VERSION) + Dir.glob('lib/**/*.rb')
   gem.require_paths         = %w(lib)
   gem.has_rdoc              = false
 
@@ -25,21 +25,21 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency     'rdf',                 '>= 2.0.0.beta', '< 3'
   gem.add_runtime_dependency     'haml',                '~> 4.0'
-  gem.add_runtime_dependency     'rdf-xsd',             '>= 1.99', '< 3'
-  gem.add_runtime_dependency     'rdf-aggregate-repo',  '>= 1.99', '< 3'
+  gem.add_runtime_dependency     'rdf-xsd',             '>= 2.0.0.beta', '< 3'
+  gem.add_runtime_dependency     'rdf-aggregate-repo',  '>= 2.0.0.beta', '< 3'
   gem.add_runtime_dependency     'htmlentities',        '~> 4.3'
 
   gem.add_development_dependency 'open-uri-cached',     '~> 0.0', '>= 0.0.5'
-  gem.add_development_dependency 'json-ld',             '>= 1.99', '< 3'
-  gem.add_development_dependency 'rspec',               '~> 3.2'
-  gem.add_development_dependency 'rspec-its',           '~> 1.0'
-  gem.add_development_dependency 'rdf-spec',            '>= 1.99', '< 3'
+  gem.add_development_dependency 'json-ld',             '>= 2.0.0.beta', '< 3'
+  gem.add_development_dependency 'rspec',               '~> 3.4'
+  gem.add_development_dependency 'rspec-its',           '~> 1.2'
+  gem.add_development_dependency 'rdf-spec',            '>= 2.0.0.beta', '< 3'
   gem.add_development_dependency 'rdf-tabular',         '>= 0.4.0.beta', '< 1'
   gem.add_development_dependency 'rdf-turtle',          '>= 2.0.0.beta', '< 3'
-  gem.add_development_dependency 'rdf-rdfxml',          '>= 1.99', '< 3'
-  gem.add_development_dependency 'rdf-vocab',           '>= 0.8'
+  gem.add_development_dependency 'rdf-rdfxml',          '>= 2.0.0.beta', '< 3'
+  gem.add_development_dependency 'rdf-vocab',           '>= 2.0.0.beta', '< 3'
   gem.add_development_dependency 'rdf-isomorphic',      '>= 2.0.0.beta', '< 3'
-  gem.add_development_dependency 'sparql',              '~> 1.99'
+  gem.add_development_dependency 'sparql',              '>= 2.0.0.beta', '< 3'
   gem.add_development_dependency 'yard' ,               '~> 0.8'
 
   gem.post_install_message  = nil
