@@ -21,8 +21,10 @@ module RDF::RDFa
       vocabs.map! do |vocab|
         begin
           # Create the name with a predictable name so that it is enumerated and can be found
-          v = RDF::Vocabulary.find(vocab) ||
-              RDF::Vocabulary.load(vocab, class_name: "D#{Digest::MD5.hexdigest vocab}")
+          v = RDF::Vocabulary.find(vocab) || begin
+            vg = RDF::Graph.load(vocab)
+            RDF::Vocabulary.from_graph(vg, url: vocab, class_name: "D#{Digest::MD5.hexdigest vocab}") unless vg.empty?
+          end
         rescue Exception => e
           # indicate the warning if the vocabulary fails to laod
           add_warning("expand", "Error loading vocabulary #{vocab}: #{e.message}", RDF::RDFA.UnresolvedVocabulary)
