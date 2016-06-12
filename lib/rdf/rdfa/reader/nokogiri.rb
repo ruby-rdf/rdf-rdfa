@@ -279,8 +279,25 @@ module RDF::RDFa
       ##
       # Document errors
       def doc_errors
-        # FIXME: Nokogiri version 1.5.5 thinks many HTML5 elements are invalid
-        @doc.errors.reject {|e| e.to_s =~ /(Tag (?:article|aside|audio|canvas|command|data|datalist|details|embed|figcaption|figure|footer|header|hgroup|keygen|main|mark|meter|nav|output|progress|ruby|section|source|time|track|video|wbr) invalid|Missing attribute name)/}
+        # FIXME: Nokogiri version 1.5 thinks many HTML5 elements are invalid
+        # FIXME: SVG 1.1 elements
+        @doc.errors.reject {|e| e.to_s =~ /(Tag\s(?:
+          abbr|article|aside|audio|bdi|bdo|
+          canvas|caption|colgroup|command|data|datalist|details|
+          embed|figcaption|figure|footer|
+          header|hgroup|keygen|legend|main|mark|meter|
+          nav|output|progress|ruby|samp|section|small|source|summary|
+          time|track|video|wbr|
+          altGlyph|altGlyphDef|altGlyphItem|
+          animate|animateColor|animateMotion|animateTransform|
+          circle|clipPath|color-profile|cursor|defs|desc|ellipse|
+          fe\w+|filter|font-[\w-]+|g|glyph|glyphRef|hkern|line|linearGradient|
+          marker|mask|metadata|missing-glyph|mpath|
+          path|pattern|polygon|polyline|radialGradient|rect|
+          set|stop|svg|switch|symbol|text|textPath|title|tref|tspan|use|view|vkern
+          )\s
+          invalid|Missing\sattribute\sname
+          )/x}
       end
       
       ##
