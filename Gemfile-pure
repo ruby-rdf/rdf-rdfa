@@ -19,7 +19,7 @@ group :development, :test do
   gem 'rdf-vocab',          github: "ruby-rdf/rdf-vocab",           branch: "develop"
   gem 'sparql',             github: "ruby-rdf/sparql",              branch: "develop"
   gem 'sparql-client',      github: "ruby-rdf/sparql-client",       branch: "develop"
-  gem 'sxp',                github: "gkellogg/sxp-ruby",            branch: "develop"
+  gem 'sxp',                github: "dryruby/sxp.rb",               branch: "develop"
 end
 
 group :test do
@@ -32,7 +32,6 @@ end
 # put test-only gems in this group so their generators
 # and rake tasks are available in development mode:
 group :debug do
-  gem "wirble"
   gem "syntax"
   gem "byebug", platforms: :mri
   gem "ruby-debug", platforms: :jruby
@@ -41,4 +40,8 @@ end
 platforms :rbx do
   gem 'rubysl', '~> 2.0'
   gem 'rubinius', '~> 2.0'
+end
+
+platforms :jruby do
+  gem 'gson',     '~> 0.6'
 end
