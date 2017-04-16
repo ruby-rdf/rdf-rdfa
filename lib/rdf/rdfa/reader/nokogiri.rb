@@ -174,8 +174,16 @@ module RDF::RDFa
           options[:encoding] = options[:encoding].to_s if options[:encoding]
 
           case @host_language
-          when :html4, :html5
+          when :html4
             ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
+          when :html5
+            begin
+              require 'nokogumbo' unless defined?(::Nokogumbo)
+              input = input.read if input.respond_to?(:read)
+              ::Nokogiri::HTML5(input.force_encoding(options[:encoding]))
+            rescue LoadError
+              ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
+            end
           else
             ::Nokogiri::XML.parse(input, base_uri.to_s, options[:encoding])
           end
@@ -281,7 +289,11 @@ module RDF::RDFa
       def doc_errors
         # FIXME: Nokogiri version 1.5 thinks many HTML5 elements are invalid, so just ignore all Tag errors.
         # Nokogumbo might make this simpler
-        @doc.errors.reject {|e| e.to_s =~ /(?:Tag \w+ invalid)|(?:Missing attribute name)/}
+        if @host_language == :html5
+          @doc.errors
+        else
+          @doc.errors.reject {|e| e.to_s =~ /(?:Tag \w+ invalid)|(?:Missing attribute name)/}
+        end
       end
       
       ##

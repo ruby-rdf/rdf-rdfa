@@ -41,19 +41,6 @@ Info = Struct.new(:id, :logger, :compare, :inputDocument, :outputDocument, :expe
 
 RSpec::Matchers.define :pass_query do |expected, info|
   match do |actual|
-    def normalize(graph)
-      case graph
-      when RDF::Queryable then graph
-      when IO, StringIO
-        RDF::Graph.new.load(graph, base_uri: @info.about)
-      else
-        # Figure out which parser to use
-        g = RDF::Repository.new
-        reader_class = detect_format(graph)
-        reader_class.new(graph, base_uri: @info.about).each {|s| g << s}
-        g
-      end
-    end
     if info.respond_to?(:id)
       @info = info
     elsif info.is_a?(Logger)
