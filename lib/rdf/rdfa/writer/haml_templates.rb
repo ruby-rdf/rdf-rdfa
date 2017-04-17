@@ -195,8 +195,15 @@ module RDF::RDFa
             %table.properties
               - predicates.each do |predicate|
                 != yield(predicate)
-        - else
+        - elsif rel
           %td{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}
+            - if typeof
+              %span.type!= typeof
+            %table.properties
+              - predicates.each do |predicate|
+                != yield(predicate)
+        - else
+          %div{resource: (about || resource), typeof: typeof, inlist: inlist}
             - if typeof
               %span.type!= typeof
             %table.properties
