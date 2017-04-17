@@ -16,14 +16,15 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 * Fully compliant RDFa 1.1 parser.
 * Template-based Writer to generate XHTML+RDFa.
   * Writer uses user-replacable [Haml][Haml]-based templates to generate RDFa.
-* If available, uses Nokogiri for parsing HTML/SVG, falls back to REXML otherwise
+* If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise. For HTML5, include the [Nokogumbo][] gem for are pure-HTML5 parser with better error detection.
 
 Install with `gem install rdf-rdfa`
 
 ### Pure Ruby
-In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri](http://www.nokogiri.org)
-and falls back to using REXML. As REXML is not really an HTML parsing library, the results will only be useful if the HTML is well-formed.
-For best performance, install the Nokogiri gem as well.
+In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri][] or [Nokogumbo][]
+and falls back to using REXML. [Nokogumbo][] uses the [Gumbo pure-C HTML5 parser](https://github.com/google/gumbo-parser#readme).
+As REXML is not really an HTML parsing library, the results will only be useful if the HTML is well-formed.
+For best performance, install the [Nokogiri][] and [Nokogumbo][] gems as well.
 
 ### Important changes from previous versions
 RDFa is an evolving standard, undergoing some substantial recent changes partly due to perceived competition
@@ -396,11 +397,12 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
-* [Ruby](http://ruby-lang.org/) (>= 2.0)
-* [RDF.rb](http://rubygems.org/gems/rdf) (>= 2.0)
+* [Ruby](http://ruby-lang.org/) (>= 2.2)
+* [RDF.rb](http://rubygems.org/gems/rdf) (>= 2.2)
 * [Haml](https://rubygems.org/gems/haml) (>= 4.0)
 * [HTMLEntities](https://rubygems.org/gems/htmlentities) (>= 4.3.1)
-* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.6.8)
+* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.7.1)
+* Soft dependency on [Nokogumbo](https://github.com/rubys/nokogumbo) (>= 1.4.10)
 
 ## Documentation
 Full documentation available on [Rubydoc.info][RDFa doc]
@@ -484,4 +486,5 @@ see <http://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 [RDFa doc]:         http://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
 [Haml]:             http://haml-lang.com/
 [Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/
-[Backports]:        http://rubygems.org/gems/backports
+[Nokogiri]:         http://www.nokogiri.org
+[Nokogumbo]:        https://github.com/rubys/nokogumbo/#readme

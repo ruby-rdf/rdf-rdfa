@@ -16,6 +16,7 @@ unless ENV['CI']  # Skip for continuous integration
                 specify "test #{t.num}: #{t.description}#{",  (negative test)" if t.expectedResults.false?}" do
                   pending "Invalid SPARQL query" if %w(0279 0284).include?(t.num)
                   pending "CDN messes up email addresses" if %w(0065 0176).include?(t.num)
+                  pending "Nokogumbo error" if t.num == "0216" && host_language == "xhtml5"
                   skip "XMLLiteral" if %w(0198).include?(t.num)
                   begin
                     t.logger = RDF::Spec.logger
@@ -47,7 +48,7 @@ unless ENV['CI']  # Skip for continuous integration
                         expect(reader.version).to produce(version.sub(/-.*$/, '').to_sym, t.debug)
                       end
 
-                      graph << reader
+                      expect {graph << reader}.not_to raise_error, t.logger.to_s
                     end
 
                     RDF::Util::File.open_file(t.results(host_language, version)) do |query|
@@ -56,8 +57,6 @@ unless ENV['CI']  # Skip for continuous integration
                   rescue RSpec::Expectations::ExpectationNotMetError => e
                     if classification != "required"
                       pending("#{classification} test") {  raise }
-                    #elsif t.num == "0319"
-                    #  pending("It actually returns a relative result") { raise}
                     else
                       raise
                     end
