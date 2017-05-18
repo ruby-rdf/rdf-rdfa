@@ -57,7 +57,7 @@ describe RDF::RDFa::Writer do
     context "plain literal" do
       subject do
         @graph << [EX.a, EX.b, "foo"]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: {})
       end
 
       {
@@ -93,7 +93,7 @@ describe RDF::RDFa::Writer do
       context "typed resource" do
         subject do
           @graph << [EX.a, RDF.type, EX.Type]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: {})
         end
 
         {
@@ -110,7 +110,7 @@ describe RDF::RDFa::Writer do
         subject do
           @graph << [EX.a, RDF.type, EX.t1]
           @graph << [EX.a, RDF.type, EX.t2]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: {})
         end
 
         {
@@ -217,7 +217,7 @@ describe RDF::RDFa::Writer do
           context v do
             subject {
               @graph << [EX.a, EX.b, RDF::Literal::Date.new(v)]
-              serialize(haml_options: {ugly: false})
+              serialize(haml_options: {})
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
@@ -252,7 +252,7 @@ describe RDF::RDFa::Writer do
           context v do
             subject {
               @graph << [EX.a, EX.b, RDF::Literal::Time.new(v)]
-              serialize(haml_options: {ugly: false})
+              serialize(haml_options: {})
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
@@ -287,7 +287,7 @@ describe RDF::RDFa::Writer do
           context v do
             subject {
               @graph << [EX.a, EX.b, RDF::Literal::DateTime.new(v)]
-              serialize(haml_options: {ugly: false})
+              serialize(haml_options: {})
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
@@ -301,7 +301,7 @@ describe RDF::RDFa::Writer do
       context "rdf:XMLLiteral" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::XML.new("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time")]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: {})
         end
 
         {
@@ -318,7 +318,7 @@ describe RDF::RDFa::Writer do
       context "xsd:string" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", datatype: RDF::XSD.string)]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: {})
         end
 
         {
@@ -335,7 +335,7 @@ describe RDF::RDFa::Writer do
       context "unknown" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", datatype: EX.unknown)]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: {})
         end
 
         {
@@ -354,7 +354,7 @@ describe RDF::RDFa::Writer do
       subject do
         @graph << [EX.a, EX.b, "c"]
         @graph << [EX.a, EX.b, "d"]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: {})
       end
 
       {
@@ -370,7 +370,7 @@ describe RDF::RDFa::Writer do
     context "resource objects" do
       subject do
         @graph << [EX.a, EX.b, EX.c]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: {})
       end
 
       {
@@ -388,7 +388,7 @@ describe RDF::RDFa::Writer do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.a, EX.b, EX.d]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: {})
       end
 
       {
@@ -513,7 +513,7 @@ describe RDF::RDFa::Writer do
           pending("Serializing multiple lists") if test == "multiple collections"
           skip "REXML" if test == 'issue 14' && !Module.constants.include?(:Nokogiri)
           @graph = parse(input, format: :ttl)
-          html = serialize(haml_options: {ugly: false})
+          html = serialize(haml_options: {})
           result.each do |path, value|
             expect(html).to have_xpath(path, value, logger)
           end
@@ -525,7 +525,7 @@ describe RDF::RDFa::Writer do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.c, EX.d, EX.e]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: {})
       end
 
       {
@@ -561,7 +561,7 @@ describe RDF::RDFa::Writer do
             end
             input = t.input("html5", "rdfa1.1")
             @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"), logger: false)
-            result = serialize(haml: template, haml_options: {ugly: false})
+            result = serialize(haml: template, haml_options: {})
             logger.info result.force_encoding("utf-8")
             graph2 = parse(result, format: :rdfa, logger: logger)
             # Need to put this in to avoid problems with added markup

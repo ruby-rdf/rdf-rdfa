@@ -63,9 +63,7 @@ module RDF::RDFa
     # @return [Array<URI>]
     attr :heading_predicates
 
-    HAML_OPTIONS = {
-      ugly: false, # to preserve whitespace without using entities
-    }
+    HAML_OPTIONS = {}
 
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
@@ -113,7 +111,7 @@ module RDF::RDFa
     #   Defines order of predicates to use in heading.
     # @option options [String, Symbol, Hash{Symbol => String}] :haml (DEFAULT_HAML) HAML templates used for generating code
     # @option options [Hash] :haml_options (HAML_OPTIONS)
-    #   Options to pass to Haml::Engine.new. Default options set `ugly: false` to ensure that whitespace in literals with newlines is properly preserved.
+    #   Options to pass to Haml::Engine.new.
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
     def initialize(output = $stdout, options = {}, &block)
