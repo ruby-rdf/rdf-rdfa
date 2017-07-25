@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'rdf/spec/reader'
 
 unless ENV['CI']  # Skip for continuous integration
@@ -7,7 +6,7 @@ unless ENV['CI']  # Skip for continuous integration
     # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
     describe "w3c test cases" do
       require 'suite_helper'
-    
+
       Fixtures::TestCase::HOST_LANGUAGE_VERSION_SETS.each do |(host_language, version)|
         describe "for #{host_language} #{version}" do
           %w(required optional buggy).each do |classification|
@@ -17,7 +16,7 @@ unless ENV['CI']  # Skip for continuous integration
                   pending "Invalid SPARQL query" if %w(0279 0284).include?(t.num)
                   skip "CDN messes up email addresses" if %w(0065 0176).include?(t.num)
                   pending "Nokogumbo error" if t.num == "0216" && host_language == "xhtml5"
-                  skip "XMLLiteral" if %w(0198).include?(t.num)
+                  skip "XMLLiteral" if %w(0198 0212).include?(t.num)
                   begin
                     t.logger = RDF::Spec.logger
                     t.logger.info t.inspect

@@ -29,7 +29,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 2.2'
   gem.add_runtime_dependency     'htmlentities',        '~> 4.3'
 
-  gem.add_development_dependency 'open-uri-cached',     '~> 0.0', '>= 0.0.5'
   gem.add_development_dependency 'json-ld',             '~> 2.0'
   gem.add_development_dependency 'rspec',               '~> 3.5'
   gem.add_development_dependency 'rspec-its',           '~> 1.2'

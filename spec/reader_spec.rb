@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'rdf/spec/reader'
 
 describe "RDF::RDFa::Reader" do
@@ -82,13 +81,13 @@ describe "RDF::RDFa::Reader" do
         inner.called(subject.class, predicate.class, object.class)
       end
     end
-    
+
     it "calls Proc with processor statements for :processor_callback" do
       lam = double("lambda")
       expect(lam).to receive(:call).at_least(1) {|s| expect(s).to be_statement}
       RDF::RDFa::Reader.new(subject, base_uri: "http://example/", processor_callback: lam).each_triple {}
     end
-    
+
     context "rdfagraph option" do
       let(:source) do
         %(<!DOCTYPE html>
@@ -107,7 +106,7 @@ describe "RDF::RDFa::Reader" do
           }
         )
       end
-      
+
       let(:processor) do
         %(
           PREFIX rdfa: <http://www.w3.org/ns/rdfa#>
@@ -161,7 +160,7 @@ describe "RDF::RDFa::Reader" do
     next unless Module.constants.map(&:to_s).include?(impl)
     context impl do
       before(:all) {@library = impl.downcase.to_s.to_sym}
-      
+
       context "sanity checking" do
         it "simple doc" do
           html = %(<?xml version="1.0" encoding="UTF-8"?>
@@ -277,7 +276,7 @@ describe "RDF::RDFa::Reader" do
             )
             expect(parse(html)).to be_equivalent_graph(expected, logger: logger, format: :ttl)
           end
-          
+
           it "creates a typed subject with @typeof" do
             html = %(
               <span about="foo" property="dc:title" typeof="rdfs:Resource">Title</span>
@@ -383,7 +382,7 @@ describe "RDF::RDFa::Reader" do
               expect(parse(subject, version: "rdfa1.0")).to be_equivalent_graph(expected, logger: logger, format: :ttl)
             end
           end
-      
+
           context "RDFa 1.1" do
             it "creates a statement with object from @src" do
               expected = RDF::Graph.new <<
@@ -420,7 +419,7 @@ describe "RDF::RDFa::Reader" do
 
             expect(parse(html)).to be_equivalent_graph(expected, logger: logger)
           end
-          
+
           it "empty @typeof on root" do
             html = %(<html typeof=""><span property="dc:title">Title</span></html>)
             expected = RDF::Graph.new << RDF::Statement.new(RDF::URI(""), RDF::Vocab::DC.title, "Title")
@@ -487,7 +486,7 @@ describe "RDF::RDFa::Reader" do
                   host_language: hl
                 )).to be_equivalent_graph(expected, logger: logger, format: :ttl)
               end
-              
+
               it %(#{does ? "uses" : "does not use"} xml:base in non-root) do
                 html = %(<div xml:base="http://example/">
                     <a xml:base="http://example/" property="rdf:value" href="">Value</a>
@@ -578,7 +577,7 @@ describe "RDF::RDFa::Reader" do
                   it "creates triple with invalid literal" do
                     expect(parse(@rdfa, validate: false)).to be_equivalent_graph(@expected, logger: logger)
                   end
-            
+
                   it "does not create triple when validating" do
                     expect {parse(@rdfa, validate: true)}.to raise_error(RDF::ReaderError)
                   end
@@ -617,7 +616,7 @@ describe "RDF::RDFa::Reader" do
               </body>
             </html>
           )}
-      
+
           it "uses vocabulary when creating property IRI" do
             query = %q(
               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -642,7 +641,7 @@ describe "RDF::RDFa::Reader" do
             )
             expect(parse(subject)).to pass_query(query, logger: logger)
           end
-          
+
           context "with terms" do
             [
               %q(term),
@@ -694,7 +693,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value () .
               )
             ],
@@ -707,7 +706,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value ("Foo") .
               )
             ],
@@ -720,7 +719,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value (<http://example/foo>) .
               )
             ],
@@ -734,7 +733,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value ("Foo" <http://example/foo>) .
               )
             ],
@@ -748,7 +747,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value ("Foo" "Bar") .
               )
             ],
@@ -763,7 +762,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value ("Foo" "Bar"), "Baz" .
               )
             ],
@@ -779,7 +778,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value (<http://example/foo> <http://example/bar>) .
               )
             ],
@@ -797,7 +796,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/foo> rdf:value ("Foo"), ("Bar") .
               )
             ],
@@ -813,7 +812,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value ("Foo"); rdf:inlist <http://example/res> .
                 <http://example/res> rdf:value ("Bar") .
               )
@@ -830,7 +829,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
                 <http://example/> rdf:value ("Foo"); rdf:inlist <http://example/res> .
                 <http://example/res> rdf:value ("Bar") .
               )
@@ -852,7 +851,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "Foo" .
               )
             ],
@@ -864,7 +863,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "Foo"@en .
               )
             ],
@@ -876,7 +875,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "Foo"@en .
               )
             ],
@@ -888,7 +887,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "Foo" .
               )
             ],
@@ -900,7 +899,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value <http://example/#foo> .
               )
             ],
@@ -912,7 +911,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value <http://example/#foo> .
               )
             ],
@@ -924,7 +923,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
               )
             ],
@@ -936,7 +935,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "2011-06-28Z"^^<http://www.w3.org/2001/XMLSchema#date> .
               )
             ],
@@ -948,7 +947,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#time> .
               )
             ],
@@ -960,7 +959,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "2011-06-28T00:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
               )
             ],
@@ -972,7 +971,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "2011-06-28T00:00:00-08:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
               )
             ],
@@ -985,7 +984,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-          
+
                 <http://example/> rdf:value "2012-03-18T00:00:00Z"^^xsd:string .
               )
             ],
@@ -997,7 +996,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "2011"^^<http://www.w3.org/2001/XMLSchema#gYear> .
               )
             ],
@@ -1009,7 +1008,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "2011-06"^^<http://www.w3.org/2001/XMLSchema#gYearMonth> .
               )
             ],
@@ -1021,7 +1020,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "P2011Y06M28DT00H00M00S"^^<http://www.w3.org/2001/XMLSchema#duration> .
               )
             ],
@@ -1033,7 +1032,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "foo" .
               )
             ],
@@ -1045,7 +1044,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value "D-Day"@en .
               )
             ],
@@ -1058,7 +1057,7 @@ describe "RDF::RDFa::Reader" do
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-          
+
                 <http://example/> rdf:value "this" .
               )
             ],
@@ -1070,7 +1069,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value <http://example/#foo> .
               )
             ],
@@ -1082,7 +1081,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value [] .
               )
             ],
@@ -1094,7 +1093,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/#foo> rdf:value " Bar ", "Bar" .
               )
             ],
@@ -1108,7 +1107,7 @@ describe "RDF::RDFa::Reader" do
               ),
               %q(
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-          
+
                 <http://example/> rdf:value <http://example/#foo>, "Bar" .
               )
             ],
@@ -1295,7 +1294,7 @@ describe "RDF::RDFa::Reader" do
                 ) + expected1
                 expect(parse(input, host_language: :xhtml1)).to be_equivalent_graph(expected1, logger: logger, format: :ttl)
               end
-            
+
               it "xhtml5" do
                 expected5 = %(
                   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -1307,7 +1306,7 @@ describe "RDF::RDFa::Reader" do
             end
           end
         end
-        
+
         context "@role" do
           {
             "with @id" => [
@@ -1521,7 +1520,7 @@ describe "RDF::RDFa::Reader" do
           expect(parse(svg)).to pass_query(query, logger: logger)
         end
       end
-      
+
       context "script" do
         {
           "text/turtle" => [
@@ -1731,7 +1730,7 @@ describe "RDF::RDFa::Reader" do
           )
           expect(parse(html, rdfagraph: :processor)).to pass_query(query, logger: logger)
         end
-        
+
         it "generates rdfa:UnresolvedCURIE on missing CURIE definition" do
           html = %(<!DOCTYPE html>
             <div property="rdf:value" resource="[undefined:curie]">Undefined Curie</div>
@@ -1749,7 +1748,7 @@ describe "RDF::RDFa::Reader" do
           )
           expect(parse(html, rdfagraph: :processor)).to pass_query(query, logger: logger)
         end
-        
+
         %w(
           \x01foo
           foo\x01
@@ -1777,7 +1776,7 @@ describe "RDF::RDFa::Reader" do
             expect(parse(html, rdfagraph: :processor)).to pass_query(query, logger: logger)
           end
         end
-        
+
         it "generates rdfa:UnresolvedTerm on missing Term definition" do
           html = %(<!DOCTYPE html>
             <div property="undefined_term">Undefined Term</div>

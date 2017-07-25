@@ -20,7 +20,7 @@ RSpec::Matchers.define :have_xpath do |path, value, logger|
       @result.to_s == value
     end
   end
-  
+
   failure_message do |actual|
     msg = "expected that #{path.inspect}\nwould be: #{value.inspect}"
     msg += "\n     was: #{@result}"
@@ -82,7 +82,7 @@ RSpec::Matchers.define :pass_query do |expected, info|
     "\n#{@expected}" +
     "\nResults:\n#{@actual.dump(:ttl, standard_prefixes: true)}" +
     "\nDebug:\n#{trace}"
-  end  
+  end
 
   failure_message_when_negated do |actual|
     trace = case @info.logger
@@ -102,5 +102,5 @@ RSpec::Matchers.define :pass_query do |expected, info|
     "\n#{@expected}" +
     "\nResults:\n#{@actual.dump(:ttl, standard_prefixes: true)}" +
     "\nDebug:\n#{trace}"
-  end  
+  end
 end

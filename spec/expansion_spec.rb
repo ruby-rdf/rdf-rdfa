@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 
 class EXP < RDF::Vocabulary("http://example.org/vocab#")
   property :name, subPropertyOf: "foaf:name", type: "rdf:Property"
@@ -38,11 +37,11 @@ class ExpansionTester
   def add_debug(node, message = "", &block)
     log_debug(node, message, &block)
   end
-  
+
   def add_warning(node, message, process_class = RDF::RDFA.Warning)
     log_warn(node, message, &block)
   end
-  
+
   def load(elements)
     @options = {}
     result = nil
@@ -67,10 +66,10 @@ class ExpansionTester
         )
       end
     end
-    
+
     result
   end
-  
+
   def parse(ttl)
     RDF::Graph.new << RDF::Turtle::Reader.new(ttl, prefixes: {
       dc:   RDF::Vocab::DC.to_uri,
@@ -246,7 +245,7 @@ describe RDF::RDFa::Expansion do
       end
     end
   end
-  
+
   describe :copy_properties do
     {
       "simple" => {
@@ -283,7 +282,7 @@ describe RDF::RDFa::Expansion do
       expect(parse(rdfa)).to be_equivalent_graph("", logger: logger)
     end
   end
-  
+
   context "with graph not referencing vocabularies" do
     it "returns unexpanded input" do
       rdfa = %(
@@ -314,7 +313,7 @@ describe RDF::RDFa::Expansion do
       expect(parse(rdfa)).to pass_query(query, logger: logger)
     end
   end
-  
+
   context "with @vocab" do
     it "returns unexpanded input", pending: "vocabulary change?" do
       rdfa = %(
@@ -368,7 +367,7 @@ describe RDF::RDFa::Expansion do
       end
     end
   end
-  
+
   context "rdfa:Pattern" do
     {
       "to single id" =>
@@ -501,7 +500,7 @@ describe RDF::RDFa::Expansion do
             ?a schema:name "Amanda" .
           }
         )
-          
+
       ],
     }.each do |title, (input, query)|
       it title do
