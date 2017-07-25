@@ -63,7 +63,9 @@ module RDF::RDFa
     # @return [Array<URI>]
     attr :heading_predicates
 
-    HAML_OPTIONS = {}
+    HAML_OPTIONS = {
+      format: :xhtml
+    }
 
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
@@ -629,7 +631,7 @@ module RDF::RDFa
       end
     end
 
-    # Haml rendering helper. Display value for object, may be humanized into a non-canonical form 
+    # Haml rendering helper. Display value for object, may be humanized into a non-canonical form
     #
     # @param [RDF::Literal] literal
     # @return [String]
