@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'rdf/spec/format'
 
 describe RDF::RDFa::Format do

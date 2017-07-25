@@ -31,7 +31,7 @@ module RDF::RDFa
     include RDF::Util::Logger
 
     XHTML = "http://www.w3.org/1999/xhtml"
-    
+
     # Content model for @about and @resource. In RDFa 1.0, this was URIorSafeCURIE
     SafeCURIEorCURIEorIRI = {
       :"rdfa1.0" => [:safe_curie, :uri, :bnode],
@@ -83,17 +83,17 @@ module RDF::RDFa
     # @!attribute [r] host_language
     # @return [:xml, :xhtml1, :xhtml5, :html4, :html5, :svg]
     attr_reader :host_language
-    
+
     # Version
     # @!attribute [r] version
     # @return [:"rdfa1.0", :"rdfa1.1"]
     attr_reader :version
-    
+
     # Repository used for collecting triples.
     # @!attribute [r] repository
     # @return [RDF::Repository]
     attr_reader :repository
-    
+
     # Returns the XML implementation module for this reader instance.
     #
     # @!attribute [rw] implementation
@@ -124,7 +124,7 @@ module RDF::RDFa
       # @!attribute [rw] parent_subject
       # @return [RDF::URI]
       attr_accessor :parent_subject
-      
+
       ##
       # The parent object.
       #
@@ -138,14 +138,14 @@ module RDF::RDFa
       # @!attribute [rw] parent_object
       # @return [RDF::URI]
       attr_accessor :parent_object
-      
+
       ##
       # A list of current, in-scope URI mappings.
       #
       # @!attribute [rw] uri_mappings
       # @return [Hash{Symbol => String}]
       attr_accessor :uri_mappings
-      
+
       ##
       # A list of current, in-scope Namespaces. This is the subset of uri_mappings
       # which are defined using xmlns.
@@ -153,7 +153,7 @@ module RDF::RDFa
       # @!attribute [rw] namespaces
       # @return [Hash{String => Namespace}]
       attr_accessor :namespaces
-      
+
       ##
       # A list of incomplete triples.
       #
@@ -165,14 +165,14 @@ module RDF::RDFa
       # @!attribute [rw] incomplete_triples
       # @return [Array<Array<RDF::URI, RDF::Resource>>]
       attr_accessor :incomplete_triples
-      
+
       ##
       # The language. Note that there is no default language.
       #
       # @!attribute [rw] language
       # @return [Symbol]
       attr_accessor :language
-      
+
       ##
       # The term mappings, a list of terms and their associated URIs.
       #
@@ -183,7 +183,7 @@ module RDF::RDFa
       # @!attribute [rw] term_mappings
       # @return [Hash{Symbol => RDF::URI}]
       attr_accessor :term_mappings
-      
+
       ##
       # The default vocabulary
       #
@@ -230,7 +230,7 @@ module RDF::RDFa
         @namespaces = from.namespaces.clone
         @list_mapping = from.list_mapping # Don't clone
       end
-      
+
       def inspect
         v = ['base', 'parent_subject', 'parent_object', 'language', 'default_vocabulary'].map do |a|
           "#{a}=#{o = self.send(a); o.respond_to?(:to_ntriples) ? o.to_ntriples : o.inspect}"
@@ -431,7 +431,7 @@ module RDF::RDFa
               add_debug(el, "=> no reader found")
             end
           end
-        
+
           # Look for Embedded RDF/XML
           unless @root.xpath("//rdf:RDF", "rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
             extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
@@ -449,7 +449,7 @@ module RDF::RDFa
               @repository << statement
             end
           end
-        
+
           # Look for Embedded microdata
           unless @root.xpath("//@itemscope").empty?
             begin
@@ -466,7 +466,7 @@ module RDF::RDFa
 
           # Perform vocabulary expansion
           expand(@repository) if @options[:vocab_expansion]
-        
+
           @processed = true
         end
 
@@ -505,7 +505,7 @@ module RDF::RDFa
       end
       enum_for(:each_triple)
     end
-    
+
     private
 
     # Keep track of allocated BNodes
@@ -513,12 +513,12 @@ module RDF::RDFa
       @bnode_cache ||= {}
       @bnode_cache[value.to_s] ||= RDF::Node.new(value)
     end
-    
+
     # Figure out the document path, if it is an Element or Attribute
     def node_path(node)
       "<#{base_uri}>#{node.respond_to?(:display_path) ? node.display_path : node}"
     end
-    
+
     # Add debug event to debug array, if specified
     #
     # @param [#display_path, #to_s] node XML Node or string for showing context
@@ -531,15 +531,15 @@ module RDF::RDFa
     def add_info(node, message, process_class = RDF::RDFA.Info, &block)
       add_processor_message(node, message, process_class, &block)
     end
-    
+
     def add_warning(node, message, process_class = RDF::RDFA.Warning)
       add_processor_message(node, message, process_class)
     end
-    
+
     def add_error(node, message, process_class = RDF::RDFA.Error)
       add_processor_message(node, message, process_class)
     end
-    
+
     def add_processor_message(node, message, process_class, &block)
       case process_class
       when RDF::RDFA.Error    then log_error(node_path(node), message, &block)
@@ -564,7 +564,7 @@ module RDF::RDFa
             RDF::Statement.new(nc, RDF::PTR.expression, node.path, graph_name: RDF::RDFA.ProcessorGraph)
           ]
         end
-        
+
         @repository.insert(*processor_statements)
         if cb = @options[:processor_callback]
           processor_statements.each {|s| cb.call(s)}
@@ -603,7 +603,7 @@ module RDF::RDFa
 
       # initialize the evaluation context with the appropriate base
       evaluation_context = EvaluationContext.new(base, @host_defaults)
-      
+
       if @version != :"rdfa1.0"
         # Process default vocabularies
         load_initial_contexts(@host_defaults[:initial_contexts]) do |which, value|
@@ -615,11 +615,11 @@ module RDF::RDFa
           end
         end
       end
-      
+
       traverse(root, evaluation_context)
       add_debug("", "parse_whole_doc: traversal complete'")
     end
-  
+
     # Parse and process URI mappings, Term mappings and a default vocabulary from @context
     #
     # Yields each mapping
@@ -737,7 +737,7 @@ module RDF::RDFa
         add_error(element, "Can't parse nil element")
         return nil
       end
-      
+
       add_debug(element) { "ec: #{evaluation_context.inspect}" }
 
       # local variables [7.5 Step 1]
@@ -819,12 +819,12 @@ module RDF::RDFa
           "[Step 2] default_vocaulary: #{default_vocabulary.inspect}"
         }
       end
-      
+
       # Local term mappings [7.5 Step 3]
       # Next, the current element is then examined for URI mapping s and these are added to the local list of URI mappings.
       # Note that a URI mapping will simply overwrite any current mapping in the list that has the same name
       extract_mappings(element, uri_mappings, namespaces)
-    
+
       # Language information [7.5 Step 4]
       language = element.language || language
       language = nil if language.to_s.empty?
@@ -856,14 +856,14 @@ module RDF::RDFa
                           term_mappings: term_mappings,
                           vocab: default_vocabulary,
                           restrictions: TERMorCURIEorAbsIRI.fetch(@version, []))
-    
+
       add_debug(element) do
         "rels: #{rels.join(" ")}, revs: #{revs.join(" ")}"
       end unless (rels + revs).empty?
 
       if !(attrs[:rel] || attrs[:rev])
         # Establishing a new subject if no rel/rev [7.5 Step 5]
-        
+
         if @version == :"rdfa1.0"
           new_subject = if attrs[:about]
             process_uri(element, attrs[:about], evaluation_context, base,
@@ -1001,7 +1001,7 @@ module RDF::RDFa
         new_subject ||= process_uri(element, attrs[:src], evaluation_context, base,
                                   uri_mappings: uri_mappings,
                                   restrictions: [:uri]) if @version == :"rdfa1.0"
-      
+
         # if the @typeof attribute is present, set typed resource to new subject
         typed_resource = new_subject if attrs[:typeof]
 
@@ -1020,7 +1020,7 @@ module RDF::RDFa
           evaluation_context.parent_object
           # no skip flag set this time
         end
-      
+
         # Then the current object resource is set to the URI obtained from the first match from the following rules:
         current_object_resource = process_uri(element, attrs[:resource], evaluation_context, base,
                       uri_mappings: uri_mappings,
@@ -1046,7 +1046,7 @@ module RDF::RDFa
           "typed_resource: #{typed_resource.to_ntriples rescue 'nil'}, "
         }
       end
-    
+
       # [Step 7] If in any of the previous steps a typed resource was set to a non-null value, it is now used to provide a subject for type values;
       if typed_resource
         # Typeof is TERMorCURIEorAbsIRIs
@@ -1094,7 +1094,7 @@ module RDF::RDFa
             add_triple(element, new_subject, r, current_object_resource)
           end
         end
-      
+
         revs.each do |r|
           add_triple(element, current_object_resource, r, new_subject)
         end
@@ -1102,7 +1102,7 @@ module RDF::RDFa
         # Incomplete triples and bnode creation [Step 10]
         add_debug(element) {"[Step 10] incompletes: rels: #{rels}, revs: #{revs}"}
         current_object_resource = RDF::Node.new
-      
+
         # predicate: full IRI
         # direction: forward/reverse
         # lists: Save into list, don't generate triple
@@ -1120,12 +1120,12 @@ module RDF::RDFa
             incomplete_triples << {predicate: r, direction: :forward}
           end
         end
-      
+
         revs.each do |r|
           incomplete_triples << {predicate: r, direction: :reverse}
         end
       end
-    
+
       # Establish current object literal [Step 11]
       #
       # If the current element has a @inlist attribute, add the property to the
@@ -1279,11 +1279,11 @@ module RDF::RDFa
             add_debug(element)  {"[Step 11] add #{current_property_value.to_ntriples} to #{p.to_ntriples} #{list_mapping[p].inspect}"}
             list_mapping[p] << current_property_value
           elsif new_subject
-            add_triple(element, new_subject, p, current_property_value) 
+            add_triple(element, new_subject, p, current_property_value)
           end
         end
       end
-    
+
       if !skip and new_subject && !evaluation_context.incomplete_triples.empty?
         # Complete the incomplete triples from the evaluation context [Step 12]
         add_debug(element) do
@@ -1341,12 +1341,12 @@ module RDF::RDFa
           new_ec.list_mapping = list_mapping
           add_debug(element, "[Step 13] new ec")
         end
-      
+
         element.children.each do |child|
           # recurse only if it's an element
           traverse(child, new_ec) if child.element?
         end
-        
+
         # Step 14: after traversing through child elements, for each list associated with
         # a property
         (list_mapping || {}).each do |p, l|
@@ -1456,7 +1456,7 @@ module RDF::RDFa
         add_warning(element, "Relative URI #{value}")
       end
     end
-    
+
     # [7.4.3] General Use of Terms in Attributes
     def process_term(element, value, options)
       if options[:vocab]
@@ -1465,7 +1465,7 @@ module RDF::RDFa
       elsif options[:term_mappings].is_a?(Hash)
         # If the term is in the local term mappings, use the associated URI (case sensitive).
         return uri(options[:term_mappings][value.to_s.to_sym]) if options[:term_mappings].has_key?(value.to_s.to_sym)
-      
+
         # Otherwise, check for case-insensitive match
         options[:term_mappings].each_pair do |term, uri|
           return uri(uri) if term.to_s.downcase == value.to_s.downcase

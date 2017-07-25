@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'rdf/spec/reader'
 
 unless ENV['CI']  # Skip for continuous integration
@@ -7,7 +6,7 @@ unless ENV['CI']  # Skip for continuous integration
     # W3C Test suite from http://www.w3.org/2006/07/SWD/RDFa/testsuite/
     describe "w3c test cases" do
       require 'suite_helper'
-    
+
       Fixtures::TestCase::HOST_LANGUAGE_VERSION_SETS.each do |(host_language, version)|
         describe "for #{host_language} #{version}" do
           %w(required optional buggy).each do |classification|

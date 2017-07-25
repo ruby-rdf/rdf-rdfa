@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'rdf/xsd'
 require 'rdf/spec/writer'
 require 'rspec/matchers'
@@ -15,7 +14,7 @@ describe RDF::RDFa::Writer do
   before(:each) do
     @graph = RDF::Repository.new
   end
-  
+
   describe ".for" do
     [
       :rdfa,
@@ -173,7 +172,7 @@ describe RDF::RDFa::Writer do
           end
         end
       end
-      
+
       context "property and rel serialize to different elements" do
         subject do
           @graph << [EX.a, RDF.value, "foo"]
@@ -314,7 +313,7 @@ describe RDF::RDFa::Writer do
           end
         end
       end
-      
+
       context "xsd:string" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", datatype: RDF::XSD.string)]
@@ -331,7 +330,7 @@ describe RDF::RDFa::Writer do
           end
         end
       end
-      
+
       context "unknown" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", datatype: EX.unknown)]
@@ -349,7 +348,7 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "multi-valued literals", skip: ("Not unless Nokogiri loaded" if !defined?(Nokogiri)) do
       subject do
         @graph << [EX.a, EX.b, "c"]
@@ -366,7 +365,7 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "resource objects" do
       subject do
         @graph << [EX.a, EX.b, EX.c]
@@ -383,7 +382,7 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "multi-valued resource objects", skip: ("Not unless Nokogiri loaded" if !defined?(Nokogiri)) do
       subject do
         @graph << [EX.a, EX.b, EX.c]
@@ -401,14 +400,14 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "lists" do
       {
         "empty list" => [
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value () .
           ),
           {
@@ -420,7 +419,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value ("Foo") .
           ),
           {
@@ -432,7 +431,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value (<foo>) .
           ),
           {
@@ -444,7 +443,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value ("Foo" <foo>) .
           ),
           {
@@ -458,7 +457,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value ("Foo" "Bar"), "Baz" .
           ),
           {
@@ -471,7 +470,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value (<foo> <bar>) .
           ),
           {
@@ -483,7 +482,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <foo> rdf:value ("Foo"), ("Bar") .
           ),
           {
@@ -579,7 +578,7 @@ describe RDF::RDFa::Writer do
   def parse(input, options = {})
     reader_class = RDF::Reader.for(options[:format]) if options[:format]
     reader_class ||= options.fetch(:reader, RDF::Reader.for(detect_format(input)))
-  
+
     graph = RDF::Repository.new
     reader_class.new(input, options).each do |statement|
       graph << statement

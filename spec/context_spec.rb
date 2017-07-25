@@ -1,29 +1,28 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 
 describe RDF::RDFa::Context do
   describe ".new" do
     describe "foaf" do
       subject { RDF::RDFa::Context.new("http://example/") }
-      
+
       it "has a URI" do
         expect(subject.uri).to eq RDF::URI("http://example/")
       end
-      
+
       it "has no terms" do
         expect(subject.terms).to be_empty
       end
-      
+
       it "has no vocabulary" do
         expect(subject.vocabulary).to be_nil
       end
-      
+
       it "has no prefixes" do
         expect(subject.prefixes).to be_empty
       end
     end
   end
-  
+
   describe ".find" do
     describe "rdfa-1.1" do
       subject { RDF::RDFa::Context.find("http://www.w3.org/2011/rdfa-context/rdfa-1.1") }
@@ -31,7 +30,7 @@ describe RDF::RDFa::Context do
       it "has 3 terms" do
         expect(subject.terms.keys.length).to eq 3
       end
-      
+
       it "uses symbols for term lookup" do
         expect(subject.terms.keys).to be_all {|k| k.is_a?(Symbol)}
       end

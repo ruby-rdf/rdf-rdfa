@@ -1,5 +1,4 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$:.unshift File.dirname(__FILE__)
 
 require "bundler/setup"
 require 'rubygems'
@@ -8,9 +7,10 @@ require 'yaml'
 require 'rdf/isomorphic'
 require 'rdf/spec'
 require 'rdf/spec/matchers'
-require 'matchers'
 require 'rdf/turtle'
 require 'rdf/vocab'
+require_relative 'matchers'
+
 begin
   require 'nokogiri'
 rescue LoadError
