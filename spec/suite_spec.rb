@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'rdf/spec/reader'
 
 unless ENV['CI']  # Skip for continuous integration

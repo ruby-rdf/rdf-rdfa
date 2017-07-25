@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 
 class EXP < RDF::Vocabulary("http://example.org/vocab#")
   property :name, subPropertyOf: "foaf:name", type: "rdf:Property"

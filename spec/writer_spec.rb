@@ -1,5 +1,4 @@
-$:.unshift "."
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'rdf/xsd'
 require 'rdf/spec/writer'
 require 'rspec/matchers'
