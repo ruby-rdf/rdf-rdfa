@@ -85,7 +85,7 @@ module RDF::RDFa
           end
           ns_decls
         end
-        
+
         ##
         # Children of this node
         #
@@ -93,7 +93,7 @@ module RDF::RDFa
         def children
           NodeSetProxy.new(@node.children, self)
         end
-        
+
         # Ancestors of this element, in order
         def ancestors
           @ancestors ||= parent ? parent.ancestors + [parent] : []
@@ -166,7 +166,7 @@ module RDF::RDFa
           @node.send(method, *args)
         end
       end
-      
+
       ##
       # NodeSet proxy
       class NodeSetProxy
@@ -214,7 +214,7 @@ module RDF::RDFa
         else
           # Try to detect charset from input
           options[:encoding] ||= input.charset if input.respond_to?(:charset)
-          
+
           # Otherwise, default is utf-8
           options[:encoding] ||= 'utf-8'
 
@@ -306,19 +306,19 @@ module RDF::RDFa
       end
 
       # Accessor methods to mask native elements & attributes
-      
+
       ##
       # Return proxy for document root
       def root
         @root ||= NodeProxy.new(@doc.root) if @doc && @doc.root
       end
-      
+
       ##
       # Document errors
       def doc_errors
         []
       end
-      
+
       ##
       # Find value of document base
       #
@@ -334,7 +334,7 @@ module RDF::RDFa
           xml_base = root.attribute("base", RDF::XML.to_s) if root
           base = xml_base if xml_base
         end
-        
+
         base || @base_uri
       end
     end

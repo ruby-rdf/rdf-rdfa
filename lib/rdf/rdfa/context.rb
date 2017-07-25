@@ -19,7 +19,7 @@ module RDF::RDFa
     # @!attribute [r] terms
     # @return [Hash{Symbol => RDF::URI}]
     attr_reader :terms
-    
+
     # Default URI defined for this vocabulary
     # @!attribute [r] vocabulary
     # @return [RDF::URI]
@@ -29,7 +29,7 @@ module RDF::RDFa
     # @!attribute [r] uri
     # @return [RDF::URI]
     attr_reader :uri
-    
+
     ##
     # Initialize a new context from the given URI.
     #
@@ -46,11 +46,11 @@ module RDF::RDFa
       @terms = options.fetch(:terms, {})
       @vocabulary = options[:vocabulary]
       @options = options.dup
-      
+
       yield(self) if block_given?
       self
     end
-    
+
     ##
     # @return [RDF::Util::Cache]
     # @private
@@ -67,7 +67,7 @@ module RDF::RDFa
     def self.repository
       @repository ||= RDF::Repository.new(title: "RDFa Contexts")
     end
-    
+
     ##
     # Set repository used for saving contexts
     # @param [RDF::Repository] repo
@@ -82,14 +82,14 @@ module RDF::RDFa
       end
       @repository = repo
     end
-    
+
     # Return a context faulting through the cache
     # @return [RDF::RDFa::Context]
     def self.find(uri)
       uri = RDF::URI.intern(uri)
-      
+
       return cache[uri] unless cache[uri].nil?
-      
+
       # Two part creation to prevent re-entrancy problems if p1 => p2 and p2 => p1
       # Return something to make the caller happy if we're re-entered
       cache[uri] = Struct.new(:prefixes, :terms, :vocabulary).new({}, {}, nil)
@@ -112,12 +112,12 @@ module RDF::RDFa
       uri = RDF::URI.intern(uri)
       repository.load(uri.to_s, base_uri: uri, graph_name: uri) unless repository.has_graph?(uri)
     end
-    
+
     # @return [RDF::Repository]
     def repository
       Context.repository
     end
-    
+
     ##
     # Defines the given named URI prefix for this context.
     #
@@ -151,7 +151,7 @@ module RDF::RDFa
       name = name.to_s.empty? ? nil : (name.respond_to?(:to_sym) ? name.to_sym : name.to_s.to_sym)
       uri.nil? ? terms[name] : terms[name] = uri
     end
-    
+
     ##
     # Extract vocabulary, prefix mappings and terms from a enumerable object into an instance
     #
@@ -179,14 +179,14 @@ module RDF::RDFa
         log_debug("process_context: uri=#{uri.inspect}, term=#{term.inspect}, prefix=#{prefix.inspect}, vocabulary=#{vocab.inspect}") if respond_to?(:log_debug)
 
         @vocabulary = vocab if vocab
-        
+
         # For every extracted triple that is the common subject of an rdfa:prefix and an rdfa:uri
         # predicate, create a mapping from the object literal of the rdfa:prefix predicate to the
         # object literal of the rdfa:uri predicate. Add or update this mapping in the local list of
         # URI mappings after transforming the 'prefix' component to lower-case.
         # For every extracted
         prefix(prefix.downcase, uri) if uri && prefix && prefix != "_"
-      
+
         # triple that is the common subject of an rdfa:term and an rdfa:uri predicate, create a
         # mapping from the object literal of the rdfa:term predicate to the object literal of the
         # rdfa:uri predicate. Add or update this mapping in the local term mappings.

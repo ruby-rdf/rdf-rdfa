@@ -108,7 +108,7 @@ module RDF::RDFa
       def consequent(subject, prediate, object)
         consequents << RDF::Query::Pattern.new(subject, prediate, object)
       end
-      
+
       ##
       # Execute the rule against queryable, yielding each consequent with bindings
       #
@@ -227,7 +227,7 @@ module RDF::RDFa
             to_add << statement
           end
         end
-        
+
         repository.insert(*to_add)
       end
     end
@@ -250,7 +250,7 @@ module RDF::RDFa
             to_add << statement
           end
         end
-        
+
         repository.insert(*to_add)
       end
 

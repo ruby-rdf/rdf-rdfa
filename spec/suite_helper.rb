@@ -23,7 +23,7 @@ module RDF::Util
     # @return [IO] File stream
     # @yield [IO] File stream
     def self.open_file(filename_or_url, options = {}, &block)
-      case 
+      case
       when filename_or_url.to_s =~ /^file:/
         path = filename_or_url[5..-1]
         Kernel.open(path.to_s, options, &block)
@@ -119,7 +119,7 @@ module Fixtures
       else               RDF::URI(base)
       end
     end
-    
+
     def results(host_language, version)
       RDF::URI(self.property('results').to_s.
         sub('test-cases/', "test-cases/#{version}/#{host_language}/"))

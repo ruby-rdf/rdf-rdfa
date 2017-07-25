@@ -82,7 +82,7 @@ module RDF::RDFa
         def namespaces
           @node.namespace_definitions.inject({}) {|memo, ns| memo[ns.prefix] = ns.href.to_s; memo }
         end
-        
+
         ##
         # Children of this node
         #
@@ -168,7 +168,7 @@ module RDF::RDFa
         else
           # Try to detect charset from input
           options[:encoding] ||= input.charset if input.respond_to?(:charset)
-          
+
           # Otherwise, default is utf-8
           options[:encoding] ||= 'utf-8'
           options[:encoding] = options[:encoding].to_s if options[:encoding]
@@ -277,13 +277,13 @@ module RDF::RDFa
       end
 
       # Accessor methods to mask native elements & attributes
-      
+
       ##
       # Return proxy for document root
       def root
         @root ||= NodeProxy.new(@doc.root) if @doc && @doc.root
       end
-      
+
       ##
       # Document errors
       def doc_errors
@@ -295,7 +295,7 @@ module RDF::RDFa
           @doc.errors.reject {|e| e.to_s =~ /(?:Tag \w+ invalid)|(?:Missing attribute name)/}
         end
       end
-      
+
       ##
       # Find value of document base
       #
@@ -305,13 +305,13 @@ module RDF::RDFa
         # find if the document has a base element
         case @host_language
         when :xhtml1, :xhtml5, :html4, :html5
-          base_el = @doc.at_css("html>head>base") 
+          base_el = @doc.at_css("html>head>base")
           base = base_el.attribute("href").to_s.split("#").first if base_el
         else
           xml_base = root.attribute_with_ns("base", RDF::XML.to_s) if root
           base = xml_base if xml_base
         end
-        
+
         base
       end
     end
