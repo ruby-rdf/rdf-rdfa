@@ -10,7 +10,6 @@ Gem::Specification.new do |gem|
   gem.license               = 'Unlicense'
   gem.summary               = "RDFa reader/writer for RDF.rb."
   gem.description           = "RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite."
-  gem.rubyforge_project     = 'rdf-rdfa'
 
   gem.authors               = %w(Gregg Kellogg)
   gem.email                 = 'public-rdf-ruby@w3.org'
