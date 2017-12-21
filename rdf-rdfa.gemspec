@@ -33,7 +33,7 @@ Gem::Specification.new do |gem|
 
   #gem.add_development_dependency 'json-ld',             '~> 3.0'
   gem.add_development_dependency 'json-ld',             '>= 2.1', '< 4.0'
-  gem.add_development_dependency 'rspec',               '~> 3.5'
+  gem.add_development_dependency 'rspec',               '~> 3.7'
   gem.add_development_dependency 'rspec-its',           '~> 1.2'
   #gem.add_development_dependency 'rdf-spec',            '~> 3.0'
   #gem.add_development_dependency 'rdf-tabular',         '~> 3.0'
@@ -49,7 +49,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rdf-vocab',           '>= 2.2', '< 4.0'
   gem.add_development_dependency 'rdf-isomorphic',      '>= 2.2', '< 4.0'
   gem.add_development_dependency 'sparql',              '>= 2.2', '< 4.0'
-  gem.add_development_dependency 'yard' ,               '~> 0.9'
+  gem.add_development_dependency 'yard' ,               '~> 0.9.12'
 
   gem.post_install_message  = nil
 end
