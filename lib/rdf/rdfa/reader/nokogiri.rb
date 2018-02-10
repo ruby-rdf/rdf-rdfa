@@ -180,7 +180,7 @@ module RDF::RDFa
             begin
               require 'nokogumbo' unless defined?(::Nokogumbo)
               input = input.read if input.respond_to?(:read)
-              ::Nokogiri::HTML5(input.force_encoding(options[:encoding]))
+              ::Nokogiri::HTML5(input.force_encoding(options[:encoding]), max_parse_errors: 1000)
             rescue LoadError
               ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
             end

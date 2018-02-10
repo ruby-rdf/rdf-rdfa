@@ -5,12 +5,12 @@ gemspec
 gem "rdf",            github: "ruby-rdf/rdf",      branch: "develop"
 gem "rdf-spec",       github: "ruby-rdf/rdf-spec", branch: "develop"
 gem "rdf-xsd",        github: "ruby-rdf/rdf-xsd",  branch: "develop"
-gem "nokogiri",       '~> 1.6'
-gem "nokogumbo",      '~> 1.4'
+gem "nokogiri",       '~> 1.8'
+gem "nokogumbo",      '~> 1.5'
 gem 'equivalent-xml', '~> 0.5'
 
 group :development, :test do
-  gem 'ebnf',               github: "gkellogg/ebnf",                branch: "develop"
+  gem 'ebnf',               github: "dryruby/ebnf",                 branch: "develop"
   gem 'json-ld',            github: "ruby-rdf/json-ld",             branch: "develop"
   gem 'rdf-aggregate-repo', github: "ruby-rdf/rdf-aggregate-repo",  branch: "develop"
   gem 'rdf-isomorphic',     github: "ruby-rdf/rdf-isomorphic",      branch: "develop"
