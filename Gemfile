@@ -5,8 +5,8 @@ gemspec
 gem "rdf",            github: "ruby-rdf/rdf",      branch: "develop"
 gem "rdf-spec",       github: "ruby-rdf/rdf-spec", branch: "develop"
 gem "rdf-xsd",        github: "ruby-rdf/rdf-xsd",  branch: "develop"
-gem "nokogiri",       '~> 1.6'
-gem "nokogumbo",      '~> 1.4'
+gem "nokogiri",       '~> 1.8'
+gem "nokogumbo",      '~> 1.4.13' # 1.5 not catching errors
 gem 'equivalent-xml', '~> 0.5'
 
 group :development, :test do
