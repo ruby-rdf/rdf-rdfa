@@ -428,30 +428,58 @@ describe "RDF::RDFa::Reader" do
           end
         end
 
-        it "html>head>base" do
-          html = %(<?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
-            <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
-                xmlns:dc="http://purl.org/dc/elements/1.1/">
-             <head>
-                <base href="http://example/"></base>
-                <title>Test 0072</title>
-             </head>
-             <body>
-                <p about="faq">
-                   Learn more by reading the example.org
-                   <span property="dc:title">Example FAQ</span>.
-                </p>
-             </body>
-            </html>
+        describe "html>head>base" do
+          it "uses absolute base" do
+            html = %(<?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+              <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
+                  xmlns:dc="http://purl.org/dc/elements/1.1/">
+               <head>
+                  <base href="http://example/"></base>
+                  <title>Test 0072</title>
+               </head>
+               <body>
+                  <p about="faq">
+                     Learn more by reading the example.org
+                     <span property="dc:title">Example FAQ</span>.
+                  </p>
+               </body>
+              </html>
+              )
+            expected = %q(
+              @prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+              <http://example/faq> dc:title "Example FAQ" .
             )
-          expected = %q(
-            @prefix dc: <http://purl.org/dc/elements/1.1/> .
 
-            <http://example/faq> dc:title "Example FAQ" .
-          )
+            expect(parse(html, base_uri: 'http://example.org/')).to be_equivalent_graph(expected, logger: logger, format: :ttl)
+          end
 
-          expect(parse(html)).to be_equivalent_graph(expected, logger: logger, format: :ttl)
+          it "uses relative base" do
+            html = %(<?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.1//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-2.dtd">
+              <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1"
+                  xmlns:dc="http://purl.org/dc/elements/1.1/">
+               <head>
+                  <base href="foo/"></base>
+                  <title>Test 0072</title>
+               </head>
+               <body>
+                  <p about="faq">
+                     Learn more by reading the example.org
+                     <span property="dc:title">Example FAQ</span>.
+                  </p>
+               </body>
+              </html>
+              )
+            expected = %q(
+              @prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+              <http://example.org/foo/faq> dc:title "Example FAQ" .
+            )
+
+            expect(parse(html, base_uri: 'http://example.org/')).to be_equivalent_graph(expected, logger: logger, format: :ttl)
+          end
         end
 
         describe "xml:base" do
