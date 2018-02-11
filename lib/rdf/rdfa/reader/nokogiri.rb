@@ -306,10 +306,10 @@ module RDF::RDFa
         case @host_language
         when :xhtml1, :xhtml5, :html4, :html5
           base_el = @doc.at_css("html>head>base")
-          base = base_el.attribute("href").to_s.split("#").first if base_el
+          base = base.join(base_el.attribute("href").to_s.split("#").first) if base_el
         else
           xml_base = root.attribute_with_ns("base", RDF::XML.to_s) if root
-          base = xml_base if xml_base
+          base = base.join(xml_base) if xml_base
         end
 
         base
