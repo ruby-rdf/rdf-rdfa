@@ -414,7 +414,9 @@ module RDF::RDFa
             rescue LoadError
             end
 
-            if reader = RDF::Reader.for(content_type: type.to_s)
+            @readers ||= {}
+            reader = @readers[type.to_s] = RDF::Reader.for(content_type: type.to_s) unless @readers.has_key?(type.to_s)
+            if reader = @readers[type.to_s]
               add_debug(el, "=> reader #{reader.to_sym}")
               # Wrap input in a RemoteDocument with appropriate content-type and base
               doc = if input.is_a?(String)
