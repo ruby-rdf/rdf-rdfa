@@ -24,7 +24,8 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'rdf',                 '~> 3.0'
   gem.add_runtime_dependency     'haml',                '~> 5.0'
   gem.add_runtime_dependency     'rdf-xsd',             '~> 3.0'
-  gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.0'
+  #gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.0'
+  gem.add_runtime_dependency     'rdf-aggregate-repo',  '>= 2.2', '< 4.0'
   gem.add_runtime_dependency     'htmlentities',        '~> 4.3'
 
   #gem.add_development_dependency 'json-ld',             '~> 3.0'
