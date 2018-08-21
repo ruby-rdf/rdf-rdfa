@@ -39,6 +39,8 @@ module RDF::RDFa
           language = case
           when @node.attribute("lang", RDF::XML.to_s)
             @node.attribute("lang", RDF::XML.to_s)
+          when @node.attribute("xml:lang")
+            @node.attribute("xml:lang").to_s
           when @node.attribute("lang")
             @node.attribute("lang").to_s
           end
@@ -49,7 +51,7 @@ module RDF::RDFa
         #
         # @return [String]
         def base
-          @node.attribute("base", RDF::XML.to_s)
+          @node.attribute("base", RDF::XML.to_s) || @node.attribute('xml:base')
         end
 
         def display_path
@@ -238,8 +240,6 @@ module RDF::RDFa
           doc_type_string = input.doctype.to_s
           version_attr = input.root && input.root.attribute("version").to_s
           root_element = input.root.name.downcase
-          root_namespace = input.root.namespace.to_s
-          root_attrs = input.root.attributes
           content_type = "application/xhtml+html" # FIXME: what about other possible XML types?
         else
           content_type = input.content_type if input.respond_to?(:content_type)
@@ -257,7 +257,7 @@ module RDF::RDFa
           doc_type_string = head.match(%r(<!DOCTYPE[^>]*>)m).to_s
           root = head.match(%r(<[^!\?>]*>)m).to_s
           root_element = root.match(%r(^<(\S+)[ >])) ? $1 : ""
-          version_attr = root.match(/version\s+=\s+(\S+)[\s">]/m) ? $1 : ""
+          version_attr = root.match(/version\s*=\s*"([^"]+)"/m) ? $1 : ""
           head_element = head.match(%r(<head.*<\/head>)mi)
           head_doc = ::REXML::Document.new(head_element.to_s)
 
@@ -331,7 +331,7 @@ module RDF::RDFa
           base_el = ::REXML::XPath.first(@doc, "/html/head/base") rescue nil
           base = base.join(base_el.attribute("href").to_s.split("#").first) if base_el
         else
-          xml_base = root.attribute("base", RDF::XML.to_s) if root
+          xml_base = root.attribute("base", RDF::XML.to_s) || root.attribute('xml:base') if root
           base = base.join(xml_base) if xml_base
         end
 

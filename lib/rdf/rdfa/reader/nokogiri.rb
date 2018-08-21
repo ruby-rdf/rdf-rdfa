@@ -35,12 +35,10 @@ module RDF::RDFa
         # @return [String]
         def language
           language = case
-          when @node.document.is_a?(::Nokogiri::HTML::Document) && @node.attributes["xml:lang"]
-            @node.attributes["xml:lang"].to_s
-          when @node.document.is_a?(::Nokogiri::HTML::Document) && @node.attributes["lang"]
-            @node.attributes["lang"].to_s
           when @node.attribute_with_ns("lang", RDF::XML.to_s)
             @node.attribute_with_ns("lang", RDF::XML.to_s)
+          when @node.attribute("xml:lang")
+            @node.attribute("xml:lang").to_s
           when @node.attribute("lang")
             @node.attribute("lang").to_s
           end
@@ -51,7 +49,7 @@ module RDF::RDFa
         #
         # @return [String]
         def base
-          @node.attribute_with_ns("base", RDF::XML.to_s)
+          @node.attribute_with_ns("base", RDF::XML.to_s) || @node.attribute('xml:base')
         end
 
         def display_path
@@ -202,8 +200,6 @@ module RDF::RDFa
           doc_type_string = input.children.detect {|c| c.is_a?(::Nokogiri::XML::DTD)}
           version_attr = input.root && input.root.attribute("version").to_s
           root_element = input.root.name.downcase
-          root_namespace = input.root.namespace.to_s
-          root_attrs = input.root.attributes
           content_type = case
           when root_element == "html" && input.is_a?(::Nokogiri::HTML::Document)
             "text/html"
@@ -226,7 +222,7 @@ module RDF::RDFa
           doc_type_string = head.match(%r(<!DOCTYPE[^>]*>)m).to_s
           root = head.match(%r(<[^!\?>]*>)m).to_s
           root_element = root.match(%r(^<(\S+)[ >])) ? $1 : ""
-          version_attr = root.match(/version\s+=\s+(\S+)[\s">]/m) ? $1 : ""
+          version_attr = root.match(/version\s*=\s*"([^"]+)"/m) ? $1 : ""
           head_element = head.match(%r(<head.*<\/head>)mi)
           head_doc = ::Nokogiri::HTML.parse(head_element.to_s)
 
@@ -308,7 +304,7 @@ module RDF::RDFa
           base_el = @doc.at_css("html>head>base")
           base = base.join(base_el.attribute("href").to_s.split("#").first) if base_el
         else
-          xml_base = root.attribute_with_ns("base", RDF::XML.to_s) if root
+          xml_base = root.attribute_with_ns("base", RDF::XML.to_s) || root.attribute('xml:base') if root
           base = base.join(xml_base) if xml_base
         end
 
