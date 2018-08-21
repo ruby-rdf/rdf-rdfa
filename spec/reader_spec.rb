@@ -1681,6 +1681,103 @@ describe "RDF::RDFa::Reader" do
                 gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
             )
           ],
+          "application/ld+json with doc base" => [
+            %q(
+              <script type="application/ld+json"><![CDATA[
+                {
+                  "@context": {
+                    "foo": "http://example/xyz#",
+                    "gr": "http://purl.org/goodrelations/v1#",
+                    "xsd": "http://www.w3.org/2001/XMLSchema#",
+                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+                  },
+                  "@id": "myCompany",
+                  "@type": "gr:BusinessEntity",
+                  "rdfs:seeAlso": {"@id": "http://example/xyz"},
+                  "gr:hasLegalName": "Hepp Industries Ltd."
+                }
+              ]]></script>
+            ),
+            %q(
+              @prefix foo:  <http://example/xyz#> .
+              @prefix gr:   <http://purl.org/goodrelations/v1#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              <http://example/myCompany>
+                a gr:BusinessEntity ;
+                rdfs:seeAlso <http://example/xyz> ;
+                gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+            )
+          ],
+          "application/ld+json with base element" => [
+            %q(
+              <html>
+              <head>
+              <base href="http://example.org/" />
+              <script type="application/ld+json"><![CDATA[
+                {
+                  "@context": {
+                    "foo": "http://example/xyz#",
+                    "gr": "http://purl.org/goodrelations/v1#",
+                    "xsd": "http://www.w3.org/2001/XMLSchema#",
+                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+                  },
+                  "@id": "myCompany",
+                  "@type": "gr:BusinessEntity",
+                  "rdfs:seeAlso": {"@id": "http://example/xyz"},
+                  "gr:hasLegalName": "Hepp Industries Ltd."
+                }
+              ]]></script>
+              </head>
+              </html>
+            ),
+            %q(
+              @prefix foo:  <http://example/xyz#> .
+              @prefix gr:   <http://purl.org/goodrelations/v1#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              <http://example.org/myCompany>
+                a gr:BusinessEntity ;
+                rdfs:seeAlso <http://example/xyz> ;
+                gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+            )
+          ],
+          "application/ld+json with @xml:base" => [
+            %q(
+              <html xmlns="http://www.w3.org/1999/xhtml" version="XHTML+RDFa 1.1">
+              <head>
+                <meta http-equiv="content-type" content="application/xhtml+xml"/>
+              <script xml:base="http://example.org/" type="application/ld+json"><![CDATA[
+                {
+                  "@context": {
+                    "foo": "http://example/xyz#",
+                    "gr": "http://purl.org/goodrelations/v1#",
+                    "xsd": "http://www.w3.org/2001/XMLSchema#",
+                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+                  },
+                  "@id": "myCompany",
+                  "@type": "gr:BusinessEntity",
+                  "rdfs:seeAlso": {"@id": "http://example/xyz"},
+                  "gr:hasLegalName": "Hepp Industries Ltd."
+                }
+              ]]></script>
+              </head>
+              </html>
+            ),
+            %q(
+              @prefix foo:  <http://example/xyz#> .
+              @prefix gr:   <http://purl.org/goodrelations/v1#> .
+              @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+              @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+              <http://example.org/myCompany>
+                a gr:BusinessEntity ;
+                rdfs:seeAlso <http://example/xyz> ;
+                gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
+            )
+          ],
           "application/ld+json with junk" => [
             %q(
               <script type="application/ld+json"><![CDATA[
@@ -1711,7 +1808,7 @@ describe "RDF::RDFa::Reader" do
                 gr:hasLegalName "Hepp Industries Ltd."^^xsd:string .
             )
           ]
-        }.each do |title, (input,result)|
+        }.each do |title, (input, result)|
           it title do
             expect(parse(input, base_uri: "http://example/")).to be_equivalent_graph(result, logger: logger)
           end

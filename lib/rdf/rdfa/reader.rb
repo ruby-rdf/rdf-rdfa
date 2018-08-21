@@ -382,6 +382,38 @@ module RDF::RDFa
     end
 
     ##
+    # Extracts RDF from script element, or embeded RDF/XML
+    def extract_script(el, input, type, **options, &block)
+      add_debug(el, "script element of type #{type}")
+      begin
+        # Formats don't exist unless they've been required
+        case type.to_s
+        when 'application/csvm+json' then require 'rdf/tabular'
+        when 'application/ld+json'   then require 'json/ld'
+        when 'application/rdf+xml'   then require 'rdf/rdfxml'
+        when 'text/ntriples'         then require 'rdf/ntriples'
+        when 'text/turtle'           then require 'rdf/turtle'
+        end
+      rescue LoadError
+      end
+
+      @readers ||= {}
+      reader = @readers[type.to_s] = RDF::Reader.for(content_type: type.to_s) unless @readers.has_key?(type.to_s)
+      if reader = @readers[type.to_s]
+        add_debug(el, "=> reader #{reader.to_sym}")
+        # Wrap input in a RemoteDocument with appropriate content-type and base
+        doc = if input.is_a?(String)
+          RDF::Util::File::RemoteDocument.new(input, content_type: type.to_s, **options)
+        else
+          input
+        end
+        reader.new(doc, options).each(&block)
+      else
+        add_debug(el, "=> no reader found")
+      end
+    end
+
+    ##
     # Iterates the given block for each RDF statement in the input.
     #
     # Reads to graph and performs expansion if required.
@@ -400,54 +432,9 @@ module RDF::RDFa
           # parse
           parse_whole_document(@doc, RDF::URI(base_uri))
 
-          def extract_script(el, input, type, options, &block)
-            add_debug(el, "script element of type #{type}")
-            begin
-              # Formats don't exist unless they've been required
-              case type.to_s
-              when 'application/csvm+json' then require 'rdf/tabular'
-              when 'application/ld+json'   then require 'json/ld'
-              when 'application/rdf+xml'   then require 'rdf/rdfxml'
-              when 'text/ntriples'         then require 'rdf/ntriples'
-              when 'text/turtle'           then require 'rdf/turtle'
-              end
-            rescue LoadError
-            end
-
-            @readers ||= {}
-            reader = @readers[type.to_s] = RDF::Reader.for(content_type: type.to_s) unless @readers.has_key?(type.to_s)
-            if reader = @readers[type.to_s]
-              add_debug(el, "=> reader #{reader.to_sym}")
-              # Wrap input in a RemoteDocument with appropriate content-type and base
-              doc = if input.is_a?(String)
-                RDF::Util::File::RemoteDocument.new(input,
-                                                    options.merge(
-                                                      content_type: type.to_s,
-                                                      base_uri: base_uri
-                                                    ))
-              else
-                input
-              end
-              reader.new(doc, options).each(&block)
-            else
-              add_debug(el, "=> no reader found")
-            end
-          end
-
           # Look for Embedded RDF/XML
           unless @root.xpath("//rdf:RDF", "rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#").empty?
-            extract_script(@root, @doc, "application/rdf+xml", @options) do |statement|
-              @repository << statement
-            end
-          end
-
-          # Look for Embedded scripts
-          @root.css("script[type]").each do |el|
-            type = el.attribute("type")
-
-            text = el.inner_html.sub(%r(\A\s*\<!\[CDATA\[)m, '').sub(%r(\]\]>\s*\Z)m, '')
-
-            extract_script(el, text, type, @options) do |statement|
+            extract_script(@root, @doc, "application/rdf+xml", @options.merge(base_uri: base_uri)) do |statement|
               @repository << statement
             end
           end
@@ -777,6 +764,7 @@ module RDF::RDFa
         rev
         role
         src
+        type
         typeof
         value
         vocab
@@ -831,6 +819,15 @@ module RDF::RDFa
       language = element.language || language
       language = nil if language.to_s.empty?
       add_debug(element) {"HTML5 [3.2.3.3] lang: #{language.inspect}"} if language
+
+      # Embedded scripts
+      if element.name == 'script'
+        text = element.inner_html.sub(%r(\A\s*\<!\[CDATA\[)m, '').sub(%r(\]\]>\s*\Z)m, '')
+
+        extract_script(element, text, attrs[:type], @options.merge(base_uri: base)) do |statement|
+          @repository << statement
+        end
+      end
 
       # From HTML5, if the property attribute and the rel and/or rev attribute exists on the same element, the non-CURIE and non-URI rel and rev values are ignored. If, after this, the value of rel and/or rev becomes empty, then the processor must act as if the respective attribute is not present.
       if [:html5, :xhtml5].include?(@host_language) && attrs[:property] && (attrs[:rel] || attrs[:rev])
