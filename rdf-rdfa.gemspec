@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
   gem.requirements          = []
 
   gem.add_runtime_dependency     'rdf',             '~> 1.99'
-  gem.add_runtime_dependency     'haml',            '~> 4.0'
+  gem.add_runtime_dependency     'haml',            '>= 4.0', '< 6.0'
   gem.add_runtime_dependency     'rdf-xsd',         '~> 1.1'
   gem.add_runtime_dependency     'rdf-aggregate-repo', '~> 1.1'
   gem.add_runtime_dependency     'htmlentities',    '~> 4.3'
@@ -42,4 +42,3 @@ Gem::Specification.new do |gem|
 
   gem.post_install_message  = nil
 end
-

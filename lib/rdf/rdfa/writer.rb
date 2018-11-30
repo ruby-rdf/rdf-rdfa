@@ -62,9 +62,8 @@ module RDF::RDFa
     # @return [Array<URI>]
     attr :heading_predicates
 
-    HAML_OPTIONS = {
-      ugly: false, # to preserve whitespace without using entities
-    }
+    # to preserve whitespace without using entities
+    HAML_OPTIONS = Gem.loaded_specs['haml'].version > Gem::Version.create('5.0') ? { ugly: false } : {}
 
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
@@ -624,7 +623,7 @@ module RDF::RDFa
       end
     end
 
-    # Haml rendering helper. Display value for object, may be humanized into a non-canonical form 
+    # Haml rendering helper. Display value for object, may be humanized into a non-canonical form
     #
     # @param [RDF::Literal] literal
     # @return [String]
