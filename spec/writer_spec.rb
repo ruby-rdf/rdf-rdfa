@@ -11,10 +11,12 @@ describe RDF::RDFa::Writer do
     let(:writer) {RDF::RDFa::Writer.new}
   end
 
+  let(:haml_options) { described_class::HAML_OPTIONS }
+
   before(:each) do
     @graph = RDF::Repository.new
   end
-  
+
   describe ".for" do
     formats = [
       :rdfa,
@@ -56,7 +58,7 @@ describe RDF::RDFa::Writer do
     context "plain literal" do
       subject do
         @graph << [EX.a, EX.b, "foo"]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: haml_options)
       end
 
       {
@@ -109,7 +111,7 @@ describe RDF::RDFa::Writer do
         subject do
           @graph << [EX.a, RDF.type, EX.t1]
           @graph << [EX.a, RDF.type, EX.t2]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: haml_options)
         end
 
         {
@@ -171,7 +173,7 @@ describe RDF::RDFa::Writer do
           end
         end
       end
-      
+
       context "property and rel serialize to different elements" do
         subject do
           @graph << [EX.a, RDF.value, "foo"]
@@ -215,7 +217,7 @@ describe RDF::RDFa::Writer do
           context v do
             subject {
               @graph << [EX.a, EX.b, RDF::Literal::Date.new(v)]
-              serialize(haml_options: {ugly: false})
+              serialize(haml_options: haml_options)
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
@@ -250,7 +252,7 @@ describe RDF::RDFa::Writer do
           context v do
             subject {
               @graph << [EX.a, EX.b, RDF::Literal::Time.new(v)]
-              serialize(haml_options: {ugly: false})
+              serialize(haml_options: haml_options)
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
@@ -285,7 +287,7 @@ describe RDF::RDFa::Writer do
           context v do
             subject {
               @graph << [EX.a, EX.b, RDF::Literal::DateTime.new(v)]
-              serialize(haml_options: {ugly: false})
+              serialize(haml_options: haml_options)
             }
             matches.each do |path, value|
               it "returns #{value.inspect} for xpath #{path}" do
@@ -299,7 +301,7 @@ describe RDF::RDFa::Writer do
       context "rdf:XMLLiteral" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal::XML.new("E = mc<sup>2</sup>: The Most Urgent Problem of Our Time")]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: haml_options)
         end
 
         {
@@ -312,7 +314,7 @@ describe RDF::RDFa::Writer do
           end
         end
       end
-      
+
       context "xsd:string" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", datatype: RDF::XSD.string)]
@@ -329,11 +331,11 @@ describe RDF::RDFa::Writer do
           end
         end
       end
-      
+
       context "unknown" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", datatype: EX.unknown)]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: haml_options)
         end
 
         {
@@ -347,12 +349,12 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "multi-valued literals" do
       subject do
         @graph << [EX.a, EX.b, "c"]
         @graph << [EX.a, EX.b, "d"]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: haml_options)
       end
 
       {
@@ -364,11 +366,11 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "resource objects" do
       subject do
         @graph << [EX.a, EX.b, EX.c]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: haml_options)
       end
 
       {
@@ -381,12 +383,12 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "multi-valued resource objects" do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.a, EX.b, EX.d]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: haml_options)
       end
 
       {
@@ -399,14 +401,14 @@ describe RDF::RDFa::Writer do
         end
       end
     end
-    
+
     context "lists" do
       {
         "empty list" => [
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value () .
           ),
           {
@@ -418,7 +420,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value ("Foo") .
           ),
           {
@@ -430,7 +432,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value (<foo>) .
           ),
           {
@@ -442,7 +444,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value ("Foo" <foo>) .
           ),
           {
@@ -456,7 +458,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value ("Foo" "Bar"), "Baz" .
           ),
           {
@@ -469,7 +471,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <> rdf:value (<foo> <bar>) .
           ),
           {
@@ -481,7 +483,7 @@ describe RDF::RDFa::Writer do
           %q(
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-            
+
             <foo> rdf:value ("Foo"), ("Bar") .
           ),
           {
@@ -511,7 +513,7 @@ describe RDF::RDFa::Writer do
           pending("Serializing multiple lists") if test == "multiple collections"
           skip "REXML" if test == 'issue 14' && !Module.constants.include?(:Nokogiri)
           @graph = parse(input, format: :ttl)
-          html = serialize(haml_options: {ugly: false})
+          html = serialize(haml_options: haml_options)
           result.each do |path, value|
             expect(html).to have_xpath(path, value, @debug)
           end
@@ -523,7 +525,7 @@ describe RDF::RDFa::Writer do
       subject do
         @graph << [EX.a, EX.b, EX.c]
         @graph << [EX.c, EX.d, EX.e]
-        serialize(haml_options: {ugly: false})
+        serialize(haml_options: haml_options)
       end
 
       {
@@ -558,7 +560,7 @@ describe RDF::RDFa::Writer do
                 end
                 input = t.input("html5", "rdfa1.1")
                 @graph = RDF::Repository.load(t.input("html5", "rdfa1.1"))
-                result = serialize(haml: template, haml_options: {ugly: false})
+                result = serialize(haml: template, haml_options: haml_options)
                 graph2 = parse(result, format: :rdfa)
                 # Need to put this in to avoid problems with added markup
                 statements = graph2.query(object: RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
@@ -577,7 +579,7 @@ describe RDF::RDFa::Writer do
   def parse(input, options = {})
     reader_class = RDF::Reader.for(options[:format]) if options[:format]
     reader_class ||= options.fetch(:reader, RDF::Reader.for(detect_format(input)))
-  
+
     graph = RDF::Repository.new
     reader_class.new(input, options).each do |statement|
       graph << statement

@@ -54,7 +54,7 @@ module Fixtures
       else               RDF::URI(base)
       end
     end
-    
+
     def results(host_language, version)
       RDF::URI(self.property('results').to_s.
         sub('test-cases/', "test-cases/#{version}/#{host_language}/"))
@@ -65,6 +65,6 @@ module Fixtures
     end
   end
 
-  manifest = RDFA_INFO.join("manifest.json")
+  manifest = RDFA_INFO.join("manifest.jsonld")
   TestCase.from_jsonld(RDF::Util::File.open_file(manifest) {|f| JSON.load(f.read)})
 end
