@@ -24,6 +24,11 @@ group :debug do
   gem "ruby-debug", platforms: :jruby
 end
 
+platforms :mri_20 do
+  # public_suffix requires Ruby version >= 2.1
+  gem 'public_suffix', '~> 2.0'
+end
+
 platforms :rbx do
   gem 'rubysl', '~> 2.0'
   gem 'rubinius', '~> 2.0'
