@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.platform              = Gem::Platform::RUBY
   gem.files                 = %w(AUTHORS README UNLICENSE VERSION) + Dir.glob('lib/**/*.rb')
   gem.require_paths         = %w(lib)
-  gem.has_rdoc              = false
 
   gem.required_ruby_version = '>= 1.9.3'
   gem.requirements          = []
