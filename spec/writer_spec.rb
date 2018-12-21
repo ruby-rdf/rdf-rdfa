@@ -94,7 +94,7 @@ describe RDF::RDFa::Writer do
       context "typed resource" do
         subject do
           @graph << [EX.a, RDF.type, EX.Type]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: haml_options)
         end
 
         {
@@ -318,7 +318,7 @@ describe RDF::RDFa::Writer do
       context "xsd:string" do
         subject do
           @graph << [EX.a, EX.b, RDF::Literal.new("Albert Einstein", datatype: RDF::XSD.string)]
-          serialize(haml_options: {ugly: false})
+          serialize(haml_options: haml_options)
         end
 
         {
