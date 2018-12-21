@@ -63,7 +63,7 @@ module RDF::RDFa
     attr :heading_predicates
 
     # to preserve whitespace without using entities
-    HAML_OPTIONS = Gem.loaded_specs['haml'].version > Gem::Version.create('5.0') ? { ugly: false } : {}
+    HAML_OPTIONS = Gem.loaded_specs['haml'].version < Gem::Version.create('5.0') ? { ugly: false } : {}
 
     # @return [Graph] Graph of statements serialized
     attr_accessor :graph
