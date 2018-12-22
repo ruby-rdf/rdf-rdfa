@@ -10,14 +10,11 @@ gemfile:
   - Gemfile
   - Gemfile-pure
 rvm:
-  - 1.9.3
   - 2.0
   - 2.1
   - 2.2.2
   - 2.2
   - 2.3
-  - 2.4
-  - 2.5
   - jruby
   - jruby-9
   - rbx-2
