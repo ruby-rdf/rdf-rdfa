@@ -16,7 +16,7 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 * Fully compliant RDFa 1.1 parser.
 * Template-based Writer to generate XHTML+RDFa.
   * Writer uses user-replacable [Haml][Haml]-based templates to generate RDFa.
-* If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise. For HTML5, include the [Nokogumbo][] gem for are pure-HTML5 parser with better error detection.
+* If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise. For HTML5, include the [Nokogumbo][] gem for a pure-HTML5 parser with better error detection.
 
 Install with `gem install rdf-rdfa`
 

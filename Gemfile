@@ -22,6 +22,9 @@ group :development, :test do
   gem 'sparql',             github: "ruby-rdf/sparql",              branch: "develop"
   gem 'sparql-client',      github: "ruby-rdf/sparql-client",       branch: "develop"
   gem 'sxp',                github: "dryruby/sxp.rb",               branch: "develop"
+
+  # Until version >= 3.4.2 with support for Ruby 2.6
+  gem "webmock",        git: "https://github.com/bblimke/webmock"
 end
 
 group :test do
