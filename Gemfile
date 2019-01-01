@@ -22,9 +22,6 @@ group :development, :test do
   gem 'sparql',             github: "ruby-rdf/sparql",              branch: "develop"
   gem 'sparql-client',      github: "ruby-rdf/sparql-client",       branch: "develop"
   gem 'sxp',                github: "dryruby/sxp.rb",               branch: "develop"
-
-  # Until version >= 3.4.2 with support for Ruby 2.6
-  gem "webmock",        git: "https://github.com/bblimke/webmock"
 end
 
 group :test do
@@ -33,19 +30,11 @@ group :test do
   gem 'psych',          platforms: [:mri, :rbx]
 end
 
-# Bundle gems for the local environment. Make sure to
-# put test-only gems in this group so their generators
-# and rake tasks are available in development mode:
 group :debug do
   gem "syntax"
   gem "byebug", platforms: :mri
   gem "ruby-debug", platforms: :jruby
   gem "rake"
-end
-
-platforms :rbx do
-  gem 'rubysl', '~> 2.0'
-  gem 'rubinius', '~> 2.0'
 end
 
 platforms :jruby do
