@@ -17,8 +17,8 @@ def run_tc(tc, options)
 
   if options[:verbose]
     puts("\nTestCase: #{tc.inspect}") 
-    puts("\nInput:\n" + Kernel.open(input_uri) {|f| f.read}) 
-    puts("\nQuery:\n" + Kernel.open(results_uri) {|f| f.read})
+    puts("\nInput:\n" + RDF::Util::File.open_file(input_uri) {|f| f.read}) 
+    puts("\nQuery:\n" + RDF::Util::File.open_file(results_uri) {|f| f.read})
   end
 
   pg = RDF::Graph.new if options[:processor_graph]
@@ -36,7 +36,7 @@ def run_tc(tc, options)
       options[opt] = arg
     end
 
-    reader = RDF::RDFa::Reader.new(Kernel.open(input_uri), options)
+    reader = RDF::RDFa::Reader.open(input_uri, options)
 
     graph = RDF::Repository.new << reader
   rescue Exception => e
@@ -50,10 +50,10 @@ def run_tc(tc, options)
     end
   end
   
-  puts("\nResult:\n" + graph.dump(options[:format])) unless options[:quiet]
+  puts("\nResult:\n" + graph.dump(options[:format], validate: false)) unless options[:quiet]
   
   begin
-    result = SPARQL::Grammar.parse(Kernel.open(results_uri)).execute(graph)
+    result = SPARQL::Grammar.open(results_uri).execute(graph)
   rescue Exception => e
     options[:result_count]["exception"] ||= 0
     options[:result_count]["exception"] += 1
@@ -116,7 +116,7 @@ def help(options)
   puts "      --quiet:              Minimal output"
   puts "      --validate:           Validate input"
   puts "      --verbose:            Verbose processing"
-  puts "      --version:            Version of processor to use (rdf1.0, rdf1.1). Defaults to #{options[:version]}"
+  puts "      --version:            Version of processor to use (rdfa1.0, rdfa1.1). Defaults to #{options[:version]}"
   puts "      --help,-?:            This message"
   exit(0)
 end
