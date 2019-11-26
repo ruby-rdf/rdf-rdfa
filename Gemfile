@@ -6,7 +6,7 @@ gem "rdf",            github: "ruby-rdf/rdf",      branch: "develop"
 gem "rdf-spec",       github: "ruby-rdf/rdf-spec", branch: "develop"
 gem "rdf-xsd",        github: "ruby-rdf/rdf-xsd",  branch: "develop"
 gem "nokogiri",       '~> 1.8'
-gem "nokogumbo",      '~> 1.5'
+gem "nokogumbo",      '~> 2.0'
 gem 'equivalent-xml', '~> 0.5'
 
 group :development, :test do
