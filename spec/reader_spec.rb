@@ -1715,7 +1715,7 @@ describe "RDF::RDFa::Reader" do
               <html>
               <head>
               <base href="http://example.org/" />
-              <script type="application/ld+json"><![CDATA[
+              <script type="application/ld+json">
                 {
                   "@context": {
                     "foo": "http://example/xyz#",
@@ -1728,7 +1728,7 @@ describe "RDF::RDFa::Reader" do
                   "rdfs:seeAlso": {"@id": "http://example/xyz"},
                   "gr:hasLegalName": "Hepp Industries Ltd."
                 }
-              ]]></script>
+              </script>
               </head>
               </html>
             ),
@@ -2662,9 +2662,9 @@ describe "RDF::RDFa::Reader" do
     end
   end
 
-  def parse(input, options = {})
+  def parse(input, **options)
     graph = RDF::Graph.new
-    RDF::RDFa::Reader.new(input, options.merge(logger: logger, library: @library)).each do |statement|
+    RDF::RDFa::Reader.new(input, logger: logger, library: @library, **options).each do |statement|
       graph << statement rescue fail "SPEC: #{$!}"
     end
     graph

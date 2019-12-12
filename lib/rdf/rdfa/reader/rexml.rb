@@ -208,7 +208,7 @@ module RDF::RDFa
       #
       # @param  [Hash{Symbol => Object}] options
       # @return [void]
-      def initialize_xml(input, options = {})
+      def initialize_xml(input, **options)
         require 'rexml/document' unless defined?(::REXML)
         @doc = case input
         when ::REXML::Document
@@ -229,7 +229,7 @@ module RDF::RDFa
       end
 
       # Determine the host language and/or version from options and the input document
-      def detect_host_language_version(input, options)
+      def detect_host_language_version(input, **options)
         @host_language = options[:host_language] ? options[:host_language].to_sym : nil
         @version = options[:version] ? options[:version].to_sym : nil
         return if @host_language && @version

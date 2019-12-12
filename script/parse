@@ -13,7 +13,7 @@ end
 require 'getoptlong'
 require 'open-uri'
 
-def run(input, options)
+def run(input, **options)
   reader_class = RDF::Reader.for(options[:input_format].to_sym)
   raise "Reader not found for #{$input_format}" unless reader_class
   
@@ -25,7 +25,7 @@ def run(input, options)
   num = 0
 
   if options[:output_format] == :ntriples || options[:quiet]
-    reader_class.new(input, options).each do |statement|
+    reader_class.new(input, **options).each do |statement|
       num += 1
       if options[:quiet]
         #print "."
@@ -34,12 +34,12 @@ def run(input, options)
       end
     end
   elsif options[:output_format] == :inspect
-    reader_class.new(input, options).each do |statement|
+    reader_class.new(input, **options).each do |statement|
       num += 1
       options[:output].puts statement.inspect
     end
   else
-    r = reader_class.new(input, options)
+    r = reader_class.new(input, **options)
     g = RDF::Repository.new << r
     num = g.count
     STDERR.puts "graph: #{g.dump(:ttl)}" if options[:verbose]
@@ -111,7 +111,7 @@ end
 if ARGV.empty?
   s = input ? input : $stdin.read
   options[:base_uri] ||= "http://example.com/"
-  run(StringIO.new(s), options)
+  run(StringIO.new(s), **options)
 else
   ARGV.each do |test_file|
     tf_opt = options.dup

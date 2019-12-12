@@ -32,7 +32,7 @@ unless ENV['CI']  # Skip for continuous integration
 
                     validate = %w(0239 0279 0295 0284).none? {|n| t.input(host_language, version).to_s.include?(n)}
                     graph = RDF::Repository.new
-                    RDF::Reader.open(t.input(host_language, version), options.merge(validate: validate)) do |reader|
+                    RDF::Reader.open(t.input(host_language, version), **options.merge(validate: validate)) do |reader|
                       expect(reader).to be_a RDF::RDFa::Reader
 
                       # Some allowances for REXML

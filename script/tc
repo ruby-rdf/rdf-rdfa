@@ -8,7 +8,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", 'spec', 'spec_h
 require File.expand_path(File.join(File.dirname(__FILE__), "..", 'spec', 'suite_helper'))
 require 'getoptlong'
 
-def run_tc(tc, options)
+def run_tc(tc, **options)
   input_uri = tc.input(options[:host_language], options[:version])
   results_uri = tc.results(options[:host_language], options[:version])
   res = nil
@@ -36,7 +36,7 @@ def run_tc(tc, options)
       options[opt] = arg
     end
 
-    reader = RDF::RDFa::Reader.open(input_uri, options)
+    reader = RDF::RDFa::Reader.open(input_uri, **options)
 
     graph = RDF::Repository.new << reader
   rescue Exception => e

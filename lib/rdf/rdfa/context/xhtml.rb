@@ -4,7 +4,7 @@
 class RDF::RDFa::Context
   def self.find_with_xhtml_rdfa_1_1(uri)
     if uri.to_s == "http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1"
-      @_xhtml_rdfa_1_1_prof ||= RDF::RDFa::Context.new(RDF::URI("http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1"), {
+      @_xhtml_rdfa_1_1_prof ||= RDF::RDFa::Context.new(RDF::URI("http://www.w3.org/2011/rdfa-context/xhtml-rdfa-1.1"),
         terms: {
           alternate:  "http://www.w3.org/1999/xhtml/vocab#alternate",
           appendix:   "http://www.w3.org/1999/xhtml/vocab#appendix",
@@ -32,7 +32,7 @@ class RDF::RDFa::Context
           top:        "http://www.w3.org/1999/xhtml/vocab#top",
           up:         "http://www.w3.org/1999/xhtml/vocab#up",
         },
-      })
+      )
     else
       find_without_xhtml_rdfa_1_1(uri)
     end

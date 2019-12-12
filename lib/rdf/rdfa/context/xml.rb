@@ -4,7 +4,7 @@
 class RDF::RDFa::Context
   def self.find_with_rdfa_1_1(uri)
     if uri.to_s == "http://www.w3.org/2011/rdfa-context/rdfa-1.1"
-      @_rdfa_1_1_prof ||= RDF::RDFa::Context.new(RDF::URI("http://www.w3.org/2011/rdfa-context/rdfa-1.1"), {
+      @_rdfa_1_1_prof ||= RDF::RDFa::Context.new(RDF::URI("http://www.w3.org/2011/rdfa-context/rdfa-1.1"),
         prefixes: {
           as:      "https://www.w3.org/ns/activitystreams#",
           cc:      "http://creativecommons.org/ns#",
@@ -15,7 +15,7 @@ class RDF::RDFa::Context
           dcat:    "http://www.w3.org/ns/dcat#",
           dcterms: "http://purl.org/dc/terms/",
           dqv:     "http://www.w3.org/ns/dqv#",
-          duv:     "https://www.w3.org/TR/vocab-duv#",
+          duv:     "https://www.w3.org/ns/duv#",
           foaf:    "http://xmlns.com/foaf/0.1/",
           gr:      "http://purl.org/goodrelations/v1#",
           grddl:   "http://www.w3.org/2003/g/data-view#",
@@ -57,7 +57,7 @@ class RDF::RDFa::Context
           license:     "http://www.w3.org/1999/xhtml/vocab#license",
           role:        "http://www.w3.org/1999/xhtml/vocab#role",
         },
-      })
+      )
     else
       find_without_rdfa_1_1(uri)
     end

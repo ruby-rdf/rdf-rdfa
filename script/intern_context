@@ -62,7 +62,7 @@ ARGV.each do |file|
 class RDF::RDFa::Context
   def self.find_with_#{context_short}(uri)
     if uri.to_s == "#{file}"
-      @_#{context_short}_prof ||= RDF::RDFa::Context.new(RDF::URI("#{file}"), {
+      @_#{context_short}_prof ||= RDF::RDFa::Context.new(RDF::URI("#{file}"),
 START
 
     output.puts %{#{preceeding}vocabulary: "#{context.vocabulary},"} if context.vocabulary
@@ -81,7 +81,7 @@ START
     end
     
     output.puts <<END
-      })
+      )
     else
       find_without_#{context_short}(uri)
     end

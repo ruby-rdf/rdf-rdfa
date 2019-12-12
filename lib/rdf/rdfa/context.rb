@@ -40,7 +40,7 @@ module RDF::RDFa
     # @yieldparam [RDF::RDFa::Context] context
     # @yieldreturn [void] ignored
     # @return [RDF::RDFa::Context]
-    def initialize(uri, options = {}, &block)
+    def initialize(uri, **options, &block)
       @uri = RDF::URI.intern(uri)
       @prefixes = options.fetch(:prefixes, {})
       @terms = options.fetch(:terms, {})
@@ -97,7 +97,7 @@ module RDF::RDFa
       cache[uri] = new(uri) do |context|
         log_debug("process_context: retrieve context <#{uri}>") if respond_to?(:log_debug)
         Context.load(uri)
-        context.parse(repository.query(graph_name: uri))
+        context.parse(repository.query({graph_name: uri}))
       end
     rescue Exception => e
       if respond_to?(:log_fatal)

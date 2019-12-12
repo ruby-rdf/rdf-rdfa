@@ -511,9 +511,7 @@ describe RDF::RDFa::Expansion do
     end
   end
 
-  def parse(input, options = {})
-    RDF::Graph.new << RDF::RDFa::Reader.new(input, options.merge(
-      logger: logger, vocab_expansion: true
-    ))
+  def parse(input, **options)
+    RDF::Graph.new << RDF::RDFa::Reader.new(input, logger: logger, vocab_expansion: true, **options)
   end
 end

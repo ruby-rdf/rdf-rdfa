@@ -17,7 +17,7 @@ module RDF::RDFa
       add_debug("expand") {"Repository has #{repository.count} statements"}
 
       # Load missing vocabularies
-      vocabs = repository.query(predicate: RDF::RDFA.usesVocabulary).to_a.map(&:object)
+      vocabs = repository.query({predicate: RDF::RDFA.usesVocabulary}).to_a.map(&:object)
       vocabs.map! do |vocab|
         begin
           # Create the name with a predictable name so that it is enumerated and can be found
