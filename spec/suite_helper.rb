@@ -45,12 +45,12 @@ module RDF::Util
         document_options[:headers][:content_type] = case filename_or_url.to_s
         when /\.html$/    then 'text/html'
         when /\.xhtml$/   then 'application/xhtml+xml'
-        when /\.xml$/    then 'application/xml'
-        when /\.svg$/    then 'image/svg+xml'
-        when /\.ttl$/    then 'text/turtle'
-        when /\.ttl$/    then 'text/turtle'
-        when /\.jsonld$/ then 'application/ld+json'
-        else                  'unknown'
+        when /\.xml$/     then 'application/xml'
+        when /\.svg$/     then 'image/svg+xml'
+        when /\.ttl$/     then 'text/turtle'
+        when /\.ttl$/     then 'text/turtle'
+        when /\.jsonld$/  then 'application/ld+json'
+        else                   'unknown'
         end
 
         document_options[:headers][:content_type] = response.content_type if response.respond_to?(:content_type)
