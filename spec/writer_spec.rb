@@ -564,7 +564,7 @@ describe RDF::RDFa::Writer do
             logger.info result.force_encoding("utf-8")
             graph2 = parse(result, format: :rdfa, logger: logger)
             # Need to put this in to avoid problems with added markup
-            statements = graph2.query(object: RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")).to_a
+            statements = graph2.query({object: RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")}).to_a
             statements.each {|st| graph2.delete(st)}
             #puts graph2.dump(:ttl)
             expect(graph2).to be_equivalent_graph(@graph, logger: logger)
@@ -575,20 +575,20 @@ describe RDF::RDFa::Writer do
   end unless ENV['CI'] # Not for continuous integration
 
   require 'rdf/turtle'
-  def parse(input, options = {})
+  def parse(input, **options)
     reader_class = RDF::Reader.for(options[:format]) if options[:format]
     reader_class ||= options.fetch(:reader, RDF::Reader.for(detect_format(input)))
 
     graph = RDF::Repository.new
-    reader_class.new(input, options).each do |statement|
+    reader_class.new(input, **options).each do |statement|
       graph << statement
     end
     graph
   end
 
   # Serialize  @graph to a string and compare against regexps
-  def serialize(options = {})
-    result = RDF::RDFa::Writer.buffer({logger: logger, standard_prefixes: true}.merge(options)) do |writer|
+  def serialize(**options)
+    result = RDF::RDFa::Writer.buffer(logger: logger, standard_prefixes: true, **options) do |writer|
       writer << @graph
     end
     require 'cgi'

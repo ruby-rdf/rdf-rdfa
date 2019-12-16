@@ -16,7 +16,7 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 * Fully compliant RDFa 1.1 parser.
 * Template-based Writer to generate XHTML+RDFa.
   * Writer uses user-replacable [Haml][Haml]-based templates to generate RDFa.
-* If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise. For HTML5, include the [Nokogumbo][] gem for are pure-HTML5 parser with better error detection.
+* If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise. For HTML5, include the [Nokogumbo][] gem for a pure-HTML5 parser with better error detection.
 
 Install with `gem install rdf-rdfa`
 
@@ -397,12 +397,12 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
-* [Ruby](http://ruby-lang.org/) (>= 2.2)
-* [RDF.rb](http://rubygems.org/gems/rdf) (~> 3.0)
-* [Haml](https://rubygems.org/gems/haml) (~> 5.0)
-* [HTMLEntities](https://rubygems.org/gems/htmlentities) (>= 4.3.1)
-* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.7.1)
-* Soft dependency on [Nokogumbo](https://github.com/rubys/nokogumbo) (>= 1.4.10)
+* [Ruby](http://ruby-lang.org/) (>= 2.4)
+* [RDF.rb](http://rubygems.org/gems/rdf) (~> 3.1)
+* [Haml](https://rubygems.org/gems/haml) (~> 5.1)
+* [HTMLEntities](https://rubygems.org/gems/htmlentities) (>= 4.3)
+* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.10)
+* Soft dependency on [Nokogumbo](https://github.com/rubys/nokogumbo) (>= 2.0)
 
 ## Documentation
 Full documentation available on [Rubydoc.info][RDFa doc]

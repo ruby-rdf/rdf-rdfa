@@ -22,7 +22,7 @@ module RDF::Util
     #   HTTP Request headers.
     # @return [IO] File stream
     # @yield [IO] File stream
-    def self.open_file(filename_or_url, options = {}, &block)
+    def self.open_file(filename_or_url, **options, &block)
       case
       when filename_or_url.to_s =~ /^file:/
         path = filename_or_url[5..-1]
@@ -45,26 +45,26 @@ module RDF::Util
         document_options[:headers][:content_type] = case filename_or_url.to_s
         when /\.html$/    then 'text/html'
         when /\.xhtml$/   then 'application/xhtml+xml'
-        when /\.xml$/    then 'application/xml'
-        when /\.svg$/    then 'image/svg+xml'
-        when /\.ttl$/    then 'text/turtle'
-        when /\.ttl$/    then 'text/turtle'
-        when /\.jsonld$/ then 'application/ld+json'
-        else                  'unknown'
+        when /\.xml$/     then 'application/xml'
+        when /\.svg$/     then 'image/svg+xml'
+        when /\.ttl$/     then 'text/turtle'
+        when /\.ttl$/     then 'text/turtle'
+        when /\.jsonld$/  then 'application/ld+json'
+        else                   'unknown'
         end
 
         document_options[:headers][:content_type] = response.content_type if response.respond_to?(:content_type)
         # For overriding content type from test data
         document_options[:headers][:content_type] = options[:contentType] if options[:contentType]
 
-        remote_document = RDF::Util::File::RemoteDocument.new(response.read, document_options)
+        remote_document = RDF::Util::File::RemoteDocument.new(response.read, **document_options)
         if block_given?
           yield remote_document
         else
           remote_document
         end
       else
-        original_open_file(filename_or_url, options, &block)
+        original_open_file(filename_or_url, **options, &block)
       end
     end
   end

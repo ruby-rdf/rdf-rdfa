@@ -116,7 +116,7 @@ module RDF::RDFa
     #   Options to pass to Haml::Engine.new.
     # @yield  [writer]
     # @yieldparam [RDF::Writer] writer
-    def initialize(output = $stdout, options = {}, &block)
+    def initialize(output = $stdout, **options, &block)
       super do
         @uri_to_term_or_curie = {}
         @uri_to_prefix = {}
@@ -175,7 +175,7 @@ module RDF::RDFa
       doc_title = nil
       titles = {}
       heading_predicates.each do |pred|
-        @graph.query(predicate: pred) do |statement|
+        @graph.query({predicate: pred}) do |statement|
           titles[statement.subject] ||= statement.object
         end
       end
@@ -220,14 +220,14 @@ module RDF::RDFa
     # @yieldreturn [:ignored]
     # @return String
     #   The rendered document is returned as a string
-    def render_document(subjects, options = {})
+    def render_document(subjects, **options)
       template = options[:haml] || :doc
       options = {
         prefix: nil,
         subjects: subjects,
         title: nil,
       }.merge(options)
-      hamlify(template, options) do |subject|
+      hamlify(template, **options) do |subject|
         yield(subject) if block_given?
       end.gsub(/^\s+$/m, '')
     end
@@ -265,7 +265,7 @@ module RDF::RDFa
     # @return String
     #   The rendered document is returned as a string
     # Return Haml template for document from `haml_template[:subject]`
-    def render_subject(subject, predicates, options = {})
+    def render_subject(subject, predicates, **options)
       template = options[:haml] || :subject
       options = {
         about:      (get_curie(subject) unless options[:rel]),
@@ -278,7 +278,7 @@ module RDF::RDFa
         subject:    subject,
         typeof:     nil,
       }.merge(options)
-      hamlify(template, options) do |predicate|
+      hamlify(template, **options) do |predicate|
         yield(predicate) if block_given?
       end
     end
@@ -303,7 +303,7 @@ module RDF::RDFa
     #   The block should only return a string for recursive object definitions.
     # @return String
     #   The rendered document is returned as a string
-    def render_property(predicate, objects, options = {}, &block)
+    def render_property(predicate, objects, **options, &block)
       log_debug {"render_property(#{predicate}): #{objects.inspect}, #{options.inspect}"}
       # If there are multiple objects, and no :property_values is defined, call recursively with
       # each object
@@ -319,7 +319,7 @@ module RDF::RDFa
       unless list_objects.empty?
         # Render non-list objects
         log_debug {"properties with lists: #{list_objects} non-lists: #{objects - list_objects}"}
-        nl = log_depth {render_property(predicate, objects - list_objects, options, &block)} unless objects == list_objects
+        nl = log_depth {render_property(predicate, objects - list_objects, **options, &block)} unless objects == list_objects
         return nl.to_s + list_objects.map do |object|
           # Render each list as multiple properties and set :inlist to true
           list = RDF::List.new(subject: object, graph: @graph)
@@ -327,7 +327,7 @@ module RDF::RDFa
 
           log_debug {"list: #{list.inspect} #{list.to_a}"}
           log_depth do
-            render_property(predicate, list.to_a, options.merge(inlist: "true")) do |object|
+            render_property(predicate, list.to_a, **options.merge(inlist: "true")) do |object|
               yield(object, true) if block_given?
             end
           end
@@ -337,7 +337,7 @@ module RDF::RDFa
       if objects.length > 1 && template.nil?
         # If there is no property_values template, render each property using property_value template
         objects.map do |object|
-          log_depth {render_property(predicate, [object], options, &block)}
+          log_depth {render_property(predicate, [object], **options, &block)}
         end.join(" ")
       else
         log_fatal("Missing property template", exception: RDF::WriterError) if template.nil?
@@ -406,7 +406,7 @@ module RDF::RDFa
       top_classes.
       select {|s| !seen.include?(s)}.
       each do |class_uri|
-        graph.query(predicate: RDF.type, object: class_uri).map {|st| st.subject}.sort.uniq.each do |subject|
+        graph.query({predicate: RDF.type, object: class_uri}).map {|st| st.subject}.sort.uniq.each do |subject|
           #log_debug {"order_subjects: #{subject.inspect}"}
           subjects << subject
           seen[subject] = true
@@ -490,7 +490,7 @@ module RDF::RDFa
     # @option options [RDF::Resource] :rel (nil)
     #   Optional @rel property
     # @return [String]
-    def subject(subject, options = {})
+    def subject(subject, **options)
       return if is_done?(subject)
 
       subject_done(subject)
@@ -503,14 +503,14 @@ module RDF::RDFa
 
       render_opts = {typeof: typeof, property_values: properties}.merge(options)
 
-      render_subject_template(subject, prop_list, render_opts)
+      render_subject_template(subject, prop_list, **render_opts)
     end
 
     # @param [RDF::Resource] subject
     # @return [Hash{String => Object}]
     def properties_for_subject(subject)
       properties = {}
-      @graph.query(subject: subject) do |st|
+      @graph.query({subject: subject}) do |st|
         key = st.predicate.to_s.freeze
         properties[key] ||= []
         properties[key] << st.object
@@ -545,7 +545,7 @@ module RDF::RDFa
     # @param [Array] prop_list
     # @param [Hash] render_opts
     # @return [String]
-    def render_subject_template(subject, prop_list, render_opts)
+    def render_subject_template(subject, prop_list, **render_opts)
       # See if there's a template based on the sorted concatenation of all types of this subject
       # or any type of this subject
       tmpl = find_template(subject)
@@ -555,7 +555,7 @@ module RDF::RDFa
       # If :rel is specified and :typeof is nil, use @resource instead of @about.
       # Pass other options from calling context
       with_template(tmpl) do
-        render_subject(subject, prop_list, render_opts) do |pred|
+        render_subject(subject, prop_list, **render_opts) do |pred|
           log_depth do
             pred = RDF::URI(pred) if pred.is_a?(String)
             values = render_opts[:property_values][pred.to_s]

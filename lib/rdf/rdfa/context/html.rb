@@ -4,8 +4,8 @@
 class RDF::RDFa::Context
   def self.find_with_html_rdfa_1_1(uri)
     if uri.to_s == "http://www.w3.org/2011/rdfa-context/html-rdfa-1.1"
-      @_html_rdfa_1_1_prof ||= RDF::RDFa::Context.new(RDF::URI("http://www.w3.org/2011/rdfa-context/html-rdfa-1.1"), {
-      })
+      @_html_rdfa_1_1_prof ||= RDF::RDFa::Context.new(RDF::URI("http://www.w3.org/2011/rdfa-context/html-rdfa-1.1"),
+      )
     else
       find_without_html_rdfa_1_1(uri)
     end

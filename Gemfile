@@ -6,7 +6,7 @@ gem "rdf",            github: "ruby-rdf/rdf",      branch: "develop"
 gem "rdf-spec",       github: "ruby-rdf/rdf-spec", branch: "develop"
 gem "rdf-xsd",        github: "ruby-rdf/rdf-xsd",  branch: "develop"
 gem "nokogiri",       '~> 1.8'
-gem "nokogumbo",      '~> 1.5'
+gem "nokogumbo",      '~> 2.0'
 gem 'equivalent-xml', '~> 0.5'
 
 group :development, :test do
@@ -25,24 +25,16 @@ group :development, :test do
 end
 
 group :test do
-  gem 'simplecov',      require: false
-  gem 'coveralls',      require: false
+  gem 'simplecov',      platforms: :mri
+  gem 'coveralls',      '~> 0.8', platforms: :mri
   gem 'psych',          platforms: [:mri, :rbx]
 end
 
-# Bundle gems for the local environment. Make sure to
-# put test-only gems in this group so their generators
-# and rake tasks are available in development mode:
 group :debug do
   gem "syntax"
   gem "byebug", platforms: :mri
   gem "ruby-debug", platforms: :jruby
   gem "rake"
-end
-
-platforms :rbx do
-  gem 'rubysl', '~> 2.0'
-  gem 'rubinius', '~> 2.0'
 end
 
 platforms :jruby do

@@ -13,7 +13,6 @@ unless ENV['CI']  # Skip for continuous integration
             describe "that are #{classification}" do
               Fixtures::TestCase.for_specific(host_language, version, Fixtures::TestCase::Test.send(classification)) do |t|
                 specify "test #{t.num}: #{t.description}#{",  (negative test)" if t.expectedResults.false?}" do
-                  pending "Invalid SPARQL query" if %w(0279 0284).include?(t.num)
                   skip "CDN messes up email addresses" if %w(0065 0176).include?(t.num)
                   pending "Nokogumbo error" if t.num == "0216" && host_language == "xhtml5"
                   skip "XMLLiteral" if %w(0198 0212).include?(t.num)
@@ -33,7 +32,7 @@ unless ENV['CI']  # Skip for continuous integration
 
                     validate = %w(0239 0279 0295 0284).none? {|n| t.input(host_language, version).to_s.include?(n)}
                     graph = RDF::Repository.new
-                    RDF::Reader.open(t.input(host_language, version), options.merge(validate: validate)) do |reader|
+                    RDF::Reader.open(t.input(host_language, version), **options.merge(validate: validate)) do |reader|
                       expect(reader).to be_a RDF::RDFa::Reader
 
                       # Some allowances for REXML
