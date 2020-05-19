@@ -15,7 +15,7 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 
 * Fully compliant RDFa 1.1 parser.
 * Template-based Writer to generate XHTML+RDFa.
-  * Writer uses user-replacable [Haml][Haml]-based templates to generate RDFa.
+  * Writer uses user-replaceable [Haml][Haml] -based templates to generate RDFa.
 * If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise. For HTML5, include the [Nokogumbo][] gem for a pure-HTML5 parser with better error detection.
 
 Install with `gem install rdf-rdfa`
@@ -409,23 +409,12 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 
 ### Principle Classes
 * {RDF::RDFa::Format}
-  * {RDF::RDFa::HTML}
-    Asserts :html format, text/html mime-type and .html file extension.
-  * {RDF::RDFa::XHTML}
-    Asserts :html format, application/xhtml+xml mime-type and .xhtml file extension.
-  * {RDF::RDFa::SVG}
-    Asserts :svg format, image/svg+xml mime-type and .svg file extension.
 * {RDF::RDFa::Reader}
   * {RDF::RDFa::Reader::Nokogiri}
   * {RDF::RDFa::Reader::REXML}
 * {RDF::RDFa::Context}
 * {RDF::RDFa::Expansion}
 * {RDF::RDFa::Writer}
-
-### Additional vocabularies
-* {RDF::RDFA}
-* {RDF::XML}
-* {RDF::XSI}
 
 ## TODO
 * Add support for LibXML and REXML bindings, and use the best available
