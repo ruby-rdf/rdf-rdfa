@@ -33,7 +33,6 @@ end
 group :debug do
   gem "syntax"
   gem "byebug", platforms: :mri
-  gem "ruby-debug", platforms: :jruby
   gem "rake"
 end
 

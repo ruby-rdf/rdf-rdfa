@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.date                  = File.mtime('VERSION').strftime('%Y-%m-%d')
 
   gem.name                  = %q{rdf-rdfa}
-  gem.homepage              = "http://ruby-rdf.github.com/rdf-rdfa"
+  gem.homepage              = "https://github.com/ruby-rdf/rdf-rdfa"
   gem.license               = 'Unlicense'
   gem.summary               = "RDFa reader/writer for RDF.rb."
   gem.description           = "RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite."
