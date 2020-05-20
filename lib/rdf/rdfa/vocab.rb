@@ -155,4 +155,7 @@ module RDF
       "dc:description": "is the class for all warnings".freeze,
       subClassOf: "rdfa:PGClass".freeze
   end
+
+  XML = Class.new(Vocabulary("http://www.w3.org/XML/1998/namespace"))
+  XSI = Class.new(Vocabulary("http://www.w3.org/2001/XMLSchema-instance"))
 end
