@@ -16,15 +16,15 @@ module RDF::RDFa
   # can explicitly override the used implementation by passing in a
   # `:library` option to `Reader.new` or `Reader.open`.
   #
-  # [Nokogiri]: http://nokogiri.org/
+  # [Nokogiri]: https://nokogiri.org/
   #
   # Based on processing rules described here:
-  # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/TR/2012/REC-rdfa-core-20120607/
-  # @see http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/
-  # @see http://dev.w3.org/html5/rdfa/
+  # @see https://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
+  # @see https://www.w3.org/TR/2012/REC-rdfa-core-20120607/
+  # @see https://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/
+  # @see https://dev.w3.org/html5/rdfa/
   #
-  # @author [Gregg Kellogg](http://kellogg-assoc.com/)
+  # @author [Gregg Kellogg](https://greggkellogg.net/)
   class Reader < RDF::Reader
     format Format
     include Expansion
@@ -46,9 +46,9 @@ module RDF::RDFa
     }
 
     # This expression matches an NCName as defined in
-    # [XML-NAMES](http://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName)
+    # [XML-NAMES](https://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName)
     #
-    # @see http://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName
+    # @see https://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName
     NC_REGEXP = Regexp.new(
       %{^
         (  [a-zA-Z_]
@@ -61,11 +61,11 @@ module RDF::RDFa
       Regexp::EXTENDED)
 
     # This expression matches an term as defined in
-    # [RDFA-CORE](http://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms)
+    # [RDFA-CORE](https://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms)
     #
     # For the avoidance of doubt, this definition means a 'term'
     # in RDFa is an XML NCName that also permits slash as a non-leading character.
-    # @see http://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms
+    # @see https://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms
     TERM_REGEXP = Regexp.new(
       %{^
         (?!\\\\u0301)             # &#x301; is a non-spacing acute accent.
@@ -245,7 +245,7 @@ module RDF::RDFa
 
     ##
     # RDFa Reader options
-    # @see http://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Reader#options-class_method
+    # @see https://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Reader#options-class_method
     def self.options
       super + [
         RDF::CLI::Option.new(

@@ -1,5 +1,5 @@
 # "Pure" version with out C dependencies
-source "http://rubygems.org"
+source "https://rubygems.org"
 
 gemspec
 

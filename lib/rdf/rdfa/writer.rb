@@ -46,7 +46,7 @@ module RDF::RDFa
   #       end
   #     end
   #
-  # @author [Gregg Kellogg](http://kellogg-assoc.com/)
+  # @author [Gregg Kellogg](https://greggkellogg.net/)
   class Writer < RDF::Writer
     format RDF::RDFa::Format
     include RDF::Util::Logger
@@ -75,7 +75,7 @@ module RDF::RDFa
 
     ##
     # RDFa Writer options
-    # @see http://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Writer#options-class_method
+    # @see https://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Writer#options-class_method
     def self.options
       super + [
         RDF::CLI::Option.new(

@@ -12,7 +12,7 @@ module RDF::RDFa
     #   Vocabulary expansion uses the built-in reasoner using included vocabularies from RDF.rb.
     #
     # @param [RDF::Repository] repository
-    # @see [OWL2 PROFILES](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules)
+    # @see [OWL2 PROFILES](https://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules)
     def expand(repository)
       add_debug("expand") {"Repository has #{repository.count} statements"}
 
@@ -45,7 +45,7 @@ module RDF::RDFa
     # Subsequently, remove reference rdfa:Pattern objects.
     #
     # @param [RDF::Repository] repository
-    # @see [HTML+RDFa](http://www.w3.org/TR/rdfa-in-html/#rdfa-reference-folding)
+    # @see [HTML+RDFa](https://www.w3.org/TR/rdfa-in-html/#rdfa-reference-folding)
     def copy_properties(repository)
       add_debug("expand") {"Repository has #{repository.size} statements"}
       fold(repository)

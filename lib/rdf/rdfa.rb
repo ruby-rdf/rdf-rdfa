@@ -15,13 +15,13 @@ module RDF
   #     end
   #   end
   #
-  # @see http://rubygems.org/gems/rdf
-  # @see http://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
-  # @see http://www.w3.org/TR/2012/REC-rdfa-core-20120607/
-  # @see http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/
-  # @see http://dev.w3.org/html5/rdfa/
+  # @see https://rubygems.org/gems/rdf
+  # @see https://www.w3.org/TR/rdfa-syntax/#s_model RDFa 1.0
+  # @see https://www.w3.org/TR/2012/REC-rdfa-core-20120607/
+  # @see https://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/
+  # @see https://dev.w3.org/html5/rdfa/
   #
-  # @author [Gregg Kellogg](http://kellogg-assoc.com/)
+  # @author [Gregg Kellogg](https://greggkellogg.net/)
   module RDFa
     require 'rdf/rdfa/format'
     require 'rdf/rdfa/vocab'

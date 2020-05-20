@@ -564,7 +564,7 @@ describe RDF::RDFa::Writer do
             logger.info result.force_encoding("utf-8")
             graph2 = parse(result, format: :rdfa, logger: logger)
             # Need to put this in to avoid problems with added markup
-            statements = graph2.query({object: RDF::URI("http://rdf.kellogg-assoc.com/css/distiller.css")}).to_a
+            statements = graph2.query({object: RDF::URI("http://rdf.greggkellogg.net/css/distiller.css")}).to_a
             statements.each {|st| graph2.delete(st)}
             #puts graph2.dump(:ttl)
             expect(graph2).to be_equivalent_graph(@graph, logger: logger)

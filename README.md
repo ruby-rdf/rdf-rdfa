@@ -3,8 +3,8 @@ This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange develo
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
 
-[![Gem Version](https://badge.fury.io/rb/rdf-rdfa.png)](http://badge.fury.io/rb/rdf-rdfa)
-[![Build Status](https://travis-ci.org/ruby-rdf/rdf-rdfa.png?branch=master)](http://travis-ci.org/ruby-rdf/rdf-rdfa)
+[![Gem Version](https://badge.fury.io/rb/rdf-rdfa.png)](https://badge.fury.io/rb/rdf-rdfa)
+[![Build Status](https://travis-ci.org/ruby-rdf/rdf-rdfa.png?branch=master)](https://travis-ci.org/ruby-rdf/rdf-rdfa)
 [![Coverage Status](https://coveralls.io/repos/ruby-rdf/rdf-rdfa/badge.svg)](https://coveralls.io/r/ruby-rdf/rdf-rdfa)
 
 ## DESCRIPTION
@@ -37,7 +37,7 @@ This version fully supports the limited syntax of [RDFa Lite 1.1][]. This includ
 One of the issues with vocabularies was that they discourage re-use of existing vocabularies when terms from several vocabularies are used at the same time. As it is common (encouraged) for RDF vocabularies to form sub-class and/or sub-property relationships with well defined vocabularies, the RDFa vocabulary expansion mechanism takes advantage of this.
 
 As an optional part of RDFa processing, an RDFa processor will perform limited
-[OWL 2 RL Profile entailment](http://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules),
+[OWL 2 RL Profile entailment](https://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules),
 specifically rules prp-eqp1, prp-eqp2, cax-sco, cax-eqc1, and
 cax-eqc2. This causes sub-classes and sub-properties of type and property IRIs to be added
 to the output graph.
@@ -123,24 +123,24 @@ The @typeof attribute has changed; previously, it always created a new subject, 
 
 For example:
 
-    <div typeof="foaf:Person" about="http://greggkellogg.net/foaf#me">
+    <div typeof="foaf:Person" about="https://greggkellogg.net/foaf#me">
       <p property="name">Gregg Kellogg</span>
-      <a rel="knows" typeof="foaf:Person" href="http://manu.sporny.org/#this">
+      <a rel="knows" typeof="foaf:Person" href="https://manu.sporny.org/#this">
         <span property="name">Manu Sporny</span>
       </a>
     </div>
 
 results in
 
-    <http://greggkellogg.net/foaf#me> a foaf:Person;
+    <https://greggkellogg.net/foaf#me> a foaf:Person;
       foaf:name "Gregg Kellogg";
-      foaf:knows <http://manu.sporny.org/#this> .
-    <http://manu.sporny.org/#this> a foaf:Person;
+      foaf:knows <https://manu.sporny.org/#this> .
+    <https://manu.sporny.org/#this> a foaf:Person;
       foaf:name "Manu Sporny" .
 
 Note that if the explicit @href is not present, i.e.,
 
-    <div typeof="foaf:Person" about="http://greggkellogg.net/foaf#me">
+    <div typeof="foaf:Person" about="https://greggkellogg.net/foaf#me">
       <p property="name">Gregg Kellogg</span>
       <a href="knows" typeof="foaf:Person">
         <span property="name">Manu Sporny</span>
@@ -149,7 +149,7 @@ Note that if the explicit @href is not present, i.e.,
 
 this results in
 
-    <http://greggkellogg.net/foaf#me> a foaf:Person;
+    <https://greggkellogg.net/foaf#me> a foaf:Person;
       foaf:name "Gregg Kellogg";
       foaf:knows [ 
             a foaf:Person;
@@ -397,11 +397,11 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
-* [Ruby](http://ruby-lang.org/) (>= 2.4)
-* [RDF.rb](http://rubygems.org/gems/rdf) (~> 3.1)
+* [Ruby](https://ruby-lang.org/) (>= 2.4)
+* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.1)
 * [Haml](https://rubygems.org/gems/haml) (~> 5.1)
 * [HTMLEntities](https://rubygems.org/gems/htmlentities) (>= 4.3)
-* Soft dependency on [Nokogiri](http://rubygems.org/gems/nokogiri) (>= 1.10)
+* Soft dependency on [Nokogiri](https://rubygems.org/gems/nokogiri) (>= 1.10)
 * Soft dependency on [Nokogumbo](https://github.com/rubys/nokogumbo) (>= 2.0)
 
 ## Documentation
@@ -427,13 +427,13 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [History](file:History.md)
 * [RDFa 1.1 Core][RDFa 1.1 Core]
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
-* [RDFa-test-suite](http://rdfa.info/test-suite/              "RDFa test suite")
+* [RDFa-test-suite](https://rdfa.info/test-suite/              "RDFa test suite")
 
 ## Author
-* [Gregg Kellogg](http://github.com/gkellogg) - <http://greggkellogg.net/>
+* [Gregg Kellogg](https://github.com/gkellogg) - <https://greggkellogg.net/>
 
 ## Contributors
-* [Nicholas Humfrey](http://github.com/njh) - <http://njh.me/>
+* [Nicholas Humfrey](https://github.com/njh) - <https://njh.me/>
 
 ## Contributing
 This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange development and release activity. All submissions _must_ be on a feature branch based on the _develop_ branch to ease staging and integration.
@@ -453,27 +453,27 @@ This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange develo
 ## License
 
 This is free and unencumbered public domain software. For more information,
-see <http://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
+see <https://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 
 ## FEEDBACK
 
 * gregg@greggkellogg.net
-* <http://rubygems.org/rdf-rdfa>
-* <http://github.com/ruby-rdf/rdf-rdfa>
-* <http://lists.w3.org/Archives/Public/public-rdf-ruby/>
+* <https://rubygems.org/rdf-rdfa>
+* <https://github.com/ruby-rdf/rdf-rdfa>
+* <https://lists.w3.org/Archives/Public/public-rdf-ruby/>
 
-[RDF.rb]:           http://rubygems.org/gems/rdf
-[YARD]:             http://yardoc.org/
-[YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
-[PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
-[RDFa 1.1 Core]:    http://www.w3.org/TR/2012/REC-rdfa-core-20120607/                    "RDFa 1.1 Core"
-[RDFa Lite 1.1]:    http://www.w3.org/TR/2012/REC-rdfa-lite-20120607/                    "RDFa Lite 1.1"
-[XHTML+RDFa 1.1]:   http://www.w3.org/TR/2012/REC-xhtml-rdfa-20120607/                   "XHTML+RDFa 1.1"
-[HTML+RDFa 1.1]:    http://www.w3.org/TR/rdfa-in-html/                                   "HTML+RDFa 1.1"
-[RDFa-test-suite]:  http://rdfa.info/test-suite/                                         "RDFa test suite"
-[Role Attr]:        http://www.w3.org/TR/role-attribute/                                 "Role Attribute"
-[RDFa doc]:         http://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
-[Haml]:             http://haml-lang.com/
-[Turtle]:           http://www.w3.org/TR/2011/WD-turtle-20110809/
-[Nokogiri]:         http://www.nokogiri.org
+[RDF.rb]:           https://rubygems.org/gems/rdf
+[YARD]:             https://yardoc.org/
+[YARD-GS]:          https://rubydoc.info/docs/yard/file/docs/GettingStarted.md
+[PDD]:              https://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
+[RDFa 1.1 Core]:    https://www.w3.org/TR/2012/REC-rdfa-core-20120607/                    "RDFa 1.1 Core"
+[RDFa Lite 1.1]:    https://www.w3.org/TR/2012/REC-rdfa-lite-20120607/                    "RDFa Lite 1.1"
+[XHTML+RDFa 1.1]:   https://www.w3.org/TR/2012/REC-xhtml-rdfa-20120607/                   "XHTML+RDFa 1.1"
+[HTML+RDFa 1.1]:    https://www.w3.org/TR/rdfa-in-html/                                   "HTML+RDFa 1.1"
+[RDFa-test-suite]:  https://rdfa.info/test-suite/                                         "RDFa test suite"
+[Role Attr]:        https://www.w3.org/TR/role-attribute/                                 "Role Attribute"
+[RDFa doc]:         https://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
+[Haml]:             https://haml-lang.com/
+[Turtle]:           https://www.w3.org/TR/2011/WD-turtle-20110809/
+[Nokogiri]:         https://www.nokogiri.org
 [Nokogumbo]:        https://github.com/rubys/nokogumbo/#readme
