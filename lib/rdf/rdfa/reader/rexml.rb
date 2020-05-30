@@ -5,7 +5,7 @@ module RDF::RDFa
     ##
     # REXML implementation of an XML parser.
     #
-    # @see http://www.germane-software.com/software/rexml/
+    # @see https://www.germane-software.com/software/rexml/
     module REXML
       ##
       # Returns the name of the underlying XML library.
@@ -104,7 +104,7 @@ module RDF::RDFa
         ##
         # Inner text of an element
         #
-        # @see http://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
+        # @see https://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
         # @return [String]
         def inner_text
           coder = HTMLEntities.new
@@ -116,7 +116,7 @@ module RDF::RDFa
         ##
         # Inner text of an element
         #
-        # @see http://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
+        # @see https://apidock.com/ruby/REXML/Element/get_text#743-Get-all-inner-texts
         # @return [String]
         def inner_html
           @node.children.map(&:to_s).join

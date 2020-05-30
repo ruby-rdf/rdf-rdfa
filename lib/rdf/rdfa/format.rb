@@ -16,7 +16,7 @@ module RDF::RDFa
   # @example Obtaining serialization format file extension mappings
   #   RDF::Format.file_extensions    #=> {xhtml: "application/xhtml+xml"}
   #
-  # @see http://www.w3.org/TR/rdf-testcases/#ntriples
+  # @see https://www.w3.org/TR/rdf-testcases/#ntriples
   class Format < RDF::Format
     content_encoding 'utf-8'
     content_type     'text/html;q=0.5',

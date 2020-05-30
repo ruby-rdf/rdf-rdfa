@@ -163,16 +163,16 @@ module RDF::RDFa
                 %base{href: base}
               - if title
                 %title= title
-              %link{rel: "stylesheet", href: "http://rdf.kellogg-assoc.com/css/distiller.css", type: "text/css"}
+              %link{rel: "stylesheet", href: "http://rdf.greggkellogg.net/css/distiller.css", type: "text/css"}
               %script{src: "https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js", type: "text/javascript"}
-              %script{src: "http://rdf.kellogg-assoc.com/js/distiller.js", type: "text/javascript"}
+              %script{src: "http://rdf.greggkellogg.net/js/distiller.js", type: "text/javascript"}
           %body
             - if base
               %p= "RDFa serialization URI base: &lt;#{base}&gt;"
             - subjects.each do |subject|
               != yield(subject)
             %footer
-              %p= "Written by <a href='http://rubygems.org/gems/rdf-rdfa'>RDF::RDFa</a> version #{RDF::RDFa::VERSION}"
+              %p= "Written by <a href='https://rubygems.org/gems/rdf-rdfa'>RDF::RDFa</a> version #{RDF::RDFa::VERSION}"
       ),
 
       # Output for non-leaf resources

@@ -3,7 +3,7 @@ module RDF::RDFa
     ##
     # Nokogiri implementation of an XML parser.
     #
-    # @see http://nokogiri.org/
+    # @see https://nokogiri.org/
     module Nokogiri
       ##
       # Returns the name of the underlying XML library.

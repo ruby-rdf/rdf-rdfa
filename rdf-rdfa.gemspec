@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.date                  = File.mtime('VERSION').strftime('%Y-%m-%d')
 
   gem.name                  = %q{rdf-rdfa}
-  gem.homepage              = "http://ruby-rdf.github.com/rdf-rdfa"
+  gem.homepage              = "https://github.com/ruby-rdf/rdf-rdfa"
   gem.license               = 'Unlicense'
   gem.summary               = "RDFa reader/writer for RDF.rb."
   gem.description           = "RDF::RDFa is an RDFa reader/writer for Ruby using the RDF.rb library suite."
@@ -21,7 +21,8 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 2.4'
   gem.requirements          = []
 
-  gem.add_runtime_dependency     'rdf',                 '~> 3.1'
+  gem.add_runtime_dependency     'rdf',                 '~> 3.1', '>= 3.1.2'
+  gem.add_runtime_dependency     'rdf-vocab',           '~> 3.1', '>= 3.1.5'
   gem.add_runtime_dependency     'haml',                '~> 5.1'
   gem.add_runtime_dependency     'rdf-xsd',             '~> 3.1'
   gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.1'
