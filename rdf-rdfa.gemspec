@@ -21,7 +21,8 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 2.4'
   gem.requirements          = []
 
-  gem.add_runtime_dependency     'rdf',                 '~> 3.1'
+  gem.add_runtime_dependency     'rdf',                 '~> 3.1', '>= 3.1.2'
+  gem.add_runtime_dependency     'rdf-vocab',           '~> 3.1', '>= 3.1.5'
   gem.add_runtime_dependency     'haml',                '~> 5.1'
   gem.add_runtime_dependency     'rdf-xsd',             '~> 3.1'
   gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.1'
