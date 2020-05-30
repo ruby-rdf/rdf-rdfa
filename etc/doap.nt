@@ -23,5 +23,5 @@
 <https://rubygems.org/gems/rdf-rdfa> <http://usefulinc.com/ns/doap#category> <http://dbpedia.org/resource/Ruby_(programming_language)> .
 <https://rubygems.org/gems/rdf-rdfa> <http://usefulinc.com/ns/doap#download-page> <https://rubygems.org/gems/rdf-rdfa> .
 <https://rubygems.org/gems/rdf-rdfa> <http://usefulinc.com/ns/doap#homepage> <https://github.com/ruby-rdf/rdf-rdfa> .
-<https://rubygems.org/gems/rdf-rdfa> <http://usefulinc.com/ns/doap#license> <https://unlicense.org/> .
+<https://rubygems.org/gems/rdf-rdfa> <http://usefulinc.com/ns/doap#license> <https://unlicense.org/1.0/> .
 <https://rubygems.org/gems/rdf-rdfa> <http://usefulinc.com/ns/doap#mailing-list> <http://lists.w3.org/Archives/Public/public-rdf-ruby/> .
