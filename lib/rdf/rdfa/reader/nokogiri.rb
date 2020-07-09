@@ -286,9 +286,9 @@ module RDF::RDFa
         # FIXME: Nokogiri version 1.5 thinks many HTML5 elements are invalid, so just ignore all Tag errors.
         # Nokogumbo might make this simpler
         if @host_language == :html5
-          @doc.errors.reject {|e|
-            e.to_s =~ /(The doctype must be the first token in the document)|(Expected a doctype token)|(Unexpected '\?' where start tag name is expected)/
-          }
+          @doc.errors.reject do |e|
+            e.to_s =~ %r{(The doctype must be the first token in the document)|(Expected a doctype token)|(Unexpected '\?' where start tag name is expected)}
+          end
         else
           @doc.errors.reject {|e| e.to_s =~ /(?:Tag \w+ invalid)|(?:Missing attribute name)/}
         end
