@@ -448,7 +448,9 @@ This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange develo
   list in the the `README`. Alphabetical order applies.
 * Do note that in order for us to merge any non-trivial changes (as a rule
   of thumb, additions larger than about 15 lines of code), we need an
-  explicit [public domain dedication][PDD] on record from you.
+  explicit [public domain dedication][PDD] on record from you,
+  which you will be asked to agree to on the first commit to a repo within the organization.
+  Note that the agreement applies to all repos in the [Ruby RDF](https://github.com/ruby-rdf/) organization.
 
 ## License
 
@@ -465,7 +467,7 @@ see <https://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 [RDF.rb]:           https://rubygems.org/gems/rdf
 [YARD]:             https://yardoc.org/
 [YARD-GS]:          https://rubydoc.info/docs/yard/file/docs/GettingStarted.md
-[PDD]:              https://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
+[PDD]:              https://unlicense.org/#unlicensing-contributions
 [RDFa 1.1 Core]:    https://www.w3.org/TR/2012/REC-rdfa-core-20120607/                    "RDFa 1.1 Core"
 [RDFa Lite 1.1]:    https://www.w3.org/TR/2012/REC-rdfa-lite-20120607/                    "RDFa Lite 1.1"
 [XHTML+RDFa 1.1]:   https://www.w3.org/TR/2012/REC-xhtml-rdfa-20120607/                   "XHTML+RDFa 1.1"
