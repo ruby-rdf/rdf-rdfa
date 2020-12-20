@@ -10,7 +10,7 @@ on:
 
 jobs:
   tests:
-    name: Ruby ${{ matrix.ruby }}
+    name: Ruby ${{ matrix.ruby }} ${{ matrix.gemfile }}
     if: "contains(github.event.commits[0].message, '[ci skip]') == false"
     runs-on: ubuntu-latest
     env:
