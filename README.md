@@ -1,11 +1,11 @@
-This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange development and release activity. All submissions _must_ be on a feature branch based on the _develop_ branch to ease staging and integration.
 # RDF::RDFa reader/writer
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
 
 [![Gem Version](https://badge.fury.io/rb/rdf-rdfa.png)](https://badge.fury.io/rb/rdf-rdfa)
-[![Build Status](https://travis-ci.org/ruby-rdf/rdf-rdfa.png?branch=master)](https://travis-ci.org/ruby-rdf/rdf-rdfa)
-[![Coverage Status](https://coveralls.io/repos/ruby-rdf/rdf-rdfa/badge.svg)](https://coveralls.io/r/ruby-rdf/rdf-rdfa)
+[![Build Status](https://github.com/ruby-rdf/rdf-rdfa/workflows/CI/badge.svg?branch=develop)](https://github.com/ruby-rdf/rdf-rdfa/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/ruby-rdf/rdf-rdfa/badge.svg)](https://coveralls.io/github/ruby-rdf/rdf-rdfa)
+[![Gitter chat](https://badges.gitter.im/ruby-rdf/rdf.png)](https://gitter.im/ruby-rdf/rdf)
 
 ## DESCRIPTION
 RDF::RDFa is an RDFa reader and writer for Ruby using the [RDF.rb][RDF.rb] library suite.
