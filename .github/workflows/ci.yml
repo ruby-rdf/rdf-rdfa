@@ -24,7 +24,7 @@ jobs:
           - 2.5
           - 2.6
           - 2.7
-          - ruby-head
+          #- ruby-head # Until net-http-persistent updated
           #- jruby # No Nokogumbo on JRuby
         gemfile:
           - Gemfile
