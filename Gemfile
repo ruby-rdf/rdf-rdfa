@@ -25,9 +25,8 @@ group :development, :test do
 end
 
 group :test do
-  gem 'simplecov',      platforms: :mri
+  gem 'simplecov',      '~> 0.16', platforms: :mri
   gem 'coveralls',      '~> 0.8', platforms: :mri
-  gem 'psych',          platforms: [:mri, :rbx]
 end
 
 group :debug do
