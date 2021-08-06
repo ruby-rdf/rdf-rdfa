@@ -176,7 +176,6 @@ module RDF::RDFa
             ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
           when :html5
             begin
-              require 'nokogumbo' unless defined?(::Nokogumbo)
               input = input.read if input.respond_to?(:read)
               ::Nokogiri::HTML5(input.force_encoding(options[:encoding]), max_parse_errors: 1000)
             rescue LoadError
@@ -283,8 +282,6 @@ module RDF::RDFa
       ##
       # Document errors
       def doc_errors
-        # FIXME: Nokogiri version 1.5 thinks many HTML5 elements are invalid, so just ignore all Tag errors.
-        # Nokogumbo might make this simpler
         if @host_language == :html5
           @doc.errors.reject do |e|
             e.to_s =~ %r{(The doctype must be the first token in the document)|(Expected a doctype token)|(Unexpected '\?' where start tag name is expected)}
