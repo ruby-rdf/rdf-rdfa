@@ -178,7 +178,7 @@ module RDF::RDFa
             begin
               input = input.read if input.respond_to?(:read)
               ::Nokogiri::HTML5(input.force_encoding(options[:encoding]), max_parse_errors: 1000)
-            rescue LoadError
+            rescue LoadError, NoMethodError
               ::Nokogiri::HTML.parse(input, base_uri.to_s, options[:encoding])
             end
           else
