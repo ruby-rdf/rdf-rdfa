@@ -5,8 +5,8 @@ gemspec
 gem "rdf",            github: "ruby-rdf/rdf",      branch: "develop"
 gem "rdf-spec",       github: "ruby-rdf/rdf-spec", branch: "develop"
 gem "rdf-xsd",        github: "ruby-rdf/rdf-xsd",  branch: "develop"
-gem "nokogiri",       '~> 1.10', platforms: [:mri, :jruby]
-gem 'equivalent-xml', '~> 0.5'
+gem "nokogiri",       '~> 1.12', platforms: [:mri, :jruby]
+gem 'equivalent-xml', '~> 0.6'
 
 group :development, :test do
   gem 'ebnf',               github: "dryruby/ebnf",                 branch: "develop"

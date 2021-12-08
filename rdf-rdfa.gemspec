@@ -18,20 +18,20 @@ Gem::Specification.new do |gem|
   gem.files                 = %w(AUTHORS README.md UNLICENSE VERSION) + Dir.glob('lib/**/*.rb')
   gem.require_paths         = %w(lib)
 
-  gem.required_ruby_version = '>= 2.4'
+  gem.required_ruby_version = '>= 2.6'
   gem.requirements          = []
 
-  gem.add_runtime_dependency     'rdf',                 '~> 3.1', '>= 3.1.13'
-  gem.add_runtime_dependency     'rdf-vocab',           '~> 3.1', '>= 3.1.11'
+  gem.add_runtime_dependency     'rdf',                 '~> 3.2'
+  gem.add_runtime_dependency     'rdf-vocab',           '~> 3.2'
   gem.add_runtime_dependency     'haml',                '~> 5.2'
-  gem.add_runtime_dependency     'rdf-xsd',             '~> 3.1'
-  gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.1'
+  gem.add_runtime_dependency     'rdf-xsd',             '~> 3.2'
+  gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.2'
   gem.add_runtime_dependency     'htmlentities',        '~> 4.3'
 
   gem.add_development_dependency 'json-ld',             '~> 3.1'
   gem.add_development_dependency 'rspec',               '~> 3.10'
   gem.add_development_dependency 'rspec-its',           '~> 1.3'
-  gem.add_development_dependency 'rdf-spec',            '~> 3.1'
+  gem.add_development_dependency 'rdf-spec',            '~> 3.2'
   gem.add_development_dependency 'rdf-turtle',          '~> 3.1'
   gem.add_development_dependency 'rdf-isomorphic',      '~> 3.1'
   gem.add_development_dependency 'rdf-tabular',         '~> 3.1'

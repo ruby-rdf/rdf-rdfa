@@ -191,7 +191,7 @@ generates the following turtle:
   	  dc:description "A yellow rectangle with sharp corners." .
 
 ### Support for embedded N-Triples or Turtle
-If the document includes a `&lt;script&gt;` element having an `@type` attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are availble), the data will be extracted and added to the default graph. For example:
+If the document includes a `&lt;script&gt;` element having an `@type` attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are available), the data will be extracted and added to the default graph. For example:
 
     <html>
       <body>
@@ -397,11 +397,11 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
-* [Ruby](https://ruby-lang.org/) (>= 2.4)
-* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.1)
-* [Haml](https://rubygems.org/gems/haml) (~> 5.1)
-* [HTMLEntities](https://rubygems.org/gems/htmlentities) (>= 4.3)
-* Soft dependency on [Nokogiri](https://rubygems.org/gems/nokogiri) (>= 1.10)
+* [Ruby](https://ruby-lang.org/) (>= 2.6)
+* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.2)
+* [Haml](https://rubygems.org/gems/haml) (~> 5.2)
+* [HTMLEntities](https://rubygems.org/gems/htmlentities) (~> 4.3)
+* Soft dependency on [Nokogiri](https://rubygems.org/gems/nokogiri) (~> 1.12)
 
 ## Documentation
 Full documentation available on [Rubydoc.info][RDFa doc]
