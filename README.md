@@ -16,15 +16,15 @@ RDF::RDFa parses [RDFa][RDFa 1.1 Core] into statements or triples.
 * Fully compliant RDFa 1.1 parser.
 * Template-based Writer to generate XHTML+RDFa.
   * Writer uses user-replaceable [Haml][Haml] -based templates to generate RDFa.
-* If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise. For HTML5, include the [Nokogumbo][] gem for a pure-HTML5 parser with better error detection.
+* If available, uses [Nokogiri][] for parsing HTML/SVG, falls back to REXML otherwise.
 
 Install with `gem install rdf-rdfa`
 
 ### Pure Ruby
-In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri][] or [Nokogumbo][]
-and falls back to using REXML. [Nokogumbo][] uses the [Gumbo pure-C HTML5 parser](https://github.com/google/gumbo-parser#readme).
+In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on [Nokogiri][]
+and falls back to using REXML.
 As REXML is not really an HTML parsing library, the results will only be useful if the HTML is well-formed.
-For best performance, install the [Nokogiri][] and [Nokogumbo][] gems as well.
+For best performance, install the [Nokogiri][] gem as well.
 
 ### Important changes from previous versions
 RDFa is an evolving standard, undergoing some substantial recent changes partly due to perceived competition
@@ -191,7 +191,7 @@ generates the following turtle:
   	  dc:description "A yellow rectangle with sharp corners." .
 
 ### Support for embedded N-Triples or Turtle
-If the document includes a `&lt;script&gt;` element having an `@type` attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are availble), the data will be extracted and added to the default graph. For example:
+If the document includes a `&lt;script&gt;` element having an `@type` attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are available), the data will be extracted and added to the default graph. For example:
 
     <html>
       <body>
@@ -397,12 +397,11 @@ The template hash defines four Haml templates:
     }
 
 ## Dependencies
-* [Ruby](https://ruby-lang.org/) (>= 2.4)
-* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.1)
-* [Haml](https://rubygems.org/gems/haml) (~> 5.1)
-* [HTMLEntities](https://rubygems.org/gems/htmlentities) (>= 4.3)
-* Soft dependency on [Nokogiri](https://rubygems.org/gems/nokogiri) (>= 1.10)
-* Soft dependency on [Nokogumbo](https://github.com/rubys/nokogumbo) (>= 2.0)
+* [Ruby](https://ruby-lang.org/) (>= 2.6)
+* [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.2)
+* [Haml](https://rubygems.org/gems/haml) (~> 5.2)
+* [HTMLEntities](https://rubygems.org/gems/htmlentities) (~> 4.3)
+* Soft dependency on [Nokogiri](https://rubygems.org/gems/nokogiri) (~> 1.12)
 
 ## Documentation
 Full documentation available on [Rubydoc.info][RDFa doc]
@@ -478,4 +477,3 @@ see <https://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 [Haml]:             https://haml-lang.com/
 [Turtle]:           https://www.w3.org/TR/2011/WD-turtle-20110809/
 [Nokogiri]:         https://www.nokogiri.org
-[Nokogumbo]:        https://github.com/rubys/nokogumbo/#readme

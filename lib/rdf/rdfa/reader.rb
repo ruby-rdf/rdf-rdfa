@@ -329,19 +329,7 @@ module RDF::RDFa
 
         detect_host_language_version(input, **options)
 
-        parse_lib = if @library == :nokogiri && @host_language == :html5
-          begin
-            require 'nokogumbo' unless defined?(::Nokogumbo)
-            :nokobumbo
-          rescue LoadError
-            :nokogiri
-          end
-        else
-          @library
-        end
-
-        parse_lib = @library == :nokogiri && defined?(::Nokogumbo) ? :nokogumbo : @library
-        add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{parse_lib}, rdfagraph = #{@options[:rdfagraph].inspect}, expand = #{@options[:vocab_expansion]}")
+        add_info(@doc, "version = #{@version},  host_language = #{@host_language}, library = #{@library}, rdfagraph = #{@options[:rdfagraph].inspect}, expand = #{@options[:vocab_expansion]}")
 
         begin
           initialize_xml(input, **options)
