@@ -75,7 +75,7 @@ module RDF::RDFa
 
     ##
     # RDFa Writer options
-    # @see https://www.rubydoc.info/github/ruby-rdf/rdf/RDF/Writer#options-class_method
+    # @see https://ruby-rdf.github.io/rdf/RDF/Writer#options-class_method
     def self.options
       super + [
         RDF::CLI::Option.new(

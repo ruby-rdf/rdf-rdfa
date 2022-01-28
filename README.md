@@ -473,7 +473,7 @@ see <https://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 [HTML+RDFa 1.1]:    https://www.w3.org/TR/rdfa-in-html/                                   "HTML+RDFa 1.1"
 [RDFa-test-suite]:  https://rdfa.info/test-suite/                                         "RDFa test suite"
 [Role Attr]:        https://www.w3.org/TR/role-attribute/                                 "Role Attribute"
-[RDFa doc]:         https://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
+[RDFa doc]:         https://ruby-rdf.github.io/rdf-rdfa/frames
 [Haml]:             https://haml-lang.com/
 [Turtle]:           https://www.w3.org/TR/2011/WD-turtle-20110809/
 [Nokogiri]:         https://www.nokogiri.org
