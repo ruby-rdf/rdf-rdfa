@@ -21,7 +21,8 @@ module RDF::RDFa
     content_encoding 'utf-8'
     content_type     'text/html;q=0.5',
       aliases: %w(application/xhtml+xml;q=0.7 image/svg+xml;q=0.4),
-      extensions: [:html, :xhtml, :svg]
+      extensions: [:html, :xhtml, :svg],
+      uri: 'http://www.w3.org/ns/formats/RDFa'
     reader { RDF::RDFa::Reader }
     writer { RDF::RDFa::Writer }
 
