@@ -92,7 +92,7 @@ options = {
 
 opts = GetoptLong.new(
   ["--help", "-?", GetoptLong::NO_ARGUMENT],
-  ["--dbg", GetoptLong::NO_ARGUMENT],
+  ["--debug", GetoptLong::NO_ARGUMENT],
   ["--format", GetoptLong::REQUIRED_ARGUMENT],
   ["--host-language", "-h", GetoptLong::REQUIRED_ARGUMENT],
   ["--library", GetoptLong::REQUIRED_ARGUMENT],
@@ -107,7 +107,7 @@ def help(options)
   puts "Usage: #{$0} [options] [test-number ...]"
   puts "Options:"
   puts "      --dump:               Dump raw output, otherwise serialize to Ruby"
-  puts "      --dbg:                Display detailed debug output"
+  puts "      --debug:              Display detailed debug output"
   puts "      --expand              Expand graph with vocab_expansion option"
   puts "      --format:             Format for output, defaults to #{options[:format].inspect}"
   puts "      --host-language:      Run for specified host language, defaults to #{options[:host_language]}"
@@ -124,7 +124,7 @@ end
 opts.each do |opt, arg|
   case opt
   when '--help'             then help(options)
-  when '--dbg'              then logger.level = Logger::DEBUG
+  when '--debug'            then logger.level = Logger::DEBUG
   when '--format'           then options[:format] = arg.to_sym
   when '--host-language'    then options[:host_language] = arg
   when '--library'          then options[:library] = arg.to_sym
@@ -142,7 +142,7 @@ result_count = {}
 Fixtures::TestCase.for_specific(options[:host_language], options[:version]) do |tc|
   next unless ARGV.empty? || ARGV.any? {|n| tc.num.match(/#{n}/)}
   next if tc.classification.to_s =~ /deprecated/
-  run_tc(tc, options.merge(result_count: result_count))
+  run_tc(tc, **options.merge(result_count: result_count))
 end
 
 result_count.each do |result, count|

@@ -721,6 +721,8 @@ module RDF::RDFa
     # @return [String]
     #   Entity-encoded string
     def escape_entities(str)
+      # Haml 6 does escaping
+      return str if Haml.const_defined?(:Template)
       CGI.escapeHTML(str).gsub(/[\n\r]/) {|c| '&#x' + c.unpack('h').first + ';'}
     end
 
@@ -761,7 +763,13 @@ module RDF::RDFa
       template = template.align_left
       log_debug {"hamlify locals: #{locals.inspect}"}
 
-      Haml::Engine.new(template, @options[:haml_options] || HAML_OPTIONS).render(self, locals) do |*args|
+      haml_opts = @options[:haml_options] || HAML_OPTIONS
+      haml_runner = if Haml.const_defined?(:Template)
+        Haml::Template.new(**haml_opts) {template}
+      else
+        Haml::Engine.new(template, **haml_opts)
+      end
+      haml_runner.render(self, locals) do |*args|
         yield(*args) if block_given?
       end
     rescue Haml::Error => e

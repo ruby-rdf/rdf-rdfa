@@ -30,7 +30,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency     'rdf',                 '~> 3.2'
   gem.add_runtime_dependency     'rdf-vocab',           '~> 3.2'
-  gem.add_runtime_dependency     'haml',                '~> 5.2'
+  gem.add_runtime_dependency     'haml',                '>= 5.2', "< 7"
   gem.add_runtime_dependency     'rdf-xsd',             '~> 3.2'
   gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.2'
   gem.add_runtime_dependency     'htmlentities',        '~> 4.3'

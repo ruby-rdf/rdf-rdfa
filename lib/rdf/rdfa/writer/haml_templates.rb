@@ -10,11 +10,11 @@ module RDF::RDFa
       doc: %q(
         !!! XML
         !!! 5
-        %html{xmlns: "http://www.w3.org/1999/xhtml", lang: lang, prefix: prefix}
+        %html{**{xmlns: "http://www.w3.org/1999/xhtml", lang: lang, prefix: prefix}.compact}
           - if base || title
             %head
               - if base
-                %base{href: base}
+                %base{**{href: base}.compact}
               - if title
                 %title= title
           %body
@@ -33,13 +33,13 @@ module RDF::RDFa
       # Yield: predicates.each
       subject: %q(
         - if element == :li
-          %li{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}
+          %li{**{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}.compact}
             - if typeof
               %span.type!= typeof
             - predicates.each do |predicate|
               != yield(predicate)
         - else
-          %div{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}
+          %div{**{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}.compact}
             - if typeof
               %span.type!= typeof
             - predicates.each do |predicate|
@@ -53,7 +53,7 @@ module RDF::RDFa
       # Otherwise, render result
       property_value: %q(
         - if heading_predicates.include?(predicate) && object.literal?
-          %h1{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}= escape_entities(get_value(object))
+          %h1{**{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}= escape_entities(get_value(object))
         - else
           %div.property
             %span.label
@@ -63,13 +63,13 @@ module RDF::RDFa
             - elsif get_curie(object) == 'rdf:nil'
               %span{rel: get_curie(predicate), inlist: ''}
             - elsif object.node?
-              %span{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}= get_curie(object)
+              %span{**{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}.compact}= get_curie(object)
             - elsif object.uri?
-              %a{property: get_curie(predicate), href: object.to_s, inlist: inlist}= object.to_s
+              %a{**{property: get_curie(predicate), href: object.to_s, inlist: inlist}.compact}= object.to_s
             - elsif object.datatype == RDF.XMLLiteral
-              %span{property: get_curie(predicate), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}<!= get_value(object)
+              %span{**{property: get_curie(predicate), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}<!= get_value(object)
             - else
-              %span{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}= escape_entities(get_value(object))
+              %span{**{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}= escape_entities(get_value(object))
       ),
 
       # Output for multi-valued properties
@@ -84,14 +84,14 @@ module RDF::RDFa
               - if res = yield(object)
                 != res
               - elsif object.node?
-                %li{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}= get_curie(object)
+                %li{**{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}.compact}= get_curie(object)
               - elsif object.uri?
                 %li
-                  %a{property: get_curie(predicate), href: object.to_s, inlist: inlist}= object.to_s
+                  %a{**{property: get_curie(predicate), href: object.to_s, inlist: inlist}.compact}= object.to_s
               - elsif object.datatype == RDF.XMLLiteral
-                %li{property: get_curie(predicate), lang: get_lang(object), datatype: get_curie(object.datatype), inlist: inlist}<!= get_value(object)
+                %li{**{property: get_curie(predicate), lang: get_lang(object), datatype: get_curie(object.datatype), inlist: inlist}.compact}<!= get_value(object)
               - else
-                %li{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}= escape_entities(get_value(object))
+                %li{**{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}= escape_entities(get_value(object))
       ),
     }
 
@@ -106,10 +106,10 @@ module RDF::RDFa
       doc: %q(
         !!! XML
         !!! 5
-        %html{xmlns: "http://www.w3.org/1999/xhtml", lang: lang, prefix: prefix}
+        %html{**{xmlns: "http://www.w3.org/1999/xhtml", lang: lang, prefix: prefix}.compact}
           - if base
             %head
-              %base{href: base}
+              %base{*{href: base}.compact}
           %body
             - subjects.each do |subject|
               != yield(subject)
@@ -121,7 +121,7 @@ module RDF::RDFa
       # Locals: about, typeof, predicates, :inlist
       # Yield: predicates.each
       subject: %q(
-        %div{rel: rel, resource: (about || resource), typeof: typeof}
+        %div{**{rel: rel, resource: (about || resource), typeof: typeof}.compact}
           - predicates.each do |predicate|
             != yield(predicate)
       ),
@@ -138,13 +138,13 @@ module RDF::RDFa
       - elsif get_curie(object) == 'rdf:nil'
         %span{rel: get_curie(predicate), inlist: ''}
       - elsif object.node?
-        %span{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}= get_curie(object)
+        %span{**{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}.compact}= get_curie(object)
       - elsif object.uri?
-        %a{property: get_curie(predicate), href: object.to_s, inlist: inlist}= object.to_s
+        %a{**{property: get_curie(predicate), href: object.to_s, inlist: inlist}.compact}= object.to_s
       - elsif object.datatype == RDF.XMLLiteral
-        %span{property: get_curie(predicate), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}<!= get_value(object)
+        %span{**{property: get_curie(predicate), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}<!= get_value(object)
       - else
-        %span{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}= escape_entities(get_value(object))
+        %span{**{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}= escape_entities(get_value(object))
       )
     }
 
@@ -156,7 +156,7 @@ module RDF::RDFa
       doc: %q(
         !!! XML
         !!! 5
-        %html{xmlns: "http://www.w3.org/1999/xhtml", lang: lang, prefix: prefix}
+        %html{**{xmlns: "http://www.w3.org/1999/xhtml", lang: lang, prefix: prefix}.compact}
           - if base || title
             %head
               - if base
@@ -189,21 +189,21 @@ module RDF::RDFa
       # Yield: predicates.each
       subject: %q(
         - if element == :li
-          %li{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}
+          %li{**{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}.compact}
             - if typeof
               %span.type!= typeof
             %table.properties
               - predicates.each do |predicate|
                 != yield(predicate)
         - elsif rel
-          %td{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}
+          %td{**{rel: rel, resource: (about || resource), typeof: typeof, inlist: inlist}.compact}
             - if typeof
               %span.type!= typeof
             %table.properties
               - predicates.each do |predicate|
                 != yield(predicate)
         - else
-          %div{resource: (about || resource), typeof: typeof, inlist: inlist}
+          %div{**{resource: (about || resource), typeof: typeof, inlist: inlist}.compact}
             - if typeof
               %span.type!= typeof
             %table.properties
@@ -218,7 +218,7 @@ module RDF::RDFa
       # Otherwise, render result
       property_value: %q(
         - if heading_predicates.include?(predicate) && object.literal?
-          %h1{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}= escape_entities(get_value(object))
+          %h1{**{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}= escape_entities(get_value(object))
         - else
           %tr.property
             %td.label
@@ -228,14 +228,14 @@ module RDF::RDFa
             - elsif get_curie(object) == 'rdf:nil'
               %td{rel: get_curie(predicate), inlist: ''}= "Empty"
             - elsif object.node?
-              %td{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}= get_curie(object)
+              %td{**{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}.compact}= get_curie(object)
             - elsif object.uri?
               %td
-                %a{property: get_curie(predicate), href: object.to_s, inlist: inlist}= object.to_s
+                %a{**{property: get_curie(predicate), href: object.to_s, inlist: inlist}.compact}= object.to_s
             - elsif object.datatype == RDF.XMLLiteral
-              %td{property: get_curie(predicate), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}<!= get_value(object)
+              %td{**{property: get_curie(predicate), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}<!= get_value(object)
             - else
-              %td{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}= escape_entities(get_value(object))
+              %td{**{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}= escape_entities(get_value(object))
       ),
 
       # Output for multi-valued properties
@@ -251,14 +251,14 @@ module RDF::RDFa
                 - if res = yield(object)
                   != res
                 - elsif object.node?
-                  %li{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}= get_curie(object)
+                  %li{**{property: get_curie(predicate), resource: get_curie(object), inlist: inlist}.compact}= get_curie(object)
                 - elsif object.uri?
                   %li
-                    %a{property: get_curie(predicate), href: object.to_s, inlist: inlist}= object.to_s
+                    %a{**{property: get_curie(predicate), href: object.to_s, inlist: inlist}.compact}= object.to_s
                 - elsif object.datatype == RDF.XMLLiteral
-                  %li{property: get_curie(predicate), lang: get_lang(object), datatype: get_curie(object.datatype), inlist: inlist}<!= get_value(object)
+                  %li{**{property: get_curie(predicate), lang: get_lang(object), datatype: get_curie(object.datatype), inlist: inlist}.compact}<!= get_value(object)
                 - else
-                  %li{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}= escape_entities(get_value(object))
+                  %li{**{property: get_curie(predicate), content: get_content(object), lang: get_lang(object), datatype: get_dt_curie(object), inlist: inlist}.compact}= escape_entities(get_value(object))
       ),
     }
     HAML_TEMPLATES = {base: BASE_HAML, min: MIN_HAML, distiller: DISTILLER_HAML}
