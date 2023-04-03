@@ -399,7 +399,7 @@ The template hash defines four Haml templates:
 ## Dependencies
 * [Ruby](https://ruby-lang.org/) (>= 2.6)
 * [RDF.rb](https://rubygems.org/gems/rdf) (~> 3.2)
-* [Haml](https://rubygems.org/gems/haml) (~> 5.2)
+* [Haml](https://rubygems.org/gems/haml) (>- 5.2, < 7)
 * [HTMLEntities](https://rubygems.org/gems/htmlentities) (~> 4.3)
 * Soft dependency on [Nokogiri](https://rubygems.org/gems/nokogiri) (~> 1.12)
 
@@ -473,7 +473,7 @@ see <https://unlicense.org/> or the accompanying [UNLICENSE](UNLICENSE) file.
 [HTML+RDFa 1.1]:    https://www.w3.org/TR/rdfa-in-html/                                   "HTML+RDFa 1.1"
 [RDFa-test-suite]:  https://rdfa.info/test-suite/                                         "RDFa test suite"
 [Role Attr]:        https://www.w3.org/TR/role-attribute/                                 "Role Attribute"
-[RDFa doc]:         https://rubydoc.info/github/ruby-rdf/rdf-rdfa/frames
+[RDFa doc]:         https://ruby-rdf.github.io/rdf-rdfa/frames
 [Haml]:             https://haml-lang.com/
 [Turtle]:           https://www.w3.org/TR/2011/WD-turtle-20110809/
 [Nokogiri]:         https://www.nokogiri.org

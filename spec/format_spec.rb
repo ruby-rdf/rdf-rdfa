@@ -36,6 +36,10 @@ describe RDF::RDFa::Format do
     specify {expect(RDF::RDFa::Format.to_sym).to eq :rdfa}
   end
 
+  describe "#to_uri" do
+    specify {expect(described_class.to_uri).to eq RDF::URI('http://www.w3.org/ns/formats/RDFa')}
+  end
+
   describe ".detect" do
     {
       about:    '<div about="foo"></div>',
