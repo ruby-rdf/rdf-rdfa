@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; RDFa reader/writer for RDF.rb.
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'>
+<h1 id="label-RDF-3A-3ARDFa+reader-2Fwriter">RDF::RDFa reader/writer</h1>
+
+<p><a href="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/">RDFa</a> parser for RDF.rb.</p>
+
+<p><a href="https://badge.fury.io/rb/rdf-rdfa"><img src="https://badge.fury.io/rb/rdf-rdfa.png"></a> <a href="https://github.com/ruby-rdf/rdf-rdfa/actions?query=workflow%3ACI"><img src="https://github.com/ruby-rdf/rdf-rdfa/workflows/CI/badge.svg?branch=develop"></a> <a href="https://coveralls.io/github/ruby-rdf/rdf-rdfa?branch=develop"><img src="https://coveralls.io/repos/ruby-rdf/rdf-rdfa/badge.svg?branch=develop"></a> <a href="https://gitter.im/ruby-rdf/rdf"><img src="https://badges.gitter.im/ruby-rdf/rdf.png"></a></p>
+
+<h2 id="label-DESCRIPTION">DESCRIPTION</h2>
+
+<p>RDF::RDFa is an RDFa reader and writer for Ruby using the <a href="https://rubygems.org/gems/rdf">RDF.rb</a> library suite.</p>
+
+<h2 id="label-FEATURES">FEATURES</h2>
+
+<p>RDF::RDFa parses <a href="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/">RDFa</a> into statements or triples.</p>
+<ul><li>
+<p>Fully compliant RDFa 1.1 parser.</p>
+</li><li>
+<p>Template-based Writer to generate XHTML+RDFa.</p>
+</li><li>
+<p>Writer uses user-replaceable <a href="https://haml-lang.com/">Haml</a> -based templates to generate RDFa.</p>
+</li><li>
+<p>If available, uses <a href="https://www.nokogiri.org">Nokogiri</a> for parsing HTML/SVG, falls back to REXML otherwise.</p>
+</li></ul>
+
+<p>Install with <code>gem install rdf-rdfa</code></p>
+
+<h3 id="label-Pure+Ruby">Pure Ruby</h3>
+
+<p>In order to run as pure ruby (not requiring any C modules), this gem does not directly depend on <a href="https://www.nokogiri.org">Nokogiri</a> and falls back to using REXML. As REXML is not really an HTML parsing library, the results will only be useful if the HTML is well-formed. For best performance, install the <a href="https://www.nokogiri.org">Nokogiri</a> gem as well.</p>
+
+<h3 id="label-Important+changes+from+previous+versions">Important changes from previous versions</h3>
+
+<p>RDFa is an evolving standard, undergoing some substantial recent changes partly due to perceived competition with Microdata. As a result, the RDF Webapps working group is currently looking at changes in the processing model for RDFa. These changes are now being tracked in <span class='object_link'><a href="RDF/RDFa/Reader.html" title="RDF::RDFa::Reader (class)">RDF::RDFa::Reader</a></span>:</p>
+
+<h4 id="label-RDFa+1.1+Lite">RDFa 1.1 Lite</h4>
+
+<p>This version fully supports the limited syntax of <a href="https://www.w3.org/TR/2012/REC-rdfa-lite-20120607/">RDFa Lite 1.1</a>. This includes the ability to use <code>@property</code> exclusively.</p>
+
+<h4 id="label-Vocabulary+Expansion">Vocabulary Expansion</h4>
+
+<p>One of the issues with vocabularies was that they discourage re-use of existing vocabularies when terms from several vocabularies are used at the same time. As it is common (encouraged) for RDF vocabularies to form sub-class and/or sub-property relationships with well defined vocabularies, the RDFa vocabulary expansion mechanism takes advantage of this.</p>
+
+<p>As an optional part of RDFa processing, an RDFa processor will perform limited <a href="https://www.w3.org/TR/2009/REC-owl2-profiles-20091027/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules">OWL 2 RL Profile entailment</a>, specifically rules prp-eqp1, prp-eqp2, cax-sco, cax-eqc1, and cax-eqc2. This causes sub-classes and sub-properties of type and property IRIs to be added to the output graph.</p>
+
+<p><span class='object_link'><a href="RDF/RDFa/Reader.html" title="RDF::RDFa::Reader (class)">RDF::RDFa::Reader</a></span> implements this using the <code>#expand</code> method, which looks for <code>rdfa:usesVocabulary</code> properties within the output graph and performs such expansion. See an example in the usage section.</p>
+
+<h4 id="label-Experimental+support+for+rdfa-3Acopy+template+expansion">Experimental support for rdfa:copy template expansion</h4>
+
+<p>RDFa 1.1 is just about an exact super-set of microdata, except for microdata’s <code>@itemref</code> feature. Experimental support is added for <code>rdfa:copy</code> and <code>rdfa:Pattern</code> to get a similar effect using expansion. To use this, reference another resource using <code>rdfa:copy</code>. If that resource has the type <code>rdfa:Pattern</code>, the properties defined there will be added to the resource containing the <code>rdfa:copy</code>, and the pattern and <code>rdfa:copy</code> will be removed from the output.</p>
+
+<p>For example, consider the following:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div&gt;
+  &lt;div typeof=&quot;schema:Person&quot;&gt;
+    &lt;link property=&quot;rdfa:copy&quot; resource=&quot;_:a&quot;/&gt;
+  &lt;/div&gt;
+  &lt;p resource=&quot;_:a&quot; typeof=&quot;rdfa:Pattern&quot;&gt;Name: &lt;span property=&quot;schema:name&quot;&gt;Amanda&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>if run with vocabulary expansion, this will result in the following Turtle:</p>
+
+<pre class="code ruby"><code class="ruby">@prefix schema: &lt;http://schema.org/&gt; .
+[a schema:Person; schema:name &quot;Amanda&quot;] .
+</code></pre>
+
+<h4 id="label-RDF+Collections+-28lists-29">RDF Collections (lists)</h4>
+
+<p>One significant RDF feature missing from RDFa was support for ordered collections, or lists. RDF supports this with special properties <code>rdf:first</code>, <code>rdf:rest</code>, and <code>rdf:nil</code>, but other RDF languages have first-class support for this concept. For example, in <a href="https://www.w3.org/TR/2011/WD-turtle-20110809/">Turtle</a>, a list can be defined as follows:</p>
+
+<pre class="code ruby"><code class="ruby">[ a schema:MusicPlayList;
+  schema:name &quot;Classic Rock Playlist&quot;;
+  schema:numTracks 5;
+  schema:tracks (
+    [ a schema:MusicRecording; schema:name &quot;Sweet Home Alabama&quot;;       schema:byArtist &quot;Lynard Skynard&quot;]
+    [ a schema:MusicRecording; schema:name &quot;Shook you all Night Long&quot;; schema:byArtist &quot;AC/DC&quot;]
+    [ a schema:MusicRecording; schema:name &quot;Sharp Dressed Man&quot;;        schema:byArtist &quot;ZZ Top&quot;]
+    [ a schema:MusicRecording; schema:name &quot;Old Time Rock and Roll&quot;;   schema:byArtist &quot;Bob Seger&quot;]
+    [ a schema:MusicRecording; schema:name &quot;Hurt So Good&quot;;             schema:byArtist &quot;John Cougar&quot;]
+  )
+]
+</code></pre>
+
+<p>defines a playlist with an ordered set of tracks. RDFa adds the @inlist attribute, which is used to identify values (object or literal) that are to be placed in a list. The same playlist might be defined in RDFa as follows:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div vocab=&quot;http://schema.org/&quot; typeof=&quot;MusicPlaylist&quot;&gt;
+  &lt;span property=&quot;name&quot;&gt;Classic Rock Playlist&lt;/span&gt;
+  &lt;meta property=&quot;numTracks&quot; content=&quot;5&quot;/&gt;
+
+  &lt;div rel=&quot;tracks&quot; inlist=&quot;&quot;&gt;
+    &lt;div typeof=&quot;MusicRecording&quot;&gt;
+      1.&lt;span property=&quot;name&quot;&gt;Sweet Home Alabama&lt;/span&gt; -
+      &lt;span property=&quot;byArtist&quot;&gt;Lynard Skynard&lt;/span&gt;
+     &lt;/div&gt;
+
+    &lt;div typeof=&quot;MusicRecording&quot;&gt;
+      2.&lt;span property=&quot;name&quot;&gt;Shook you all Night Long&lt;/span&gt; -
+      &lt;span property=&quot;byArtist&quot;&gt;AC/DC&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div typeof=&quot;MusicRecording&quot;&gt;
+      3.&lt;span property=&quot;name&quot;&gt;Sharp Dressed Man&lt;/span&gt; -
+      &lt;span property=&quot;byArtist&quot;&gt;ZZ Top&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div typeof=&quot;MusicRecording&quot;&gt;
+      4.&lt;span property=&quot;name&quot;&gt;Old Time Rock and Roll&lt;/span&gt;
+      &lt;span property=&quot;byArtist&quot;&gt;Bob Seger&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div typeof=&quot;MusicRecording&quot;&gt;
+      5.&lt;span property=&quot;name&quot;&gt;Hurt So Good&lt;/span&gt;
+      &lt;span property=&quot;byArtist&quot;&gt;John Cougar&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>This basically does the same thing, but places each track in an rdf:List in the defined order.</p>
+
+<h4 id="label-Magnetic+-40about-2F-40typeof">Magnetic @about/@typeof</h4>
+
+<p>The @typeof attribute has changed; previously, it always created a new subject, either using a resource from @about, @resource and so forth. This has long been a source of errors for people using RDFa. The new rules cause @typeof to bind to a subject if used with @about, otherwise, to an object, if either used alone, or in combination with some other resource attribute (such as @href, @src or @resource).</p>
+
+<p>For example:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div typeof=&quot;foaf:Person&quot; about=&quot;https://greggkellogg.net/foaf#me&quot;&gt;
+  &lt;p property=&quot;name&quot;&gt;Gregg Kellogg&lt;/span&gt;
+  &lt;a rel=&quot;knows&quot; typeof=&quot;foaf:Person&quot; href=&quot;https://manu.sporny.org/#this&quot;&gt;
+    &lt;span property=&quot;name&quot;&gt;Manu Sporny&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>results in</p>
+
+<pre class="code ruby"><code class="ruby">&lt;https://greggkellogg.net/foaf#me&gt; a foaf:Person;
+  foaf:name &quot;Gregg Kellogg&quot;;
+  foaf:knows &lt;https://manu.sporny.org/#this&gt; .
+&lt;https://manu.sporny.org/#this&gt; a foaf:Person;
+  foaf:name &quot;Manu Sporny&quot; .
+</code></pre>
+
+<p>Note that if the explicit @href is not present, i.e.,</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div typeof=&quot;foaf:Person&quot; about=&quot;https://greggkellogg.net/foaf#me&quot;&gt;
+  &lt;p property=&quot;name&quot;&gt;Gregg Kellogg&lt;/span&gt;
+  &lt;a href=&quot;knows&quot; typeof=&quot;foaf:Person&quot;&gt;
+    &lt;span property=&quot;name&quot;&gt;Manu Sporny&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>this results in</p>
+
+<pre class="code ruby"><code class="ruby">&lt;https://greggkellogg.net/foaf#me&gt; a foaf:Person;
+  foaf:name &quot;Gregg Kellogg&quot;;
+  foaf:knows [ 
+        a foaf:Person;
+        foaf:name &quot;Manu Sporny&quot; 
+  ].
+</code></pre>
+
+<h3 id="label-Support+for+embedded+RDF-2FXML">Support for embedded RDF/XML</h3>
+
+<p>If the document includes embedded RDF/XML, as is the case with many SVG documents, and the RDF::RDFXML gem is installed, the reader will add extracted triples to the default graph.</p>
+
+<p>For example:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;svg width=&quot;12cm&quot; height=&quot;4cm&quot; viewBox=&quot;0 0 1200 400&quot;
+    xmlns:dc=&quot;http://purl.org/dc/terms/&quot;
+    xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+    xml:base=&quot;http://example.net/&quot;
+    xmlns=&quot;http://www.w3.org/2000/svg&quot; version=&quot;1.2&quot; baseProfile=&quot;tiny&quot;&gt;
+  &lt;desc property=&quot;dc:description&quot;&gt;A yellow rectangle with sharp corners.&lt;/desc&gt;
+  &lt;metadata&gt;
+    &lt;rdf:RDF&gt;
+      &lt;rdf:Description rdf:about=&quot;&quot;&gt;
+        &lt;dc:title&gt;Test 0304&lt;/dc:title&gt;
+      &lt;/rdf:Description&gt;
+    &lt;/rdf:RDF&gt;
+  &lt;/metadata&gt;
+  &lt;!-- Show outline of canvas using &#39;rect&#39; element --&gt;
+  &lt;rect x=&quot;1&quot; y=&quot;1&quot; width=&quot;1198&quot; height=&quot;398&quot;
+        fill=&quot;none&quot; stroke=&quot;blue&quot; stroke-width=&quot;2&quot;/&gt;
+  &lt;rect x=&quot;400&quot; y=&quot;100&quot; width=&quot;400&quot; height=&quot;200&quot;
+        fill=&quot;yellow&quot; stroke=&quot;navy&quot; stroke-width=&quot;10&quot;  /&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<p>generates the following turtle:</p>
+
+<pre class="code ruby"><code class="ruby">@prefix dc: &lt;http://purl.org/dc/terms/&gt; .
+</code></pre>
+
+<p> <a href="http://example.net">example.net</a>/ dc:title “Test 0304” ;  dc:description “A yellow rectangle with sharp corners.” .</p>
+
+<h3 id="label-Support+for+embedded+N-Triples+or+Turtle">Support for embedded N-Triples or Turtle</h3>
+
+<p>If the document includes a <code>&amp;lt;script&amp;gt;</code> element having an <code>@type</code> attribute whose value matches that of a loaded RDF reader (text/ntriples and text/turtle are loaded if they are available), the data will be extracted and added to the default graph. For example:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;html&gt;
+  &lt;body&gt;
+    &lt;script type=&quot;text/turtle&quot;&gt;&lt;![CDATA[
+       @prefix foo:  &lt;http://www.example.com/xyz#&gt; .
+       @prefix gr:   &lt;http://purl.org/goodrelations/v1#&gt; .
+       @prefix xsd:  &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+       @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+
+       foo:myCompany
+         a gr:BusinessEntity ;
+         rdfs:seeAlso &lt;http://www.example.com/xyz&gt; ;
+         gr:hasLegalName &quot;Hepp Industries Ltd.&quot;^^xsd:string .
+    ]]&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>generates the following Turtle:</p>
+
+<pre class="code ruby"><code class="ruby">@prefix foo:  &lt;http://www.example.com/xyz#&gt; .
+   @prefix gr:   &lt;http://purl.org/goodrelations/v1#&gt; .
+   @prefix xsd:  &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+   @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+
+   foo:myCompany
+     a gr:BusinessEntity ;
+     rdfs:seeAlso &lt;http://www.example.com/xyz&gt; ;
+     gr:hasLegalName &quot;Hepp Industries Ltd.&quot;^^xsd:string .
+</code></pre>
+
+<h3 id="label-Support+for+Role+Attribute">Support for Role Attribute</h3>
+
+<p>The processor will generate RDF triples consistent with the <a href="https://www.w3.org/TR/role-attribute/">Role Attr</a> specification.</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div id=&quot;heading1&quot; role=&quot;heading&quot;&gt;
+  &lt;p&gt;Some contents that are a header&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>generates the following Turtle:</p>
+
+<pre class="code ruby"><code class="ruby">@prefix xhv: &lt;http://www.w3.org/1999/xhtml/vocab#&gt; .
+&lt;#heading1&gt; xhv:role xhv:heading.
+</code></pre>
+
+<h3 id="label-Support+for+microdata">Support for microdata</h3>
+
+<p>The RDFa reader will call out to <code>RDF::Microdata::Reader</code>, if an <code>@itemscope</code> attribute is detected, and the microdata reader is loaded. This avoids a common problem when pages contain both microdata and RDFa, and only one processor is run.</p>
+
+<h3 id="label-Support+for+value+property">Support for value property</h3>
+
+<p>In an <a href="https://www.w3.org/2001/sw/wiki/RDFa_1.1._Errata#Using_.3Cdata.3E.2C_.3Cinput.3E_and_.3Cli.3E_along_with_.40value">RDFA+HTML Errata</a>, it was suggested that the <code>@value</code> attribute could be parsed to obtain a numeric literal; this is consistent with how it’s treated in microdata+rdfa. This processor now parses the value of an <code>@value</code> property to determine if it is an <code>xsd:integer</code>, <code>xsd:float</code>, or <code>xsd:double</code>, and uses a plain literal otherwise. The datatype can be overriden using the <code>@datatype</code> attribute.</p>
+
+<h2 id="label-Usage">Usage</h2>
+
+<h3 id="label-Reading+RDF+data+in+the+RDFa+format">Reading RDF data in the RDFa format</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_graph'>graph</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Graph</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>etc/doap.html</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='symbol'>:rdfa</span><span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Reading+RDF+data+with+vocabulary+expansion">Reading RDF data with vocabulary expansion</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_graph'>graph</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Graph</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>etc/doap.html</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='symbol'>:rdfa</span><span class='comma'>,</span> <span class='label'>vocab_expansion:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>or</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_graph'>graph</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa.html" title="RDF::RDFa (module)">RDFa</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa/Reader.html" title="RDF::RDFa::Reader (class)">Reader</a></span></span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>etc/doap.html</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_expand'>expand</span>
+</code></pre>
+
+<h3 id="label-Reading+Processor+Graph">Reading Processor Graph</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_graph'>graph</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Graph</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>etc/doap.html</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='symbol'>:rdfa</span><span class='comma'>,</span> <span class='label'>rdfagraph:</span> <span class='symbol'>:processor</span><span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Reading+Both+Processor+and+Output+Graphs">Reading Both Processor and Output Graphs</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_graph'>graph</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Graph</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>etc/doap.html</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>format:</span> <span class='symbol'>:rdfa</span><span class='comma'>,</span> <span class='label'>rdfagraph:</span> <span class='lbracket'>[</span><span class='symbol'>:output</span><span class='comma'>,</span> <span class='symbol'>:processor</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Writing+RDF+data+using+the+XHTML-2BRDFa+format">Writing RDF data using the XHTML+RDFa format</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdf/rdfa</span><span class='tstring_end'>&#39;</span></span>
+
+<span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa.html" title="RDF::RDFa (module)">RDFa</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa/Writer.html" title="RDF::RDFa::Writer (class)">Writer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>etc/doap.html</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_writer'>writer</span><span class='op'>|</span>
+  <span class='id identifier rubyid_writer'>writer</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_graph'>graph</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>Note that prefixes may be chained between Reader and Writer, so that the Writer will use the same prefix definitions found during parsing:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_prefixes'>prefixes</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='id identifier rubyid_graph'>graph</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Graph</span><span class='period'>.</span><span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>etc/doap.html</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>prefixes:</span> <span class='id identifier rubyid_prefixes'>prefixes</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_graph'>graph</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span><span class='lparen'>(</span><span class='symbol'>:rdfa</span><span class='comma'>,</span> <span class='label'>prefixes:</span> <span class='id identifier rubyid_prefixes'>prefixes</span><span class='rparen'>)</span>
+</code></pre>
+
+<h3 id="label-Template-based+Writer">Template-based Writer</h3>
+
+<p>The RDFa writer uses <a href="https://haml-lang.com/">Haml</a> templates for code generation. This allows fully customizable RDFa output in a variety of host languages. The <a href="<span class='object_link'><a href="RDF/RDFa/Writer.html#DEFAULT_HAML-constant" title="RDF::RDFa::Writer::DEFAULT_HAML (constant)">RDF::RDFa::Writer::DEFAULT_HAML</a></span>">default template</a> generates human readable HTML5 output. A <a href="<span class='object_link'><a href="RDF/RDFa/Writer.html#MIN_HAML-constant" title="RDF::RDFa::Writer::MIN_HAML (constant)">RDF::RDFa::Writer::MIN_HAML</a></span>">minimal template</a> generates HTML, which is not intended for human consumption.</p>
+
+<p>To specify an alternative Haml template, consider the following:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdf/rdfa</span><span class='tstring_end'>&#39;</span></span>
+
+<span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa.html" title="RDF::RDFa (module)">RDFa</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa/Writer.html" title="RDF::RDFa::Writer (class)">Writer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_buffer'>buffer</span><span class='lparen'>(</span><span class='label'>haml:</span> <span class='const'><span class='object_link'><a href="RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa.html" title="RDF::RDFa (module)">RDFa</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa/Writer.html" title="RDF::RDFa::Writer (class)">Writer</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="RDF/RDFa/Writer.html#MIN_HAML-constant" title="RDF::RDFa::Writer::MIN_HAML (constant)">MIN_HAML</a></span></span><span class='rparen'>)</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_graph'>graph</span>
+</code></pre>
+
+<p>The template hash defines four Haml templates:</p>
+<ul><li>
+<p><em>doc</em>: Document Template, takes an ordered list of _subject_s and yields each one to be rendered. From <span class='object_link'><a href="RDF/RDFa/Writer.html#render_document-instance_method" title="RDF::RDFa::Writer#render_document (method)">RDF::RDFa::Writer#render_document</a></span>:</p>
+
+<p>Render document using <code>haml_template[:doc]</code>. Yields each subject to be rendered separately.</p>
+
+<p>This template takes locals <em>lang</em>, <em>prefix</em>, <em>base</em>, <em>title</em> in addition to <em>subjects</em> to create output similar to the following:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;!DOCTYPE html&gt;
+&lt;html prefix=&#39;xhv: http://www.w3.org/1999/xhtml/vocab#&#39; xmlns=&#39;http://www.w3.org/1999/xhtml&#39;&gt;
+  &lt;head&gt;
+    &lt;base href=&quot;http://example/&quot;&gt;
+    &lt;title&gt;Document Title&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Options passed to the Writer are used to supply <em>lang</em> and <em>base</em> locals. <em>prefix</em> is generated based upon prefixes found from the default profiles, as well as those provided by a previous Reader. <em>title</em> is taken from the first top-level subject having an appropriate title property (as defined by the <em>heading_predicates</em> option).</p>
+</li><li>
+<p><em>subject</em>: Subject Template, take a <em>subject</em> and an ordered list of <em>predicate_s and yields each </em>predicate_ to be rendered. From <span class='object_link'><a href="RDF/RDFa/Writer.html#render_subject-instance_method" title="RDF::RDFa::Writer#render_subject (method)">RDF::RDFa::Writer#render_subject</a></span>:</p>
+
+<p>Render a subject using <code>haml_template[:subject]</code>.</p>
+
+<p>The <em>subject</em> template may be called either as a top-level element, or recursively under another element if the <em>rel</em> local is not nil.</p>
+
+<p>Yields each predicate/property to be rendered separately (@see #render_property_value and <code>#render_property_values</code>).</p>
+
+<p>Return Haml template for document from <code>haml_template[:subject]</code></p>
+
+<p>The template takes locals <em>rel</em> and <em>typeof</em> in addition to <em>predicates</em> and <em>subject</em> to create output similar to the following:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div resource=&quot;http://example/&quot;&gt;
+  ...
+&lt;/div&gt;
+</code></pre>
+
+<p>Note that if <em>typeof</em> is defined, in this template, it will generate a textual description.</p>
+</li><li>
+<p><em>property_value</em>: Property Value Template, used for predicates having a single value; takes a <em>predicate</em>, and a single-valued Array of <em>objects</em>. From <span class='object_link'><a href="RDF/RDFa/Writer.html#render_property-instance_method" title="RDF::RDFa::Writer#render_property (method)">RDF::RDFa::Writer#render_property</a></span>:</p>
+
+<p>Render a single- or multi-valued predicate using <code>haml_template[:property_value]</code> or <code>haml_template[:property_values]</code>. Yields each object for optional rendering. The block should only render for recursive subject definitions (i.e., where the object is also a subject and is rendered underneath the first referencing subject).</p>
+
+<p>If a multi-valued property definition is not found within the template, the writer will use the single-valued property definition multiple times.</p>
+
+<p>In addition to <em>predicate</em> and <em>objects</em>, the template takes <em>inlist</em> to indicate that the property is part of an <code>rdf:List</code>.</p>
+
+<p>Also, if the predicate is identified as a <em>heading predicate</em> (via <em>:heading_predicates</em> option), it will generate a heading element, and may use the value as the document title.</p>
+
+<p>Each <em>object</em> is yielded to the calling block, and the result is rendered, unless nil. Otherwise, rendering depends on the type of <em>object</em>. This is useful for recursive document descriptions.</p>
+
+<p>Creates output similar to the following:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div class=&#39;property&#39;&gt;
+  &lt;span class=&#39;label&#39;&gt;
+    xhv:alternate
+  &lt;/span&gt;
+  &lt;a property=&#39;xhv:alternate&#39; href=&#39;http://rdfa.info/feed/&#39;&gt;http://rdfa.info/feed/&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>Note the use of methods defined in <span class='object_link'><a href="RDF/RDFa/Writer.html" title="RDF::RDFa::Writer (class)">RDF::RDFa::Writer</a></span> useful in rendering the output.</p>
+</li><li>
+<p><em>property_values</em>: Similar to <em>property_value</em>, but for predicates having more than one value. Locals are identical to <em>property_values</em>, but <em>objects</em> is expected to have more than one value. Described further in <span class='object_link'><a href="RDF/RDFa/Writer.html#render_property-instance_method" title="RDF::RDFa::Writer#render_property (method)">RDF::RDFa::Writer#render_property</a></span>.</p>
+
+<p>In this case, and unordered list is used for output. Creates output similar to the following:</p>
+
+<pre class="code ruby"><code class="ruby">&lt;div class=&#39;property&#39;&gt;
+  &lt;span class=&#39;label&#39;&gt;
+    xhv:bookmark
+  &lt;/span&gt;
+  &lt;ul rel=&#39;xhv:bookmark&#39;&gt;
+    &lt;li&gt;
+      &lt;a href=&#39;http://rdfa.info/2009/12/12/oreilly-catalog-uses-rdfa/&#39;&gt;
+        http://rdfa.info/2009/12/12/oreilly-catalog-uses-rdfa/
+      &lt;/a&gt;
+    &lt;/li&gt;
+      &lt;a href=&#39;http://rdfa.info/2010/05/31/new-rdfa-checker/&#39;&gt;
+        http://rdfa.info/2010/05/31/new-rdfa-checker/
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>If <em>property_values</em> does not exist, repeated values will be replecated using <em>property_value</em>.</p>
+</li><li>
+<p>Type-specific templates.  To simplify generation of different output types, the  template may contain a elements indexed by a URI. When a subject with an rdf:type  matching that URI is found, subsequent Haml definitions will be taken from  the associated Hash. For example:</p>
+
+<p>{  document: "...",  subject: "...",  :property_value =&gt; "...",  :property_values =&gt; "...",  RDF::URI("<a href="http://schema.org/Person">schema.org/Person</a>") =&gt; {  subject: "...",  :property_value =&gt; "...",  :property_values =&gt; "...",  } }</p>
+</li></ul>
+
+<h2 id="label-Dependencies">Dependencies</h2>
+<ul><li>
+<p><a href="https://ruby-lang.org/">Ruby</a> (&gt;= 2.6)</p>
+</li><li>
+<p><a href="https://rubygems.org/gems/rdf">RDF.rb</a> (~&gt; 3.2)</p>
+</li><li>
+<p><a href="https://rubygems.org/gems/haml">Haml</a> (&gt;- 5.2, &lt; 7)</p>
+</li><li>
+<p><a href="https://rubygems.org/gems/htmlentities">HTMLEntities</a> (~&gt; 4.3)</p>
+</li><li>
+<p>Soft dependency on <a href="https://rubygems.org/gems/nokogiri">Nokogiri</a> (~&gt; 1.12)</p>
+</li></ul>
+
+<h2 id="label-Documentation">Documentation</h2>
+
+<p>Full documentation available on <a href="https://ruby-rdf.github.io/rdf-rdfa/frames">Rubydoc.info</a></p>
+
+<h3 id="label-Principle+Classes">Principle Classes</h3>
+<ul><li>
+<p><span class='object_link'><a href="RDF/RDFa/Format.html" title="RDF::RDFa::Format (class)">RDF::RDFa::Format</a></span></p>
+</li><li>
+<p><span class='object_link'><a href="RDF/RDFa/Reader.html" title="RDF::RDFa::Reader (class)">RDF::RDFa::Reader</a></span></p>
+</li><li>
+<p><span class='object_link'><a href="RDF/RDFa/Reader/Nokogiri.html" title="RDF::RDFa::Reader::Nokogiri (module)">RDF::RDFa::Reader::Nokogiri</a></span></p>
+</li><li>
+<p><span class='object_link'><a href="RDF/RDFa/Reader/REXML.html" title="RDF::RDFa::Reader::REXML (module)">RDF::RDFa::Reader::REXML</a></span></p>
+</li><li>
+<p><span class='object_link'><a href="RDF/RDFa/Context.html" title="RDF::RDFa::Context (class)">RDF::RDFa::Context</a></span></p>
+</li><li>
+<p><span class='object_link'><a href="RDF/RDFa/Expansion.html" title="RDF::RDFa::Expansion (module)">RDF::RDFa::Expansion</a></span></p>
+</li><li>
+<p><span class='object_link'><a href="RDF/RDFa/Writer.html" title="RDF::RDFa::Writer (class)">RDF::RDFa::Writer</a></span></p>
+</li></ul>
+
+<h2 id="label-TODO">TODO</h2>
+<ul><li>
+<p>Add support for LibXML and REXML bindings, and use the best available</p>
+</li><li>
+<p>Consider a SAX-based parser for improved performance</p>
+</li></ul>
+
+<h2 id="label-Resources">Resources</h2>
+<ul><li>
+<p><a href="https://rubygems.org/gems/rdf">RDF.rb</a></p>
+</li><li>
+<p><a href="http://rdf.greggkellogg.net/distiller">Distiller</a></p>
+</li><li>
+<p><a href="https://ruby-rdf.github.io/rdf-rdfa/frames">Documentation</a></p>
+</li><li>
+<p><a href="file:History_md.html">History</a></p>
+</li><li>
+<p><a href="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/">RDFa 1.1 Core</a></p>
+</li><li>
+<p><a href="https://www.w3.org/TR/2012/REC-xhtml-rdfa-20120607/">XHTML+RDFa 1.1</a></p>
+</li><li>
+<p><a href="https://rdfa.info/test-suite/">RDFa-test-suite</a></p>
+</li></ul>
+
+<h2 id="label-Author">Author</h2>
+<ul><li>
+<p><a href="https://github.com/gkellogg">Gregg Kellogg</a> - <a href="https://greggkellogg.net">greggkellogg.net</a>/</p>
+</li></ul>
+
+<h2 id="label-Contributors">Contributors</h2>
+<ul><li>
+<p><a href="https://github.com/njh">Nicholas Humfrey</a> - <a href="https://njh.me">njh.me</a>/</p>
+</li></ul>
+
+<h2 id="label-Contributing">Contributing</h2>
+
+<p>This repository uses <a href="https://github.com/nvie/gitflow">Git Flow</a> to mange development and release activity. All submissions <em>must</em> be on a feature branch based on the <em>develop</em> branch to ease staging and integration.</p>
+<ul><li>
+<p>Do your best to adhere to the existing coding conventions and idioms.</p>
+</li><li>
+<p>Don’t use hard tabs, and don’t leave trailing whitespace on any line.</p>
+</li><li>
+<p>Do document every method you add using <a href="https://yardoc.org/">YARD</a> annotations. Read the  <a href="https://rubydoc.info/docs/yard/file/docs/GettingStarted.md">tutorial</a> or just look at the existing code for examples.</p>
+</li><li>
+<p>Don’t touch the <code>.gemspec</code>, <code>VERSION</code> or <code>AUTHORS</code> files. If you need to  change them, do so on your private branch only.</p>
+</li><li>
+<p>Do feel free to add yourself to the <code>CREDITS</code> file and the corresponding  list in the the <code>README</code>. Alphabetical order applies.</p>
+</li><li>
+<p>Do note that in order for us to merge any non-trivial changes (as a rule  of thumb, additions larger than about 15 lines of code), we need an  explicit <a href="https://unlicense.org/#unlicensing-contributions">public domain dedication</a> on record from you,  which you will be asked to agree to on the first commit to a repo within the organization.  Note that the agreement applies to all repos in the <a href="https://github.com/ruby-rdf/">Ruby RDF</a> organization.</p>
+</li></ul>
+
+<h2 id="label-License">License</h2>
+
+<p>This is free and unencumbered public domain software. For more information, see <a href="https://unlicense.org">unlicense.org</a>/ or the accompanying <a href="UNLICENSE">UNLICENSE</a> file.</p>
+
+<h2 id="label-FEEDBACK">FEEDBACK</h2>
+<ul><li>
+<p>gregg@greggkellogg.net</p>
+</li><li>
+<p><a href="https://rubygems.org/rdf-rdfa">rubygems.org/rdf-rdfa</a></p>
+</li><li>
+<p><a href="https://github.com/ruby-rdf/rdf-rdfa">github.com/ruby-rdf/rdf-rdfa</a></p>
+</li><li>
+<p><a href="https://lists.w3.org/Archives/Public/public-rdf-ruby">lists.w3.org/Archives/Public/public-rdf-ruby</a>/</p>
+</li></ul>
+</div></div>
+
+      <div id="footer">
+  Generated on Mon Apr  3 23:22:42 2023 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.28 (ruby-3.1.4).
+</div>
+
+    </div>
+  </body>
+</html>

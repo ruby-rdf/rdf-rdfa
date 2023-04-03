@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: RDF::RDFa::Reader
+  
+    &mdash; RDFa reader/writer for RDF.rb.
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "RDF::RDFa::Reader";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../RDFa.html" title="RDF::RDFa (module)">RDFa</a></span></span>
+     &raquo; 
+    <span class="title">Reader</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: RDF::RDFa::Reader
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">RDF::Reader</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">RDF::Reader</li>
+          
+            <li class="next">RDF::RDFa::Reader</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Expansion.html" title="RDF::RDFa::Expansion (module)">Expansion</a></span>, Util::Logger</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/rdf/rdfa/reader.rb<span class="defines">,<br />
+  lib/rdf/rdfa/reader/rexml.rb,<br /> lib/rdf/rdfa/reader/nokogiri.rb</span>
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>An RDFa parser in Ruby</p>
+
+<p>This class supports <a href="https://nokogiri.org/">Nokogiri</a> for HTML processing, and will automatically select the most performant implementation (Nokogiri or LibXML) that is available. If need be, you can explicitly override the used implementation by passing in a <code>:library</code> option to <code>Reader.new</code> or <code>Reader.open</code>.</p>
+
+<p>Based on processing rules described here:</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><a href="https://www.w3.org/TR/rdfa-syntax/#s_model" target="_parent" title="RDFa 1.0">RDFa 1.0</a></li>
+    
+      <li><a href="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/" target="_parent" title="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/">https://www.w3.org/TR/2012/REC-rdfa-core-20120607/</a></li>
+    
+      <li><a href="https://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/" target="_parent" title="https://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/">https://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/</a></li>
+    
+      <li><a href="https://dev.w3.org/html5/rdfa/" target="_parent" title="https://dev.w3.org/html5/rdfa/">https://dev.w3.org/html5/rdfa/</a></li>
+    
+  </ul>
+<p class="tag_title">Author:</p>
+<ul class="author">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'>
+<p><a href="https://greggkellogg.net/">Gregg Kellogg</a></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Reader/Nokogiri.html" title="RDF::RDFa::Reader::Nokogiri (module)">Nokogiri</a></span>, <span class='object_link'><a href="Reader/REXML.html" title="RDF::RDFa::Reader::REXML (module)">REXML</a></span>
+    
+  
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="XHTML-constant" class="">XHTML =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http://www.w3.org/1999/xhtml</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="SafeCURIEorCURIEorIRI-constant" class="">SafeCURIEorCURIEorIRI =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Content model for @about and @resource. In RDFa 1.0, this was URIorSafeCURIE</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='symbol'>:&quot;rdfa1.0&quot;</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:safe_curie</span><span class='comma'>,</span> <span class='symbol'>:uri</span><span class='comma'>,</span> <span class='symbol'>:bnode</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='symbol'>:&quot;rdfa1.1&quot;</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:safe_curie</span><span class='comma'>,</span> <span class='symbol'>:curie</span><span class='comma'>,</span> <span class='symbol'>:uri</span><span class='comma'>,</span> <span class='symbol'>:bnode</span><span class='rbracket'>]</span><span class='comma'>,</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="TERMorCURIEorAbsIRI-constant" class="">TERMorCURIEorAbsIRI =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Content model for @datatype. In RDFa 1.0, this was CURIE Also plural TERMorCURIEorAbsIRIs, content model for @rel, @rev, @property and @typeof</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='symbol'>:&quot;rdfa1.0&quot;</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:term</span><span class='comma'>,</span> <span class='symbol'>:curie</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='symbol'>:&quot;rdfa1.1&quot;</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:term</span><span class='comma'>,</span> <span class='symbol'>:curie</span><span class='comma'>,</span> <span class='symbol'>:absuri</span><span class='rbracket'>]</span><span class='comma'>,</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="NC_REGEXP-constant" class="">NC_REGEXP =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>This expression matches an NCName as defined in <a href="https://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName">XML-NAMES</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><a href="https://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName" target="_parent" title="https://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName">https://www.w3.org/TR/2009/REC-xml-names-20091208/#NT-NCName</a></li>
+    
+  </ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+<span class='tstring'><span class='tstring_beg'>%{</span><span class='tstring_content'>^
+  (  [a-zA-Z_]
+   | \\\\u[0-9a-fA-F]{4}
+  )
+  (  [0-9a-zA-Z_\.-/]
+   | \\\\u([0-9a-fA-F]{4})
+  )*
+$</span><span class='tstring_end'>}</span></span><span class='comma'>,</span>
+<span class='const'>Regexp</span><span class='op'>::</span><span class='const'>EXTENDED</span><span class='rparen'>)</span></pre></dd>
+      
+        <dt id="TERM_REGEXP-constant" class="">TERM_REGEXP =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>This expression matches an term as defined in <a href="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms">RDFA-CORE</a></p>
+
+<p>For the avoidance of doubt, this definition means a ‘term’ in RDFa is an XML NCName that also permits slash as a non-leading character.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><a href="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms" target="_parent" title="https://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms">https://www.w3.org/TR/2012/REC-rdfa-core-20120607/#s_terms</a></li>
+    
+  </ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+<span class='tstring'><span class='tstring_beg'>%{</span><span class='tstring_content'>^
+  (?!\\\\u0301)             # &amp;#x301; is a non-spacing acute accent.
+                            # It is legal within an XML Name, but not as the first character.
+  (  [a-zA-Z_]
+   | \\\\u[0-9a-fA-F]{4}
+  )
+  (  [-0-9a-zA-Z_\.\/]
+   | \\\\u([0-9a-fA-F]{4})
+  )*
+$</span><span class='tstring_end'>}</span></span><span class='comma'>,</span>
+<span class='const'>Regexp</span><span class='op'>::</span><span class='const'>EXTENDED</span><span class='rparen'>)</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#host_language-instance_method" title="#host_language (instance method)">#<strong>host_language</strong>  &#x21d2; :xml, ... </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Host language.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#implementation-instance_method" title="#implementation (instance method)">#<strong>implementation</strong>  &#x21d2; Module </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the XML implementation module for this reader instance.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#repository-instance_method" title="#repository (instance method)">#<strong>repository</strong>  &#x21d2; RDF::Repository </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Repository used for collecting triples.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#version-instance_method" title="#version (instance method)">#<strong>version</strong>  &#x21d2; :&quot;rdfa1.0&quot;, :&quot;rdfa1.1&quot; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Version.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#options-class_method" title="options (class method)">.<strong>options</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>RDFa Reader options.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_statement-instance_method" title="#each_statement (instance method)">#<strong>each_statement</strong> {|statement| ... } </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Iterates the given block for each RDF statement in the input.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_triple-instance_method" title="#each_triple (instance method)">#<strong>each_triple</strong> {|subject, predicate, object| ... } </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Iterates the given block for each RDF triple in the input.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#extract_script-instance_method" title="#extract_script (instance method)">#<strong>extract_script</strong>(el, input, type, **options, &amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Extracts RDF from script element, or embeded RDF/XML.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(input = $stdin, **options) {|reader| ... } &#x21d2; reader </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Initializes the RDFa reader instance.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Expansion.html" title="RDF::RDFa::Expansion (module)">Expansion</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Expansion.html#copy_properties-instance_method" title="RDF::RDFa::Expansion#copy_properties (method)">#copy_properties</a></span>, <span class='object_link'><a href="Expansion.html#expand-instance_method" title="RDF::RDFa::Expansion#expand (method)">#expand</a></span>, <span class='object_link'><a href="Expansion.html#rule-instance_method" title="RDF::RDFa::Expansion#rule (method)">#rule</a></span></p>
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(input = $stdin, **options) {|reader| ... } &#x21d2; <tt>reader</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Initializes the RDFa reader instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>input</span>
+      
+      
+        <span class='type'>(<tt>IO</tt>, <tt>File</tt>, <tt><span class='object_link'><a href="../../String.html" title="String (class)">String</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>$stdin</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the input stream to read</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Object}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>any additional options (see <code>RDF::Reader#initialize</code>)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    
+    
+    <p class="tag_title">Options Hash (<tt>**options</tt>):</p>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:library</span>
+          <span class="type">(<tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>One of :nokogiri or :rexml. If nil/unspecified uses :nokogiri if available, :rexml otherwise.</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:vocab_expansion</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>false</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to perform OWL2 expansion on the resulting graph</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:reference_folding</span>
+          <span class="type">(<tt>Boolean</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>true</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>whether to perform RDFa property copying on the resulting graph</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:host_language</span>
+          <span class="type">(<tt>:xml</tt>, <tt>:xhtml1</tt>, <tt>:xhtml5</tt>, <tt>:html4</tt>, <tt>:html5</tt>, <tt>:svg</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>:html5</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>Host Language</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:version</span>
+          <span class="type">(<tt>:"rdfa1.0"</tt>, <tt>:"rdfa1.1"</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>:&quot;rdfa1.1&quot;</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>Parser version information</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:processor_callback</span>
+          <span class="type">(<tt>Proc</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>nil</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>Callback used to provide processor graph triples.</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:rdfagraph</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>[:output]</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>Used to indicate if either or both of the :output or :processor graphs are output. Value is an array containing on or both of :output or :processor.</p>
+</div>
+          
+        </li>
+      
+        <li>
+          <span class="name">:vocab_repository</span>
+          <span class="type">(<tt>Repository</tt>)</span>
+          <span class="default">
+            
+              &mdash; default:
+              <tt>nil</tt>
+            
+          </span>
+          
+            &mdash; <div class='inline'>
+<p>Repository to save loaded vocabularies.</p>
+</div>
+          
+        </li>
+      
+    </ul>
+  
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>reader</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p><code>self</code></p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>reader</span>
+      
+      
+        <span class='type'>(<tt>RDF::Reader</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Returns:</p>
+<ul class="yieldreturn">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>void</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>ignored</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>RDF::ReaderError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if <em>validate</em></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 300</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='gvar'>$stdin</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>super</span> <span class='kw'>do</span>
+    <span class='ivar'>@options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>reference_folding:</span> <span class='kw'>true</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='ivar'>@options</span><span class='rparen'>)</span>
+    <span class='ivar'>@repository</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Repository</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+
+    <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>all</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='lbracket'>[</span><span class='symbol'>:output</span><span class='comma'>,</span> <span class='symbol'>:processor</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../String.html" title="String (class)">String</a></span></span><span class='comma'>,</span> <span class='const'>Symbol</span> <span class='kw'>then</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>,</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:strip</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_sym</span><span class='rparen'>)</span>
+    <span class='kw'>when</span> <span class='const'>Array</span> <span class='kw'>then</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span> <span class='id identifier rubyid_o'>o</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbrace'>}</span>
+    <span class='kw'>else</span>  <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_o'>o</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='symbol'>:output</span><span class='comma'>,</span> <span class='symbol'>:processor</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_o'>o</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+    <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='symbol'>:output</span> <span class='kw'>if</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+    <span class='ivar'>@library</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:library</span><span class='rbracket'>]</span>
+      <span class='kw'>when</span> <span class='kw'>nil</span>
+        <span class='comment'># Use Nokogiri when available, and REXML otherwise:
+</span>        <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>Nokogiri</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='symbol'>:nokogiri</span> <span class='op'>:</span> <span class='symbol'>:rexml</span>
+      <span class='kw'>when</span> <span class='symbol'>:nokogiri</span><span class='comma'>,</span> <span class='symbol'>:rexml</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:library</span><span class='rbracket'>]</span>
+      <span class='kw'>else</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>expected :rexml or :nokogiri, but got </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:library</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rdf/rdfa/reader/</span><span class='embexpr_beg'>#{</span><span class='ivar'>@library</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='ivar'>@implementation</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='ivar'>@library</span>
+      <span class='kw'>when</span> <span class='symbol'>:nokogiri</span> <span class='kw'>then</span> <span class='const'><span class='object_link'><a href="Reader/Nokogiri.html" title="RDF::RDFa::Reader::Nokogiri (module)">Nokogiri</a></span></span>
+      <span class='kw'>when</span> <span class='symbol'>:rexml</span>    <span class='kw'>then</span> <span class='const'><span class='object_link'><a href="Reader/REXML.html" title="RDF::RDFa::Reader::REXML (module)">REXML</a></span></span>
+    <span class='kw'>end</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_extend'>extend</span><span class='lparen'>(</span><span class='ivar'>@implementation</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_detect_host_language_version'>detect_host_language_version</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_add_info'>add_info</span><span class='lparen'>(</span><span class='ivar'>@doc</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>version = </span><span class='embexpr_beg'>#{</span><span class='ivar'>@version</span><span class='embexpr_end'>}</span><span class='tstring_content'>,  host_language = </span><span class='embexpr_beg'>#{</span><span class='ivar'>@host_language</span><span class='embexpr_end'>}</span><span class='tstring_content'>, library = </span><span class='embexpr_beg'>#{</span><span class='ivar'>@library</span><span class='embexpr_end'>}</span><span class='tstring_content'>, rdfagraph = </span><span class='embexpr_beg'>#{</span><span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>, expand = </span><span class='embexpr_beg'>#{</span><span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:vocab_expansion</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+    <span class='kw'>begin</span>
+      <span class='id identifier rubyid_initialize_xml'>initialize_xml</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='kw'>rescue</span>
+      <span class='id identifier rubyid_add_error'>add_error</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Malformed document: </span><span class='embexpr_beg'>#{</span><span class='gvar'>$!</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_add_error'>add_error</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Empty document</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='id identifier rubyid_add_error'>add_error</span><span class='lparen'>(</span><span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_doc_errors'>doc_errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:message</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='op'>!</span><span class='id identifier rubyid_doc_errors'>doc_errors</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+    <span class='comment'># Section 4.2 RDFa Host Language Conformance
+</span>    <span class='comment'>#
+</span>    <span class='comment'># The Host Language may require the automatic inclusion of one or more Initial Contexts
+</span>    <span class='ivar'>@host_defaults</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+      <span class='label'>vocabulary:</span>       <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>uri_mappings:</span>     <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>initial_contexts:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span>
+
+    <span class='kw'>if</span> <span class='ivar'>@version</span> <span class='op'>==</span> <span class='symbol'>:&quot;rdfa1.0&quot;</span>
+      <span class='comment'># Add default term mappings
+</span>      <span class='ivar'>@host_defaults</span><span class='lbracket'>[</span><span class='symbol'>:term_mappings</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='qwords_beg'>%w(</span><span class='words_sep'>
+        </span><span class='tstring_content'>alternate</span><span class='words_sep'> </span><span class='tstring_content'>appendix</span><span class='words_sep'> </span><span class='tstring_content'>bookmark</span><span class='words_sep'> </span><span class='tstring_content'>cite</span><span class='words_sep'> </span><span class='tstring_content'>chapter</span><span class='words_sep'> </span><span class='tstring_content'>contents</span><span class='words_sep'> </span><span class='tstring_content'>copyright</span><span class='words_sep'> </span><span class='tstring_content'>first</span><span class='words_sep'> </span><span class='tstring_content'>glossary</span><span class='words_sep'> </span><span class='tstring_content'>help</span><span class='words_sep'> </span><span class='tstring_content'>icon</span><span class='words_sep'> </span><span class='tstring_content'>index</span><span class='words_sep'>
+        </span><span class='tstring_content'>last</span><span class='words_sep'> </span><span class='tstring_content'>license</span><span class='words_sep'> </span><span class='tstring_content'>meta</span><span class='words_sep'> </span><span class='tstring_content'>next</span><span class='words_sep'> </span><span class='tstring_content'>p3pv1</span><span class='words_sep'> </span><span class='tstring_content'>prev</span><span class='words_sep'> </span><span class='tstring_content'>role</span><span class='words_sep'> </span><span class='tstring_content'>section</span><span class='words_sep'> </span><span class='tstring_content'>stylesheet</span><span class='words_sep'> </span><span class='tstring_content'>subsection</span><span class='words_sep'> </span><span class='tstring_content'>start</span><span class='words_sep'> </span><span class='tstring_content'>top</span><span class='words_sep'> </span><span class='tstring_content'>up</span><span class='words_sep'>
+        </span><span class='tstring_end'>)</span></span><span class='period'>.</span><span class='id identifier rubyid_inject'>inject</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_term'>term</span><span class='op'>|</span> <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_term'>term</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>URI</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http://www.w3.org/1999/xhtml/vocab#</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_term'>term</span><span class='semicolon'>;</span> <span class='id identifier rubyid_hash'>hash</span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>case</span> <span class='ivar'>@host_language</span>
+    <span class='kw'>when</span> <span class='symbol'>:xml</span><span class='comma'>,</span> <span class='symbol'>:svg</span>
+      <span class='ivar'>@host_defaults</span><span class='lbracket'>[</span><span class='symbol'>:initial_contexts</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../RDFa.html#XML_RDFA_CONTEXT-constant" title="RDF::RDFa::XML_RDFA_CONTEXT (constant)">XML_RDFA_CONTEXT</a></span></span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:xhtml1</span>
+      <span class='ivar'>@host_defaults</span><span class='lbracket'>[</span><span class='symbol'>:initial_contexts</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../RDFa.html#XML_RDFA_CONTEXT-constant" title="RDF::RDFa::XML_RDFA_CONTEXT (constant)">XML_RDFA_CONTEXT</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../RDFa.html#XHTML_RDFA_CONTEXT-constant" title="RDF::RDFa::XHTML_RDFA_CONTEXT (constant)">XHTML_RDFA_CONTEXT</a></span></span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:xhtml5</span><span class='comma'>,</span> <span class='symbol'>:html4</span><span class='comma'>,</span> <span class='symbol'>:html5</span>
+      <span class='ivar'>@host_defaults</span><span class='lbracket'>[</span><span class='symbol'>:initial_contexts</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="../RDFa.html#XML_RDFA_CONTEXT-constant" title="RDF::RDFa::XML_RDFA_CONTEXT (constant)">XML_RDFA_CONTEXT</a></span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../RDFa.html#HTML_RDFA_CONTEXT-constant" title="RDF::RDFa::HTML_RDFA_CONTEXT (constant)">HTML_RDFA_CONTEXT</a></span></span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="host_language-instance_method">
+  
+    #<strong>host_language</strong>  &#x21d2; <tt>:xml</tt>, ...  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Host language</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>:xml</tt>, <tt>:xhtml1</tt>, <tt>:xhtml5</tt>, <tt>:html4</tt>, <tt>:html5</tt>, <tt>:svg</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+85
+86
+87</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 85</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_host_language'>host_language</span>
+  <span class='ivar'>@host_language</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="implementation=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="implementation-instance_method">
+  
+    #<strong>implementation</strong>  &#x21d2; <tt>Module</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the XML implementation module for this reader instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Module</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+101
+102
+103</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 101</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_implementation'>implementation</span>
+  <span class='ivar'>@implementation</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="repository-instance_method">
+  
+    #<strong>repository</strong>  &#x21d2; <tt>RDF::Repository</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Repository used for collecting triples.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>RDF::Repository</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+95
+96
+97</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 95</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_repository'>repository</span>
+  <span class='ivar'>@repository</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="version-instance_method">
+  
+    #<strong>version</strong>  &#x21d2; <tt>:"rdfa1.0"</tt>, <tt>:"rdfa1.1"</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>:"rdfa1.0"</tt>, <tt>:"rdfa1.1"</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+90
+91
+92</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 90</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_version'>version</span>
+  <span class='ivar'>@version</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="options-class_method">
+  
+    .<strong>options</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>RDFa Reader options</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><a href="https://ruby-rdf.github.io/rdf/RDF/Reader#options-class_method" target="_parent" title="https://ruby-rdf.github.io/rdf/RDF/Reader#options-class_method">https://ruby-rdf.github.io/rdf/RDF/Reader#options-class_method</a></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 249</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_options'>options</span>
+  <span class='kw'>super</span> <span class='op'>+</span> <span class='lbracket'>[</span>
+    <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>CLI</span><span class='op'>::</span><span class='const'>Option</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+      <span class='label'>symbol:</span> <span class='symbol'>:vocab_expansion</span><span class='comma'>,</span>
+      <span class='label'>datatype:</span> <span class='const'>TrueClass</span><span class='comma'>,</span>
+      <span class='label'>on:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--vocab-expansion</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Perform OWL2 expansion on the resulting graph.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='kw'>true</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>CLI</span><span class='op'>::</span><span class='const'>Option</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+      <span class='label'>symbol:</span> <span class='symbol'>:host_language</span><span class='comma'>,</span>
+      <span class='label'>datatype:</span> <span class='qwords_beg'>%w(</span><span class='tstring_content'>xml</span><span class='words_sep'> </span><span class='tstring_content'>xhtml1</span><span class='words_sep'> </span><span class='tstring_content'>xhtml5</span><span class='words_sep'> </span><span class='tstring_content'>html4</span><span class='words_sep'> </span><span class='tstring_content'>svg</span><span class='tstring_end'>)</span></span><span class='comma'>,</span>
+      <span class='label'>on:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--host-language HOSTLANG</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='qwords_beg'>%w(</span><span class='tstring_content'>xml</span><span class='words_sep'> </span><span class='tstring_content'>xhtml1</span><span class='words_sep'> </span><span class='tstring_content'>xhtml5</span><span class='words_sep'> </span><span class='tstring_content'>html4</span><span class='words_sep'> </span><span class='tstring_content'>svg</span><span class='tstring_end'>)</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Host Language. One of xml, xhtml1, xhtml5, html4, or svg</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_arg'>arg</span><span class='op'>|</span>
+        <span class='id identifier rubyid_arg'>arg</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+    <span class='kw'>end</span><span class='comma'>,</span>
+    <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>CLI</span><span class='op'>::</span><span class='const'>Option</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+      <span class='label'>symbol:</span> <span class='symbol'>:rdfagraph</span><span class='comma'>,</span>
+      <span class='label'>datatype:</span> <span class='qwords_beg'>%w(</span><span class='tstring_content'>output</span><span class='words_sep'> </span><span class='tstring_content'>processor</span><span class='words_sep'> </span><span class='tstring_content'>both</span><span class='tstring_end'>)</span></span><span class='comma'>,</span>
+      <span class='label'>on:</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--rdfagraph RDFAGRAPH</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='qwords_beg'>%w(</span><span class='tstring_content'>output</span><span class='words_sep'> </span><span class='tstring_content'>processor</span><span class='words_sep'> </span><span class='tstring_content'>both</span><span class='tstring_end'>)</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Used to indicate if either or both of the :output or :processor graphs are output.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_arg'>arg</span><span class='op'>|</span> <span class='id identifier rubyid_arg'>arg</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="each_statement-instance_method">
+  
+    #<strong>each_statement</strong> {|statement| ... } 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p>
+<p>Iterates the given block for each RDF statement in the input.</p>
+
+<p>Reads to graph and performs expansion if required.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>statement</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>statement</span>
+      
+      
+        <span class='type'>(<tt>RDF::Statement</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 412</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_statement'>each_statement</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='kw'>unless</span> <span class='ivar'>@processed</span> <span class='op'>||</span> <span class='ivar'>@root</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+      <span class='comment'># Add prefix definitions from host defaults
+</span>      <span class='ivar'>@host_defaults</span><span class='lbracket'>[</span><span class='symbol'>:uri_mappings</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each_pair'>each_pair</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_prefix'>prefix</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+        <span class='id identifier rubyid_prefix'>prefix</span><span class='lparen'>(</span><span class='id identifier rubyid_prefix'>prefix</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+
+      <span class='comment'># parse
+</span>      <span class='id identifier rubyid_parse_whole_document'>parse_whole_document</span><span class='lparen'>(</span><span class='ivar'>@doc</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>URI</span><span class='lparen'>(</span><span class='id identifier rubyid_base_uri'>base_uri</span><span class='rparen'>)</span><span class='rparen'>)</span>
+
+      <span class='comment'># Look for Embedded RDF/XML
+</span>      <span class='kw'>unless</span> <span class='ivar'>@root</span><span class='period'>.</span><span class='id identifier rubyid_xpath'>xpath</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>//rdf:RDF</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rdf</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http://www.w3.org/1999/02/22-rdf-syntax-ns#</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+        <span class='id identifier rubyid_extract_script'>extract_script</span><span class='lparen'>(</span><span class='ivar'>@root</span><span class='comma'>,</span> <span class='ivar'>@doc</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>application/rdf+xml</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>**</span><span class='ivar'>@options</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>base_uri:</span> <span class='id identifier rubyid_base_uri'>base_uri</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span>
+          <span class='ivar'>@repository</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_statement'>statement</span>
+        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+
+      <span class='comment'># Look for Embedded microdata
+</span>      <span class='kw'>unless</span> <span class='ivar'>@root</span><span class='period'>.</span><span class='id identifier rubyid_xpath'>xpath</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>//@itemscope</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+        <span class='kw'>begin</span>
+          <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdf/microdata</span><span class='tstring_end'>&#39;</span></span>
+          <span class='id identifier rubyid_add_debug'>add_debug</span><span class='lparen'>(</span><span class='ivar'>@doc</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>process microdata</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+          <span class='ivar'>@repository</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Microdata</span><span class='op'>::</span><span class='const'>Reader</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@doc</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+        <span class='kw'>rescue</span> <span class='const'>LoadError</span>
+          <span class='id identifier rubyid_add_debug'>add_debug</span><span class='lparen'>(</span><span class='ivar'>@doc</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>microdata detected, not processed</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+
+      <span class='comment'># Perform property copying
+</span>      <span class='id identifier rubyid_copy_properties'>copy_properties</span><span class='lparen'>(</span><span class='ivar'>@repository</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:reference_folding</span><span class='rbracket'>]</span>
+
+      <span class='comment'># Perform vocabulary expansion
+</span>      <span class='id identifier rubyid_expand'>expand</span><span class='lparen'>(</span><span class='ivar'>@repository</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:vocab_expansion</span><span class='rbracket'>]</span>
+
+      <span class='ivar'>@processed</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Return statements in the default graph for
+</span>    <span class='comment'># statements in the associated named or default graph from the
+</span>    <span class='comment'># processed repository
+</span>    <span class='ivar'>@repository</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span>
+      <span class='kw'>case</span> <span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_graph_name'>graph_name</span>
+      <span class='kw'>when</span> <span class='kw'>nil</span>
+        <span class='kw'>yield</span> <span class='id identifier rubyid_statement'>statement</span> <span class='kw'>if</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='symbol'>:output</span><span class='rparen'>)</span>
+      <span class='kw'>when</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../RDFA.html" title="RDF::RDFA (class)">RDFA</a></span></span><span class='period'>.</span><span class='const'>ProcessorGraph</span>
+        <span class='kw'>yield</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Statement</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_to_triple'>to_triple</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@options</span><span class='lbracket'>[</span><span class='symbol'>:rdfagraph</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='symbol'>:processor</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_validate?'>validate?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_log_statistics'>log_statistics</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>ReaderError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Errors found during processing</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_enum_for'>enum_for</span><span class='lparen'>(</span><span class='symbol'>:each_statement</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each_triple-instance_method">
+  
+    #<strong>each_triple</strong> {|subject, predicate, object| ... } 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p>
+<p>Iterates the given block for each RDF triple in the input.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>subject</tt>, <tt>predicate</tt>, <tt>object</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>subject</span>
+      
+      
+        <span class='type'>(<tt>RDF::Resource</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>predicate</span>
+      
+      
+        <span class='type'>(<tt>RDF::URI</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>object</span>
+      
+      
+        <span class='type'>(<tt>RDF::Value</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+477
+478
+479
+480
+481
+482
+483
+484</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 477</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_triple'>each_triple</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='id identifier rubyid_each_statement'>each_statement</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_statement'>statement</span><span class='op'>|</span>
+      <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_statement'>statement</span><span class='period'>.</span><span class='id identifier rubyid_to_triple'>to_triple</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_enum_for'>enum_for</span><span class='lparen'>(</span><span class='symbol'>:each_triple</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="extract_script-instance_method">
+  
+    #<strong>extract_script</strong>(el, input, type, **options, &amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Extracts RDF from script element, or embeded RDF/XML</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rdf/rdfa/reader.rb', line 374</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_extract_script'>extract_script</span><span class='lparen'>(</span><span class='id identifier rubyid_el'>el</span><span class='comma'>,</span> <span class='id identifier rubyid_input'>input</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_add_debug'>add_debug</span><span class='lparen'>(</span><span class='id identifier rubyid_el'>el</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>script element of type </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>begin</span>
+    <span class='comment'># Formats don&#39;t exist unless they&#39;ve been required
+</span>    <span class='kw'>case</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/csvm+json</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>then</span> <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdf/tabular</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/ld+json</span><span class='tstring_end'>&#39;</span></span>   <span class='kw'>then</span> <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>json/ld</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>application/rdf+xml</span><span class='tstring_end'>&#39;</span></span>   <span class='kw'>then</span> <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdf/rdfxml</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/ntriples</span><span class='tstring_end'>&#39;</span></span>         <span class='kw'>then</span> <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdf/ntriples</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>text/turtle</span><span class='tstring_end'>&#39;</span></span>           <span class='kw'>then</span> <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rdf/turtle</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>rescue</span> <span class='const'>LoadError</span>
+  <span class='kw'>end</span>
+
+  <span class='ivar'>@readers</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_reader'>reader</span> <span class='op'>=</span> <span class='ivar'>@readers</span><span class='lbracket'>[</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Reader</span><span class='period'>.</span><span class='id identifier rubyid_for'>for</span><span class='lparen'>(</span><span class='label'>content_type:</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='ivar'>@readers</span><span class='period'>.</span><span class='id identifier rubyid_has_key?'>has_key?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_reader'>reader</span> <span class='op'>=</span> <span class='ivar'>@readers</span><span class='lbracket'>[</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_add_debug'>add_debug</span><span class='lparen'>(</span><span class='id identifier rubyid_el'>el</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>=&gt; reader </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_reader'>reader</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='comment'># Wrap input in a RemoteDocument with appropriate content-type and base
+</span>    <span class='id identifier rubyid_doc'>doc</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../../String.html" title="String (class)">String</a></span></span><span class='rparen'>)</span>
+      <span class='const'><span class='object_link'><a href="../../RDF.html" title="RDF (module)">RDF</a></span></span><span class='op'>::</span><span class='const'>Util</span><span class='op'>::</span><span class='const'>File</span><span class='op'>::</span><span class='const'>RemoteDocument</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='comma'>,</span> <span class='label'>content_type:</span> <span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_input'>input</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_reader'>reader</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_doc'>doc</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_add_debug'>add_debug</span><span class='lparen'>(</span><span class='id identifier rubyid_el'>el</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>=&gt; no reader found</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Apr  3 23:22:43 2023 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.28 (ruby-3.1.4).
+</div>
+
+    </div>
+  </body>
+</html>

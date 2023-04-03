@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: History
+  
+    &mdash; RDFa reader/writer for RDF.rb.
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "History";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: History</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'>
+<h3 id="label-1.0.1">1.0.1</h3>
+<ul><li>
+<p>LC version of HTML+RDFa</p>
+</li><li>
+<p>Remove support for @value</p>
+</li><li>
+<p>Prefer @content to @datetime</p>
+</li></ul>
+
+<h3 id="label-1.0.0">1.0.0</h3>
+<ul><li>
+<p>1.0 release!</p>
+</li></ul>
+
+<h3 id="label-0.3.20">0.3.20</h3>
+<ul><li>
+<p>Change rdfa:Prototype/rdfa:ref to rdfa:Pattern/rdfa:copy. Feature now called Property Copying instead of Reference Folding.</p>
+
+<h3 id="label-0.3.19">0.3.19</h3>
+</li><li>
+<p>Generate UnresolvedTerm and UnresolvedCURIE as indicated. UnresolvedCURIE only generated for SafeCURIEs.</p>
+</li><li>
+<p>Perform basic sanity checking before emitting triples. Validation is too strict for most usage.</p>
+</li><li>
+<p>Add HTML5 logic to remove unwanted @rel and @rev items.</p>
+</li><li>
+<p>Make reference folding standard, under option control.</p>
+</li></ul>
+
+<h3 id="label-0.3.18">0.3.18</h3>
+<ul><li>
+<p>Fixed additional incomplete-triples bug with typed resource</p>
+</li><li>
+<p>Added experimental support for rdfa:copy</p>
+</li></ul>
+
+<h3 id="label-0.3.17">0.3.17</h3>
+<ul><li>
+<p>Added rdfa:PrefixReDefinition warning.</p>
+</li></ul>
+
+<h3 id="label-0.3.16">0.3.16</h3>
+<ul><li>
+<p>Fix step 11 when there is @resource, @href and @src but not @rel or @rev to not also depend on the state of incomplete triples. This addresses an odd Drupal case.</p>
+</li><li>
+<p>respec shared examples updates to match rdf-spec 0.3.11</p>
+
+<h3 id="label-0.3.15">0.3.15</h3>
+</li><li>
+<p>Add support for <code>@role</code> attribute.</p>
+</li><li>
+<p>Processing defaults to HTML, rather than XML, unless XML is explicitly detected.</p>
+</li><li>
+<p>Process embedded RDF:XML, if RDF::RDFXML is loaded, and a RDF/XML is detected.</p>
+</li><li>
+<p>Process alternate readers where content is contained within a &lt;script&gt; tag, based on the @type attribute. This is commonly used for N-Triples and Turtle embedded in HTML.</p>
+</li><li>
+<p>If @itemscope detected, and RDF::Microdata is loaded, process embedded microdata.</p>
+</li></ul>
+
+<h3 id="label-0.3.14">0.3.14</h3>
+<ul><li>
+<p>Support for rdf:HTML literal.</p>
+</li></ul>
+
+<h3 id="label-0.3.13">0.3.13</h3>
+<ul><li>
+<p>Parse any include RDF/XML if RDF::RDFXML is available.</p>
+</li><li>
+<p>Add support for extracting RDF from &lt;script&gt; elements.</p>
+</li><li>
+<p>Places triples in a named graph if the script has an @id attribute.</p>
+</li></ul>
+
+<h3 id="label-0.3.11">0.3.11</h3>
+<ul><li>
+<p>Up to date with RDFa Proposed Recomendation versions of specs.</p>
+</li><li>
+<p>Fix problems with @resource=[] or @about=[], which should be ignored and use the next most appropriate attribute.</p>
+</li><li>
+<p>Remove support for @data, which was previously a synonym for @src in HTML5.</p>
+</li><li>
+<p>More robust detection of XHTML1 if version is rdfa1.0</p>
+</li><li>
+<p>Support change to remove @rel/@rev elements that aren’t CURIES or IRIs when in the presense of @property</p>
+</li></ul>
+
+<h3 id="label-0.3.10.1">0.3.10.1</h3>
+<ul><li>
+<p>Fix case where @datatype and @property are present, but @datatype is empty. (TC 290)</p>
+</li></ul>
+
+<h3 id="label-0.3.10">0.3.10</h3>
+<ul><li>
+<p>Updated to Candidate Recommendation of drafts:</p>
+</li><li>
+<p><a href="http://www.w3.org/TR/2012/CR-rdfa-core-20120313/">RDFa 1.1 Core</a></p>
+</li><li>
+<p><a href="http://www.w3.org/TR/2012/CR-rdfa-lite-20120313/">RDFa Lite 1.1</a></p>
+</li><li>
+<p><a href="http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/">XHTML+RDFa 1.1</a></p>
+</li><li>
+<p><a href="http://dev.w3.org/html5/rdfa/">HTML+RDFa 1.1</a></p>
+</li><li>
+<p>change profile to context to conform with change in use in RDFa 1.1.</p>
+</li><li>
+<p>Change <code>:expand_reader</code> option to <code>:vocab_expansion</code>, to conform with RDFa Core 1.1 definition.</p>
+</li><li>
+<p>Changed <code>:processor_graph</code> to <code>:processor_callback</code> and added <code>:rdfagraph</code> option, taking either or both of <code>:output</code> and <code>:processor</code>.</p>
+</li><li>
+<p>Better error recovery is there is no document root.</p>
+</li><li>
+<p>Updates to CURIE definition, Term resolution (use @vocab first), and Error/Warning generation in the processor graph.</p>
+</li><li>
+<p><code>rdfa:usesVocabulary</code> changed to <code>rdfa:hasVocabulary</code>.</p>
+</li><li>
+<p>Tolerate errors in vocabulary download when missing.</p>
+</li><li>
+<p>Change <code>SafeCURIEorCURIEorIRI</code> to not include term.</p>
+</li><li>
+<p>Remove <code>TERMorCURIEorAbsIRIprop</code>, as it doesn’t seem necessary.</p>
+</li></ul>
+
+<h3 id="label-0.3.9">0.3.9</h3>
+<ul><li>
+<p>Updated to latest working drafts:</p>
+</li><li>
+<p><a href="http://www.w3.org/TR/2011/WD-rdfa-core-20110331/">RDFa 1.1 Core</a></p>
+</li><li>
+<p><a href="http://www.w3.org/2010/02/rdfa/drafts/2011/ED-rdfa-lite-20111030/">RDFa Lite 1.1</a></p>
+</li><li>
+<p><a href="http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/">XHTML+RDFa 1.1</a></p>
+</li><li>
+<p><a href="http://www.w3.org/TR/2011/WD-rdfa-in-html-20110525/">HTML+RDFa 1.1</a></p>
+</li><li>
+<p>In reader:</p>
+</li><li>
+<p>Don’t default xhtml1 and rdfa1.1 in parser; depend on host_detect.</p>
+</li><li>
+<p>Use separate context documents for XML, XHTML and HTML.</p>
+</li><li>
+<p>Remove Facet gem, which was causing problems with Active Record.</p>
+</li><li>
+<p>Added full support for HTML5 &lt;time&gt; element.</p>
+</li><li>
+<p>Added support for HTML5 &lt;data&gt; element with @value attribute to create a plain literal with possible language.</p>
+</li><li>
+<p>Change vocabulary expansion rules to use OWL 2 RL entailment.</p>
+</li><li>
+<p>Terms can now include a ‘/’, to allow for use with @vocab where the class/property is a relative IRI.</p>
+</li><li>
+<p>In writer:</p>
+</li><li>
+<p>Don’t serialize using XHTML initial context, as it is not used universally.</p>
+</li><li>
+<p>Simplify Haml templates using latest RDFa attribute semantics</p>
+</li></ul>
+
+<h3 id="label-0.3.8">0.3.8</h3>
+<ul><li>
+<p>Remove hard dependency on Nokogiri. Use it if it is available, otherwise fallback to REXML.</p>
+</li><li>
+<p>JRuby uses REXML due to some implementation issues with the pure-java implementation of Nokogiri.</p>
+</li><li>
+<p>Support for RDF Lite 1.1</p>
+</li><li>
+<p>Add support for @property doing object references if used with @href/@src/@resource (but no @rel)</p>
+</li><li>
+<p>Add support for @property chaining if used with @typeof.</p>
+</li><li>
+<p>Change @typeof behavior to add type to object, not subject, unless used with @about.</p>
+</li></ul>
+
+<h3 id="label-0.3.7">0.3.7</h3>
+<ul><li>
+<p>RDF.rb 0.3.4 compatibility.</p>
+</li><li>
+<p>Changed @member to @inlist.</p>
+</li><li>
+<p>Added format detection.</p>
+</li><li>
+<p>Serialize lists.</p>
+</li><li>
+<p>Change @src to be like @resource for RDFa 1.1 (still like @about for RDFa 1.0).</p>
+</li><li>
+<p>Fix writer template issues with muti-valued properties</p>
+</li></ul>
+
+<h3 id="label-0.3.6">0.3.6</h3>
+<ul><li>
+<p>Sync with changes to RDFa 1.1 spec:</p>
+</li><li>
+<p>Deprecate explicit use of @profile</p>
+</li><li>
+<p>Add rdfa:hasVocabulary when encountering @vocab</p>
+</li><li>
+<p>Implemented Reader#expand to perform vocabulary expansion using RDFS rules 5, 7, 9 and 11.</p>
+</li><li>
+<p>Support for RDF collections (rdf:List) using @member attribute.</p>
+</li><li>
+<p>Implemented :expand option to reader, which allows normal use of reader interface without requiring the use of the #expand method.</p>
+</li><li>
+<p>Add caches for popular vocabularies to speed load time.</p>
+</li><li>
+<p>Add :vocabulary_profile as Reader option to allow for use of persistent vocabulary caches.</p>
+</li><li>
+<p>Performance improvements by evaluating debug statements in block only when debug enabled.</p>
+</li></ul>
+
+<h3 id="label-0.3.5">0.3.5</h3>
+<ul><li>
+<p>Updates to writer necessary for structure-data.org linter.</p>
+</li><li>
+<p>Support for type-specific templates and types matching a regular expression.</p>
+</li><li>
+<p>Allow #find-template to be overridden in subclasses.</p>
+</li><li>
+<p>In reader</p>
+</li><li>
+<p>Fix initialization bugs when passed an Nokogiri::XML::Document or Nokogiri::HTML::Document.</p>
+</li><li>
+<p>Fixed bug where @typeof was ignored in the root element.</p>
+</li></ul>
+
+<h3 id="label-0.3.4.2">0.3.4.2</h3>
+<ul><li>
+<p>Fix Writer output for multi-valued properties when there is no :property_values Haml template.</p>
+</li><li>
+<p>Simplify templates by using pre-rendered CURIEs.</p>
+</li></ul>
+
+<h3 id="label-0.3.4.1">0.3.4.1</h3>
+<ul><li>
+<p>Change built-in profiles to use alias_method_chain, as they were being removed from the cache.</p>
+</li><li>
+<p>Fixes to Writer template detection with type.</p>
+</li></ul>
+
+<h3 id="label-0.3.4">0.3.4</h3>
+<ul><li>
+<p>Add writer support for template selection based on subject type.</p>
+</li></ul>
+
+<h3 id="label-0.3.3.3">0.3.3.3</h3>
+<ul><li>
+<p>Minor update to rdfa-1-1 profile</p>
+</li></ul>
+
+<h3 id="label-0.3.3.2">0.3.3.2</h3>
+<ul><li>
+<p>In Reader:</p>
+</li><li>
+<p>Ensure that encoding is set to utf-8 if not specified.</p>
+</li><li>
+<p>Look for encoding from input and HTML meta tags.</p>
+</li><li>
+<p>Look for content-type from input and HTML meta tags.</p>
+</li><li>
+<p>Retrieve @xmlns, @xml:lang and @lang as attributes when doing HTML parsing.</p>
+</li></ul>
+
+<h3 id="label-0.3.3.1">0.3.3.1</h3>
+<ul><li>
+<p>Improve format detection.</p>
+</li><li>
+<p>Use HTML parser instead of XML if format is determined to be html4 or html5.</p>
+</li></ul>
+
+<h3 id="label-0.3.3">0.3.3</h3>
+<ul><li>
+<p>Major update to writer using Haml templates, rather than Nokogiri node creation.</p>
+</li></ul>
+
+<h3 id="label-0.3.2">0.3.2</h3>
+<ul><li>
+<p>Added RDFa Writer, to perform templated serialization of RDF content to RDFa.</p>
+</li><li>
+<p>Uses Haml to define default and minimal templates for RDFa serialization.</p>
+</li><li>
+<p>Allows templates to be specified on invocation, for arbitrary RDFa serialization.</p>
+</li><li>
+<p>Update to pre-LC2 drafts of RDFa</p>
+</li><li>
+<p>Add support for cached profiles, and include cached profiles for XML+RDFa and XHTML+RDFa.</p>
+</li><li>
+<p>Profiles are processed left to right</p>
+</li><li>
+<p>Detect 1.0 using @version</p>
+</li><li>
+<p>Automatically load profiles based on host language</p>
+</li></ul>
+
+<h3 id="label-0.3.1.2">0.3.1.2</h3>
+<ul><li>
+<p>Assert :html and xhtml as a format types (by creating RDF::RDFa::HTML/XHTML as a sub-class of Format that uses RDFa::Reader/Writer)</p>
+</li><li>
+<p>Added :svg format, image/svg+xml and .svg as looks for RDFa parser as well.</p>
+</li></ul>
+
+<h3 id="label-0.3.1">0.3.1</h3>
+<ul><li>
+<p>Bug fix relating to datatypes in literals being ignored.</p>
+</li><li>
+<p>Bug fix parsing non-RDFa profiles to ensure they don’t cause processing to terminate (or recurse).</p>
+</li></ul>
+
+<h3 id="label-0.3.0">0.3.0</h3>
+<ul><li>
+<p>RDF.rb 0.3.0 compatibility updates</p>
+</li><li>
+<p>Remove literal_normalization and qname_hacks, add back uri_hacks (until 0.3.0)</p>
+</li><li>
+<p>URI canonicalization and validation.</p>
+</li><li>
+<p>Added :canonicalize, and :intern options.</p>
+</li><li>
+<p>Change :strict option to :validate.</p>
+</li><li>
+<p>Add check to ensure that predicates are not literals, it’s not legal in any RDF variant.</p>
+</li><li>
+<p>Collect prefixes when extracting mappings.</p>
+</li><li>
+<p>Added :profile_repository option to RDF::RDFa::Reader.initialize. This MUST be an RDF::Repository and will be used to save profiles that are encountered.</p>
+</li><li>
+<p>Fixme, for now, retrieval should include HTTP headers and perform appropriate HTTP cache control and check for potential updates.</p>
+</li><li>
+<p>Update to 2010-10-26 LC version of RDFa Core 1.1</p>
+</li><li>
+<p>Deep processing of XMLLiterals</p>
+</li><li>
+<p>Case sensitive Terms</p>
+</li><li>
+<p>Updated processor graph vocabulary</p>
+</li><li>
+<p>Upgrade for changes to RDFa 1.1 test suite</p>
+</li><li>
+<p>Allow use of xml:base for non-HTML languages</p>
+</li><li>
+<p>XHTML has no default vocabulary.</p>
+</li><li>
+<p>No longer pass vocabularies, prefixes or terms when creating XMLLiterals. Only namespaces derived via xmlns are passed to Literal#typed.</p>
+</li><li>
+<p>Literal::XML</p>
+</li><li>
+<p>Add all in-scope namespaces, not just those that seem to be used.</p>
+</li><li>
+<p>RSpec 2 compatibility.</p>
+</li></ul>
+
+<h3 id="label-0.2.2">0.2.2</h3>
+<ul><li>
+<p>Ruby 1.9.2 compatibility</p>
+</li><li>
+<p>Added script/parse as command-line option for parsing files.</p>
+</li><li>
+<p>Add back support for RDFa 1.0 as well as RDFa 1.1. Parser checks @version to determine which</p>
+</li><li>
+<p>Update RDFa processing to WD-rdfa-core-20100803 semantics</p>
+</li><li>
+<p>Added Processor Graph and required output</p>
+</li><li>
+<p>Reverse order of processing profiles</p>
+</li><li>
+<p>Don’t process element if any profile fails</p>
+</li><li>
+<p>XMLLiterals must be explicitly specified as @datatype</p>
+</li><li>
+<p>TERMorCURIEorAbsURI requires an absolute URI, not document relative</p>
+</li><li>
+<p>Extract a new default vocabulary from @profile.</p>
+</li></ul>
+
+<h3 id="label-0.2.1">0.2.1</h3>
+<ul><li>
+<p>Update for RDF 0.2.1</p>
+</li></ul>
+
+<h3 id="label-0.2.0">0.2.0</h3>
+<ul><li>
+<p>Updates for RDF 0.2.0</p>
+</li><li>
+<p>Use URI#intern instead of URI#new</p>
+</li><li>
+<p>Change use of Graph#predicates and Graph#objects to use as enumerables</p>
+</li></ul>
+
+<h3 id="label-0.0.3">0.0.3</h3>
+<ul><li>
+<p>Removed internal graph in Reader and implement each_triple &amp; each_statement to perform parsing</p>
+</li></ul>
+
+<h3 id="label-0.0.2">0.0.2</h3>
+<ul><li>
+<p>Remove dependency on Namespace</p>
+</li><li>
+<p>Changed to RDF::RDFa, and moved files accordingly.</p>
+</li><li>
+<p>Added vocab definitions for RDA, XHV, XML, XSI and OWL</p>
+</li></ul>
+
+<h3 id="label-0.0.1">0.0.1</h3>
+<ul><li>
+<p>First port from RdfContext version 0.5.4</p>
+</li></ul>
+</div></div>
+
+      <div id="footer">
+  Generated on Mon Apr  3 23:22:42 2023 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.28 (ruby-3.1.4).
+</div>
+
+    </div>
+  </body>
+</html>
