@@ -764,7 +764,7 @@ module RDF::RDFa
       log_debug {"hamlify locals: #{locals.inspect}"}
 
       haml_opts = @options[:haml_options] || HAML_OPTIONS
-      haml_runner = if Haml.const_defined?(:Template)
+      haml_runner = if Haml::VERSION >= "6"
         Haml::Template.new(**haml_opts) {template}
       else
         Haml::Engine.new(template, **haml_opts)
