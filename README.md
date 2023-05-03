@@ -2,7 +2,7 @@
 
 [RDFa][RDFa 1.1 Core] parser for RDF.rb.
 
-[![Gem Version](https://badge.fury.io/rb/rdf-rdfa.png)](https://badge.fury.io/rb/rdf-rdfa)
+[![Gem Version](https://badge.fury.io/rb/rdf-rdfa.svg)](https://badge.fury.io/rb/rdf-rdfa)
 [![Build Status](https://github.com/ruby-rdf/rdf-rdfa/workflows/CI/badge.svg?branch=develop)](https://github.com/ruby-rdf/rdf-rdfa/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/ruby-rdf/rdf-rdfa/badge.svg?branch=develop)](https://coveralls.io/github/ruby-rdf/rdf-rdfa?branch=develop)
 [![Gitter chat](https://badges.gitter.im/ruby-rdf/rdf.png)](https://gitter.im/ruby-rdf/rdf)
