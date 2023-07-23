@@ -36,9 +36,9 @@ module RDF::RDFa
         #
         # @return [String]
         def language
-          language = case
-          when @node.attribute("lang", RDF::XML.to_s)
-            @node.attribute("lang", RDF::XML.to_s)
+          case
+          when @node.attribute("lang", "http://www.w3.org/XML/1998/namespace")
+            @node.attribute("lang", "http://www.w3.org/XML/1998/namespace")
           when @node.attribute("xml:lang")
             @node.attribute("xml:lang").to_s
           when @node.attribute("lang")
@@ -51,7 +51,7 @@ module RDF::RDFa
         #
         # @return [String]
         def base
-          @node.attribute("base", RDF::XML.to_s) || @node.attribute('xml:base')
+          @node.attribute("base", "http://www.w3.org/XML/1998/namespace") || @node.attribute('xml:base')
         end
 
         def display_path
@@ -224,7 +224,7 @@ module RDF::RDFa
           @base_uri = base_uri ? base_uri.to_s : nil
 
           # Only parse as XML, no HTML mode
-          doc = ::REXML::Document.new(input.respond_to?(:read) ? input.read : input.to_s)
+          ::REXML::Document.new(input.respond_to?(:read) ? input.read : input.to_s)
         end
       end
 
@@ -331,7 +331,7 @@ module RDF::RDFa
           base_el = ::REXML::XPath.first(@doc, "/html/head/base") rescue nil
           base = base.join(base_el.attribute("href").to_s.split("#").first) if base_el
         else
-          xml_base = root.attribute("base", RDF::XML.to_s) || root.attribute('xml:base') if root
+          xml_base = root.attribute("base", "http://www.w3.org/XML/1998/namespace") || root.attribute('xml:base') if root
           base = base.join(xml_base) if xml_base
         end
 

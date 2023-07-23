@@ -35,8 +35,8 @@ module RDF::RDFa
         # @return [String]
         def language
           case
-          when @node.attribute_with_ns("lang", RDF::XML.to_s)
-            @node.attribute_with_ns("lang", RDF::XML.to_s)
+          when @node.attribute_with_ns("lang", "http://www.w3.org/XML/1998/namespace")
+            @node.attribute_with_ns("lang", "http://www.w3.org/XML/1998/namespace")
           when @node.attribute("xml:lang")
             @node.attribute("xml:lang").to_s
           when @node.attribute("lang")
@@ -49,7 +49,7 @@ module RDF::RDFa
         #
         # @return [String]
         def base
-          @node.attribute_with_ns("base", RDF::XML.to_s) || @node.attribute('xml:base')
+          @node.attribute_with_ns("base", "http://www.w3.org/XML/1998/namespace") || @node.attribute('xml:base')
         end
 
         def display_path
@@ -303,7 +303,7 @@ module RDF::RDFa
           base_el = @doc.at_css("html>head>base")
           base = base.join(base_el.attribute("href").to_s.split("#").first) if base_el
         else
-          xml_base = root.attribute_with_ns("base", RDF::XML.to_s) || root.attribute('xml:base') if root
+          xml_base = root.attribute_with_ns("base", "http://www.w3.org/XML/1998/namespace") || root.attribute('xml:base') if root
           base = base.join(xml_base) if xml_base
         end
 
