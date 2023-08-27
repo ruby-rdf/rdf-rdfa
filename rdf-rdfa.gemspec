@@ -29,21 +29,21 @@ Gem::Specification.new do |gem|
   gem.requirements          = []
 
   gem.add_runtime_dependency     'rdf',                 '~> 3.3'
-  gem.add_runtime_dependency     'rdf-vocab',           '~> 3.2'
+  gem.add_runtime_dependency     'rdf-vocab',           '~> 3.3'
   gem.add_runtime_dependency     'haml',                '~> 6.1'
-  gem.add_runtime_dependency     'rdf-xsd',             '~> 3.2'
+  gem.add_runtime_dependency     'rdf-xsd',             '~> 3.3'
   gem.add_runtime_dependency     'rdf-aggregate-repo',  '~> 3.3'
   gem.add_runtime_dependency     'htmlentities',        '~> 4.3'
 
   gem.add_development_dependency 'json-ld',             '~> 3.3'
   gem.add_development_dependency 'rspec',               '~> 3.12'
   gem.add_development_dependency 'rspec-its',           '~> 1.3'
-  gem.add_development_dependency 'rdf-spec',            '~> 3.2'
-  gem.add_development_dependency 'rdf-turtle',          '~> 3.2'
-  gem.add_development_dependency 'rdf-isomorphic',      '~> 3.2'
-  gem.add_development_dependency 'rdf-tabular',         '~> 3.2'
-  gem.add_development_dependency 'rdf-rdfxml',          '~> 3.2'
-  gem.add_development_dependency 'sparql',              '~> 3.2'
+  gem.add_development_dependency 'rdf-spec',            '~> 3.3'
+  gem.add_development_dependency 'rdf-turtle',          '~> 3.3'
+  gem.add_development_dependency 'rdf-isomorphic',      '~> 3.3'
+  gem.add_development_dependency 'rdf-tabular',         '~> 3.3'
+  gem.add_development_dependency 'rdf-rdfxml',          '~> 3.3'
+  gem.add_development_dependency 'sparql',              '~> 3.3'
   gem.add_development_dependency 'yard' ,               '~> 0.9'
 
   gem.post_install_message  = nil
