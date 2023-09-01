@@ -5,7 +5,7 @@ gemspec
 gem "rdf",            github: "ruby-rdf/rdf",      branch: "develop"
 gem "rdf-spec",       github: "ruby-rdf/rdf-spec", branch: "develop"
 gem "rdf-xsd",        github: "ruby-rdf/rdf-xsd",  branch: "develop"
-gem "nokogiri",       '~> 1.13', '>= 1.13.4', platforms: [:mri, :jruby] # Ruby 2.6
+gem "nokogiri",       '~> 1.15', '>= 1.13.4', platforms: [:mri, :jruby]
 gem 'equivalent-xml', '~> 0.6'
 
 group :development, :test do
@@ -24,7 +24,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'simplecov', '~> 0.21',  platforms: :mri
+  gem 'simplecov', '~> 0.22',  platforms: :mri
   gem 'simplecov-lcov', '~> 0.8',  platforms: :mri
 end
 
