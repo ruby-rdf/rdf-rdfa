@@ -428,6 +428,10 @@ Full documentation available on [Rubydoc.info][RDFa doc]
 * [XHTML+RDFa 1.1][XHTML+RDFa 1.1]
 * [RDFa-test-suite](https://rdfa.info/test-suite/              "RDFa test suite")
 
+## Change Log
+
+See [Release Notes on GitHub](https://github.com/ruby-rdf/rdf-rdfa/releases)
+
 ## Author
 * [Gregg Kellogg](https://github.com/gkellogg) - <https://greggkellogg.net/>
 
