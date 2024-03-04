@@ -82,6 +82,9 @@ module RDF::RDFa
           symbol: :lang,
           datatype: String,
           on: ["--lang"],
+          datatype: TrueClass,
+          default: false,
+          control: :checkbox,
           description: "Output as root @lang attribute, and avoid generation _@lang_ where possible."),
       ]
     end

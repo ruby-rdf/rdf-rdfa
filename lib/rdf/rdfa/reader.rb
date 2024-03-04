@@ -251,18 +251,24 @@ module RDF::RDFa
         RDF::CLI::Option.new(
           symbol: :vocab_expansion,
           datatype: TrueClass,
+          default: false,
+          control: :checkbox,
           on: ["--vocab-expansion"],
           description: "Perform OWL2 expansion on the resulting graph.") {true},
         RDF::CLI::Option.new(
           symbol: :host_language,
-          datatype: %w(xml xhtml1 xhtml5 html4 svg),
-          on: ["--host-language HOSTLANG", %w(xml xhtml1 xhtml5 html4 svg)],
+          datatype: %w(xml xhtml1 xhtml5 html4 html5 svg),
+          default: :html5,
+          control: :select,
+          on: ["--host-language HOSTLANG", %w(xml xhtml1 xhtml5 html4 html5 svg)],
           description: "Host Language. One of xml, xhtml1, xhtml5, html4, or svg") do |arg|
             arg.to_sym
         end,
         RDF::CLI::Option.new(
           symbol: :rdfagraph,
           datatype: %w(output processor both),
+          default: :output,
+          control: :select,
           on: ["--rdfagraph RDFAGRAPH", %w(output processor both)],
           description: "Used to indicate if either or both of the :output or :processor graphs are output.") {|arg| arg.to_sym},
       ]

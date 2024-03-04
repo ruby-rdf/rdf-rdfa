@@ -1,0 +1,24 @@
+<div vocab="http://schema.org/">
+  <div resource="#muse" typeof="rdfa:Pattern">
+    <link property="image" href="Muse1.jpg"/>
+    <link property="image" href="Muse2.jpg"/>
+    <link property="image" href="Muse3.jpg"/>
+    <span property="name">Muse</span>
+  </div>
+
+  <p typeof="MusicEvent">
+    <link property="rdfa:copy" href="#muse"/>
+    Muse at the United Center.
+    <time property="startDate" datetime="2013-03-03">March 3rd 2013</time>, 
+    <a property="location" href="#united">United Center, Chicago, Illinois</a>
+    ...
+  </p>
+
+  <p typeof="MusicEvent">
+    <link property="rdfa:copy" href="#muse"/>
+    Muse at the Target Center.
+    <time property="startDate" datetime="2013-03-07">March 7th 2013</time>, 
+    <a property="location" href="#target">Target Center, Minneapolis, Minnesota</a>
+    ...
+  </p>
+</div>
