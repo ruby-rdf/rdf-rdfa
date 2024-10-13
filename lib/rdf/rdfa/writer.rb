@@ -80,7 +80,6 @@ module RDF::RDFa
       super + [
         RDF::CLI::Option.new(
           symbol: :lang,
-          datatype: String,
           on: ["--lang"],
           datatype: TrueClass,
           default: false,
